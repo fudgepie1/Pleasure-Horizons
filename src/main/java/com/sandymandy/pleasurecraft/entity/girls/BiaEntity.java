@@ -43,7 +43,7 @@ public class BiaEntity extends AbstractGirlEntity{
     public List<SceneOption> getSceneOptions() {
         return List.of(
                 new SceneOption("Doggy",
-                        "prone_doggy_intro", List.of("prone_doggy_soft"),List.of("prone_doggy_hard1","prone_doggy_hard2","prone_doggy_hard3"),"prone_doggy_cum")
+                        "prone_doggy_intro", List.of("prone_doggy_soft"),List.of("prone_doggy_hard1","prone_doggy_hard2","prone_doggy_hard3"),"prone_doggy_cum",true)
         );
 
     }

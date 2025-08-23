@@ -12,7 +12,8 @@ public record SceneOption(
         String introAnim,
         List<String> slowAnim,
         List<String> fastAnim,
-        String cumAnim
+        String cumAnim,
+        boolean isBedScene
 ) {
     public static final PacketCodec<RegistryByteBuf, SceneOption> CODEC = PacketCodec.tuple(
             PacketCodecs.STRING, SceneOption::name,
@@ -20,6 +21,7 @@ public record SceneOption(
             PacketCodecs.collection(ArrayList::new , PacketCodecs.STRING), SceneOption::slowAnim,
             PacketCodecs.collection(ArrayList::new, PacketCodecs.STRING), SceneOption::fastAnim,
             PacketCodecs.STRING, SceneOption::cumAnim,
+            PacketCodecs.BOOLEAN, SceneOption::isBedScene,
             SceneOption::new
     );
 

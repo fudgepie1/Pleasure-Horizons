@@ -110,7 +110,7 @@ public class PleasureCraftPackets {
                 (packet, context) -> Objects.requireNonNull(context.player().getServer()).execute(() -> {
                     var entity = context.player().getWorld().getEntityById(packet.entityId());
                     if (entity instanceof AbstractGirlEntity girl) {
-                        girl.getSceneManager().startScene(context.player(), packet.introAnim(), packet.slowAnim(),packet.fastAnim(),packet.cumAnim());
+                        girl.getSceneManager().startScene(context.player(), packet.sceneOptions());
                     }
                 }));
 

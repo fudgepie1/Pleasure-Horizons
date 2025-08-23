@@ -12,7 +12,8 @@ import com.sandymandy.pleasurecraft.networking.C2S.NextSceneAnimationC2SPacket;
 import com.sandymandy.pleasurecraft.scene.SceneOption;
 import com.sandymandy.pleasurecraft.scene.SceneStateManager;
 import com.sandymandy.pleasurecraft.screen.GirlInventoryScreenHandlerFactory;
-import com.sandymandy.pleasurecraft.util.Messages;
+import com.sandymandy.pleasurecraft.util.PleasureCraftMessages;
+import com.sandymandy.pleasurecraft.util.Utils;
 import com.sandymandy.pleasurecraft.util.inventory.GirlInventory;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -46,6 +47,7 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -65,6 +67,7 @@ import java.util.*;
 public abstract class AbstractGirlEntity extends TameableEntity implements GeoEntity {
     private static final TrackedData<Boolean> MOVING_TO_BED = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<Boolean> LOCKED_STATE = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+    private static final TrackedData<Boolean> FROZEN_STATE = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<Boolean> SITTING = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<Boolean> STRIPPED = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<Boolean> FOLLOWING = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
@@ -89,7 +92,6 @@ public abstract class AbstractGirlEntity extends TameableEntity implements GeoEn
     public float previousYaw = 0;
     public Vec3d previousVelocity = Vec3d.ZERO;
     private boolean freeze = false;
-    private boolean lockMovement = false;
     public Vec3d clientPassengerBonePos = Vec3d.ZERO;
     public Vec3d serverPassengerBonePos = Vec3d.ZERO;
     public boolean showHiddenBones = false;
@@ -98,6 +100,8 @@ public abstract class AbstractGirlEntity extends TameableEntity implements GeoEn
     private String currentAnimState = "idle";
     private boolean currentLoopState = false;
     private boolean currentHoldState = false;
+    public BlockPos targetBedPos;
+    public Utils.BlockInfo blockInfo;
 
     protected Item getTameItem() {
         return Items.DANDELION;
@@ -176,6 +180,7 @@ public abstract class AbstractGirlEntity extends TameableEntity implements GeoEn
         super.initDataTracker(builder);
         builder.add(MOVING_TO_BED, false);
         builder.add(LOCKED_STATE, false);
+        builder.add(FROZEN_STATE, false);
         builder.add(SITTING, false);
         builder.add(STRIPPED, false);
         builder.add(FOLLOWING, true);
@@ -337,11 +342,11 @@ public abstract class AbstractGirlEntity extends TameableEntity implements GeoEn
     }
 
     public void setFreeze(boolean locked) {
-        this.freeze = locked;
+        this.dataTracker.set(FROZEN_STATE,locked);
     }
 
     public boolean isFrozenInPlace() {
-        return this.freeze;
+        return this.dataTracker.get(FROZEN_STATE);
     }
 
     public void setMovementLockedState(boolean locked) {
@@ -359,7 +364,6 @@ public abstract class AbstractGirlEntity extends TameableEntity implements GeoEn
     public boolean isMovingToBed() {
         return this.dataTracker.get(MOVING_TO_BED);
     }
-
 
     public void setSceneState(boolean inScene) {
         this.dataTracker.set(IN_SCENE, inScene);
@@ -818,7 +822,7 @@ public abstract class AbstractGirlEntity extends TameableEntity implements GeoEn
                     : this.getBlockPos();
 
             // Send a message referencing whichever Pos we have
-            new Messages().GlobleMessage(
+            new PleasureCraftMessages().GlobleMessage(
                     this.getWorld(),
                     getGirlDisplayName() + " died and respawned at base: " +
                             respawnPos.getX() + ", " +
@@ -839,7 +843,7 @@ public abstract class AbstractGirlEntity extends TameableEntity implements GeoEn
         }
         else if(isFrozenInPlace() &! damageType.equals("outOfWorld") || damageType.equals("genericKill")){
             if(!this.hasPassengers()){
-                new Messages().GlobleMessage(
+                new PleasureCraftMessages().GlobleMessage(
                         this.getWorld(),getGirlDisplayName() + " is busy at the moment");
             }
             return false;
@@ -911,10 +915,10 @@ public abstract class AbstractGirlEntity extends TameableEntity implements GeoEn
         String finalMessage = "<"+getGirlDisplayName()+"> " + message;
 
         if(playerEntity == null){
-            new Messages().GlobleMessage(this.getWorld(), finalMessage);
+            new PleasureCraftMessages().GlobleMessage(this.getWorld(), finalMessage);
         }
         else {
-            new Messages().PlayerSpecificMessage(playerEntity,finalMessage);
+            new PleasureCraftMessages().PlayerSpecificMessage(playerEntity,finalMessage);
         }
 
     }

@@ -1,12 +1,18 @@
-    package com.sandymandy.pleasurecraft.scene;
+package com.sandymandy.pleasurecraft.scene;
 
-    import com.sandymandy.pleasurecraft.PleasureCraft;
-    import com.sandymandy.pleasurecraft.entity.girls.AbstractGirlEntity;
-    import net.minecraft.entity.player.PlayerEntity;
+import com.sandymandy.pleasurecraft.PleasureCraft;
+import com.sandymandy.pleasurecraft.entity.girls.AbstractGirlEntity;
+import com.sandymandy.pleasurecraft.util.Utils;
+import net.minecraft.entity.ai.pathing.Path;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.registry.tag.BlockTags;
+import net.minecraft.util.math.BlockPos;
 
-    import java.util.List;
+import java.util.List;
 
-    public class SceneStateManager {
+import static com.sandymandy.pleasurecraft.util.Utils.findNearbyBlock;
+
+public class SceneStateManager {
 
     private final AbstractGirlEntity entity;
     public String passengerBoneName = "Torso2";
@@ -17,11 +23,12 @@
     private final float cumThreshold = 5f;
     private boolean isKeyHeld = false;
 
-    // Animations for this scene
+    // Animations
     private String animIntro;
     private List<String> animSlow;
     private List<String> animFast;
     private String animCum;
+    private boolean isBedScene;
 
     // Progress speeds
     private static final float SLOW_SPEED = 0.002f;
@@ -35,35 +42,20 @@
         NONE, INTRO, SLOW, FAST, CUM
     }
 
-    public void startScene(PlayerEntity rider,
-                           String introAnim,
-                           List<String> slowAnim,
-                           List<String> fastAnim,
-                           String cumAnim) {
+    public void startScene(PlayerEntity rider, SceneOption option) {
         if (inScene) return;
 
+        this.animIntro = option.introAnim();
+        this.animSlow = option.slowAnim();
+        this.animFast = option.fastAnim();
+        this.animCum = option.cumAnim();
+        this.isBedScene = option.isBedScene();
 
-        // Store animations
-        this.animIntro = introAnim;
-        this.animSlow = slowAnim;
-        this.animFast = fastAnim;
-        this.animCum = cumAnim;
-
-        if (entity.isSittingdown()) {
-            entity.setSit(false);
-        }
-        if (!entity.isStripped()) {
-            entity.setStripped(true);
-        }
-
-        entity.setFreeze(true);
-        inScene = true;
-        entity.setSceneState(true);
-        this.sceneProgress = 0f;
-        isKeyHeld = false;
+        if (entity.isSittingdown()) entity.setSit(false);
+        if (!entity.isStripped()) entity.setStripped(true);
 
         onSceneStart(rider);
-        rider.startRiding(entity, false);
+
     }
 
     public void stopScene() {
@@ -73,33 +65,35 @@
         entity.setFreeze(false);
         entity.setSceneState(false);
         entity.setStripped(false);
+        entity.targetBedPos = null;
     }
 
-    public void onSceneStart(PlayerEntity player) {
-        player.setInvisible(true);
+    public void onSceneStart(PlayerEntity rider) {
+        rider.setInvisible(true);
 
-        playPhase(ScenePhase.INTRO, this.animIntro, false,true);
+        entity.setFreeze(true);
+        inScene = true;
+        entity.setSceneState(true);
+        this.sceneProgress = 0f;
+        isKeyHeld = false;
+        rider.startRiding(entity, false);
+
+        playPhase(ScenePhase.INTRO, this.animIntro, false, true);
     }
 
     public void onAnimationFinished(String finishedAnim) {
-
         if (finishedAnim.equals(this.animIntro)) {
-            playPhase(ScenePhase.SLOW, getRandomFromList(this.animSlow), true,false);
-        }
-        else if (finishedAnim.equals(this.animCum)) {
+            playPhase(ScenePhase.SLOW, getRandomFromList(this.animSlow), true, false);
+        } else if (finishedAnim.equals(this.animCum)) {
             stopScene();
+        } else {
+            PleasureCraft.LOGGER.error(finishedAnim + " is not equal to intro or cum anim.");
         }
-        else {
-            PleasureCraft.LOGGER.error(finishedAnim+" is not equal to " + this.animIntro + " or " + getRandomFromList(this.animSlow));
-        }
-
     }
 
-    public void onSceneStop() {
+    private void onSceneStop() {
         for (PlayerEntity player : entity.getWorld().getPlayers()) {
-            if (!player.hasVehicle()) {
-                player.setInvisible(false);
-            }
+            if (!player.hasVehicle()) player.setInvisible(false);
         }
 
         if (entity.hasPassengers()) {
@@ -107,7 +101,6 @@
         }
 
         currentPhase = ScenePhase.NONE;
-
         entity.stopOverrideAnimations();
     }
 
@@ -122,26 +115,21 @@
 
     public void tryTriggerCum() {
         if (entity.isSceneActive() && this.entity.getSceneProgress() >= cumThreshold && currentPhase != ScenePhase.CUM) {
-            playPhase(ScenePhase.CUM, animCum, false,false);
+            playPhase(ScenePhase.CUM, animCum, false, false);
         }
     }
 
-    private void inScene(){
-        if (!this.entity.isSceneActive()) return;
-        PleasureCraft.LOGGER.info(this.entity.getSceneProgress()+"");
-    }
-
     private String getRandomFromList(List<String> list) {
-        if (list.size() == 1) return list.getFirst(); // fallback
+        if (list.size() == 1) return list.getFirst();
         int index = entity.getWorld().getRandom().nextInt(list.size());
         return list.get(index);
     }
 
+
+
+
     public void tick() {
-        inScene();
-
         entity.setSceneProgress(sceneProgress);
-
         entity.toggleModelBones(List.of("RightLeg", "LeftLeg", "Torso2"), entity.isSceneActive());
 
         if (!entity.isSceneActive()) {
@@ -158,22 +146,25 @@
         PlayerEntity player = (PlayerEntity) entity.getFirstPassenger();
         if (player != null) player.setInvisible(true);
 
-        // Phase handling for looping states
+        // Handle scene phases
         switch (currentPhase) {
             case SLOW -> {
                 sceneProgress += SLOW_SPEED;
                 if (isKeyHeld) {
-                    playPhase(ScenePhase.FAST, getRandomFromList(this.animFast), true,false);
+                    playPhase(ScenePhase.FAST, getRandomFromList(this.animFast), true, false);
                 }
             }
             case FAST -> {
                 sceneProgress += FAST_SPEED;
                 if (!isKeyHeld) {
-                    playPhase(ScenePhase.SLOW, getRandomFromList(this.animSlow), true,false);
+                    playPhase(ScenePhase.SLOW, getRandomFromList(this.animSlow), true, false);
                 }
             }
-            default -> {} // INTRO and CUM are handled by onAnimationFinished
+            default -> {
+            } // INTRO and CUM handled elsewhere
         }
+
+
 
     }
 }

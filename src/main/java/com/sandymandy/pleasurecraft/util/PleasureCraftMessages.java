@@ -6,7 +6,7 @@ import net.minecraft.world.World;
 
 import java.util.Objects;
 
-public class Messages {
+public class PleasureCraftMessages {
     public void GlobleMessage(World world, String messageContent) {
         Text message = Text.literal(messageContent);
         if (world.isClient) return; // Don't run on client

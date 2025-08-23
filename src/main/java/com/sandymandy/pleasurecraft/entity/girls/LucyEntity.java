@@ -45,9 +45,9 @@ public class LucyEntity extends AbstractGirlEntity{
     public List<SceneOption> getSceneOptions() {
         return List.of(
                 new SceneOption("Paizuri",
-                        "paizuri_start", List.of("paizuri_slow"),List.of("paizuri_fast"),"paizuri_cum"),
+                        "paizuri_start", List.of("paizuri_slow"),List.of("paizuri_fast"),"paizuri_cum",false),
                 new SceneOption("Blow Job",
-                        "blowjob_start",List.of("blowjob_slow"),List.of("blowjob_fast"),"blowjob_cum")
+                        "blowjob_start",List.of("blowjob_slow"),List.of("blowjob_fast"),"blowjob_cum",false)
         );
     }
 

@@ -1,6 +1,7 @@
 package com.sandymandy.pleasurecraft.networking.C2S;
 
 import com.sandymandy.pleasurecraft.PleasureCraft;
+import com.sandymandy.pleasurecraft.scene.SceneOption;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
@@ -10,17 +11,14 @@ import net.minecraft.util.Identifier;
 import java.util.ArrayList;
 import java.util.List;
 
-public record StartSceneC2SPacket(int entityId, String introAnim, List<String> slowAnim, List<String> fastAnim, String cumAnim) implements CustomPayload {
+public record StartSceneC2SPacket(int entityId, SceneOption sceneOptions) implements CustomPayload {
 
     public static final Id<StartSceneC2SPacket> ID = new Id<>(Identifier.of(PleasureCraft.MOD_ID, "start_scene_from_client"));
 
     public static final PacketCodec<RegistryByteBuf, StartSceneC2SPacket> CODEC =
             PacketCodec.tuple(
                     PacketCodecs.VAR_INT, StartSceneC2SPacket::entityId,
-                    PacketCodecs.STRING, StartSceneC2SPacket::introAnim,
-                    PacketCodecs.collection(ArrayList::new, PacketCodecs.STRING), StartSceneC2SPacket::slowAnim,
-                    PacketCodecs.collection(ArrayList::new, PacketCodecs.STRING), StartSceneC2SPacket::fastAnim,
-                    PacketCodecs.STRING, StartSceneC2SPacket::cumAnim,
+                    SceneOption.CODEC, StartSceneC2SPacket::sceneOptions,
                     StartSceneC2SPacket::new
             );
 

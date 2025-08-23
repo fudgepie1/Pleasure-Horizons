@@ -14,25 +14,22 @@ import java.util.List;
 
 public class GirlSceneScreen extends Screen {
     private final int entityId;
-    private final List<SceneOption> options;
+    private final List<SceneOption> sceneOptions;
 
-    public GirlSceneScreen(int entityId, List<SceneOption> options) {
+    public GirlSceneScreen(int entityId, List<SceneOption> sceneOptions) {
         super(Text.literal("Scene Options"));
         this.entityId = entityId;
-        this.options = options;
+        this.sceneOptions = sceneOptions;
     }
 
     @Override
     protected void init() {
         int y = this.height / 4;
-        for (SceneOption option : options) {
-            this.addDrawableChild(ButtonWidget.builder(Text.of(option.name()), button -> {
+        for (SceneOption sceneOptions : sceneOptions) {
+            this.addDrawableChild(ButtonWidget.builder(Text.of(sceneOptions.name()), button -> {
                 ClientPlayNetworking.send(new StartSceneC2SPacket(
                         this.entityId,
-                        option.introAnim(),
-                        option.slowAnim(),
-                        option.fastAnim(),
-                        option.cumAnim()
+                        sceneOptions
                 ));
                 MinecraftClient.getInstance().setScreen(null); // close after sending
             }).dimensions(this.width / 2 - 100, y, 200, 20).build());
