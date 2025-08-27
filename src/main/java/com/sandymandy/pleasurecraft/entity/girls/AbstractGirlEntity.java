@@ -7,8 +7,9 @@ import com.sandymandy.pleasurecraft.entity.ai.goal.GirlAttackGoal;
 import com.sandymandy.pleasurecraft.entity.ai.goal.StopMovementGoal;
 import com.sandymandy.pleasurecraft.networking.C2S.AnimationSyncC2SPacket;
 import com.sandymandy.pleasurecraft.networking.C2S.BonePosSyncC2SPacket;
-import com.sandymandy.pleasurecraft.networking.S2C.ClothingArmorVisibilityS2CPacket;
 import com.sandymandy.pleasurecraft.networking.C2S.NextSceneAnimationC2SPacket;
+import com.sandymandy.pleasurecraft.networking.C2S.OverrideAnimationStateSyncC2SPacket;
+import com.sandymandy.pleasurecraft.networking.S2C.ClothingArmorVisibilityS2CPacket;
 import com.sandymandy.pleasurecraft.scene.SceneOption;
 import com.sandymandy.pleasurecraft.scene.SceneStateManager;
 import com.sandymandy.pleasurecraft.screen.GirlInventoryScreenHandlerFactory;
@@ -47,7 +48,6 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -75,6 +75,7 @@ public abstract class AbstractGirlEntity extends TameableEntity implements GeoEn
     private static final TrackedData<String> OVERRIDE_ANIM = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.STRING);
     private static final TrackedData<Boolean> OVERRIDE_LOOP = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<Boolean> OVERRIDE_HOLD = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+    private static final TrackedData<Boolean> OVERRIDE_ANIM_PLAYING = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     public static final TrackedData<Float> SCENE_PROGRESS = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.FLOAT);
     private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
     private final SceneStateManager sceneManager = new SceneStateManager(this);
@@ -120,7 +121,6 @@ public abstract class AbstractGirlEntity extends TameableEntity implements GeoEn
     public float getYAxisGUI(){return 0.0625F;}
 
     public abstract List<SceneOption> getSceneOptions();
-
 
 
     protected Map<EquipmentSlot, List<String>> getClothingBones() {
@@ -188,6 +188,7 @@ public abstract class AbstractGirlEntity extends TameableEntity implements GeoEn
         builder.add(OVERRIDE_ANIM,"");
         builder.add(OVERRIDE_LOOP, false);
         builder.add(OVERRIDE_HOLD, false);
+        builder.add(OVERRIDE_ANIM_PLAYING, false);
         builder.add(SCENE_PROGRESS,0f);
     }
 
@@ -223,11 +224,11 @@ public abstract class AbstractGirlEntity extends TameableEntity implements GeoEn
         this.goalSelector.add(1, new SwimGoal(this));
         this.goalSelector.add(2, new TameableEscapeDangerGoal(1.5D, DamageTypeTags.PANIC_ENVIRONMENTAL_CAUSES));
         this.goalSelector.add(3, new GirlAttackGoal(this, 1.5, false));
-        this.goalSelector.add(4, new ConditionalGoal(new FollowOwnerGoal(this, 1.0, 10.0F, 2.0F), () -> isFollowing() && !isMovingToBed()));
-        this.goalSelector.add(5, new ConditionalGoal(new TemptGoal(this, 1.25D, Ingredient.ofItems(getTameItem()), false),() -> !isMovingToBed()));
-        this.goalSelector.add(6, new ConditionalGoal(new WanderAroundGoal(this, 1.0D),() -> !isMovingToBed()));
-        this.goalSelector.add(7, new ConditionalGoal(new LookAtEntityGoal(this, PlayerEntity.class, 6.0F),() -> !isFrozenInPlace() || !isMovingToBed()));
-        this.goalSelector.add(8, new ConditionalGoal(new LookAroundGoal(this),() -> !isFrozenInPlace() || !isMovingToBed()));
+        this.goalSelector.add(4, new ConditionalGoal(new FollowOwnerGoal(this, 1.0, 10.0F, 2.0F), () -> isFollowing()/* && !isMovingToBed()*/));
+        this.goalSelector.add(5, new ConditionalGoal(new TemptGoal(this, 1.25D, Ingredient.ofItems(getTameItem()), false),() -> true/*!isMovingToBed()*/));
+        this.goalSelector.add(6, new ConditionalGoal(new WanderAroundGoal(this, 1.0D),() -> true/*!isMovingToBed()*/));
+        this.goalSelector.add(7, new ConditionalGoal(new LookAtEntityGoal(this, PlayerEntity.class, 6.0F),() -> !isFrozenInPlace() /*|| !isMovingToBed()*/));
+        this.goalSelector.add(8, new ConditionalGoal(new LookAroundGoal(this),() -> !isFrozenInPlace() /*|| !isMovingToBed()*/));
         this.targetSelector.add(1, new TrackOwnerAttackerGoal(this));
         this.targetSelector.add(2, new AttackWithOwnerGoal(this));
         this.targetSelector.add(3, new RevengeGoal(this, PlayerEntity.class));
@@ -238,19 +239,18 @@ public abstract class AbstractGirlEntity extends TameableEntity implements GeoEn
     public ActionResult interactMob(PlayerEntity player, Hand hand) {
         ItemStack itemStack = player.getStackInHand(hand);
         Item itemInHand = itemStack.getItem();
-        if (this.isTamed()) {
+        if(!this.isOverrideAnimPlaying()) {
+            if (this.isTamed()) {
+                if (this.isFoodItem(itemStack) && this.getHealth() < this.getMaxHealth()) {
+                    this.getNavigation().findPathTo(player, 20);
+                    this.eat(player, hand, itemStack);
+                    FoodComponent foodComponent = itemStack.get(DataComponentTypes.FOOD);
+                    float f = foodComponent != null ? foodComponent.nutrition() : 1.0F;
+                    this.heal(2.0F * f);
+                    return ActionResult.SUCCESS;
+                }
 
-            if (this.isFoodItem(itemStack) && this.getHealth() < this.getMaxHealth()) {
-                this.getNavigation().findPathTo(player, 20);
-                this.eat(player, hand, itemStack);
-                FoodComponent foodComponent = itemStack.get(DataComponentTypes.FOOD);
-                float f = foodComponent != null ? foodComponent.nutrition() : 1.0F;
-                this.heal(2.0F * f);
-                return ActionResult.SUCCESS;
-            }
-
-            if(this.isOwner(player)) {
-                if (itemStack.equals(ItemStack.EMPTY)){
+                if (this.isOwner(player)) {
                     if (player.isSneaking()) {
                         this.setSit(!this.isSittingdown());
                         this.jumping = false;
@@ -265,37 +265,39 @@ public abstract class AbstractGirlEntity extends TameableEntity implements GeoEn
                         return ActionResult.SUCCESS;
                     }
                 }
-            }else {
-                if ((itemInHand.equals(getTameItem()))) {
-                    player.sendMessage(Text.literal("She's Already In A Relationship With Someone"), true);
-                    return ActionResult.FAIL;
+                else {
+                    if ((itemInHand.equals(getTameItem()))) {
+                        player.sendMessage(Text.literal("She's Already In A Relationship With Someone"), true);
+                        return ActionResult.FAIL;
+                    }
                 }
             }
-        } else {
+            else {
 
-            if (itemStack.isEmpty() && player.isSneaking()) {
-                this.getNavigation().findPathTo(player, 20);
-                player.openHandledScreen(new GirlInventoryScreenHandlerFactory(this));
-                this.setMovementLockedState(true);
-                getLookControl().lookAt(player, this.getMaxHeadRotation() + 20, this.getMaxLookPitchChange());
-                return ActionResult.SUCCESS;
-            }
-
-            if (!this.getWorld().isClient) {
-                if (itemInHand.equals(getTameItem()) && !player.isSneaking()) {
-                    itemStack.decrementUnlessCreative(1, player);
-                    this.tryTame(player);
+                if (itemStack.isEmpty() && player.isSneaking()) {
+                    this.getNavigation().findPathTo(player, 20);
+                    player.openHandledScreen(new GirlInventoryScreenHandlerFactory(this));
+                    this.setMovementLockedState(true);
+                    getLookControl().lookAt(player, this.getMaxHeadRotation() + 20, this.getMaxLookPitchChange());
                     return ActionResult.SUCCESS;
-                } else {
-                    // Wrong item OR empty hand (not sneaking)
-                    player.sendMessage(Text.literal(
-                            "She ignores you. Maybe try giving her a " + getReadableTameItemName() + "."
-                    ), true);
-                    return ActionResult.FAIL;
                 }
+
+                if (!this.getWorld().isClient) {
+                    if (itemInHand.equals(getTameItem()) && !player.isSneaking()) {
+                        itemStack.decrementUnlessCreative(1, player);
+                        this.tryTame(player);
+                        return ActionResult.SUCCESS;
+                    } else {
+                        // Wrong item OR empty hand (not sneaking)
+                        player.sendMessage(Text.literal(
+                                "She ignores you. Maybe try giving her a " + getReadableTameItemName() + "."
+                        ), true);
+                        return ActionResult.FAIL;
+                    }
+                }
+
+
             }
-
-
         }
         return super.interactMob(player, hand);
     }
@@ -357,13 +359,13 @@ public abstract class AbstractGirlEntity extends TameableEntity implements GeoEn
         return this.dataTracker.get(LOCKED_STATE);
     }
 
-    public void setMovingToBedState(boolean state) {
-        this.dataTracker.set(MOVING_TO_BED, state);
-    }
-
-    public boolean isMovingToBed() {
-        return this.dataTracker.get(MOVING_TO_BED);
-    }
+//    public void setMovingToBedState(boolean state) {
+//        this.dataTracker.set(MOVING_TO_BED, state);
+//    }
+//
+//    public boolean isMovingToBed() {
+//        return this.dataTracker.get(MOVING_TO_BED);
+//    }
 
     public void setSceneState(boolean inScene) {
         this.dataTracker.set(IN_SCENE, inScene);
@@ -403,6 +405,14 @@ public abstract class AbstractGirlEntity extends TameableEntity implements GeoEn
 
     public float getSceneProgress(){
         return this.dataTracker.get(SCENE_PROGRESS);
+    }
+
+    public void setOverrideAnimPlayingState(boolean state){
+        this.dataTracker.set(OVERRIDE_ANIM_PLAYING, state);
+    }
+
+    public boolean isOverrideAnimPlaying(){
+        return this.dataTracker.get(OVERRIDE_ANIM_PLAYING);
     }
 
     @Override
@@ -524,19 +534,18 @@ public abstract class AbstractGirlEntity extends TameableEntity implements GeoEn
             this.currentLoopState = overrideLoop;
             this.currentHoldState = overrideHold;
 
+            if(!overrideLoop) {
 
-            // End override if it was one-shot and finished playing
-            if (!overrideLoop && (controller.getAnimationState() == AnimationController.State.STOPPED || controller.getAnimationState() == AnimationController.State.PAUSED)) {
-                if (isSceneActive()){
-                    ClientPlayNetworking.send(new NextSceneAnimationC2SPacket(this.getId(),this.currentAnimState));
+                // End override if it was one-shot and finished playing
+                if (!(controller.getAnimationState() == AnimationController.State.STOPPED || controller.getAnimationState() == AnimationController.State.PAUSED)) {
+                    ClientPlayNetworking.send(new OverrideAnimationStateSyncC2SPacket(this.getId(), true));
                 }
-                else {
-                    stopOverrideAnimations();
-                }
+                else ClientPlayNetworking.send(new NextSceneAnimationC2SPacket(this.getId(), this.currentAnimState));
 
             }
         }
         else {
+            ClientPlayNetworking.send(new OverrideAnimationStateSyncC2SPacket(this.getId(), false));
             this.currentAnimState = getDefaultAnimation(state);
             this.currentLoopState = true;
         }
@@ -584,6 +593,14 @@ public abstract class AbstractGirlEntity extends TameableEntity implements GeoEn
     public void stopOverrideAnimations() {
         ClientPlayNetworking.send(new AnimationSyncC2SPacket(this.getId(), "",false,false));
     }
+
+    public void animationFinished(String finishedAnimation){
+
+        this.dataTracker.set(OVERRIDE_ANIM_PLAYING, false);
+        this.sceneManager.onAnimationFinished(finishedAnimation);
+        if(!isSceneActive()) stopOverrideAnimations();
+    }
+
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
         return cache;

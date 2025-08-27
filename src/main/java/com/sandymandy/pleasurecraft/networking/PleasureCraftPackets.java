@@ -27,8 +27,7 @@ public class PleasureCraftPackets {
         PayloadTypeRegistry.playC2S().register(NextSceneAnimationC2SPacket.ID, NextSceneAnimationC2SPacket.CODEC);
         PayloadTypeRegistry.playC2S().register(StartSceneC2SPacket.ID, StartSceneC2SPacket.CODEC);
         PayloadTypeRegistry.playC2S().register(MovementLockStateC2SPacket.ID, MovementLockStateC2SPacket.CODEC);
-
-
+        PayloadTypeRegistry.playC2S().register(OverrideAnimationStateSyncC2SPacket.ID, OverrideAnimationStateSyncC2SPacket.CODEC);
 
         // --- S2C (server → client) ---
         PayloadTypeRegistry.playS2C().register(ClothingArmorVisibilityS2CPacket.ID, ClothingArmorVisibilityS2CPacket.CODEC);
@@ -102,7 +101,7 @@ public class PleasureCraftPackets {
                 (packet, context) -> Objects.requireNonNull(context.player().getServer()).execute(() -> {
                     var entity = context.player().getWorld().getEntityById(packet.entityId());
                     if (entity instanceof AbstractGirlEntity girl) {
-                        girl.getSceneManager().onAnimationFinished(packet.finishedAnimation());
+                        girl.animationFinished(packet.finishedAnimation());
                     }
                 }));
 
@@ -119,6 +118,14 @@ public class PleasureCraftPackets {
                     var entity = context.player().getWorld().getEntityById(packet.entityId());
                     if (entity instanceof AbstractGirlEntity girl) {
                         girl.setMovementLockedState(packet.data());
+                    }
+                }));
+
+        ServerPlayNetworking.registerGlobalReceiver(OverrideAnimationStateSyncC2SPacket.ID,
+                (packet, context) -> Objects.requireNonNull(context.player().getServer()).execute(() -> {
+                    var entity = context.player().getWorld().getEntityById(packet.entityId());
+                    if (entity instanceof AbstractGirlEntity girl) {
+                        girl.setOverrideAnimPlayingState(packet.state());
                     }
                 }));
 

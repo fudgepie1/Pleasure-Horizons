@@ -8,7 +8,6 @@ import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
-import net.minecraft.text.Text;
 import net.minecraft.world.World;
 
 import java.util.List;

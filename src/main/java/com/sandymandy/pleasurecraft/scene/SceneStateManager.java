@@ -2,15 +2,9 @@ package com.sandymandy.pleasurecraft.scene;
 
 import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.entity.girls.AbstractGirlEntity;
-import com.sandymandy.pleasurecraft.util.Utils;
-import net.minecraft.entity.ai.pathing.Path;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.registry.tag.BlockTags;
-import net.minecraft.util.math.BlockPos;
 
 import java.util.List;
-
-import static com.sandymandy.pleasurecraft.util.Utils.findNearbyBlock;
 
 public class SceneStateManager {
 
@@ -86,8 +80,6 @@ public class SceneStateManager {
             playPhase(ScenePhase.SLOW, getRandomFromList(this.animSlow), true, false);
         } else if (finishedAnim.equals(this.animCum)) {
             stopScene();
-        } else {
-            PleasureCraft.LOGGER.error(finishedAnim + " is not equal to intro or cum anim.");
         }
     }
 

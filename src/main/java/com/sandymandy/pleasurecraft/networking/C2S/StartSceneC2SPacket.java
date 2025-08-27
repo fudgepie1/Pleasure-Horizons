@@ -8,9 +8,6 @@ import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.util.Identifier;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public record StartSceneC2SPacket(int entityId, SceneOption sceneOptions) implements CustomPayload {
 
     public static final Id<StartSceneC2SPacket> ID = new Id<>(Identifier.of(PleasureCraft.MOD_ID, "start_scene_from_client"));
