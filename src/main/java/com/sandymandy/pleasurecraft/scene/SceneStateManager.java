@@ -1,7 +1,6 @@
 package com.sandymandy.pleasurecraft.scene;
 
-import com.sandymandy.pleasurecraft.PleasureCraft;
-import com.sandymandy.pleasurecraft.entity.girls.AbstractGirlEntity;
+import com.sandymandy.pleasurecraft.entity.base.AbstractGirlEntity;
 import net.minecraft.entity.player.PlayerEntity;
 
 import java.util.List;
@@ -45,7 +44,7 @@ public class SceneStateManager {
         this.animCum = option.cumAnim();
         this.isBedScene = option.isBedScene();
 
-        if (entity.isSittingdown()) entity.setSit(false);
+        if (entity.isSitting()) entity.setSitting(false);
         if (!entity.isStripped()) entity.setStripped(true);
 
         onSceneStart(rider);
@@ -124,10 +123,7 @@ public class SceneStateManager {
         entity.setSceneProgress(sceneProgress);
         entity.toggleModelBones(List.of("RightLeg", "LeftLeg", "Torso2"), entity.isSceneActive());
 
-        if (!entity.isSceneActive()) {
-            entity.setFreeze(false);
-            return;
-        }
+
 
         // Handle scene exit
         if (entity.isSceneActive() && !entity.hasPassengers()) {

@@ -32,7 +32,7 @@ public class PleasureCraftItems {
 
 
     public static void registerModItems(){
-        PleasureCraft.LOGGER.info("Registering Mod Items for " + PleasureCraft.MOD_ID);
+        PleasureCraft.LOGGER.info("Registering Items for " + PleasureCraft.MOD_ID);
 
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.SPAWN_EGGS).register(entries -> {
             entries.add(LUCY_SPAWN_EGG);

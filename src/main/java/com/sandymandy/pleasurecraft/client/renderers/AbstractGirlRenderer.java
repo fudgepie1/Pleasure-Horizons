@@ -1,6 +1,6 @@
 package com.sandymandy.pleasurecraft.client.renderers;
 
-import com.sandymandy.pleasurecraft.entity.girls.AbstractGirlEntity;
+import com.sandymandy.pleasurecraft.entity.base.AbstractGirlEntity;
 import com.sandymandy.pleasurecraft.util.renderer.OffsetVertexConsumer;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;

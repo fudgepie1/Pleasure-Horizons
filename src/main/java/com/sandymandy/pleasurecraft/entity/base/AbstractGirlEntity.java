@@ -1,10 +1,8 @@
-package com.sandymandy.pleasurecraft.entity.girls;
+package com.sandymandy.pleasurecraft.entity.base;
 
 import com.mojang.authlib.GameProfile;
 import com.sandymandy.pleasurecraft.PleasureCraft;
-import com.sandymandy.pleasurecraft.entity.ai.goal.ConditionalGoal;
-import com.sandymandy.pleasurecraft.entity.ai.goal.GirlAttackGoal;
-import com.sandymandy.pleasurecraft.entity.ai.goal.StopMovementGoal;
+import com.sandymandy.pleasurecraft.entity.ai.goal.*;
 import com.sandymandy.pleasurecraft.networking.C2S.AnimationSyncC2SPacket;
 import com.sandymandy.pleasurecraft.networking.C2S.BonePosSyncC2SPacket;
 import com.sandymandy.pleasurecraft.networking.C2S.NextSceneAnimationC2SPacket;
@@ -28,8 +26,6 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
-import net.minecraft.entity.passive.PassiveEntity;
-import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.item.Item;
@@ -64,11 +60,10 @@ import software.bernie.geckolib.cache.object.GeoBone;
 import java.util.*;
 
 
-public abstract class AbstractGirlEntity extends TameableEntity implements GeoEntity {
+public abstract class AbstractGirlEntity extends TameableGirlEntity implements GeoEntity {
     private static final TrackedData<Boolean> MOVING_TO_BED = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<Boolean> LOCKED_STATE = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<Boolean> FROZEN_STATE = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
-    private static final TrackedData<Boolean> SITTING = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<Boolean> STRIPPED = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<Boolean> FOLLOWING = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<Boolean> IN_SCENE = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
@@ -85,6 +80,7 @@ public abstract class AbstractGirlEntity extends TameableEntity implements GeoEn
     public Map<String, Vec2f> boneUVOffsets = new HashMap<>();
     public final Map<EquipmentSlot, Boolean> clothingVisibility = new EnumMap<>(EquipmentSlot.class);
     public final Map<EquipmentSlot, Boolean> armorVisibility = new EnumMap<>(EquipmentSlot.class);
+    public final Map<EquipmentSlot, Boolean> nudeBodyVisibility = new EnumMap<>(EquipmentSlot.class);
     private final GirlInventory inventory = GirlInventory.ofSize();
     private BlockPos basePos;
     private LivingEntity attackTarget;
@@ -92,7 +88,6 @@ public abstract class AbstractGirlEntity extends TameableEntity implements GeoEn
     private static final int MAX_TICKS_NO_HIT = 20 * 20;
     public float previousYaw = 0;
     public Vec3d previousVelocity = Vec3d.ZERO;
-    private boolean freeze = false;
     public Vec3d clientPassengerBonePos = Vec3d.ZERO;
     public Vec3d serverPassengerBonePos = Vec3d.ZERO;
     public boolean showHiddenBones = false;
@@ -101,6 +96,7 @@ public abstract class AbstractGirlEntity extends TameableEntity implements GeoEn
     private String currentAnimState = "idle";
     private boolean currentLoopState = false;
     private boolean currentHoldState = false;
+    public boolean overrideFreezeFailSafe = false;
     public BlockPos targetBedPos;
     public Utils.BlockInfo blockInfo;
 
@@ -170,8 +166,29 @@ public abstract class AbstractGirlEntity extends TameableEntity implements GeoEn
         return armor;
     }
 
+    protected Map<EquipmentSlot, List<String>> getNudeBodyBones() {
+        Map<EquipmentSlot, List<String>> body = new HashMap<>();
 
-    protected AbstractGirlEntity(EntityType<? extends TameableEntity> entityType, World world) {
+        body.put(EquipmentSlot.HEAD, new ArrayList<>());
+
+        body.put(EquipmentSlot.CHEST, new ArrayList<>(List.of(
+                "boobR",
+                "boobL"
+        )));
+
+        body.put(EquipmentSlot.LEGS, new ArrayList<>(List.of(
+                "vagina",
+                "fleshL",
+                "fleshR"
+        )));
+
+        body.put(EquipmentSlot.FEET, new ArrayList<>());
+
+        return body;
+    }
+
+
+    protected AbstractGirlEntity(EntityType<? extends TameableGirlEntity> entityType, World world) {
         super(entityType, world);
     }
 
@@ -181,7 +198,6 @@ public abstract class AbstractGirlEntity extends TameableEntity implements GeoEn
         builder.add(MOVING_TO_BED, false);
         builder.add(LOCKED_STATE, false);
         builder.add(FROZEN_STATE, false);
-        builder.add(SITTING, false);
         builder.add(STRIPPED, false);
         builder.add(FOLLOWING, true);
         builder.add(IN_SCENE, false);
@@ -220,17 +236,17 @@ public abstract class AbstractGirlEntity extends TameableEntity implements GeoEn
     @Override
     protected void initGoals() {
         this.goalSelector.add(-1, new ConditionalGoal(new StopMovementGoal(this), () -> isFrozenInPlace()));
-        this.goalSelector.add(0, new SitGoal(this));
+        this.goalSelector.add(0, new GirlSitGoal(this));
         this.goalSelector.add(1, new SwimGoal(this));
         this.goalSelector.add(2, new TameableEscapeDangerGoal(1.5D, DamageTypeTags.PANIC_ENVIRONMENTAL_CAUSES));
         this.goalSelector.add(3, new GirlAttackGoal(this, 1.5, false));
-        this.goalSelector.add(4, new ConditionalGoal(new FollowOwnerGoal(this, 1.0, 10.0F, 2.0F), () -> isFollowing()/* && !isMovingToBed()*/));
+        this.goalSelector.add(4, new ConditionalGoal(new GirlFollowOwnerGoal(this, 1.0, 10.0F, 2.0F), () -> isFollowing()/* && !isMovingToBed()*/));
         this.goalSelector.add(5, new ConditionalGoal(new TemptGoal(this, 1.25D, Ingredient.ofItems(getTameItem()), false),() -> true/*!isMovingToBed()*/));
         this.goalSelector.add(6, new ConditionalGoal(new WanderAroundGoal(this, 1.0D),() -> true/*!isMovingToBed()*/));
         this.goalSelector.add(7, new ConditionalGoal(new LookAtEntityGoal(this, PlayerEntity.class, 6.0F),() -> !isFrozenInPlace() /*|| !isMovingToBed()*/));
         this.goalSelector.add(8, new ConditionalGoal(new LookAroundGoal(this),() -> !isFrozenInPlace() /*|| !isMovingToBed()*/));
-        this.targetSelector.add(1, new TrackOwnerAttackerGoal(this));
-        this.targetSelector.add(2, new AttackWithOwnerGoal(this));
+        this.targetSelector.add(1, new GirlTrackOwnerAttackerGoal(this));
+        this.targetSelector.add(2, new GirlAttackWithOwnerGoal(this));
         this.targetSelector.add(3, new RevengeGoal(this, PlayerEntity.class));
     }
 
@@ -252,7 +268,7 @@ public abstract class AbstractGirlEntity extends TameableEntity implements GeoEn
 
                 if (this.isOwner(player)) {
                     if (player.isSneaking()) {
-                        this.setSit(!this.isSittingdown());
+                        this.setSitting(!this.isSitting());
                         this.jumping = false;
                         this.navigation.stop();
                         this.setTarget(null);
@@ -307,24 +323,13 @@ public abstract class AbstractGirlEntity extends TameableEntity implements GeoEn
             this.setOwner(player);
             this.navigation.stop();
             setTarget(null);
-            setSit(true);
+            this.setSitting(true);
             this.getWorld().sendEntityStatus(this, EntityStatuses.ADD_POSITIVE_PLAYER_REACTION_PARTICLES);
             player.sendMessage(Text.literal("You Asked " + getGirlDisplayName() + " Out And She Said §aYes" ), true);
             this.setBasePosHere();
         } else {
             this.getWorld().sendEntityStatus(this, EntityStatuses.ADD_NEGATIVE_PLAYER_REACTION_PARTICLES);
         }
-    }
-
-    public void setSit(boolean sitting) {
-        this.dataTracker.set(SITTING, sitting);
-        this.setTarget(null);
-        this.calculateDimensions();
-        super.setSitting(sitting);
-    }
-
-    public boolean isSittingdown() {
-        return this.dataTracker.get(SITTING);
     }
 
     public void setFollowing(boolean follow) {
@@ -415,18 +420,9 @@ public abstract class AbstractGirlEntity extends TameableEntity implements GeoEn
         return this.dataTracker.get(OVERRIDE_ANIM_PLAYING);
     }
 
-    @Override
-    public boolean isBreedingItem(ItemStack stack) {
-        return false;
-    }
 
     public boolean isFoodItem(ItemStack stack) {
         return stack.isIn(ItemTags.WOLF_FOOD);
-    }
-
-    @Override
-    public @Nullable PassiveEntity createChild(ServerWorld world, PassiveEntity entity) {
-        return null;
     }
 
     @Override
@@ -440,7 +436,7 @@ public abstract class AbstractGirlEntity extends TameableEntity implements GeoEn
         if(!player.getWorld().isClient){
             this.setTamed(false,true); // Mark the entity as untamed
             this.setOwnerUuid(null); // Remove the owner UUID
-            this.setSit(false); // Ensure the entity is not sitting
+            this.setSitting(false); // Ensure the entity is not sitting
             this.setStripped(false);
             if(!isTamed() && !isOwner(player)){
                 player.sendMessage(Text.literal("§cYou Broke Up With " + getGirlDisplayName()), true);
@@ -462,7 +458,7 @@ public abstract class AbstractGirlEntity extends TameableEntity implements GeoEn
 
     public void teleportToBase() {
         if (this.basePos != null && this.getWorld() != null) {
-            setSit(true);
+            setSitting(true);
             this.teleport(this.basePos.getX(), this.basePos.getY(), this.basePos.getZ(), false);
         }
     }
@@ -534,13 +530,15 @@ public abstract class AbstractGirlEntity extends TameableEntity implements GeoEn
             this.currentLoopState = overrideLoop;
             this.currentHoldState = overrideHold;
 
+            if (controller.getAnimationState() == AnimationController.State.RUNNING) ClientPlayNetworking.send(new OverrideAnimationStateSyncC2SPacket(this.getId(), true));
+
             if(!overrideLoop) {
 
                 // End override if it was one-shot and finished playing
-                if (!(controller.getAnimationState() == AnimationController.State.STOPPED || controller.getAnimationState() == AnimationController.State.PAUSED)) {
-                    ClientPlayNetworking.send(new OverrideAnimationStateSyncC2SPacket(this.getId(), true));
+                if (controller.getAnimationState() == AnimationController.State.STOPPED || controller.getAnimationState() == AnimationController.State.PAUSED) {
+                    ClientPlayNetworking.send(new NextSceneAnimationC2SPacket(this.getId(), this.currentAnimState));
                 }
-                else ClientPlayNetworking.send(new NextSceneAnimationC2SPacket(this.getId(), this.currentAnimState));
+
 
             }
         }
@@ -568,9 +566,9 @@ public abstract class AbstractGirlEntity extends TameableEntity implements GeoEn
     }
 
     private String getDefaultAnimation(AnimationState<?> state) {
-        if (!this.isOnGround() && !isSittingdown()) return "fly";
-        if (state.isMoving() && !isSittingdown()) return "walk";
-        if (isSittingdown()) return "sit";
+        if (!this.isOnGround() && !isSitting()) return "fly";
+        if (state.isMoving() && !isSitting()) return "walk";
+        if (isSitting()) return "sit";
         return "idle";
     }
 
@@ -613,7 +611,7 @@ public abstract class AbstractGirlEntity extends TameableEntity implements GeoEn
 
         RegistryWrapper.WrapperLookup registryLookup = this.getWorld().getRegistryManager();
         Inventories.writeNbt(nbt, this.inventory.getItems(), registryLookup);
-        nbt.putBoolean("SitSate", this.isSittingdown());
+        nbt.putBoolean("SitSate", this.isSitting());
         nbt.putBoolean("StripState", this.isStripped());
         nbt.putBoolean("SceneState", this.isSceneActive());
         nbt.putBoolean("FrozenState", this.isFrozenInPlace());
@@ -633,7 +631,7 @@ public abstract class AbstractGirlEntity extends TameableEntity implements GeoEn
 
         RegistryWrapper.WrapperLookup registryLookup = this.getWorld().getRegistryManager();
         Inventories.readNbt(nbt, this.inventory.getItems(), registryLookup);
-        this.setSit(nbt.getBoolean("SitSate"));
+        this.setSitting(nbt.getBoolean("SitSate"));
         this.setStripped(nbt.getBoolean("StripState"));
         if (nbt.contains("BaseX") && nbt.contains("BaseY") && nbt.contains("BaseZ")) {
             int x = nbt.getInt("BaseX");
@@ -650,6 +648,7 @@ public abstract class AbstractGirlEntity extends TameableEntity implements GeoEn
         previousVelocity = getVelocity();
         updateClothingAndArmor();
         applySkinToBone((PlayerEntity) this.getFirstPassenger());
+        freezingLogic();
     }
 
     @Override
@@ -672,6 +671,42 @@ public abstract class AbstractGirlEntity extends TameableEntity implements GeoEn
         }
     }
 
+    private void freezingLogic() {
+        if (!this.isSceneActive() && !overrideFreezeFailSafe) {
+            this.setFreeze(false);
+        }
+    }
+
+    private long stripAnimStartTime = -1;
+
+    public void stripAndDressUp() {
+
+        if (this.getWorld().isClient()) return;
+
+        String stripAnim = "strip";
+        if (!this.isOverrideAnimPlaying()) {
+            overrideFreezeFailSafe = true;
+            this.setFreeze(true);
+            playAnimation(stripAnim, false, false);
+
+            // Record when the animation started
+            stripAnimStartTime = this.getWorld().getTime();
+        }
+
+        if (this.currentAnimState.equals(stripAnim) && stripAnimStartTime >= 0) {
+            long elapsed = this.getWorld().getTime() - stripAnimStartTime;
+
+            // 3 seconds = 60 ticks per second * 3 = 180 ticks
+            if (elapsed >= 180) {
+                this.setStripped(!isStripped());
+                overrideFreezeFailSafe = false;
+
+                // Reset so it doesn't keep toggling every tick
+                stripAnimStartTime = -1;
+            }
+        }
+    }
+
 
     private void updateClothingAndArmor() {
         if (this.getWorld().isClient()) return;
@@ -681,6 +716,7 @@ public abstract class AbstractGirlEntity extends TameableEntity implements GeoEn
         for (EquipmentSlot slot : EquipmentSlot.values()) {
             clothingVisibility.put(slot, !stripped && this.inventory.getArmorStack(slot).isEmpty());
             armorVisibility.put(slot, !stripped && !this.inventory.getArmorStack(slot).isEmpty());
+            nudeBodyVisibility.put(slot, this.inventory.getArmorStack(slot).isEmpty() || stripped);
 
 
         }
@@ -694,8 +730,13 @@ public abstract class AbstractGirlEntity extends TameableEntity implements GeoEn
                 .map(s -> armorVisibility.getOrDefault(s, false))
                 .toList();
 
+        List<Boolean> nudeBodyList = Arrays.stream(EquipmentSlot.values())
+                .map(s -> nudeBodyVisibility.getOrDefault(s, false))
+                .toList();
+
+
         ClothingArmorVisibilityS2CPacket packet =
-                new ClothingArmorVisibilityS2CPacket(this.getId(), clothingList, armorList);
+                new ClothingArmorVisibilityS2CPacket(this.getId(), clothingList, armorList, nudeBodyList);
 
         for (ServerPlayerEntity player : Objects.requireNonNull(this.getServer()).getPlayerManager().getPlayerList()) {
             ServerPlayNetworking.send(player, packet);
@@ -709,7 +750,12 @@ public abstract class AbstractGirlEntity extends TameableEntity implements GeoEn
         for (EquipmentSlot slot : EquipmentSlot.values()) {
             List<String> clothingBones = getClothingBones().get(slot);
             if (clothingBones != null) {
-                toggleModelBones(clothingBones, clothingVisibility.getOrDefault(slot, false));
+                toggleModelBones(clothingBones, clothingVisibility.getOrDefault(slot, true));
+            }
+
+            List<String> nudeBody = getNudeBodyBones().get(slot);
+            if(nudeBody != null){
+                toggleModelBones(nudeBody, nudeBodyVisibility.getOrDefault(slot, true));
             }
 
             List<String> armorBones = getArmorBones().get(slot);
@@ -723,11 +769,6 @@ public abstract class AbstractGirlEntity extends TameableEntity implements GeoEn
                 this.overrideBoneUV(this.getArmorBones().get(slot),uv,0);
             }
         }
-
-
-
-        // Naked bits
-        toggleModelBones(List.of("vagina"), isStripped());
     }
 
 
@@ -872,27 +913,27 @@ public abstract class AbstractGirlEntity extends TameableEntity implements GeoEn
 
     @Override
     public void pushAwayFrom(Entity entity) {
-        if (!freeze) {
+        if (!this.isFrozenInPlace()) {
             super.pushAwayFrom(entity);
         }
     }
 
     @Override
     public void takeKnockback(double strength, double x, double z) {
-        if (!this.freeze) {
+        if (!this.isFrozenInPlace()) {
             super.takeKnockback(strength, x, z);
         }
     }
 
     @Override
     public boolean isPushable() {
-        return !freeze;
+        return !this.isFrozenInPlace();
     }
 
 
     @Override
     public void addVelocity(double dx, double dy, double dz) {
-        if (!freeze) {
+        if (!this.isFrozenInPlace()) {
             super.addVelocity(dx, dy, dz);
         }
     }

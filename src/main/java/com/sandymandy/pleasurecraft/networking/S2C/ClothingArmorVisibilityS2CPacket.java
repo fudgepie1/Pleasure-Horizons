@@ -13,7 +13,8 @@ import java.util.List;
 public record ClothingArmorVisibilityS2CPacket(
         int entityId,
         List<Boolean> clothing,
-        List<Boolean> armor
+        List<Boolean> armor,
+        List<Boolean> nudeBody
 ) implements CustomPayload {
 
     public static final Id<ClothingArmorVisibilityS2CPacket> ID =
@@ -24,6 +25,7 @@ public record ClothingArmorVisibilityS2CPacket(
                     PacketCodecs.VAR_INT, ClothingArmorVisibilityS2CPacket::entityId,
                     PacketCodecs.collection(ArrayList::new, PacketCodecs.BOOLEAN), ClothingArmorVisibilityS2CPacket::clothing,
                     PacketCodecs.collection(ArrayList::new, PacketCodecs.BOOLEAN), ClothingArmorVisibilityS2CPacket::armor,
+                    PacketCodecs.collection(ArrayList::new, PacketCodecs.BOOLEAN), ClothingArmorVisibilityS2CPacket::nudeBody,
                     ClothingArmorVisibilityS2CPacket::new
             );
 

@@ -1,5 +1,6 @@
 package com.sandymandy.pleasurecraft.entity.girls;
 
+import com.sandymandy.pleasurecraft.entity.base.AbstractGirlEntity;
 import com.sandymandy.pleasurecraft.scene.SceneOption;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
@@ -13,7 +14,7 @@ import net.minecraft.world.World;
 import java.util.List;
 import java.util.Map;
 
-public class BiaEntity extends AbstractGirlEntity{
+public class BiaEntity extends AbstractGirlEntity {
 
     public BiaEntity(EntityType<? extends AbstractGirlEntity> entityType, World world) {
         super(entityType, world);

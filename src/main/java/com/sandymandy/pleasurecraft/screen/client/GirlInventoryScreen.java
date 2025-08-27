@@ -1,7 +1,7 @@
 package com.sandymandy.pleasurecraft.screen.client;
 
 import com.sandymandy.pleasurecraft.PleasureCraft;
-import com.sandymandy.pleasurecraft.entity.girls.AbstractGirlEntity;
+import com.sandymandy.pleasurecraft.entity.base.AbstractGirlEntity;
 import com.sandymandy.pleasurecraft.networking.C2S.MovementLockStateC2SPacket;
 import com.sandymandy.pleasurecraft.screen.GirlInventoryScreenHandler;
 import com.sandymandy.pleasurecraft.screen.InventoryButtonAction;
@@ -106,7 +106,7 @@ public class GirlInventoryScreen extends HandledScreen<GirlInventoryScreenHandle
                 int y = startY + i * (buttonHeight + paddingY);
                 Text dynamicLabel = action.label();
 
-                if (action.label().getString().equals("Sit") && girl.isSittingdown()){
+                if (action.label().getString().equals("Sit") && girl.isSitting()){
                     dynamicLabel = Text.literal("Stand");
                 }
                 else if (action.label().getString().equals("Follow Me") && girl.isFollowing()){

@@ -1,7 +1,7 @@
 package com.sandymandy.pleasurecraft.screen;
 
 import com.sandymandy.pleasurecraft.PleasureCraft;
-import com.sandymandy.pleasurecraft.entity.girls.AbstractGirlEntity;
+import com.sandymandy.pleasurecraft.entity.base.AbstractGirlEntity;
 import com.sandymandy.pleasurecraft.util.inventory.slot.PublicArmorSlot;
 import com.sandymandy.pleasurecraft.util.inventory.GirlInventory;
 import net.minecraft.entity.Entity;

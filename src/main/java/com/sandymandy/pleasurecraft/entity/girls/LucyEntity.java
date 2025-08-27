@@ -1,5 +1,6 @@
 package com.sandymandy.pleasurecraft.entity.girls;
 
+import com.sandymandy.pleasurecraft.entity.base.AbstractGirlEntity;
 import com.sandymandy.pleasurecraft.scene.SceneOption;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;

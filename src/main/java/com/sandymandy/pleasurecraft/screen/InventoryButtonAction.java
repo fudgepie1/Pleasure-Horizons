@@ -1,6 +1,6 @@
 package com.sandymandy.pleasurecraft.screen;
 
-import com.sandymandy.pleasurecraft.entity.girls.AbstractGirlEntity;
+import com.sandymandy.pleasurecraft.entity.base.AbstractGirlEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Text;
 

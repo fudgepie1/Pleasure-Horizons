@@ -1,5 +1,6 @@
 package com.sandymandy.pleasurecraft;
 
+import com.sandymandy.pleasurecraft.advancement.criterion.PleasureCraftCriteria;
 import com.sandymandy.pleasurecraft.entity.PleasureCraftEntities;
 import com.sandymandy.pleasurecraft.item.PleasureCraftItemGroups;
 import com.sandymandy.pleasurecraft.item.PleasureCraftItems;
@@ -42,6 +43,7 @@ public class PleasureCraft implements ModInitializer {
 		PleasureCraftItems.registerModItems();
 		PleasureCraftPackets.registerPackets();
 		PleasureCraftPackets.registerC2SPackets();
+		PleasureCraftCriteria.registerAdvancementCriteria();
 	}
 
 	public record GirlScreenData(int entityId) {

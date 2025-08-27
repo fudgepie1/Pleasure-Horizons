@@ -1,7 +1,7 @@
 package com.sandymandy.pleasurecraft.networking;
 
 import com.sandymandy.pleasurecraft.PleasureCraft;
-import com.sandymandy.pleasurecraft.entity.girls.AbstractGirlEntity;
+import com.sandymandy.pleasurecraft.entity.base.AbstractGirlEntity;
 import com.sandymandy.pleasurecraft.networking.C2S.*;
 import com.sandymandy.pleasurecraft.networking.S2C.ClothingArmorVisibilityS2CPacket;
 import com.sandymandy.pleasurecraft.networking.S2C.SceneOptionsS2CPacket;
@@ -43,13 +43,13 @@ public class PleasureCraftPackets {
                             var entity = context.player().getWorld().getEntityById(packet.entityId());
                             if (entity instanceof AbstractGirlEntity girl) {
                                 switch (packet.actionId()) {
-                                    case "stripOrDressup" -> girl.setStripped(!girl.isStripped());
+                                    case "stripOrDressup" -> girl.stripAndDressUp();
                                     case "breakUp" -> girl.breakUp(context.player());
                                     case "setBase" -> girl.setBasePosHere();
                                     case "talk" -> ServerPlayNetworking.send(context.player(), new SceneOptionsS2CPacket(girl.getId(), girl.getSceneOptions()));
                                     case "testAnim1" -> girl.playAnimation("downed",false,false);
                                     case "goToBase" -> girl.teleportToBase();
-                                    case "sit" -> girl.setSit(!girl.isSittingdown());
+                                    case "sit" -> girl.setSitting(!girl.isSitting());
                                     case "follow" -> girl.setFollowing(!girl.isFollowing());
                                     default -> PleasureCraft.LOGGER.warn("Unknown Girl interaction: " + packet.actionId());
                                 }
@@ -144,6 +144,7 @@ public class PleasureCraftPackets {
                         for (EquipmentSlot slot : EquipmentSlot.values()) {
                             girl.clothingVisibility.put(slot, packet.clothing().get(i));
                             girl.armorVisibility.put(slot, packet.armor().get(i));
+                            girl.nudeBodyVisibility.put(slot, packet.nudeBody().get(i));
                             i++;
                         }
                         girl.applyClothingAndArmor();
