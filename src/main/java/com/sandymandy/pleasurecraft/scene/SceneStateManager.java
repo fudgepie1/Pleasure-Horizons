@@ -1,6 +1,7 @@
 package com.sandymandy.pleasurecraft.scene;
 
 import com.sandymandy.pleasurecraft.entity.base.AbstractGirlEntity;
+import com.sandymandy.pleasurecraft.util.PleasureCraftMessages;
 import net.minecraft.entity.player.PlayerEntity;
 
 import java.util.List;
@@ -15,6 +16,7 @@ public class SceneStateManager {
     private float sceneProgress = 0f;
     private final float cumThreshold = 5f;
     private boolean isKeyHeld = false;
+    private int timer = 0 ;
 
     // Animations
     private String animIntro;
@@ -41,6 +43,7 @@ public class SceneStateManager {
         if (entity.isSitting()) entity.setSitting(false);
         if (!entity.isStripped()){
             entity.requestStrip();
+            entity.messageAsEntity(rider, "Be there in a bit, just need to take these clothes off");
             return;
         }
 
@@ -127,10 +130,22 @@ public class SceneStateManager {
 
 
 
+
+
+
         // Handle scene exit
-        if (entity.isSceneActive() && !entity.hasPassengers()) {
-            stopScene();
-            return;
+        if (entity.isSceneActive()) {
+            if(!entity.hasPassengers()) stopScene();
+
+            timer ++;
+
+            if(timer >= 20 && !(sceneProgress == 0f) && !this.entity.getWorld().isClient && sceneProgress < (cumThreshold + 0.2f)){
+                if(sceneProgress >= cumThreshold){
+                    new PleasureCraftMessages().GlobleMessage(entity.getWorld(),"Scene Progress: READY TO CUM");
+                }
+                else new PleasureCraftMessages().GlobleMessage(entity.getWorld(),"Scene Progress: "+sceneProgress);
+                timer = 0;
+            }
         }
 
         PlayerEntity player = (PlayerEntity) entity.getFirstPassenger();
@@ -153,8 +168,6 @@ public class SceneStateManager {
             default -> {
             } // INTRO and CUM handled elsewhere
         }
-
-
 
     }
 }

@@ -33,9 +33,6 @@ public class StripGoal extends Goal {
     @Override
     public void tick() {
         stripTimer++;
-
-        PleasureCraft.LOGGER.info(stripTimer+"");
-
         if (stripTimer == stripTimerThreshold) {
             girl.setStripped(!girl.isStripped()); // toggle stripped state
         }

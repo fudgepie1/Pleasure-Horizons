@@ -687,7 +687,16 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
     }
 
     public void requestStrip() {
+        requestStrip(false, null);
+    }
+
+    public void requestStrip(boolean sendMessage, @Nullable PlayerEntity player) {
         this.requestStrip = true;
+
+        if(sendMessage){
+            if(player != null) messageAsEntity(player,"okie then, just for you tho ^_~");
+            else messageAsEntity("okie then, just for you tho ^_~");
+        }
     }
 
     public boolean shouldStrip() {

@@ -1,8 +1,10 @@
 # Changelog
 
-## 0.4
+## 0.3.2
 - Added a custom GUI that gives you the sex options that are girl depended.
 - Make the entity stop and look at the player when interacting
+- Made the entity play The stripping animation when stripping
+- Fixed the bug where the vagina was always invisible
 
 ## 0.3.1
 - Added a change log to keep track of changes each update
