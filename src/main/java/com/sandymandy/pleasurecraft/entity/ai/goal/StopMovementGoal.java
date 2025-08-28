@@ -1,5 +1,6 @@
 package com.sandymandy.pleasurecraft.entity.ai.goal;
 
+import com.sandymandy.pleasurecraft.entity.base.AbstractGirlEntity;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.entity.ai.control.MoveControl;
@@ -7,16 +8,16 @@ import net.minecraft.entity.ai.control.MoveControl;
 import java.util.EnumSet;
 
 public class StopMovementGoal extends Goal {
-    private final PathAwareEntity entity;
+    private final AbstractGirlEntity entity;
 
-    public StopMovementGoal(PathAwareEntity entity) {
+    public StopMovementGoal(AbstractGirlEntity entity) {
         this.entity = entity;
         this.setControls(EnumSet.of(Goal.Control.MOVE, Goal.Control.JUMP));
     }
 
     @Override
     public boolean canStart() {
-        return true; // Always active while added
+        return entity.isFrozenInPlace(); // Always active while added
     }
 
     @Override
@@ -42,6 +43,6 @@ public class StopMovementGoal extends Goal {
 
     @Override
     public boolean shouldContinue() {
-        return true; // Continuous block
+        return !entity.isFrozenInPlace(); // Continuous block
     }
 }

@@ -38,17 +38,19 @@ public class SceneStateManager {
     public void startScene(PlayerEntity rider, SceneOption option) {
         if (inScene) return;
 
+        if (entity.isSitting()) entity.setSitting(false);
+        if (!entity.isStripped()){
+            entity.requestStrip();
+            return;
+        }
+
         this.animIntro = option.introAnim();
         this.animSlow = option.slowAnim();
         this.animFast = option.fastAnim();
         this.animCum = option.cumAnim();
         this.isBedScene = option.isBedScene();
 
-        if (entity.isSitting()) entity.setSitting(false);
-        if (!entity.isStripped()) entity.setStripped(true);
-
         onSceneStart(rider);
-
     }
 
     public void stopScene() {

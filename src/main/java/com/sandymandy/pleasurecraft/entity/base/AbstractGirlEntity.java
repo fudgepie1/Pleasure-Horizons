@@ -12,7 +12,6 @@ import com.sandymandy.pleasurecraft.scene.SceneOption;
 import com.sandymandy.pleasurecraft.scene.SceneStateManager;
 import com.sandymandy.pleasurecraft.screen.GirlInventoryScreenHandlerFactory;
 import com.sandymandy.pleasurecraft.util.PleasureCraftMessages;
-import com.sandymandy.pleasurecraft.util.Utils;
 import com.sandymandy.pleasurecraft.util.inventory.GirlInventory;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -71,6 +70,7 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
     private static final TrackedData<Boolean> OVERRIDE_LOOP = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<Boolean> OVERRIDE_HOLD = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<Boolean> OVERRIDE_ANIM_PLAYING = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+    private static final TrackedData<Boolean> OVERRIDE_FREEZE = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     public static final TrackedData<Float> SCENE_PROGRESS = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.FLOAT);
     private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
     private final SceneStateManager sceneManager = new SceneStateManager(this);
@@ -96,9 +96,9 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
     private String currentAnimState = "idle";
     private boolean currentLoopState = false;
     private boolean currentHoldState = false;
-    public boolean overrideFreezeFailSafe = false;
     public BlockPos targetBedPos;
-    public Utils.BlockInfo blockInfo;
+    private boolean requestStrip = false;
+
 
     protected Item getTameItem() {
         return Items.DANDELION;
@@ -205,6 +205,7 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
         builder.add(OVERRIDE_LOOP, false);
         builder.add(OVERRIDE_HOLD, false);
         builder.add(OVERRIDE_ANIM_PLAYING, false);
+        builder.add(OVERRIDE_FREEZE, false);
         builder.add(SCENE_PROGRESS,0f);
     }
 
@@ -235,19 +236,27 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
 
     @Override
     protected void initGoals() {
-        this.goalSelector.add(-1, new ConditionalGoal(new StopMovementGoal(this), () -> isFrozenInPlace()));
+        this.goalSelector.add(-2, new StripGoal(this));
+        this.goalSelector.add(-1, new StopMovementGoal(this));
         this.goalSelector.add(0, new GirlSitGoal(this));
         this.goalSelector.add(1, new SwimGoal(this));
         this.goalSelector.add(2, new TameableEscapeDangerGoal(1.5D, DamageTypeTags.PANIC_ENVIRONMENTAL_CAUSES));
-        this.goalSelector.add(3, new GirlAttackGoal(this, 1.5, false));
-        this.goalSelector.add(4, new ConditionalGoal(new GirlFollowOwnerGoal(this, 1.0, 10.0F, 2.0F), () -> isFollowing()/* && !isMovingToBed()*/));
-        this.goalSelector.add(5, new ConditionalGoal(new TemptGoal(this, 1.25D, Ingredient.ofItems(getTameItem()), false),() -> true/*!isMovingToBed()*/));
-        this.goalSelector.add(6, new ConditionalGoal(new WanderAroundGoal(this, 1.0D),() -> true/*!isMovingToBed()*/));
-        this.goalSelector.add(7, new ConditionalGoal(new LookAtEntityGoal(this, PlayerEntity.class, 6.0F),() -> !isFrozenInPlace() /*|| !isMovingToBed()*/));
-        this.goalSelector.add(8, new ConditionalGoal(new LookAroundGoal(this),() -> !isFrozenInPlace() /*|| !isMovingToBed()*/));
+        this.goalSelector.add(3, new DoorInteractGoal(this) {
+            @Override
+            protected boolean isDoorOpen() {
+                return super.isDoorOpen();
+            }
+        });
+        this.goalSelector.add(4, new GirlAttackGoal(this, 1.5, false));
+        this.goalSelector.add(5, new ConditionalGoal(new GirlFollowOwnerGoal(this, 1.0, 10.0F, 2.0F), () -> isFollowing()/* && !isMovingToBed()*/));
+        this.goalSelector.add(6, new ConditionalGoal(new TemptGoal(this, 1.25D, Ingredient.ofItems(getTameItem()), false),() -> true/*!isMovingToBed()*/));
+        this.goalSelector.add(7, new ConditionalGoal(new WanderAroundGoal(this, 1.0D),() -> true/*!isMovingToBed()*/));
+        this.goalSelector.add(8, new ConditionalGoal(new LookAtEntityGoal(this, PlayerEntity.class, 6.0F),() -> !isFrozenInPlace() /*|| !isMovingToBed()*/));
+        this.goalSelector.add(9, new ConditionalGoal(new LookAroundGoal(this),() -> !isFrozenInPlace() /*|| !isMovingToBed()*/));
         this.targetSelector.add(1, new GirlTrackOwnerAttackerGoal(this));
         this.targetSelector.add(2, new GirlAttackWithOwnerGoal(this));
         this.targetSelector.add(3, new RevengeGoal(this, PlayerEntity.class));
+
     }
 
 
@@ -364,13 +373,13 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
         return this.dataTracker.get(LOCKED_STATE);
     }
 
-//    public void setMovingToBedState(boolean state) {
-//        this.dataTracker.set(MOVING_TO_BED, state);
-//    }
-//
-//    public boolean isMovingToBed() {
-//        return this.dataTracker.get(MOVING_TO_BED);
-//    }
+    public void setOverrideFreeze(boolean state) {
+        this.dataTracker.set(OVERRIDE_FREEZE, state);
+    }
+
+    public boolean getOverrideFreeze() {
+        return this.dataTracker.get(OVERRIDE_FREEZE);
+    }
 
     public void setSceneState(boolean inScene) {
         this.dataTracker.set(IN_SCENE, inScene);
@@ -672,39 +681,21 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
     }
 
     private void freezingLogic() {
-        if (!this.isSceneActive() && !overrideFreezeFailSafe) {
+        if (!this.isSceneActive() && !getOverrideFreeze()) {
             this.setFreeze(false);
         }
     }
 
-    private long stripAnimStartTime = -1;
+    public void requestStrip() {
+        this.requestStrip = true;
+    }
 
-    public void stripAndDressUp() {
-
-        if (this.getWorld().isClient()) return;
-
-        String stripAnim = "strip";
-        if (!this.isOverrideAnimPlaying()) {
-            overrideFreezeFailSafe = true;
-            this.setFreeze(true);
-            playAnimation(stripAnim, false, false);
-
-            // Record when the animation started
-            stripAnimStartTime = this.getWorld().getTime();
+    public boolean shouldStrip() {
+        if (requestStrip) {
+            requestStrip = false;
+            return true;
         }
-
-        if (this.currentAnimState.equals(stripAnim) && stripAnimStartTime >= 0) {
-            long elapsed = this.getWorld().getTime() - stripAnimStartTime;
-
-            // 3 seconds = 60 ticks per second * 3 = 180 ticks
-            if (elapsed >= 180) {
-                this.setStripped(!isStripped());
-                overrideFreezeFailSafe = false;
-
-                // Reset so it doesn't keep toggling every tick
-                stripAnimStartTime = -1;
-            }
-        }
+        return false;
     }
 
 
