@@ -25,7 +25,6 @@ public class StripGoal extends Goal {
     public void start() {
         this.stripTimer = 0;                  // reset timer every time it starts
         this.stripTimerThreshold = 38;        // 3 seconds (20 ticks per second)
-        girl.setOverrideFreeze(true);
         girl.setFreeze(true);
         girl.playAnimation("strip", false, false); // play strip anim
     }
@@ -46,7 +45,6 @@ public class StripGoal extends Goal {
 
     @Override
     public void stop() {
-        girl.setOverrideFreeze(false);
         girl.setFreeze(false);
     }
 }

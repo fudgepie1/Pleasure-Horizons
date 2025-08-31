@@ -11,7 +11,6 @@ import org.jetbrains.annotations.Nullable;
 
 public class Utils {
 
-    @Nullable
     public static BlockInfo findNearbyBlock(World world, BlockPos center, int radius, @Nullable Block block, @Nullable TagKey<Block> blockTag) {
         for (BlockPos pos : BlockPos.iterate(
                 center.add(-radius, -radius, -radius),
@@ -29,6 +28,11 @@ public class Utils {
             }
         }
         return null; // none found
+    }
+
+    public static boolean checkForBlockAt(World world, BlockPos blockPos, @Nullable Block block, @Nullable TagKey<Block> blockTag){
+        BlockState state = world.getBlockState(blockPos);
+        return isBlockOrTag(state, block, blockTag);
     }
 
     private static boolean isBlockOrTag(BlockState state, @Nullable Block block, @Nullable TagKey<Block> tag) {

@@ -2,28 +2,32 @@ package com.sandymandy.pleasurecraft.scene;
 
 import com.sandymandy.pleasurecraft.entity.base.AbstractGirlEntity;
 import com.sandymandy.pleasurecraft.util.PleasureCraftMessages;
+import com.sandymandy.pleasurecraft.util.Utils;
+import com.sandymandy.pleasurecraft.util.Utils.BlockInfo;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.registry.tag.BlockTags;
+import net.minecraft.util.math.BlockPos;
 
 import java.util.List;
+
 
 public class SceneStateManager {
 
     private final AbstractGirlEntity entity;
     public String passengerBoneName = "Torso2";
     public float passengerYOffset = 0f;
-    private boolean inScene = false;
     private ScenePhase currentPhase = ScenePhase.NONE;
     private float sceneProgress = 0f;
     private final float cumThreshold = 5f;
     private boolean isKeyHeld = false;
     private int timer = 0 ;
-
+    BlockPos bedPos;
     // Animations
     private String animIntro;
     private List<String> animSlow;
     private List<String> animFast;
     private String animCum;
-    private boolean isBedScene;
+    public boolean isBedScene;
 
     // Progress speeds
     private static final float SLOW_SPEED = 0.002f;
@@ -33,12 +37,16 @@ public class SceneStateManager {
         this.entity = entity;
     }
 
+    public boolean isBedScene() {
+        return isBedScene;
+    }
+
     public enum ScenePhase {
         NONE, INTRO, SLOW, FAST, CUM
     }
 
     public void startScene(PlayerEntity rider, SceneOption option) {
-        if (inScene) return;
+        if (entity.isSceneActive()) return;
 
         if (entity.isSitting()) entity.setSitting(false);
         if (!entity.isStripped()){
@@ -53,27 +61,47 @@ public class SceneStateManager {
         this.animCum = option.cumAnim();
         this.isBedScene = option.isBedScene();
 
+        if (isBedScene) {
+            //  Check for a bed before starting
+            BlockInfo bedInfo = Utils.findNearbyBlock(
+                    entity.getWorld(),
+                    entity.getBlockPos(),
+                    15,// radius
+                    null,
+                    BlockTags.BEDS
+            );
+
+            if (bedInfo == null) {
+                entity.messageAsEntity(rider, "We need a bed nearby for this...");
+                return;
+            }
+
+            //  Store target bed pos in entity so the BedGoal can use it
+            entity.targetBedPos = bedInfo.pos();
+            bedPos = bedInfo.pos();
+
+
+            entity.requestMoveToBed();
+            return; // Don't start yet – let the goal handle it
+        }
+
+
         onSceneStart(rider);
     }
 
     public void stopScene() {
-        if (!inScene) return;
+        if (!entity.isSceneActive()) return;
         onSceneStop();
-        inScene = false;
-        entity.setFreeze(false);
         entity.setSceneState(false);
-        entity.setStripped(false);
-        entity.targetBedPos = null;
     }
 
     public void onSceneStart(PlayerEntity rider) {
         rider.setInvisible(true);
 
-        entity.setFreeze(true);
-        inScene = true;
         entity.setSceneState(true);
         this.sceneProgress = 0f;
         isKeyHeld = false;
+        entity.targetBedPos = null;
         rider.startRiding(entity, false);
 
         playPhase(ScenePhase.INTRO, this.animIntro, false, true);
@@ -88,12 +116,12 @@ public class SceneStateManager {
     }
 
     private void onSceneStop() {
-        for (PlayerEntity player : entity.getWorld().getPlayers()) {
-            if (!player.hasVehicle()) player.setInvisible(false);
-        }
-
         if (entity.hasPassengers()) {
             entity.removeAllPassengers();
+        }
+
+        for (PlayerEntity player : entity.getWorld().getPlayers()) {
+            if (!player.hasVehicle()) player.setInvisible(false);
         }
 
         currentPhase = ScenePhase.NONE;
@@ -121,32 +149,32 @@ public class SceneStateManager {
         return list.get(index);
     }
 
+    private void onSceneActive(){
+        if(!entity.hasPassengers()) stopScene();
 
+        timer ++;
+
+        if(timer >= 20 && !(sceneProgress == 0f) && !this.entity.getWorld().isClient && sceneProgress < (cumThreshold + 0.2f)){
+            if(sceneProgress >= cumThreshold){
+                new PleasureCraftMessages().GlobleMessage(entity.getWorld(),"Scene Progress: READY TO CUM");
+            }
+            else new PleasureCraftMessages().GlobleMessage(entity.getWorld(),"Scene Progress: "+sceneProgress);
+            timer = 0;
+        }
+
+        if(bedPos != null && isBedScene &! Utils.checkForBlockAt(entity.getWorld(),bedPos,null,BlockTags.BEDS)){
+            stopScene();
+        }
+    }
 
 
     public void tick() {
         entity.setSceneProgress(sceneProgress);
         entity.toggleModelBones(List.of("RightLeg", "LeftLeg", "Torso2"), entity.isSceneActive());
 
-
-
-
-
-
         // Handle scene exit
-        if (entity.isSceneActive()) {
-            if(!entity.hasPassengers()) stopScene();
+        if (entity.isSceneActive()) onSceneActive();
 
-            timer ++;
-
-            if(timer >= 20 && !(sceneProgress == 0f) && !this.entity.getWorld().isClient && sceneProgress < (cumThreshold + 0.2f)){
-                if(sceneProgress >= cumThreshold){
-                    new PleasureCraftMessages().GlobleMessage(entity.getWorld(),"Scene Progress: READY TO CUM");
-                }
-                else new PleasureCraftMessages().GlobleMessage(entity.getWorld(),"Scene Progress: "+sceneProgress);
-                timer = 0;
-            }
-        }
 
         PlayerEntity player = (PlayerEntity) entity.getFirstPassenger();
         if (player != null) player.setInvisible(true);

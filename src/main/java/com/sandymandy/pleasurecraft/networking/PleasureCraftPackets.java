@@ -26,7 +26,7 @@ public class PleasureCraftPackets {
         PayloadTypeRegistry.playC2S().register(ThrustKeybindC2SPacket.ID, ThrustKeybindC2SPacket.CODEC);
         PayloadTypeRegistry.playC2S().register(NextSceneAnimationC2SPacket.ID, NextSceneAnimationC2SPacket.CODEC);
         PayloadTypeRegistry.playC2S().register(StartSceneC2SPacket.ID, StartSceneC2SPacket.CODEC);
-        PayloadTypeRegistry.playC2S().register(MovementLockStateC2SPacket.ID, MovementLockStateC2SPacket.CODEC);
+        PayloadTypeRegistry.playC2S().register(InInventoryC2SPacket.ID, InInventoryC2SPacket.CODEC);
         PayloadTypeRegistry.playC2S().register(OverrideAnimationStateSyncC2SPacket.ID, OverrideAnimationStateSyncC2SPacket.CODEC);
 
         // --- S2C (server → client) ---
@@ -113,11 +113,11 @@ public class PleasureCraftPackets {
                     }
                 }));
 
-        ServerPlayNetworking.registerGlobalReceiver(MovementLockStateC2SPacket.ID,
+        ServerPlayNetworking.registerGlobalReceiver(InInventoryC2SPacket.ID,
                 (packet, context) -> Objects.requireNonNull(context.player().getServer()).execute(() -> {
                     var entity = context.player().getWorld().getEntityById(packet.entityId());
                     if (entity instanceof AbstractGirlEntity girl) {
-                        girl.setMovementLockedState(packet.data());
+                        girl.setInInventory(packet.data());
                     }
                 }));
 

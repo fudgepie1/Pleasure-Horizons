@@ -27,6 +27,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
@@ -43,6 +44,8 @@ public class TameableGirlEntity extends PathAwareEntity implements Tameable {
     protected static final TrackedData<Byte> TAMEABLE_FLAGS = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.BYTE);
     protected static final TrackedData<Optional<UUID>> OWNER_UUID = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.OPTIONAL_UUID);
     private static final TrackedData<Boolean> SITTING = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+    public Vec3d prevVelocity = Vec3d.ZERO;
+
 
     protected TameableGirlEntity(EntityType<? extends TameableGirlEntity> entityType, World world) {
         super(entityType, world);
@@ -322,7 +325,14 @@ public class TameableGirlEntity extends PathAwareEntity implements Tameable {
             }
 
             super.tick();
+
         }
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        this.prevVelocity = this.getVelocity();
     }
 
     protected void eat(PlayerEntity player, Hand hand, ItemStack stack) {

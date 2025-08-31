@@ -2,7 +2,7 @@ package com.sandymandy.pleasurecraft.screen.client;
 
 import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.entity.base.AbstractGirlEntity;
-import com.sandymandy.pleasurecraft.networking.C2S.MovementLockStateC2SPacket;
+import com.sandymandy.pleasurecraft.networking.C2S.InInventoryC2SPacket;
 import com.sandymandy.pleasurecraft.screen.GirlInventoryScreenHandler;
 import com.sandymandy.pleasurecraft.screen.InventoryButtonAction;
 import com.sandymandy.pleasurecraft.screen.InventoryButtonRegistry;
@@ -61,7 +61,7 @@ public class GirlInventoryScreen extends HandledScreen<GirlInventoryScreenHandle
     @Override
     public void close() {
         super.close();
-        ClientPlayNetworking.send(new MovementLockStateC2SPacket(this.girl.getId(),false));
+        ClientPlayNetworking.send(new InInventoryC2SPacket(this.girl.getId(),false));
     }
 
     @Override
@@ -95,7 +95,7 @@ public class GirlInventoryScreen extends HandledScreen<GirlInventoryScreenHandle
                         if (girl != null && client != null && player != null) {
                             action.action().accept(girl, player);  // Run the button's logic
                             this.client.setScreen(null);
-                            ClientPlayNetworking.send(new MovementLockStateC2SPacket(this.girl.getId(),false));
+                            ClientPlayNetworking.send(new InInventoryC2SPacket(this.girl.getId(),false));
                         }
                     }
                 ).dimensions(startX, y, buttonWidth, buttonHeight).build());
@@ -111,9 +111,6 @@ public class GirlInventoryScreen extends HandledScreen<GirlInventoryScreenHandle
                 }
                 else if (action.label().getString().equals("Follow Me") && girl.isFollowing()){
                     dynamicLabel = Text.literal("Stop Following");
-                }
-                else if (action.label().getString().equals("Freeze") && girl.isFrozenInPlace()){
-                    dynamicLabel = Text.literal("Unfreeze");
                 }
 
                 this.addDrawableChild(ButtonWidget.builder(
