@@ -1206,7 +1206,7 @@
 				}
 			}
 		},
-		"animation.bia.anal_start": {
+		"animation.bia.anal_intro": {
 			"loop": true,
 			"animation_length": 2.84,
 			"bones": {
@@ -15749,7 +15749,7 @@
 				}
 			}
 		},
-		"animation.bia.prone_doggy_soft": {
+		"animation.bia.prone_doggy_slow": {
 			"loop": true,
 			"animation_length": 1.45833,
 			"bones": {
