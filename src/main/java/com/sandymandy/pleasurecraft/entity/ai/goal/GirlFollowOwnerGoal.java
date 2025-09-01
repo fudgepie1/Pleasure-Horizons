@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.EnumSet;
 
-public class GirlFollowOwnerGoal extends Goal {
+public class    GirlFollowOwnerGoal extends Goal {
     private final TameableGirlEntity tameable;
     @Nullable
     private LivingEntity owner;
@@ -54,7 +54,7 @@ public class GirlFollowOwnerGoal extends Goal {
         if (this.navigation.isIdle()) {
             return false;
         } else {
-            return this.tameable.cannotFollowOwner() ? false : !(this.tameable.squaredDistanceTo(this.owner) <= this.maxDistance * this.maxDistance);
+            return !this.tameable.cannotFollowOwner() && !(this.tameable.squaredDistanceTo(this.owner) <= this.maxDistance * this.maxDistance);
         }
     }
 

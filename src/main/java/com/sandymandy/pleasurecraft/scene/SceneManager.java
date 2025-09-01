@@ -11,7 +11,7 @@ import net.minecraft.util.math.BlockPos;
 import java.util.List;
 
 
-public class SceneStateManager {
+public  class SceneManager {
 
     private final AbstractGirlEntity entity;
     public String passengerBoneName = "Torso2";
@@ -23,26 +23,41 @@ public class SceneStateManager {
     private int timer = 0 ;
     BlockPos bedPos;
     // Animations
-    private String animIntro;
+    private List<String> animIntro;
     private List<String> animSlow;
     private List<String> animFast;
     private String animCum;
+    private float bedOffset;
+    private List<String> bedIdle;
     public boolean isBedScene;
+    private int index = 0;
 
     // Progress speeds
     private static final float SLOW_SPEED = 0.002f;
     private static final float FAST_SPEED = 0.01f;
 
-    public SceneStateManager(AbstractGirlEntity entity) {
+    public SceneManager(AbstractGirlEntity entity) {
         this.entity = entity;
     }
 
-    public boolean isBedScene() {
-        return isBedScene;
+    public float bedOffset(){
+        return bedOffset;
     }
 
+    public void playBedIdle(boolean clear) {
+        if(!entity.getWorld().isClient()) {
+
+            if (!clear) playPhase(ScenePhase.IDLE, bedIdle.getFirst(), false, true);
+            else {
+                if (bedIdle.contains(entity.getOverrideAnim()))
+                    entity.stopOverrideAnimations();
+            }
+        }
+    }
+
+
     public enum ScenePhase {
-        NONE, INTRO, SLOW, FAST, CUM
+        NONE, IDLE, INTRO, SLOW, FAST, CUM
     }
 
     public void startScene(PlayerEntity rider, SceneOption option) {
@@ -60,6 +75,8 @@ public class SceneStateManager {
         this.animFast = option.fastAnim();
         this.animCum = option.cumAnim();
         this.isBedScene = option.isBedScene();
+        this.bedOffset = option.bedOffset();
+        this.bedIdle = option.bedIdle();
 
         if (isBedScene) {
             //  Check for a bed before starting
@@ -104,16 +121,55 @@ public class SceneStateManager {
         entity.targetBedPos = null;
         rider.startRiding(entity, false);
 
-        playPhase(ScenePhase.INTRO, this.animIntro, false, true);
+        playPhase(ScenePhase.INTRO, this.animIntro.getFirst(), false, true);
     }
 
     public void onAnimationFinished(String finishedAnim) {
-        if (finishedAnim.equals(this.animIntro)) {
-            playPhase(ScenePhase.SLOW, getRandomFromList(this.animSlow), true, false);
-        } else if (finishedAnim.equals(this.animCum)) {
+        if(this.entity.getWorld().isClient())return;
+
+        if(finishedAnim.equals(bedIdle.getFirst())){
+            playPhase(ScenePhase.IDLE, bedIdle.getLast(), true, false);
+            return;
+        }
+
+        if (finishedAnim.equals(animCum)) {
             stopScene();
+            return;
+
+        }
+
+        if (this.animIntro.contains(finishedAnim)) {
+
+            // Find the index of the finished intro
+            this.index = animIntro.indexOf(finishedAnim);
+
+
+            if (!finishedAnim.equals(animIntro.getLast())) {
+                // Play the next intro in the list
+                entity.playAnimation(animIntro.get(this.index + 1), false, true);
+            } else {
+                // No more intros -> go to SLOW
+                playPhase(ScenePhase.SLOW, getRandomFromList(this.animSlow), true, false);
+            }
+        }
+
+    }
+
+
+
+    private void handleFinishedAnimation(String finishedAnim, List<String> sequence, Runnable onEnd) {
+        int index = sequence.indexOf(finishedAnim);
+        if (index != -1) {
+            if (index < sequence.size() - 1) {
+                // Play the next in sequence
+                playPhase(currentPhase, sequence.get(index + 1), false, true);
+            } else {
+                // Sequence finished
+                onEnd.run();
+            }
         }
     }
+
 
     private void onSceneStop() {
         if (entity.hasPassengers()) {
@@ -132,7 +188,7 @@ public class SceneStateManager {
         this.isKeyHeld = held;
     }
 
-    private void playPhase(ScenePhase phase, String animation, boolean loop, boolean holdOnLastFrame) {
+    public void playPhase(ScenePhase phase, String animation, boolean loop, boolean holdOnLastFrame) {
         currentPhase = phase;
         entity.playAnimation(animation, loop, holdOnLastFrame);
     }

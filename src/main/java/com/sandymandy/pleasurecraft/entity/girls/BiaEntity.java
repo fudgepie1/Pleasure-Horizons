@@ -11,6 +11,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.world.World;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -42,7 +43,22 @@ public class BiaEntity extends AbstractGirlEntity {
     public List<SceneOption> getSceneOptions() {
         return List.of(
                 new SceneOption("Doggy",
-                        "prone_doggy_intro", List.of("prone_doggy_soft"),List.of("prone_doggy_hard1","prone_doggy_hard2","prone_doggy_hard3"),"prone_doggy_cum",true)
+                        List.of("prone_doggy_intro"),
+                        List.of("prone_doggy_soft"),
+                        List.of("prone_doggy_hard1","prone_doggy_hard2","prone_doggy_hard3"),
+                        "prone_doggy_cum",
+                        true,
+                        1,
+                        List.of("sitdown", "sitdownidle")),
+
+                new SceneOption("Anal",
+                        List.of("anal_start"),
+                        List.of("anal_slow"),
+                        List.of("anal_fast"),
+                        "anal_cum",
+                        true,
+                        1,
+                        List.of("anal_prepare", "anal_wait"))
         );
 
     }

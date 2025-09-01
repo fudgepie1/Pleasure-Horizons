@@ -11,6 +11,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.world.World;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -45,9 +46,9 @@ public class LucyEntity extends AbstractGirlEntity{
     public List<SceneOption> getSceneOptions() {
         return List.of(
                 new SceneOption("Paizuri",
-                        "paizuri_start", List.of("paizuri_slow"),List.of("paizuri_fast"),"paizuri_cum",false),
+                        List.of("paizuri_start"), List.of("paizuri_slow"),List.of("paizuri_fast"),"paizuri_cum",false, 0, new ArrayList<>()),
                 new SceneOption("Blow Job",
-                        "blowjob_start",List.of("blowjob_slow"),List.of("blowjob_fast"),"blowjob_cum",false)
+                        List.of("blowjob_start"),List.of("blowjob_slow"),List.of("blowjob_fast"),"blowjob_cum",false, 0, new ArrayList<>())
         );
     }
 

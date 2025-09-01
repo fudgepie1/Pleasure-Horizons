@@ -9,7 +9,7 @@ import com.sandymandy.pleasurecraft.networking.C2S.NextSceneAnimationC2SPacket;
 import com.sandymandy.pleasurecraft.networking.C2S.OverrideAnimationStateSyncC2SPacket;
 import com.sandymandy.pleasurecraft.networking.S2C.ClothingArmorVisibilityS2CPacket;
 import com.sandymandy.pleasurecraft.scene.SceneOption;
-import com.sandymandy.pleasurecraft.scene.SceneStateManager;
+import com.sandymandy.pleasurecraft.scene.SceneManager;
 import com.sandymandy.pleasurecraft.screen.GirlInventoryScreenHandlerFactory;
 import com.sandymandy.pleasurecraft.util.PleasureCraftMessages;
 import com.sandymandy.pleasurecraft.util.inventory.GirlInventory;
@@ -61,7 +61,6 @@ import java.util.*;
 
 public abstract class AbstractGirlEntity extends TameableGirlEntity implements GeoEntity {
     private static final TrackedData<Boolean> WAITING_AT_BED = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
-    private static final TrackedData<Boolean> MOVING_TO_BED = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<Boolean> LOCKED_STATE = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<Boolean> FROZEN_STATE = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<Boolean> STRIPPED = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
@@ -73,7 +72,7 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
     private static final TrackedData<Boolean> OVERRIDE_ANIM_PLAYING = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     public static final TrackedData<Float> SCENE_PROGRESS = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.FLOAT);
     private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
-    private final SceneStateManager sceneManager = new SceneStateManager(this);
+    private final SceneManager sceneManager = new SceneManager(this);
     public Map<String, Boolean> boneVisibility = new HashMap<>();
     public Map<String, Identifier> boneTextureOverrides = new HashMap<>();
     public Map<String, Identifier> playerTexture = new HashMap<>();
@@ -198,7 +197,6 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
     @Override
     protected void initDataTracker(DataTracker.Builder builder) {
         super.initDataTracker(builder);
-        builder.add(MOVING_TO_BED, false);
         builder.add(WAITING_AT_BED, false);
         builder.add(LOCKED_STATE, false);
         builder.add(FROZEN_STATE, false);
@@ -239,7 +237,7 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
 
     @Override
     protected void initGoals() {
-        this.goalSelector.add(-3, new BedGoal(this, 1.0));
+        this.goalSelector.add(-3, new BedGoal(this, 1.25D));
         this.goalSelector.add(-2, new StripGoal(this));
         this.goalSelector.add(-1, new StopMovementGoal(this));
         this.goalSelector.add(0, new GirlSitGoal(this));
@@ -252,9 +250,9 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
             }
         });
         this.goalSelector.add(4, new GirlAttackGoal(this, 1.5, false));
-        this.goalSelector.add(5, new ConditionalGoal(new GirlFollowOwnerGoal(this, 1.0, 10.0F, 2.0F), () -> isFollowing() && !isMovingToBed()));
-        this.goalSelector.add(6, new ConditionalGoal(new TemptGoal(this, 1.25D, Ingredient.ofItems(getTameItem()), false),() -> !isMovingToBed()));
-        this.goalSelector.add(7, new ConditionalGoal(new WanderAroundGoal(this, 1.0D),() -> !isMovingToBed()));
+        this.goalSelector.add(5, new ConditionalGoal(new GirlFollowOwnerGoal(this, 1.0, 10.0F, 2.0F), this::isFollowing));
+        this.goalSelector.add(6, new TemptGoal(this, 1.25D, Ingredient.ofItems(getTameItem()), false));
+        this.goalSelector.add(7, new WanderAroundGoal(this, 1.0D));
         this.goalSelector.add(8, new ConditionalGoal(new LookAtEntityGoal(this, PlayerEntity.class, 6.0F),() -> !isMovementLocked()));
         this.goalSelector.add(9, new ConditionalGoal(new LookAroundGoal(this),() -> !isMovementLocked()));
         this.targetSelector.add(1, new GirlTrackOwnerAttackerGoal(this));
@@ -431,14 +429,6 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
         return this.dataTracker.get(OVERRIDE_ANIM_PLAYING);
     }
     
-    public boolean isMovingToBed(){
-        return this.dataTracker.get(MOVING_TO_BED);
-    }
-
-    public void setMovingToBedState(boolean state){
-        this.dataTracker.set(MOVING_TO_BED, state);
-    }
-
     public boolean isWaitingAtBed(){
         return this.dataTracker.get(WAITING_AT_BED);
     }
@@ -565,8 +555,6 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
                 if (controller.getAnimationState() == AnimationController.State.STOPPED || controller.getAnimationState() == AnimationController.State.PAUSED) {
                     ClientPlayNetworking.send(new NextSceneAnimationC2SPacket(this.getId(), this.currentAnimState));
                 }
-
-
             }
         }
         else {
@@ -591,6 +579,19 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
         return PlayState.CONTINUE;
 
     }
+    private String lastFinishedAnim = "";
+
+
+    public void animationFinished(String finishedAnimation){
+        if (finishedAnimation.equals(lastFinishedAnim)) return; // ignore duplicates
+        lastFinishedAnim = finishedAnimation;
+        if (this.getWorld().isClient()) return;
+
+
+        this.dataTracker.set(OVERRIDE_ANIM_PLAYING, false);
+        this.sceneManager.onAnimationFinished(finishedAnimation);
+        if(!isSceneActive()) stopOverrideAnimations();
+    }
 
     private String getDefaultAnimation(AnimationState<?> state) {
         if (!this.isOnGround() && !isSitting()) return "fly";
@@ -600,8 +601,8 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
     }
 
 
-
     // Call this to force an animation
+
     public void playAnimation(String animationName, boolean loop, boolean holdOnLastFrame) {
         if (!this.getWorld().isClient) { // run only on server
             this.setOverrideAnim(animationName != null ? animationName : "");
@@ -617,13 +618,6 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
 
     public void stopOverrideAnimations() {
         ClientPlayNetworking.send(new AnimationSyncC2SPacket(this.getId(), "",false,false));
-    }
-
-    public void animationFinished(String finishedAnimation){
-
-        this.dataTracker.set(OVERRIDE_ANIM_PLAYING, false);
-        this.sceneManager.onAnimationFinished(finishedAnimation);
-        if(!isSceneActive()) stopOverrideAnimations();
     }
 
     @Override
@@ -852,7 +846,7 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
         }
     }
 
-    public SceneStateManager getSceneManager() {
+    public SceneManager getSceneManager() {
         return sceneManager;
     }
 

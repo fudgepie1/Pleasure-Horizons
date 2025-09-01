@@ -1,10 +1,12 @@
 package com.sandymandy.pleasurecraft.entity.ai.goal;
 
 import com.sandymandy.pleasurecraft.entity.base.AbstractGirlEntity;
+import com.sandymandy.pleasurecraft.scene.SceneManager;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.ai.pathing.BirdNavigation;
 import net.minecraft.entity.ai.pathing.EntityNavigation;
 import net.minecraft.entity.ai.pathing.MobNavigation;
+import net.minecraft.entity.ai.pathing.Path;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.state.property.Properties;
@@ -21,18 +23,19 @@ public class BedGoal extends Goal {
     private final double speed;
     private PlayerEntity player;
     private final EntityNavigation navigation;
+    private SceneManager sceneManager;
     private Direction bedFacing;
     private Vec3d snapPos;
-    private double snapPosX;
-    private double snapPosZ;
+    private Path pathToBed;
 
     public BedGoal(AbstractGirlEntity entity, double speed) {
         this.entity = entity;
         this.speed = speed;
         this.navigation = entity.getNavigation();
-        this.setControls(EnumSet.of(Goal.Control.MOVE, Goal.Control.LOOK));
+        this.sceneManager = entity.getSceneManager();
+        this.setControls(EnumSet.of(Goal.Control.MOVE, Goal.Control.LOOK, Control.JUMP));
         if (!(entity.getNavigation() instanceof MobNavigation) && !(entity.getNavigation() instanceof BirdNavigation)) {
-            throw new IllegalArgumentException("Unsupported mob type for FollowOwnerGoal");
+            throw new IllegalArgumentException("Unsupported mob type for BedGoal");
         }
     }
 
@@ -48,7 +51,9 @@ public class BedGoal extends Goal {
 
     @Override
     public void start() {
+        this.sceneManager = entity.getSceneManager();
         this.player = (PlayerEntity) this.entity.getOwner();
+        this.snapPos = Vec3d.of(this.entity.targetBedPos);
 
         var state = this.entity.getWorld().getBlockState(this.entity.targetBedPos);
         if (state.contains(Properties.HORIZONTAL_FACING)) {
@@ -60,10 +65,22 @@ public class BedGoal extends Goal {
 
         if (bedFacing == Direction.NORTH){
             this.entity.targetBedPos = new BlockPos(this.entity.targetBedPos.getX(), this.entity.targetBedPos.getY(), this.entity.targetBedPos.getZ() + 1);
+            this.snapPos = new Vec3d(this.entity.targetBedPos.getX() + 0.5, this.entity.targetBedPos.getY(), this.entity.targetBedPos.getZ() + 1.5);
+
+        }
+        else if (bedFacing == Direction.EAST){
+            this.snapPos = new Vec3d(this.entity.targetBedPos.getX() - 0.5, this.entity.targetBedPos.getY(), this.entity.targetBedPos.getZ() + 0.5);
+
+        }
+        else if (bedFacing == Direction.SOUTH){
+            this.snapPos = new Vec3d(this.entity.targetBedPos.getX() + 0.5, this.entity.targetBedPos.getY(), this.entity.targetBedPos.getZ() - 0.5);
         }
         else if (bedFacing == Direction.WEST){
             this.entity.targetBedPos = new BlockPos(this.entity.targetBedPos.getX() + 1, this.entity.targetBedPos.getY(), this.entity.targetBedPos.getZ());
+            this.snapPos = new Vec3d(this.entity.targetBedPos.getX() + 1.5, this.entity.targetBedPos.getY(), this.entity.targetBedPos.getZ() + 0.5);
         }
+
+        pathToBed = this.navigation.findPathTo(this.entity.targetBedPos, 1);
     }
 
     @Override
@@ -87,26 +104,30 @@ public class BedGoal extends Goal {
                 this.entity.setWaitingAtBedState(true);
 
                 // Snap to Bed
-                this.entity.setPosition(this.entity.targetBedPos.getX() + 0.5, this.entity.targetBedPos.getY() + 0.4, this.entity.targetBedPos.getZ() + 0.5);
+                this.entity.setPosition(snapPos);
 
                 // Start the Scene
+                this.sceneManager.playBedIdle(false);
                 startOnContact();
             }
         }
         else {
-            this.entity.messageAsEntity("Moving to bed");
-            this.navigation.startMovingTo(this.entity.targetBedPos.getX(), this.entity.targetBedPos.getY(), this.entity.targetBedPos.getZ(), this.speed);
+            this.navigation.startMovingAlong(pathToBed, this.speed);
         }
     }
 
     private void startOnContact(){
         if(this.entity.squaredDistanceTo(this.player) <= 1.5){
-            entity.getSceneManager().onSceneStart(player);
+            this.entity.setPosition(this.entity.targetBedPos.getX() + 0.5, this.entity.targetBedPos.getY(), this.entity.targetBedPos.getZ() + 0.5);
+            sceneManager.onSceneStart(player);
         }
     }
 
     @Override
     public void stop() {
+        this.navigation.stop();
         this.entity.setWaitingAtBedState(false);
+        this.sceneManager.playBedIdle(true);
     }
+
 }

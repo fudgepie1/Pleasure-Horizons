@@ -1,8 +1,8 @@
 # Changelog
 
 ## 0.3.3
-- Fixed a bug where the entity wouldn't take any knockback after unfreezing \
-- 
+- Fixed a bug where the entity wouldn't take any knockback after unfreezing
+- Made the entity check and move to nearby beds for bed scenes
 
 
 ## 0.3.2
