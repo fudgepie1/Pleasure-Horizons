@@ -1,6 +1,7 @@
 package com.sandymandy.pleasurecraft.client.renderers;
 
 import com.sandymandy.pleasurecraft.entity.base.AbstractGirlEntity;
+import com.sandymandy.pleasurecraft.entity.base.SceneEntity;
 import com.sandymandy.pleasurecraft.util.renderer.OffsetVertexConsumer;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
@@ -17,7 +18,7 @@ import software.bernie.geckolib.renderer.GeoEntityRenderer;
 
 import java.util.Map;
 
-public abstract class AbstractGirlRenderer<T extends AbstractGirlEntity> extends GeoEntityRenderer<T> {
+public abstract class AbstractGirlRenderer<T extends SceneEntity> extends GeoEntityRenderer<T> {
 
     public AbstractGirlRenderer(EntityRendererFactory.Context renderManager, GeoModel<T> model) {
         super(renderManager, model);
@@ -57,7 +58,7 @@ public abstract class AbstractGirlRenderer<T extends AbstractGirlEntity> extends
                             VertexConsumerProvider vertexConsumers, VertexConsumer vertexConsumer,
                             float tickDelta, int light, int overlay, int color) {
 
-        entity.handlePassengerBone(getGeoModel().getBone(entity.getSceneManager().passengerBoneName).get());
+        entity.handlePassengerBone(getGeoModel().getBone(entity.passengerBoneName).get());
 
         super.renderFinal(matrices, entity, model, vertexConsumers, vertexConsumer,
                 tickDelta, light, overlay, color);

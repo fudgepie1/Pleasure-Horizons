@@ -1,8 +1,7 @@
 package com.sandymandy.pleasurecraft.screen.client;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.sandymandy.pleasurecraft.networking.C2S.StartSceneC2SPacket;
-import com.sandymandy.pleasurecraft.scene.SceneOption;
+import com.sandymandy.pleasurecraft.util.SceneOption;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;

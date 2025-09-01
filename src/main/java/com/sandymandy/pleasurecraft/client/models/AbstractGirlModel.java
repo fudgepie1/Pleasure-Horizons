@@ -1,6 +1,6 @@
 package com.sandymandy.pleasurecraft.client.models;
 
-import com.sandymandy.pleasurecraft.entity.base.AbstractGirlEntity;
+import com.sandymandy.pleasurecraft.entity.base.SceneEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
@@ -11,7 +11,7 @@ import software.bernie.geckolib.model.GeoModel;
 import software.bernie.geckolib.model.data.EntityModelData;
 import software.bernie.geckolib.renderer.GeoRenderer;
 
-public abstract class AbstractGirlModel<T extends AbstractGirlEntity> extends GeoModel<T> {
+public abstract class AbstractGirlModel<T extends SceneEntity> extends GeoModel<T> {
 
     @Override
     public abstract Identifier getModelResource(T animatable, GeoRenderer<T> renderer);

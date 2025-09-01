@@ -3,13 +3,9 @@ package com.sandymandy.pleasurecraft.entity.base;
 import com.mojang.authlib.GameProfile;
 import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.entity.ai.goal.*;
-import com.sandymandy.pleasurecraft.networking.C2S.AnimationSyncC2SPacket;
 import com.sandymandy.pleasurecraft.networking.C2S.BonePosSyncC2SPacket;
-import com.sandymandy.pleasurecraft.networking.C2S.NextSceneAnimationC2SPacket;
-import com.sandymandy.pleasurecraft.networking.C2S.OverrideAnimationStateSyncC2SPacket;
 import com.sandymandy.pleasurecraft.networking.S2C.ClothingArmorVisibilityS2CPacket;
-import com.sandymandy.pleasurecraft.scene.SceneOption;
-import com.sandymandy.pleasurecraft.scene.SceneManager;
+import com.sandymandy.pleasurecraft.util.SceneOption;
 import com.sandymandy.pleasurecraft.screen.GirlInventoryScreenHandlerFactory;
 import com.sandymandy.pleasurecraft.util.PleasureCraftMessages;
 import com.sandymandy.pleasurecraft.util.inventory.GirlInventory;
@@ -48,12 +44,9 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3d;
-import software.bernie.geckolib.animatable.GeoAnimatable;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animatable.instance.SingletonAnimatableInstanceCache;
-import software.bernie.geckolib.animation.*;
-import software.bernie.geckolib.animation.AnimationState;
 import software.bernie.geckolib.cache.object.GeoBone;
 
 import java.util.*;
@@ -72,7 +65,6 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
     private static final TrackedData<Boolean> OVERRIDE_ANIM_PLAYING = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     public static final TrackedData<Float> SCENE_PROGRESS = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.FLOAT);
     private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
-    private final SceneManager sceneManager = new SceneManager(this);
     public Map<String, Boolean> boneVisibility = new HashMap<>();
     public Map<String, Identifier> boneTextureOverrides = new HashMap<>();
     public Map<String, Identifier> playerTexture = new HashMap<>();
@@ -83,22 +75,23 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
     private final GirlInventory inventory = GirlInventory.ofSize();
     private BlockPos basePos;
     private LivingEntity attackTarget;
-    private int ticksSinceLastHit;
-    private static final int MAX_TICKS_NO_HIT = 20 * 20;
-    public float previousYaw = 0;
     public Vec3d previousVelocity = Vec3d.ZERO;
     public Vec3d clientPassengerBonePos = Vec3d.ZERO;
     public Vec3d serverPassengerBonePos = Vec3d.ZERO;
-    public boolean showHiddenBones = false;
     public final int maxRelationshipLevel = 3;
+    private int ticksSinceLastHit;
     public int currentRelationshipLevel;
-    private String currentAnimState = "idle";
-    private boolean currentLoopState = false;
-    private boolean currentHoldState = false;
+    private static final int MAX_TICKS_NO_HIT = 20 * 20;
+    public float previousYaw = 0;
+    public float passengerYOffset = 0f;
+    public String currentAnimState = "idle";
+    public boolean currentLoopState = false;
+    public boolean currentHoldState = false;
     private boolean requestStrip = false;
     private boolean requestMoveToBed = false;
     private boolean inInventory = false;
     public BlockPos targetBedPos;
+
 
 
 
@@ -118,7 +111,9 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
 
     public float getYAxisGUI(){return 0.0625F;}
 
-    public abstract List<SceneOption> getSceneOptions();
+    public List<SceneOption> getSceneOptions() {
+        return new ArrayList<>();
+    }
 
 
     protected Map<EquipmentSlot, List<String>> getClothingBones() {
@@ -237,9 +232,6 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
 
     @Override
     protected void initGoals() {
-        this.goalSelector.add(-3, new BedGoal(this, 1.25D));
-        this.goalSelector.add(-2, new StripGoal(this));
-        this.goalSelector.add(-1, new StopMovementGoal(this));
         this.goalSelector.add(0, new GirlSitGoal(this));
         this.goalSelector.add(1, new SwimGoal(this));
         this.goalSelector.add(2, new TameableEscapeDangerGoal(1.5D, DamageTypeTags.PANIC_ENVIRONMENTAL_CAUSES));
@@ -258,7 +250,6 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
         this.targetSelector.add(1, new GirlTrackOwnerAttackerGoal(this));
         this.targetSelector.add(2, new GirlAttackWithOwnerGoal(this));
         this.targetSelector.add(3, new RevengeGoal(this, PlayerEntity.class));
-
     }
 
 
@@ -530,97 +521,6 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
     }
 
     @Override
-    public void registerControllers(AnimatableManager.ControllerRegistrar controllerRegistrar) {
-        controllerRegistrar.add(new AnimationController<>(this, "controller", 4, this::handleAnimations));
-    }
-
-    private <T extends GeoAnimatable> PlayState handleAnimations(AnimationState<T> state) {
-        AnimationController<?> controller = state.getController();
-
-        String overrideAnim = this.getOverrideAnim();
-        boolean overrideLoop = this.getOverrideLoop();
-        boolean overrideHold = this.getOverrideHold();
-
-        // 1. Forced animation override
-        if (overrideAnim != null && !overrideAnim.isEmpty()) {
-            this.currentAnimState = overrideAnim;
-            this.currentLoopState = overrideLoop;
-            this.currentHoldState = overrideHold;
-
-            if (controller.getAnimationState() == AnimationController.State.RUNNING) ClientPlayNetworking.send(new OverrideAnimationStateSyncC2SPacket(this.getId(), true));
-
-            if(!overrideLoop) {
-
-                // End override if it was one-shot and finished playing
-                if (controller.getAnimationState() == AnimationController.State.STOPPED || controller.getAnimationState() == AnimationController.State.PAUSED) {
-                    ClientPlayNetworking.send(new NextSceneAnimationC2SPacket(this.getId(), this.currentAnimState));
-                }
-            }
-        }
-        else {
-            ClientPlayNetworking.send(new OverrideAnimationStateSyncC2SPacket(this.getId(), false));
-            this.currentAnimState = getDefaultAnimation(state);
-            this.currentLoopState = true;
-        }
-
-        Animation.LoopType loopType;
-
-        if (this.currentLoopState) {
-            loopType = Animation.LoopType.LOOP;
-        } else if (this.currentHoldState) {
-            loopType = Animation.LoopType.HOLD_ON_LAST_FRAME;
-        } else {
-            loopType = Animation.LoopType.PLAY_ONCE;
-        }
-
-
-        controller.setAnimation(RawAnimation.begin().then
-                (getAnimationPath(this.currentAnimState), loopType));
-        return PlayState.CONTINUE;
-
-    }
-    private String lastFinishedAnim = "";
-
-
-    public void animationFinished(String finishedAnimation){
-        if (finishedAnimation.equals(lastFinishedAnim)) return; // ignore duplicates
-        lastFinishedAnim = finishedAnimation;
-        if (this.getWorld().isClient()) return;
-
-
-        this.dataTracker.set(OVERRIDE_ANIM_PLAYING, false);
-        this.sceneManager.onAnimationFinished(finishedAnimation);
-        if(!isSceneActive()) stopOverrideAnimations();
-    }
-
-    private String getDefaultAnimation(AnimationState<?> state) {
-        if (!this.isOnGround() && !isSitting()) return "fly";
-        if (state.isMoving() && !isSitting()) return "walk";
-        if (isSitting()) return "sit";
-        return "idle";
-    }
-
-
-    // Call this to force an animation
-
-    public void playAnimation(String animationName, boolean loop, boolean holdOnLastFrame) {
-        if (!this.getWorld().isClient) { // run only on server
-            this.setOverrideAnim(animationName != null ? animationName : "");
-            this.setOverrideLoop(loop);
-            this.setOverrideHold(holdOnLastFrame);
-        } else {
-            ClientPlayNetworking.send(new AnimationSyncC2SPacket(this.getId(),
-                    animationName != null ? animationName : "",
-                    loop,
-                    holdOnLastFrame));
-        }
-    }
-
-    public void stopOverrideAnimations() {
-        ClientPlayNetworking.send(new AnimationSyncC2SPacket(this.getId(), "",false,false));
-    }
-
-    @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
         return cache;
     }
@@ -662,7 +562,6 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
 
     public void tick() {
         super.tick();
-        this.getSceneManager().tick();
         previousYaw = getYaw();
         previousVelocity = getVelocity();
         updateClothingAndArmor();
@@ -839,15 +738,11 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
         /*This is not based on the local coordinates from the entity. it is the global coordinates based on the world. It also has a base offset of -0.6 on the Y Axis
         * This is also based on the client not the server*/
         if(this.getPassengerBone() == Vec3d.ZERO){
-            return this.getPos().add(0,this.getSceneManager().passengerYOffset,0);
+            return this.getPos().add(0,this.passengerYOffset,0);
         }
         else {
-            return this.getPassengerBone().add(0,this.getSceneManager().passengerYOffset,0);
+            return this.getPassengerBone().add(0,this.passengerYOffset,0);
         }
-    }
-
-    public SceneManager getSceneManager() {
-        return sceneManager;
     }
 
     @Override
@@ -987,9 +882,6 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
 
     }
 
-    private String getAnimationPath(String animation){
-        return "animation." + this.getGirlID() + "." + animation;
-    }
 
     private float getArmorU(String armorType){
         if (armorType.contains("turtle")) return 0.10546875f;

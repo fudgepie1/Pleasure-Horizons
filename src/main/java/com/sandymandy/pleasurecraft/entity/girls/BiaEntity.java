@@ -1,7 +1,8 @@
 package com.sandymandy.pleasurecraft.entity.girls;
 
 import com.sandymandy.pleasurecraft.entity.base.AbstractGirlEntity;
-import com.sandymandy.pleasurecraft.scene.SceneOption;
+import com.sandymandy.pleasurecraft.entity.base.SceneEntity;
+import com.sandymandy.pleasurecraft.util.SceneOption;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
@@ -9,13 +10,13 @@ import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
+import net.minecraft.util.math.Vec2f;
 import net.minecraft.world.World;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class BiaEntity extends AbstractGirlEntity {
+public class BiaEntity extends SceneEntity {
 
     public BiaEntity(EntityType<? extends AbstractGirlEntity> entityType, World world) {
         super(entityType, world);
@@ -44,20 +45,20 @@ public class BiaEntity extends AbstractGirlEntity {
         return List.of(
                 new SceneOption("Doggy",
                         List.of("prone_doggy_intro"),
-                        List.of("prone_doggy_soft"),
+                        List.of("prone_doggy_slow"),
                         List.of("prone_doggy_hard1","prone_doggy_hard2","prone_doggy_hard3"),
                         "prone_doggy_cum",
                         true,
-                        1,
+                        1f,
                         List.of("sitdown", "sitdownidle")),
 
                 new SceneOption("Anal",
-                        List.of("anal_start"),
+                        List.of("anal_intro"),
                         List.of("anal_slow"),
                         List.of("anal_fast"),
                         "anal_cum",
                         true,
-                        1,
+                        0f,
                         List.of("anal_prepare", "anal_wait"))
         );
 

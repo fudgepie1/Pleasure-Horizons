@@ -1,7 +1,7 @@
 package com.sandymandy.pleasurecraft.networking.C2S;
 
 import com.sandymandy.pleasurecraft.PleasureCraft;
-import com.sandymandy.pleasurecraft.scene.SceneOption;
+import com.sandymandy.pleasurecraft.util.SceneOption;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;

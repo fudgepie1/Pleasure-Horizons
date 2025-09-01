@@ -1,7 +1,8 @@
 package com.sandymandy.pleasurecraft.entity.girls;
 
 import com.sandymandy.pleasurecraft.entity.base.AbstractGirlEntity;
-import com.sandymandy.pleasurecraft.scene.SceneOption;
+import com.sandymandy.pleasurecraft.entity.base.SceneEntity;
+import com.sandymandy.pleasurecraft.util.SceneOption;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
@@ -9,13 +10,14 @@ import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
+import net.minecraft.util.math.Vec2f;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class LucyEntity extends AbstractGirlEntity{
+public class LucyEntity extends SceneEntity {
 
     public LucyEntity(EntityType<? extends AbstractGirlEntity> entityType, World world) {
         super(entityType, world);
@@ -46,9 +48,18 @@ public class LucyEntity extends AbstractGirlEntity{
     public List<SceneOption> getSceneOptions() {
         return List.of(
                 new SceneOption("Paizuri",
-                        List.of("paizuri_start"), List.of("paizuri_slow"),List.of("paizuri_fast"),"paizuri_cum",false, 0, new ArrayList<>()),
+                        List.of("paizuri_intro"), List.of("paizuri_slow"),List.of("paizuri_fast"),"paizuri_cum",false, 0, new ArrayList<>()),
+
                 new SceneOption("Blow Job",
-                        List.of("blowjob_start"),List.of("blowjob_slow"),List.of("blowjob_fast"),"blowjob_cum",false, 0, new ArrayList<>())
+                        List.of("blowjob_intro"),List.of("blowjob_slow"),List.of("blowjob_fast"),"blowjob_cum",false, 0, new ArrayList<>()),
+                new SceneOption("Doggy",
+                        List.of("doggy_intro"),
+                        List.of("doggy_slow"),
+                        List.of("doggy_fast1","doggy_fast2"),
+                        "doggy_cum",
+                        true,
+                        0f,
+                        List.of("doggy_lay_on_bed", "doggy_bed_idle"))
         );
     }
 

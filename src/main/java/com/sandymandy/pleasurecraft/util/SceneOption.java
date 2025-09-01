@@ -1,9 +1,9 @@
-package com.sandymandy.pleasurecraft.scene;
+package com.sandymandy.pleasurecraft.util;
 
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
-import org.joml.Vector3f;
+import net.minecraft.util.math.Vec2f;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,5 +30,4 @@ public record SceneOption(
             PacketCodecs.collection(ArrayList::new, PacketCodecs.STRING), SceneOption::bedIdle,
             SceneOption::new
     );
-
 }

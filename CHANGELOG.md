@@ -3,6 +3,7 @@
 ## 0.3.3
 - Fixed a bug where the entity wouldn't take any knockback after unfreezing
 - Made the entity check and move to nearby beds for bed scenes
+- Added 2 more scenes one for lucy and one for bia
 
 
 ## 0.3.2
@@ -26,5 +27,4 @@
 
 ## TODO
 - Fix the animation randomizer in the Scene
-- Make it so that the player needs a bed to start bed related scenes. By using this.getMoveControl().moveTo(x, y, z, s);
 - Make the AI more advance.

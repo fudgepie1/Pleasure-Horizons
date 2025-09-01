@@ -2,6 +2,7 @@ package com.sandymandy.pleasurecraft.networking;
 
 import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.entity.base.AbstractGirlEntity;
+import com.sandymandy.pleasurecraft.entity.base.SceneEntity;
 import com.sandymandy.pleasurecraft.networking.C2S.*;
 import com.sandymandy.pleasurecraft.networking.S2C.ClothingArmorVisibilityS2CPacket;
 import com.sandymandy.pleasurecraft.networking.S2C.SceneOptionsS2CPacket;
@@ -41,7 +42,7 @@ public class PleasureCraftPackets {
         ServerPlayNetworking.registerGlobalReceiver(InventoryButtonC2SPacket.ID,
                 (packet, context) -> Objects.requireNonNull(context.player().getServer()).execute(() -> {
                             var entity = context.player().getWorld().getEntityById(packet.entityId());
-                            if (entity instanceof AbstractGirlEntity girl) {
+                            if (entity instanceof SceneEntity girl) {
                                 switch (packet.actionId()) {
                                     case "stripOrDressup" -> girl.requestStrip(true, context.player());
                                     case "breakUp" -> girl.breakUp(context.player());
@@ -60,7 +61,7 @@ public class PleasureCraftPackets {
         ServerPlayNetworking.registerGlobalReceiver(BonePosSyncC2SPacket.ID,
                 (packet, context) -> Objects.requireNonNull(context.player().getServer()).execute(() -> {
                             var entity = context.player().getWorld().getEntityById(packet.entityId());
-                            if (entity instanceof AbstractGirlEntity girl) {
+                            if (entity instanceof SceneEntity girl) {
                                 girl.cachePassengerBone(true, packet.position());
                             }
 
@@ -70,7 +71,7 @@ public class PleasureCraftPackets {
         ServerPlayNetworking.registerGlobalReceiver(AnimationSyncC2SPacket.ID,
                 (packet, context) -> Objects.requireNonNull(context.player().getServer()).execute(() -> {
                             var entity = context.player().getWorld().getEntityById(packet.entityId());
-                            if (entity instanceof AbstractGirlEntity girl) {
+                            if (entity instanceof SceneEntity girl) {
                                 girl.setOverrideAnim(packet.animationState());
                                 girl.setOverrideLoop(packet.loopState());
                                 girl.setOverrideHold(packet.holdState());
@@ -82,9 +83,9 @@ public class PleasureCraftPackets {
         ServerPlayNetworking.registerGlobalReceiver(CumKeybindC2SPacket.ID,
                 (packet, context) -> Objects.requireNonNull(context.player().getServer()).execute(() -> {
                     var entity = context.player().getVehicle();
-                    if (entity instanceof AbstractGirlEntity girl) {
+                    if (entity instanceof SceneEntity girl) {
                         if (packet.pressed()) {
-                            girl.getSceneManager().tryTriggerCum();
+                            girl.tryTriggerCum();
                         }
                     }
                 }));
@@ -92,15 +93,15 @@ public class PleasureCraftPackets {
         ServerPlayNetworking.registerGlobalReceiver(ThrustKeybindC2SPacket.ID,
                 (packet, context) -> Objects.requireNonNull(context.player().getServer()).execute(() -> {
                     var entity = context.player().getVehicle();
-                    if (entity instanceof AbstractGirlEntity girl) {
-                        girl.getSceneManager().setKeyHeld(packet.held());
+                    if (entity instanceof SceneEntity girl) {
+                        girl.setKeyHeld(packet.held());
                     }
                 }));
 
         ServerPlayNetworking.registerGlobalReceiver(NextSceneAnimationC2SPacket.ID,
                 (packet, context) -> Objects.requireNonNull(context.player().getServer()).execute(() -> {
                     var entity = context.player().getWorld().getEntityById(packet.entityId());
-                    if (entity instanceof AbstractGirlEntity girl) {
+                    if (entity instanceof SceneEntity girl) {
                         girl.animationFinished(packet.finishedAnimation());
                     }
                 }));
@@ -108,15 +109,15 @@ public class PleasureCraftPackets {
         ServerPlayNetworking.registerGlobalReceiver(StartSceneC2SPacket.ID,
                 (packet, context) -> Objects.requireNonNull(context.player().getServer()).execute(() -> {
                     var entity = context.player().getWorld().getEntityById(packet.entityId());
-                    if (entity instanceof AbstractGirlEntity girl) {
-                        girl.getSceneManager().startScene(context.player(), packet.sceneOptions());
+                    if (entity instanceof SceneEntity girl) {
+                        girl.startScene(context.player(), packet.sceneOptions());
                     }
                 }));
 
         ServerPlayNetworking.registerGlobalReceiver(InInventoryC2SPacket.ID,
                 (packet, context) -> Objects.requireNonNull(context.player().getServer()).execute(() -> {
                     var entity = context.player().getWorld().getEntityById(packet.entityId());
-                    if (entity instanceof AbstractGirlEntity girl) {
+                    if (entity instanceof SceneEntity girl) {
                         girl.setInInventory(packet.data());
                     }
                 }));
@@ -124,7 +125,7 @@ public class PleasureCraftPackets {
         ServerPlayNetworking.registerGlobalReceiver(OverrideAnimationStateSyncC2SPacket.ID,
                 (packet, context) -> Objects.requireNonNull(context.player().getServer()).execute(() -> {
                     var entity = context.player().getWorld().getEntityById(packet.entityId());
-                    if (entity instanceof AbstractGirlEntity girl) {
+                    if (entity instanceof SceneEntity girl) {
                         girl.setOverrideAnimPlayingState(packet.state());
                     }
                 }));
@@ -139,7 +140,7 @@ public class PleasureCraftPackets {
                     if (world == null) return;
 
                     Entity entity = world.getEntityById(packet.entityId());
-                    if (entity instanceof AbstractGirlEntity girl) {
+                    if (entity instanceof SceneEntity girl) {
                         int i = 0;
                         for (EquipmentSlot slot : EquipmentSlot.values()) {
                             girl.clothingVisibility.put(slot, packet.clothing().get(i));

@@ -1,12 +1,11 @@
 package com.sandymandy.pleasurecraft.networking.S2C;
 
 import com.sandymandy.pleasurecraft.PleasureCraft;
-import com.sandymandy.pleasurecraft.scene.SceneOption;
+import com.sandymandy.pleasurecraft.util.SceneOption;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 import java.util.ArrayList;
