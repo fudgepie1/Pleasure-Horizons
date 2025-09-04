@@ -1,6 +1,5 @@
 package com.sandymandy.pleasurecraft.entity.ai.goal;
 
-import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.entity.base.SceneEntity;
 import com.sandymandy.pleasurecraft.util.Utils;
 import net.minecraft.entity.ai.goal.Goal;
@@ -85,7 +84,6 @@ public class BedGoal extends Goal {
     @Override
     public void tick() {
         handleMovement();
-        PleasureCraft.LOGGER.info(this.snapPos+"");
         startOnContact();
     }
 
@@ -93,8 +91,6 @@ public class BedGoal extends Goal {
         if (this.entity.squaredDistanceTo(this.entity.targetBedPos.toCenterPos()) <= 3) {
             if (player != null) {
                 this.navigation.stop();
-                PleasureCraft.LOGGER.info(entity.getBedOffset()+"");
-
                 // Make the entity Face the direction of the bed
                 if (bedFacing != null) {
                     float yaw = Direction.getHorizontalDegreesOrThrow(bedFacing); // Direction → yaw in degrees
@@ -130,8 +126,6 @@ public class BedGoal extends Goal {
         this.navigation.stop();
         this.entity.setWaitingAtBedState(false);
         this.entity.playBedIdle(true);
-        PleasureCraft.LOGGER.info(entity.targetBedPos+"");
-
     }
 
 }

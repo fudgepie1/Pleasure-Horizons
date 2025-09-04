@@ -1,7 +1,7 @@
 package com.sandymandy.pleasurecraft.screen.client;
 
 import com.sandymandy.pleasurecraft.networking.C2S.StartSceneC2SPacket;
-import com.sandymandy.pleasurecraft.util.SceneOption;
+import com.sandymandy.pleasurecraft.util.SceneOptions;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -13,9 +13,9 @@ import java.util.List;
 
 public class GirlSceneScreen extends Screen {
     private final int entityId;
-    private final List<SceneOption> sceneOptions;
+    private final List<SceneOptions> sceneOptions;
 
-    public GirlSceneScreen(int entityId, List<SceneOption> sceneOptions) {
+    public GirlSceneScreen(int entityId, List<SceneOptions> sceneOptions) {
         super(Text.literal("Scene Options"));
         this.entityId = entityId;
         this.sceneOptions = sceneOptions;
@@ -24,7 +24,7 @@ public class GirlSceneScreen extends Screen {
     @Override
     protected void init() {
         int y = this.height / 4;
-        for (SceneOption sceneOptions : sceneOptions) {
+        for (SceneOptions sceneOptions : sceneOptions) {
             this.addDrawableChild(ButtonWidget.builder(Text.of(sceneOptions.name()), button -> {
                 ClientPlayNetworking.send(new StartSceneC2SPacket(
                         this.entityId,

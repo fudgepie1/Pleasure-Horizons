@@ -1,7 +1,6 @@
 package com.sandymandy.pleasurecraft.networking;
 
 import com.sandymandy.pleasurecraft.PleasureCraft;
-import com.sandymandy.pleasurecraft.entity.base.AbstractGirlEntity;
 import com.sandymandy.pleasurecraft.entity.base.SceneEntity;
 import com.sandymandy.pleasurecraft.networking.C2S.*;
 import com.sandymandy.pleasurecraft.networking.S2C.ClothingArmorVisibilityS2CPacket;
@@ -25,7 +24,7 @@ public class PleasureCraftPackets {
         PayloadTypeRegistry.playC2S().register(AnimationSyncC2SPacket.ID, AnimationSyncC2SPacket.CODEC);
         PayloadTypeRegistry.playC2S().register(CumKeybindC2SPacket.ID, CumKeybindC2SPacket.CODEC);
         PayloadTypeRegistry.playC2S().register(ThrustKeybindC2SPacket.ID, ThrustKeybindC2SPacket.CODEC);
-        PayloadTypeRegistry.playC2S().register(NextSceneAnimationC2SPacket.ID, NextSceneAnimationC2SPacket.CODEC);
+        PayloadTypeRegistry.playC2S().register(NextAnimationC2SPacket.ID, NextAnimationC2SPacket.CODEC);
         PayloadTypeRegistry.playC2S().register(StartSceneC2SPacket.ID, StartSceneC2SPacket.CODEC);
         PayloadTypeRegistry.playC2S().register(InInventoryC2SPacket.ID, InInventoryC2SPacket.CODEC);
         PayloadTypeRegistry.playC2S().register(OverrideAnimationStateSyncC2SPacket.ID, OverrideAnimationStateSyncC2SPacket.CODEC);
@@ -98,11 +97,11 @@ public class PleasureCraftPackets {
                     }
                 }));
 
-        ServerPlayNetworking.registerGlobalReceiver(NextSceneAnimationC2SPacket.ID,
+        ServerPlayNetworking.registerGlobalReceiver(NextAnimationC2SPacket.ID,
                 (packet, context) -> Objects.requireNonNull(context.player().getServer()).execute(() -> {
                     var entity = context.player().getWorld().getEntityById(packet.entityId());
                     if (entity instanceof SceneEntity girl) {
-                        girl.animationFinished(packet.finishedAnimation());
+                        girl.animationFinished();
                     }
                 }));
 

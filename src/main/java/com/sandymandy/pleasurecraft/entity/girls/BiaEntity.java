@@ -2,7 +2,7 @@ package com.sandymandy.pleasurecraft.entity.girls;
 
 import com.sandymandy.pleasurecraft.entity.base.AbstractGirlEntity;
 import com.sandymandy.pleasurecraft.entity.base.SceneEntity;
-import com.sandymandy.pleasurecraft.util.SceneOption;
+import com.sandymandy.pleasurecraft.util.SceneOptions;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
@@ -10,7 +10,6 @@ import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
-import net.minecraft.util.math.Vec2f;
 import net.minecraft.world.World;
 
 import java.util.List;
@@ -41,9 +40,9 @@ public class BiaEntity extends SceneEntity {
     public int getSizeGUI(){return 35;}
 
     @Override
-    public List<SceneOption> getSceneOptions() {
+    public List<SceneOptions> getSceneOptions() {
         return List.of(
-                new SceneOption("Doggy",
+                new SceneOptions("Doggy",
                         List.of("prone_doggy_intro"),
                         List.of("prone_doggy_slow"),
                         List.of("prone_doggy_hard1","prone_doggy_hard2","prone_doggy_hard3"),
@@ -52,7 +51,7 @@ public class BiaEntity extends SceneEntity {
                         1f,
                         List.of("sitdown", "sitdownidle")),
 
-                new SceneOption("Anal",
+                new SceneOptions("Anal",
                         List.of("anal_intro"),
                         List.of("anal_slow"),
                         List.of("anal_fast"),

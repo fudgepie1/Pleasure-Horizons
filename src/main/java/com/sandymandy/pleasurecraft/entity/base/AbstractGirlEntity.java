@@ -5,7 +5,7 @@ import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.entity.ai.goal.*;
 import com.sandymandy.pleasurecraft.networking.C2S.BonePosSyncC2SPacket;
 import com.sandymandy.pleasurecraft.networking.S2C.ClothingArmorVisibilityS2CPacket;
-import com.sandymandy.pleasurecraft.util.SceneOption;
+import com.sandymandy.pleasurecraft.util.SceneOptions;
 import com.sandymandy.pleasurecraft.screen.GirlInventoryScreenHandlerFactory;
 import com.sandymandy.pleasurecraft.util.PleasureCraftMessages;
 import com.sandymandy.pleasurecraft.util.inventory.GirlInventory;
@@ -59,11 +59,12 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
     private static final TrackedData<Boolean> STRIPPED = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<Boolean> FOLLOWING = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<Boolean> IN_SCENE = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
-    private static final TrackedData<String> OVERRIDE_ANIM = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.STRING);
     private static final TrackedData<Boolean> OVERRIDE_LOOP = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<Boolean> OVERRIDE_HOLD = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<Boolean> OVERRIDE_ANIM_PLAYING = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     public static final TrackedData<Float> SCENE_PROGRESS = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.FLOAT);
+    private static final TrackedData<String> OVERRIDE_ANIM = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.STRING);
+    private static final TrackedData<String> SCENE_ANIM = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.STRING);
     private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
     public Map<String, Boolean> boneVisibility = new HashMap<>();
     public Map<String, Identifier> boneTextureOverrides = new HashMap<>();
@@ -111,7 +112,7 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
 
     public float getYAxisGUI(){return 0.0625F;}
 
-    public List<SceneOption> getSceneOptions() {
+    public List<SceneOptions> getSceneOptions() {
         return new ArrayList<>();
     }
 
@@ -198,11 +199,13 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
         builder.add(STRIPPED, true);
         builder.add(FOLLOWING, true);
         builder.add(IN_SCENE, false);
-        builder.add(OVERRIDE_ANIM,"");
         builder.add(OVERRIDE_LOOP, false);
         builder.add(OVERRIDE_HOLD, false);
         builder.add(OVERRIDE_ANIM_PLAYING, false);
         builder.add(SCENE_PROGRESS,0f);
+        builder.add(OVERRIDE_ANIM,"");
+        builder.add(SCENE_ANIM,"");
+
     }
 
 
@@ -392,7 +395,7 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
         this.dataTracker.set(OVERRIDE_LOOP, loop);
     }
 
-    public boolean getOverrideLoop(){
+    public boolean getOverrideLoopState(){
         return this.dataTracker.get(OVERRIDE_LOOP);
     }
 
@@ -400,7 +403,7 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
         this.dataTracker.set(OVERRIDE_HOLD, hold);
     }
 
-    public boolean getOverrideHold(){
+    public boolean getOverrideHoldState(){
         return this.dataTracker.get(OVERRIDE_HOLD);
     }
 
@@ -426,6 +429,14 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
 
     public void setWaitingAtBedState(boolean state){
         this.dataTracker.set(WAITING_AT_BED, state);
+    }
+
+    public void setCurrentSceneAnim(String anim){
+        this.dataTracker.set(SCENE_ANIM, anim);
+    }
+
+    public String getCurrentSceneAnim(){
+        return this.dataTracker.get(SCENE_ANIM);
     }
 
 

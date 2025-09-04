@@ -2,7 +2,7 @@ package com.sandymandy.pleasurecraft.entity.girls;
 
 import com.sandymandy.pleasurecraft.entity.base.AbstractGirlEntity;
 import com.sandymandy.pleasurecraft.entity.base.SceneEntity;
-import com.sandymandy.pleasurecraft.util.SceneOption;
+import com.sandymandy.pleasurecraft.util.SceneOptions;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
@@ -10,7 +10,6 @@ import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
-import net.minecraft.util.math.Vec2f;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
@@ -45,14 +44,14 @@ public class LucyEntity extends SceneEntity {
     public float getYAxisGUI(){return 0.0525F;}
 
     @Override
-    public List<SceneOption> getSceneOptions() {
+    public List<SceneOptions> getSceneOptions() {
         return List.of(
-                new SceneOption("Paizuri",
+                new SceneOptions("Paizuri",
                         List.of("paizuri_intro"), List.of("paizuri_slow"),List.of("paizuri_fast"),"paizuri_cum",false, 0, new ArrayList<>()),
 
-                new SceneOption("Blow Job",
+                new SceneOptions("Blow Job",
                         List.of("blowjob_intro"),List.of("blowjob_slow"),List.of("blowjob_fast"),"blowjob_cum",false, 0, new ArrayList<>()),
-                new SceneOption("Doggy",
+                new SceneOptions("Doggy",
                         List.of("doggy_intro"),
                         List.of("doggy_slow"),
                         List.of("doggy_fast1","doggy_fast2"),

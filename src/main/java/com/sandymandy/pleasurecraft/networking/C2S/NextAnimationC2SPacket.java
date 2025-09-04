@@ -7,15 +7,14 @@ import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.util.Identifier;
 
-public record NextSceneAnimationC2SPacket(int entityId, String finishedAnimation) implements CustomPayload {
-    public static final Id<NextSceneAnimationC2SPacket> ID =
+public record NextAnimationC2SPacket(int entityId) implements CustomPayload {
+    public static final Id<NextAnimationC2SPacket> ID =
             new Id<>(Identifier.of(PleasureCraft.MOD_ID, "sync_scene_progress"));
 
-    public static final PacketCodec<RegistryByteBuf, NextSceneAnimationC2SPacket> CODEC =
+    public static final PacketCodec<RegistryByteBuf, NextAnimationC2SPacket> CODEC =
             PacketCodec.tuple(
-                    PacketCodecs.VAR_INT, NextSceneAnimationC2SPacket::entityId,
-                    PacketCodecs.STRING, NextSceneAnimationC2SPacket::finishedAnimation,
-                    NextSceneAnimationC2SPacket::new
+                    PacketCodecs.VAR_INT, NextAnimationC2SPacket::entityId,
+                    NextAnimationC2SPacket::new
             );
 
     @Override
