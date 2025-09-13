@@ -4,9 +4,7 @@ import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.entity.ai.goal.BedGoal;
 import com.sandymandy.pleasurecraft.entity.ai.goal.StopMovementGoal;
 import com.sandymandy.pleasurecraft.entity.ai.goal.StripGoal;
-import com.sandymandy.pleasurecraft.networking.C2S.AnimationSyncC2SPacket;
-import com.sandymandy.pleasurecraft.networking.C2S.NextAnimationC2SPacket;
-import com.sandymandy.pleasurecraft.networking.C2S.OverrideAnimationStateSyncC2SPacket;
+import com.sandymandy.pleasurecraft.networking.C2S.*;
 import com.sandymandy.pleasurecraft.util.*;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.entity.EntityType;
@@ -23,25 +21,20 @@ import software.bernie.geckolib.animation.keyframe.event.SoundKeyframeEvent;
 
 import java.util.List;
 
+import static com.sandymandy.pleasurecraft.util.Utils.Round;
+
 public class SceneEntity extends AbstractGirlEntity{
     private static final TrackedData<SceneOptions> CURRENT_SCENE_OPTIONS = DataTracker.registerData(SceneEntity.class, PleasureCraftTrackedData.SCENE_OPTION);
     private static final TrackedData<com.sandymandy.pleasurecraft.util.ScenePhase> CURRENT_SCENE_PHASE = DataTracker.registerData(SceneEntity.class, PleasureCraftTrackedData.SCENE_PHASE);
 
     private int timer = 0 ;
     private int introIndex = 0;
+    private String lastSceneAnim = "";
     private final float cumThreshold = 5f;
     private float sceneProgress = 0f;
     private boolean isKeyHeld = false;
     public String passengerBoneName = "Torso2";
     BlockPos bedPos;
-//    private List<String> animIntro;
-//    private List<String> animSlow;
-//    private List<String> animFast;
-//    private String animCum;
-//    private float bedOffset;
-//    private List<String> bedIdle;
-//    public boolean isBedScene;
-//    private int index = 0;
 
     private static final float SLOW_SPEED = 0.002f;
     private static final float FAST_SPEED = 0.01f;
@@ -74,17 +67,6 @@ public class SceneEntity extends AbstractGirlEntity{
         return this.dataTracker.get(CURRENT_SCENE_PHASE);
     }
 
-    public void playBedIdle(boolean clear) {
-        if(!this.getWorld().isClient()) {
-
-            if (!clear) playPhase(ScenePhase.LAYING_DOWN);
-            else {
-                if (this.getCurrentSceneOptions().bedIdle().contains(this.getCurrentSceneAnim()))
-                    playPhase(ScenePhase.NONE);
-            }
-        }
-    }
-
     public void startScene(PlayerEntity rider, SceneOptions option) {
         if (this.isSceneActive()) return;
 
@@ -96,14 +78,6 @@ public class SceneEntity extends AbstractGirlEntity{
         }
 
         this.setCurrentSceneOptions(option);
-//
-//        this.animIntro = option.introAnim();
-//        this.animSlow = option.slowAnim();
-//        this.animFast = option.fastAnim();
-//        this.animCum = option.cumAnim();
-//        this.isBedScene = option.isBedScene();
-//        this.bedOffset = option.bedOffset();
-//        this.bedIdle = option.bedIdle();
 
         if (isBedScene()) {
             //  Check for a bed before starting
@@ -140,7 +114,8 @@ public class SceneEntity extends AbstractGirlEntity{
         isKeyHeld = false;
         this.targetBedPos = null;
         rider.startRiding(this, false);
-        introIndex = 0; // reset
+        introIndex = 0;
+        lastSceneAnim = "";
         playPhase(ScenePhase.INTRO);
 
         this.setSceneState(true);
@@ -148,8 +123,13 @@ public class SceneEntity extends AbstractGirlEntity{
 
     public void stopScene() {
         if (!this.isSceneActive()) return;
+        if(this.getWorld().isClient()){
+            ClientPlayNetworking.send(new StopSceneOnServerC2SPacket(this.getId()));
+            return;
+        }
+        introIndex = 0;
         onSceneStop();
-        this.playPhase(ScenePhase.NONE);
+        setCurrentScenePhase(ScenePhase.NONE);
         this.getNavigation().stop();
     }
 
@@ -162,7 +142,6 @@ public class SceneEntity extends AbstractGirlEntity{
             if (!player.hasVehicle()) player.setInvisible(false);
         }
 
-        setCurrentScenePhase(ScenePhase.NONE);
         this.stopOverrideAnimations();
     }
 
@@ -171,8 +150,13 @@ public class SceneEntity extends AbstractGirlEntity{
     }
 
     public void playPhase(ScenePhase phase) {
-        if (this.getWorld().isClient()) return; // client waits for sync
+        if (this.getWorld().isClient()) {
+            ClientPlayNetworking.send(new ScenePhaseSyncC2SPacket(this.getId(), phase));
+            return;
+        }
         setCurrentScenePhase(phase);
+        lastSceneAnim = "";
+        if (phase != ScenePhase.INTRO) introIndex = 0;
     }
 
     public void tryTriggerCum() {
@@ -187,6 +171,17 @@ public class SceneEntity extends AbstractGirlEntity{
         return list.get(index);
     }
 
+    private void setSceneAnimIfChanged(AnimationController<?> c, String anim, Animation.LoopType loop) {
+        if (anim == null || anim.isEmpty()) return;
+
+        // Only reset if different from last
+        if (!anim.equals(lastSceneAnim)) {
+            c.setAnimation(RawAnimation.begin().then(getAnimationPath(anim), loop));
+            c.forceAnimationReset();
+            lastSceneAnim = anim;
+        }
+    }
+
     private void onSceneActive(){
         if(this.getWorld().isClient()) return;
 
@@ -196,13 +191,27 @@ public class SceneEntity extends AbstractGirlEntity{
             if(sceneProgress >= cumThreshold){
                 new PleasureCraftMessages().GlobleMessage(this.getWorld(),"Scene Progress: READY TO CUM");
             }
-            else new PleasureCraftMessages().GlobleMessage(this.getWorld(),"Scene Progress: "+sceneProgress);
+            else new PleasureCraftMessages().GlobleMessage(this.getWorld(),"Scene Progress: "+Round(getSceneProgress(), 2));
             timer = 0;
         }
 
-        if(bedPos != null && isBedScene() &! Utils.checkForBlockAt(this.getWorld(),bedPos,null,BlockTags.BEDS)){
+        if(bedPos != null && isBedScene() && !Utils.checkForBlockAt(this.getWorld(),bedPos,null,BlockTags.BEDS)){
             stopScene();
         }
+    }
+
+    private void playerModelLogic(){
+        boolean isActivePhase = switch (getCurrentScenePhase()) {
+            case NONE, BED_IDLE, LAYING_DOWN -> false; // Inactive/resting
+            default -> true; // Active NSFW phases
+        };
+
+        this.toggleModelBones(List.of("RightLeg", "LeftLeg", "Torso2"), isActivePhase );
+
+        this.toggleModelBones(List.of("rightLowerArmAlex", "rightArmAlex", "leftLowerArmAlex", "leftArmAlex"), isPlayerModelSlim() && isActivePhase );
+
+        this.toggleModelBones(List.of("rightLowerArmSteve", "rightArmSteve", "leftLowerArmSteve", "leftArmSteve"), !isPlayerModelSlim() && isActivePhase );
+
     }
 
     @Override
@@ -210,45 +219,46 @@ public class SceneEntity extends AbstractGirlEntity{
         super.tick();
         this.setSceneProgress(sceneProgress);
 
-
+        playerModelLogic();
 
         if(!this.getWorld().isClient()) {
             this.setSceneState(getCurrentScenePhase() != ScenePhase.NONE);
         }
 
-        boolean isActivePhase = switch (getCurrentScenePhase()) {
-            case NONE, BED_IDLE, LAYING_DOWN -> false; // Inactive/resting
-            default -> true; // Active NSFW phases
-        };
-        this.toggleModelBones(List.of("RightLeg", "LeftLeg", "Torso2"), isActivePhase );
-        PleasureCraft.LOGGER.info(getCurrentScenePhase()+"");
+        PleasureCraft.LOGGER.info(isPlayerModelSlim()+"");
 
         // Handle scene exit
         if (this.isSceneActive()) onSceneActive();
-        if(!this.hasPassengers()) stopScene();
+
+        boolean isStopPhase = switch (getCurrentScenePhase()) {
+            case BED_IDLE, LAYING_DOWN -> false;
+            default -> true;
+        };
+        if(!this.hasPassengers() && this.isSceneActive() && isStopPhase) stopScene();
 
 
         PlayerEntity player = (PlayerEntity) this.getFirstPassenger();
         if (player != null) player.setInvisible(true);
 
         // Handle scene phases
-        switch (getCurrentScenePhase()) {
-            case SLOW -> {
-                sceneProgress += SLOW_SPEED;
-                if (isKeyHeld) {
-                    playPhase(ScenePhase.FAST);
+        if(!this.getWorld().isClient()) {
+            switch (getCurrentScenePhase()) {
+                case SLOW -> {
+                    sceneProgress += SLOW_SPEED;
+                    if (isKeyHeld) {
+                        playPhase(ScenePhase.FAST);
+                    }
                 }
-            }
-            case FAST -> {
-                sceneProgress += FAST_SPEED;
-                if (!isKeyHeld) {
-                    playPhase(ScenePhase.SLOW);
+                case FAST -> {
+                    sceneProgress += FAST_SPEED;
+                    if (!isKeyHeld) {
+                        playPhase(ScenePhase.SLOW);
+                    }
                 }
+                default -> {
+                } // INTRO and CUM handled elsewhere
             }
-            default -> {
-            } // INTRO and CUM handled elsewhere
         }
-
     }
 
     @Override
@@ -283,22 +293,18 @@ public class SceneEntity extends AbstractGirlEntity{
 
     private PlayState handleMiscAnimations(AnimationState<SceneEntity> state) {
         if (isSceneActive() || getOverrideAnim().isEmpty()) {
-//            PleasureCraft.LOGGER.info("Stopped");
             return PlayState.STOP;
-        }
-        else {
+        } else {
             AnimationController<?> controller = state.getController();
             String overrideAnim = this.getOverrideAnim();
             if (overrideAnim == null || overrideAnim.isEmpty()) {
-                ClientPlayNetworking.send(new OverrideAnimationStateSyncC2SPacket(this.getId(), false));
-                ClientPlayNetworking.send(new NextAnimationC2SPacket(this.getId()));
-                stopOverrideAnimations();
                 return PlayState.STOP;
             }
-            else {
-                ClientPlayNetworking.send(new OverrideAnimationStateSyncC2SPacket(this.getId(), true));
-            }
 
+            // Detect finish for one-shot anims like strip
+            if (controller.hasAnimationFinished()) {
+                clearOverrideAnim();
+            }
 
             Animation.LoopType loopType =
                     this.getOverrideLoopState() ? Animation.LoopType.LOOP :
@@ -312,80 +318,86 @@ public class SceneEntity extends AbstractGirlEntity{
         }
     }
 
-    private PlayState handleSceneAnimations(AnimationState<SceneEntity> state) {
-        if (!isSceneActive() || !getOverrideAnim().isEmpty()) return PlayState.STOP;
-        else {
-
-            SceneOptions options = this.getCurrentSceneOptions();
-            String anim = "null";
-            Animation.LoopType loopType = Animation.LoopType.LOOP;
-
-            switch (getCurrentScenePhase()) {
-                case INTRO -> {
-                    // If there are intro animations, step through them in order
-                    List<String> intros = options.introAnim();
-                    if (!intros.isEmpty()) {
-                        if (introIndex >= intros.size()) {
-                            // If we've finished all intros → switch to SLOW
-                            playPhase(ScenePhase.SLOW);
-                        } else {
-                            anim = intros.get(introIndex);
-                            loopType = Animation.LoopType.HOLD_ON_LAST_FRAME; // play once
-                        }
-                    }
-                }
-                case SLOW -> {
-                    anim = getRandomFromList(options.slowAnim());
-                    loopType = Animation.LoopType.LOOP;
-                }
-                case FAST -> {
-                    anim = getRandomFromList(options.fastAnim());
-                    loopType = Animation.LoopType.LOOP;
-                }
-                case CUM -> {
-                    anim = options.cumAnim();
-                    loopType = Animation.LoopType.HOLD_ON_LAST_FRAME;
-                }
-                case BED_IDLE -> {
-                    anim = options.bedIdle().isEmpty() ? "null" : options.bedIdle().getLast();
-                    loopType = Animation.LoopType.LOOP;
-                }
-                case LAYING_DOWN -> {
-                    anim = options.bedIdle().isEmpty() ? "null" : options.bedIdle().getFirst();
-                    loopType = Animation.LoopType.LOOP;
-                }
-                default -> {
-                    anim = "null";
-                }
-            }
-
-
-            if (anim == null || anim.isEmpty()) return PlayState.STOP;
-
-            state.getController().setAnimation(RawAnimation.begin().then(getAnimationPath(anim), loopType));
-            return PlayState.CONTINUE;
+    public void clearOverrideAnim() {
+        if (this.getWorld().isClient) {
+            ClientPlayNetworking.send(new ClearOverrideAnimC2SPacket(this.getId()));
+        } else {
+            setOverrideAnim("");
+            setOverrideLoop(false);
+            setOverrideHold(false);
+            setOverrideAnimPlayingState(false);
         }
     }
 
+    private PlayState handleSceneAnimations(AnimationState<SceneEntity> state) {
+        if (!isSceneActive() || !getOverrideAnim().isEmpty()) return PlayState.STOP;
 
-    public void animationFinished() {
+        final AnimationController<?> controller = state.getController();
+        final SceneOptions options = this.getCurrentSceneOptions();
+
+        // Notify server when an animation finishes (only once per cycle)
+        if (controller.hasAnimationFinished() && !lastSceneAnim.isEmpty()) {
+            ClientPlayNetworking.send(new AnimationFinishC2SPacket(this.getId()));
+            lastSceneAnim = ""; // prevent spamming until new anim set
+        }
+
+        switch (getCurrentScenePhase()) {
+            case LAYING_DOWN -> {
+                String laying = options.bedIdle().isEmpty() ? "null" : options.bedIdle().getFirst();
+                setSceneAnimIfChanged(controller, laying, Animation.LoopType.PLAY_ONCE);
+                return PlayState.CONTINUE;
+            }
+            case BED_IDLE -> {
+                String bedIdle = options.bedIdle().isEmpty() ? "null" : options.bedIdle().getLast();
+                setSceneAnimIfChanged(controller, bedIdle, Animation.LoopType.LOOP);
+                return PlayState.CONTINUE;
+            }
+            case INTRO -> {
+                List<String> intros = options.introAnim();
+                if (intros.isEmpty()) {
+                    playPhase(ScenePhase.SLOW);
+                    return PlayState.CONTINUE;
+                }
+                String current = intros.get(Math.min(introIndex, intros.size() - 1));
+                setSceneAnimIfChanged(controller, current, Animation.LoopType.PLAY_ONCE);
+                return PlayState.CONTINUE;
+            }
+            case SLOW -> {
+                String slow = options.slowAnim().isEmpty() ? "null" : getRandomFromList(options.slowAnim());
+                setSceneAnimIfChanged(controller, slow, Animation.LoopType.LOOP);
+                return PlayState.CONTINUE;
+            }
+            case FAST -> {
+                String fast = options.fastAnim().isEmpty() ? "null" : getRandomFromList(options.fastAnim());
+                setSceneAnimIfChanged(controller, fast, Animation.LoopType.LOOP);
+                return PlayState.CONTINUE;
+            }
+            case CUM -> {
+                setSceneAnimIfChanged(controller, options.cumAnim(), Animation.LoopType.PLAY_ONCE);
+                return PlayState.CONTINUE;
+            }
+            default -> {
+                return PlayState.STOP;
+            }
+        }
+    }
+
+    public void animationFinished(){
         if (this.getWorld().isClient()) return;
+        if (!this.isSceneActive()) return;
 
-        if(!this.isSceneActive()) this.setOverrideAnimPlayingState(false);
-        else {
-            if (getCurrentScenePhase() == ScenePhase.INTRO) {
+        switch (getCurrentScenePhase()) {
+            case INTRO -> {
                 List<String> intros = getCurrentSceneOptions().introAnim();
                 if (introIndex < intros.size() - 1) {
                     introIndex++;
-                    // force next intro animation
-                    playAnimation(intros.get(introIndex), false, true);
                 } else {
-                    // all intros played → go slow
                     playPhase(ScenePhase.SLOW);
                 }
-            } else if (getCurrentScenePhase() == ScenePhase.CUM) {
-                stopScene();
             }
+            case CUM -> stopScene();
+            case LAYING_DOWN -> playPhase(ScenePhase.BED_IDLE);
+            default -> { /* nothing */ }
         }
     }
 
@@ -414,7 +426,14 @@ public class SceneEntity extends AbstractGirlEntity{
     }
 
     public void stopOverrideAnimations() {
-        ClientPlayNetworking.send(new AnimationSyncC2SPacket(this.getId(), "",false,false));
+        if (!this.getWorld().isClient) {
+            setOverrideAnim("");
+            setOverrideLoop(false);
+            setOverrideHold(false);
+            setOverrideAnimPlayingState(false); // If you have this method
+        } else {
+            ClientPlayNetworking.send(new AnimationSyncC2SPacket(this.getId(), "", false, false));
+        }
     }
 
     private String getAnimationPath(String animation){

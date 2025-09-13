@@ -9,6 +9,9 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 public class Utils {
 
     public static BlockInfo findNearbyBlock(World world, BlockPos center, int radius, @Nullable Block block, @Nullable TagKey<Block> blockTag) {
@@ -40,6 +43,11 @@ public class Utils {
             return true;
         }
         return tag != null && state.isIn(tag);
+    }
+
+    public static float Round(float d, int decimalPlace) {
+        return BigDecimal.valueOf(d).setScale(decimalPlace, RoundingMode.HALF_DOWN).floatValue();
+
     }
 
     // simple record to hold info

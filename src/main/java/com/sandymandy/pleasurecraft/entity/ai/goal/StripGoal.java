@@ -12,7 +12,7 @@ public class StripGoal extends Goal {
 
     public StripGoal(SceneEntity girl) {
         this.girl = girl;
-        this.setControls(EnumSet.of(Control.MOVE, Control.LOOK, Control.JUMP));
+        this.setControls(EnumSet.of(Control.JUMP));
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.sandymandy.pleasurecraft.entity.ai.goal;
 
 import com.sandymandy.pleasurecraft.entity.base.SceneEntity;
+import com.sandymandy.pleasurecraft.util.ScenePhase;
 import com.sandymandy.pleasurecraft.util.Utils;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.ai.pathing.BirdNavigation;
@@ -105,7 +106,9 @@ public class BedGoal extends Goal {
                 this.entity.setPosition(snapPos);
 
                 // Start the Scene
-                this.entity.playBedIdle(false);
+                if(!this.entity.isSceneActive()){
+                    this.entity.playPhase(ScenePhase.LAYING_DOWN);
+                }
             }
         }
         else if (!entity.isWaitingAtBed()) {
@@ -115,7 +118,7 @@ public class BedGoal extends Goal {
 
     private void startOnContact(){
         if(!entity.isWaitingAtBed()) return;
-        if(this.entity.squaredDistanceTo(this.player) <= 1.5 /*&& entity.getCurrentPhase().equals(SceneEntity.ScenePhase.IDLE)*/){
+        if(this.entity.squaredDistanceTo(this.player) <= 1.5 && entity.getCurrentScenePhase().equals(ScenePhase.BED_IDLE)){
             this.entity.setPosition(scenePos);
             this.entity.onSceneStart(player);
         }
@@ -125,7 +128,6 @@ public class BedGoal extends Goal {
     public void stop() {
         this.navigation.stop();
         this.entity.setWaitingAtBedState(false);
-        this.entity.playBedIdle(true);
     }
 
 }

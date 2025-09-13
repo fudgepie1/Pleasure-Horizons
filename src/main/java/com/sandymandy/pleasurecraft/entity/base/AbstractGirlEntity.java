@@ -13,6 +13,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.PlayerSkinProvider;
+import net.minecraft.client.util.SkinTextures;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.FoodComponent;
 import net.minecraft.entity.*;
@@ -62,6 +63,7 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
     private static final TrackedData<Boolean> OVERRIDE_LOOP = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<Boolean> OVERRIDE_HOLD = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<Boolean> OVERRIDE_ANIM_PLAYING = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+    private static final TrackedData<Boolean> IS_PLAYER_MODEL_SLIM = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     public static final TrackedData<Float> SCENE_PROGRESS = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.FLOAT);
     private static final TrackedData<String> OVERRIDE_ANIM = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.STRING);
     private static final TrackedData<String> SCENE_ANIM = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.STRING);
@@ -202,6 +204,7 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
         builder.add(OVERRIDE_LOOP, false);
         builder.add(OVERRIDE_HOLD, false);
         builder.add(OVERRIDE_ANIM_PLAYING, false);
+        builder.add(IS_PLAYER_MODEL_SLIM, false);
         builder.add(SCENE_PROGRESS,0f);
         builder.add(OVERRIDE_ANIM,"");
         builder.add(SCENE_ANIM,"");
@@ -431,12 +434,12 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
         this.dataTracker.set(WAITING_AT_BED, state);
     }
 
-    public void setCurrentSceneAnim(String anim){
-        this.dataTracker.set(SCENE_ANIM, anim);
+    public void setIsPlayerModelSlim(boolean isSlim){
+        this.dataTracker.set(IS_PLAYER_MODEL_SLIM, isSlim);
     }
 
-    public String getCurrentSceneAnim(){
-        return this.dataTracker.get(SCENE_ANIM);
+    public boolean isPlayerModelSlim(){
+        return this.dataTracker.get(IS_PLAYER_MODEL_SLIM);
     }
 
 
@@ -921,6 +924,7 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
 
             // Get the skin identifier
             texture = skinProvider.getSkinTextures(profile).texture();
+            setIsPlayerModelSlim(skinProvider.getSkinTextures(profile).model() == SkinTextures.Model.SLIM);
 
             // if isn't null set the player texture
             if (texture != null) {
