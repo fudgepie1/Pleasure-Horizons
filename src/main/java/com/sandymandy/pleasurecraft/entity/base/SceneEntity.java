@@ -141,8 +141,6 @@ public class SceneEntity extends AbstractGirlEntity{
         for (PlayerEntity player : this.getWorld().getPlayers()) {
             if (!player.hasVehicle()) player.setInvisible(false);
         }
-
-        this.stopOverrideAnimations();
     }
 
     public void setKeyHeld(boolean held) {
@@ -225,7 +223,7 @@ public class SceneEntity extends AbstractGirlEntity{
             this.setSceneState(getCurrentScenePhase() != ScenePhase.NONE);
         }
 
-        PleasureCraft.LOGGER.info(isPlayerModelSlim()+"");
+        PleasureCraft.LOGGER.info(this.getOverrideAnim());
 
         // Handle scene exit
         if (this.isSceneActive()) onSceneActive();
@@ -264,7 +262,7 @@ public class SceneEntity extends AbstractGirlEntity{
     @Override
     protected void initGoals() {
         this.goalSelector.add(-3, new BedGoal(this, 1.5D));
-        this.goalSelector.add(-2, new StripGoal(this));
+        this.goalSelector.add(-2, new StripGoal(this, 38));
         this.goalSelector.add(-1, new StopMovementGoal(this));
         super.initGoals();
     }
@@ -272,68 +270,63 @@ public class SceneEntity extends AbstractGirlEntity{
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllerRegistrar) {
         controllerRegistrar.add(new AnimationController<>(this, "scene", 4, this::handleSceneAnimations).setSoundKeyframeHandler(new SoundKeyframeHandler(this)).setParticleKeyframeHandler(new ParticleKeyframeHandler(this)).setCustomInstructionKeyframeHandler(new CustomKeyframeHandler(this)));
-        controllerRegistrar.add(new AnimationController<>(this, "misc", 4, this::handleMiscAnimations).setSoundKeyframeHandler(new SoundKeyframeHandler(this)).setParticleKeyframeHandler(new ParticleKeyframeHandler(this)).setCustomInstructionKeyframeHandler(new CustomKeyframeHandler(this)));
-        controllerRegistrar.add(new AnimationController<>(this, "movement", 4, this::handleMovementAnimations).setSoundKeyframeHandler(new SoundKeyframeHandler(this)).setParticleKeyframeHandler(new ParticleKeyframeHandler(this)).setCustomInstructionKeyframeHandler(new CustomKeyframeHandler(this)));
+        controllerRegistrar.add(new AnimationController<>(this, "movement", 4, this::handleDefaultAnimations).setSoundKeyframeHandler(new SoundKeyframeHandler(this)).setParticleKeyframeHandler(new ParticleKeyframeHandler(this)).setCustomInstructionKeyframeHandler(new CustomKeyframeHandler(this)));
 
     }
 
-    private PlayState handleMovementAnimations(AnimationState<SceneEntity> state) {
-        if (isSceneActive() || !getOverrideAnim().isEmpty()) {
+    private PlayState handleDefaultAnimations(AnimationState<SceneEntity> state) {
+        if (isSceneActive()) {
             return PlayState.STOP; // Defer to scene controller during scenes
         }
         else {
-            String anim = getDefaultAnimation(state);
-            state.getController().setAnimation(
-                    RawAnimation.begin().then(getAnimationPath(anim), Animation.LoopType.LOOP)
-            );
-            return PlayState.CONTINUE;
-        }
-
-    }
-
-    private PlayState handleMiscAnimations(AnimationState<SceneEntity> state) {
-        if (isSceneActive() || getOverrideAnim().isEmpty()) {
-            return PlayState.STOP;
-        } else {
             AnimationController<?> controller = state.getController();
             String overrideAnim = this.getOverrideAnim();
-            if (overrideAnim == null || overrideAnim.isEmpty()) {
-                return PlayState.STOP;
+            boolean overrideLoop = this.getOverrideLoopState();
+            boolean overrideHold = this.getOverrideHoldState();
+
+            // 1. Forced animation override
+            if (overrideAnim != null && !overrideAnim.isEmpty()) {
+                this.currentAnimState = overrideAnim;
+                this.currentLoopState = overrideLoop;
+                this.currentHoldState = overrideHold;
+
+                if(!overrideLoop) {
+
+                    // End override if it was one-shot and finished playing
+                    if (controller.getAnimationState() == AnimationController.State.STOPPED || controller.getAnimationState() == AnimationController.State.PAUSED) {
+                        ClientPlayNetworking.send(new AnimationSyncC2SPacket(this.getId(), "", false, false));
+                    }
+                }
+            }
+            else {
+                this.currentAnimState = getDefaultAnimation(state);
+                this.currentLoopState = true;
             }
 
-            // Detect finish for one-shot anims like strip
-            if (controller.hasAnimationFinished()) {
-                clearOverrideAnim();
+            Animation.LoopType loopType;
+
+            if (this.currentLoopState) {
+                loopType = Animation.LoopType.LOOP;
+            } else if (this.currentHoldState) {
+                loopType = Animation.LoopType.HOLD_ON_LAST_FRAME;
+            } else {
+                loopType = Animation.LoopType.PLAY_ONCE;
             }
 
-            Animation.LoopType loopType =
-                    this.getOverrideLoopState() ? Animation.LoopType.LOOP :
-                            this.getOverrideHoldState() ? Animation.LoopType.HOLD_ON_LAST_FRAME :
-                                    Animation.LoopType.PLAY_ONCE;
 
-            controller.setAnimation(
-                    RawAnimation.begin().then(getAnimationPath(overrideAnim), loopType)
-            );
+            controller.setAnimation(RawAnimation.begin().then
+                    (getAnimationPath(this.currentAnimState), loopType));
             return PlayState.CONTINUE;
-        }
-    }
 
-    public void clearOverrideAnim() {
-        if (this.getWorld().isClient) {
-            ClientPlayNetworking.send(new ClearOverrideAnimC2SPacket(this.getId()));
-        } else {
-            setOverrideAnim("");
-            setOverrideLoop(false);
-            setOverrideHold(false);
-            setOverrideAnimPlayingState(false);
         }
+
     }
 
     private PlayState handleSceneAnimations(AnimationState<SceneEntity> state) {
         if (!isSceneActive() || !getOverrideAnim().isEmpty()) return PlayState.STOP;
-
         final AnimationController<?> controller = state.getController();
         final SceneOptions options = this.getCurrentSceneOptions();
+
 
         // Notify server when an animation finishes (only once per cycle)
         if (controller.hasAnimationFinished() && !lastSceneAnim.isEmpty()) {
@@ -422,17 +415,6 @@ public class SceneEntity extends AbstractGirlEntity{
                     animationName != null ? animationName : "",
                     loop,
                     holdOnLastFrame));
-        }
-    }
-
-    public void stopOverrideAnimations() {
-        if (!this.getWorld().isClient) {
-            setOverrideAnim("");
-            setOverrideLoop(false);
-            setOverrideHold(false);
-            setOverrideAnimPlayingState(false); // If you have this method
-        } else {
-            ClientPlayNetworking.send(new AnimationSyncC2SPacket(this.getId(), "", false, false));
         }
     }
 

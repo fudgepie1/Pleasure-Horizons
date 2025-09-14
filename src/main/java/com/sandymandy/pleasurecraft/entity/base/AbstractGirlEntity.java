@@ -198,7 +198,7 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
         builder.add(WAITING_AT_BED, false);
         builder.add(LOCKED_STATE, false);
         builder.add(FROZEN_STATE, false);
-        builder.add(STRIPPED, true);
+        builder.add(STRIPPED, false);
         builder.add(FOLLOWING, true);
         builder.add(IN_SCENE, false);
         builder.add(OVERRIDE_LOOP, false);
@@ -263,7 +263,7 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
     public ActionResult interactMob(PlayerEntity player, Hand hand) {
         ItemStack itemStack = player.getStackInHand(hand);
         Item itemInHand = itemStack.getItem();
-        if(!this.isOverrideAnimPlaying()) {
+        if(this.getOverrideAnim().isEmpty()) {
             if (this.isTamed()) {
                 if (this.isFoodItem(itemStack) && this.getHealth() < this.getMaxHealth()) {
                     this.getNavigation().findPathTo(player, 20);
@@ -416,14 +416,6 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
 
     public float getSceneProgress(){
         return this.dataTracker.get(SCENE_PROGRESS);
-    }
-
-    public void setOverrideAnimPlayingState(boolean state){
-        this.dataTracker.set(OVERRIDE_ANIM_PLAYING, state);
-    }
-
-    public boolean isOverrideAnimPlaying(){
-        return this.dataTracker.get(OVERRIDE_ANIM_PLAYING);
     }
     
     public boolean isWaitingAtBed(){

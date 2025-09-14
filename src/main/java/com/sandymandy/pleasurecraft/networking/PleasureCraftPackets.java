@@ -24,7 +24,6 @@ public class PleasureCraftPackets {
         PayloadTypeRegistry.playC2S().register(AnimationSyncC2SPacket.ID, AnimationSyncC2SPacket.CODEC);
         PayloadTypeRegistry.playC2S().register(CumKeybindC2SPacket.ID, CumKeybindC2SPacket.CODEC);
         PayloadTypeRegistry.playC2S().register(ThrustKeybindC2SPacket.ID, ThrustKeybindC2SPacket.CODEC);
-        PayloadTypeRegistry.playC2S().register(ClearOverrideAnimC2SPacket.ID, ClearOverrideAnimC2SPacket.CODEC);
         PayloadTypeRegistry.playC2S().register(StartSceneC2SPacket.ID, StartSceneC2SPacket.CODEC);
         PayloadTypeRegistry.playC2S().register(InInventoryC2SPacket.ID, InInventoryC2SPacket.CODEC);
         PayloadTypeRegistry.playC2S().register(AnimationFinishC2SPacket.ID, AnimationFinishC2SPacket.CODEC);
@@ -97,14 +96,6 @@ public class PleasureCraftPackets {
                     var entity = context.player().getVehicle();
                     if (entity instanceof SceneEntity girl) {
                         girl.setKeyHeld(packet.held());
-                    }
-                }));
-
-        ServerPlayNetworking.registerGlobalReceiver(ClearOverrideAnimC2SPacket.ID,
-                (packet, context) -> Objects.requireNonNull(context.player().getServer()).execute(() -> {
-                    var entity = context.player().getWorld().getEntityById(packet.entityId());
-                    if (entity instanceof SceneEntity girl) {
-                        girl.clearOverrideAnim();
                     }
                 }));
 
