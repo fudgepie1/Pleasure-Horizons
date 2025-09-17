@@ -43,28 +43,27 @@ public class BiaEntity extends SceneEntity {
     public List<SceneOptions> getSceneOptions() {
         return List.of(
                 new SceneOptions("Anal",
+                        6,
                         List.of("anal_intro"),
                         List.of("anal_slow"),
                         List.of("anal_fast"),
                         "anal_cum",
                         true,
-                        0f,
-                        List.of("anal_prepare", "anal_wait"),
                         true,
-                        6),
+                        0f,
+                        List.of("anal_prepare", "anal_wait")),
 
                 new SceneOptions("Doggy",
+                        8,
                         List.of("prone_doggy_intro"),
                         List.of("prone_doggy_slow"),
                         List.of("prone_doggy_hard1","prone_doggy_hard2","prone_doggy_hard3"),
                         "prone_doggy_cum",
                         true,
-                        1f,
-                        List.of("sitdown", "sitdownidle"),
                         true,
-                        8)
+                        1f,
+                        List.of("sitdown", "sitdownidle"))
         );
-
     }
 
 

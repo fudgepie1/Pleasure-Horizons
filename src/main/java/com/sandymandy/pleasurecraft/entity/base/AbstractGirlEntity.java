@@ -106,7 +106,7 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
         return "null";
     }
 
-    public int getMaxRelationshipLevel(){return 8;}
+    protected int getMaxRelationshipLevel(){return 8;}
 
     public int getSizeGUI(){return 20;}
 
@@ -465,7 +465,6 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
             this.setOwnerUuid(null); // Remove the owner UUID
             this.setSitting(false); // Ensure the entity is not sitting
             this.setStripped(false);
-            this.currentRelationshipLevel = 0;
             if(!isTamed() && !isOwner(player)){
                 player.sendMessage(Text.literal("§cYou Broke Up With " + getGirlDisplayName()), true);
             }

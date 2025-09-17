@@ -1,5 +1,6 @@
 package com.sandymandy.pleasurecraft.screen.client;
 
+import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.networking.C2S.InInventoryC2SPacket;
 import com.sandymandy.pleasurecraft.networking.C2S.StartSceneC2SPacket;
 import com.sandymandy.pleasurecraft.screen.InventoryButtonAction;
@@ -10,7 +11,9 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 
 import java.util.List;
 
@@ -43,7 +46,7 @@ public class GirlSceneScreen extends Screen {
             }
 
             if (!buttonWidget.active) {
-                buttonWidget.setTooltip(Tooltip.of(Text.literal("Requires relationship level " + sceneOptions.requiredRelationshipLevel())));
+                buttonWidget.setTooltip(Tooltip.of(Text.literal("Requires Relationship Level " + sceneOptions.requiredRelationshipLevel())));
             }
 
             this.addDrawableChild(buttonWidget);
@@ -56,6 +59,22 @@ public class GirlSceneScreen extends Screen {
         int alpha = 120; // adjust blur opacity
         context.fillGradient(alpha, 0, 0, this.height, this.width, 0xAA000000, 0xAA000000);
         super.render(context, mouseX, mouseY, delta);
+
+        // draw relationship icon + number
+        Identifier RELATIONSHIP_ICON = Identifier.of(PleasureCraft.MOD_ID, "textures/gui/relationship_heart.png");
+
+        int iconX = this.width / 2 - 10; // position from top-left corner
+        int iconY = this.height / 4 - 30;
+
+        context.drawTexture(RenderLayer::getGuiTextured, RELATIONSHIP_ICON,
+                iconX, iconY, 0, 0, 18, 18, 18, 18);
+
+        // draw the number next to it
+        context.drawText(MinecraftClient.getInstance().textRenderer,
+                String.valueOf(currentRelationshipLevel),
+                iconX + 20, iconY + 4, 0xFFFFFF, true);
+
+
     }
 
 }

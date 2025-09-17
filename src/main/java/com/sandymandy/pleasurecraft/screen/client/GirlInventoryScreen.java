@@ -101,7 +101,7 @@ public class GirlInventoryScreen extends HandledScreen<GirlInventoryScreenHandle
         }
 
         if (!button.active) {
-            button.setTooltip(Tooltip.of(Text.literal("Requires relationship level " + action.requiredRelationshipLevel())));
+            button.setTooltip(Tooltip.of(Text.literal("Requires Relationship Level " + action.requiredRelationshipLevel())));
         }
 
         this.addDrawableChild(button);

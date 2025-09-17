@@ -38,6 +38,11 @@ public class LucyEntity extends SceneEntity {
     }
 
     @Override
+    protected int getMaxRelationshipLevel() {
+        return 10;
+    }
+
+    @Override
     public int getSizeGUI(){return 29;}
 
     @Override
@@ -47,37 +52,38 @@ public class LucyEntity extends SceneEntity {
     public List<SceneOptions> getSceneOptions() {
         return List.of(
                 new SceneOptions("Paizuri",
+                        6,
                         List.of("paizuri_intro"),
                         List.of("paizuri_slow"),
                         List.of("paizuri_fast"),
                         "paizuri_cum",
+                        true,
                         false,
                         0,
-                        new ArrayList<>(),
-                        true,
-                        6),
+                        new ArrayList<>()),
 
                 new SceneOptions("Blow Job",
+                        8,
                         List.of("blowjob_intro"),
                         List.of("blowjob_slow"),
                         List.of("blowjob_fast"),
                         "blowjob_cum",
                         false,
-                        0,
-                        new ArrayList<>(),
                         false,
-                        8),
+                        0,
+                        new ArrayList<>()),
 
                 new SceneOptions("Doggy",
+                        10,
                         List.of("doggy_intro"),
                         List.of("doggy_slow"),
                         List.of("doggy_fast1","doggy_fast2"),
                         "doggy_cum",
                         true,
+                        true,
                         0f,
-                        List.of("doggy_lay_on_bed", "doggy_bed_idle"),
-                        true,10)
-        );
+                        List.of("doggy_lay_on_bed", "doggy_bed_idle"))
+                );
     }
 
     @Override

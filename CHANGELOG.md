@@ -2,7 +2,7 @@
 
 ## 0.3.4
 - Improved the animation handling
-- Added a relationship system
+- Added a Relationship system
 - Added a custom village that contains the girls
 
 ## 0.3.3
@@ -33,4 +33,3 @@
 ## TODO
 - Fix the animation randomizer in the Scene
 - Make the AI more advance.
-- Add Relationship/Leveling System and in menu
