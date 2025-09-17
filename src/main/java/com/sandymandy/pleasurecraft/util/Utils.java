@@ -18,11 +18,6 @@ import java.math.RoundingMode;
 
 public class Utils {
 
-    public static final PacketCodec<ByteBuf, AnimationController.State> ANIMATION_STATE_CODEC = PacketCodecs.indexed(
-            i -> AnimationController.State.values()[i],  // Decode: int ordinal -> enum
-            AnimationController.State::ordinal           // Encode: enum -> int ordinal
-    );
-
     public static BlockInfo findNearbyBlock(World world, BlockPos center, int radius, @Nullable Block block, @Nullable TagKey<Block> blockTag) {
         for (BlockPos pos : BlockPos.iterate(
                 center.add(-radius, -radius, -radius),
@@ -61,5 +56,6 @@ public class Utils {
 
     // simple record to hold info
     public record BlockInfo(BlockPos pos, BlockState state, Direction facing) {}
+
 
 }

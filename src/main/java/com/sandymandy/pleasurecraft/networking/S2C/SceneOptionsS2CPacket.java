@@ -11,12 +11,13 @@ import net.minecraft.util.Identifier;
 import java.util.ArrayList;
 import java.util.List;
 
-public record SceneOptionsS2CPacket(int entityId, List<SceneOptions> options) implements CustomPayload {
+public record SceneOptionsS2CPacket(int entityId, int currentRelationshipLevel,List<SceneOptions> options) implements CustomPayload {
     public static final Id<SceneOptionsS2CPacket> ID = new Id<>(Identifier.of(PleasureCraft.MOD_ID, "scene_options"));
 
     public static final PacketCodec<RegistryByteBuf, SceneOptionsS2CPacket> CODEC =
             PacketCodec.tuple(
                     PacketCodecs.VAR_INT, SceneOptionsS2CPacket::entityId,
+                    PacketCodecs.VAR_INT, SceneOptionsS2CPacket::currentRelationshipLevel,
                     PacketCodecs.collection(ArrayList::new, SceneOptions.CODEC), SceneOptionsS2CPacket::options,
                     SceneOptionsS2CPacket::new
             );

@@ -42,15 +42,6 @@ public class BiaEntity extends SceneEntity {
     @Override
     public List<SceneOptions> getSceneOptions() {
         return List.of(
-                new SceneOptions("Doggy",
-                        List.of("prone_doggy_intro"),
-                        List.of("prone_doggy_slow"),
-                        List.of("prone_doggy_hard1","prone_doggy_hard2","prone_doggy_hard3"),
-                        "prone_doggy_cum",
-                        true,
-                        1f,
-                        List.of("sitdown", "sitdownidle")),
-
                 new SceneOptions("Anal",
                         List.of("anal_intro"),
                         List.of("anal_slow"),
@@ -58,7 +49,20 @@ public class BiaEntity extends SceneEntity {
                         "anal_cum",
                         true,
                         0f,
-                        List.of("anal_prepare", "anal_wait"))
+                        List.of("anal_prepare", "anal_wait"),
+                        true,
+                        6),
+
+                new SceneOptions("Doggy",
+                        List.of("prone_doggy_intro"),
+                        List.of("prone_doggy_slow"),
+                        List.of("prone_doggy_hard1","prone_doggy_hard2","prone_doggy_hard3"),
+                        "prone_doggy_cum",
+                        true,
+                        1f,
+                        List.of("sitdown", "sitdownidle"),
+                        true,
+                        8)
         );
 
     }

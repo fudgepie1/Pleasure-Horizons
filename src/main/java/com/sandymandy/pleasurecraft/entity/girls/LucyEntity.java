@@ -47,10 +47,27 @@ public class LucyEntity extends SceneEntity {
     public List<SceneOptions> getSceneOptions() {
         return List.of(
                 new SceneOptions("Paizuri",
-                        List.of("paizuri_intro"), List.of("paizuri_slow"),List.of("paizuri_fast"),"paizuri_cum",false, 0, new ArrayList<>()),
+                        List.of("paizuri_intro"),
+                        List.of("paizuri_slow"),
+                        List.of("paizuri_fast"),
+                        "paizuri_cum",
+                        false,
+                        0,
+                        new ArrayList<>(),
+                        true,
+                        6),
 
                 new SceneOptions("Blow Job",
-                        List.of("blowjob_intro"),List.of("blowjob_slow"),List.of("blowjob_fast"),"blowjob_cum",false, 0, new ArrayList<>()),
+                        List.of("blowjob_intro"),
+                        List.of("blowjob_slow"),
+                        List.of("blowjob_fast"),
+                        "blowjob_cum",
+                        false,
+                        0,
+                        new ArrayList<>(),
+                        false,
+                        8),
+
                 new SceneOptions("Doggy",
                         List.of("doggy_intro"),
                         List.of("doggy_slow"),
@@ -58,7 +75,8 @@ public class LucyEntity extends SceneEntity {
                         "doggy_cum",
                         true,
                         0f,
-                        List.of("doggy_lay_on_bed", "doggy_bed_idle"))
+                        List.of("doggy_lay_on_bed", "doggy_bed_idle"),
+                        true,10)
         );
     }
 

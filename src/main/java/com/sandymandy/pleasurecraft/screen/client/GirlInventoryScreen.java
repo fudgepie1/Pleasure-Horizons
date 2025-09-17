@@ -10,6 +10,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
+import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.entity.player.PlayerEntity;
@@ -56,12 +57,54 @@ public class GirlInventoryScreen extends HandledScreen<GirlInventoryScreenHandle
         int j = this.y;
         context.drawTexture(RenderLayer::getGuiTextured,TEXTURE, centerX, centerY, 0, 0, GUI_WIDTH, GUI_HEIGHT, GUI_WIDTH, GUI_HEIGHT);
         InventoryScreen.drawEntity(context, i + 26, j + 8, i + 75, j + 78, this.girl.getSizeGUI(), this.girl.getYAxisGUI(), mouseX, mouseY, this.girl);
+
+        int relLevel = girl.getCurrentRelationshipLevel();
+
+
+        Identifier HEALTH_BOOST_ICON = Identifier.of(PleasureCraft.MOD_ID, "textures/gui/relationship_heart.png");
+
+        // pick position relative to GUI
+        int iconX = centerX;  // adjust position
+        int iconY = centerY - 20;
+
+        // draw the effect texture (assumes 18x18 size like vanilla)
+        context.drawTexture(RenderLayer::getGuiTextured, HEALTH_BOOST_ICON,
+                iconX, iconY, 0, 0, 18, 18, 18, 18);
+
+        // draw the number next to it
+        context.drawText(this.textRenderer, String.valueOf(relLevel),
+                iconX + 20, iconY + 5, 0xFFFFFF, true);
+
     }
 
     @Override
     public void close() {
         super.close();
         ClientPlayNetworking.send(new InInventoryC2SPacket(this.girl.getId(),false));
+    }
+
+    private void drawButton(Text label, InventoryButtonAction action, int x, int y, int buttonWidth, int buttonHeight){
+
+        ButtonWidget button = ButtonWidget.builder(
+                label,
+                btn -> {
+                    if (girl != null && client != null && player != null) {
+                        action.action().accept(girl, player);  // Run the button's logic
+                        this.client.setScreen(null);
+                        ClientPlayNetworking.send(new InInventoryC2SPacket(this.girl.getId(),false));
+                    }
+                }
+        ).dimensions(x, y, buttonWidth, buttonHeight).build();
+
+        if (girl.getCurrentRelationshipLevel() < action.requiredRelationshipLevel()) {
+            button.active = false; // disables and grays out
+        }
+
+        if (!button.active) {
+            button.setTooltip(Tooltip.of(Text.literal("Requires relationship level " + action.requiredRelationshipLevel())));
+        }
+
+        this.addDrawableChild(button);
     }
 
     @Override
@@ -89,16 +132,7 @@ public class GirlInventoryScreen extends HandledScreen<GirlInventoryScreenHandle
                     dynamicLabel = Text.literal("Dress Up");
                 }
 
-                this.addDrawableChild(ButtonWidget.builder(
-                    dynamicLabel,
-                    btn -> {
-                        if (girl != null && client != null && player != null) {
-                            action.action().accept(girl, player);  // Run the button's logic
-                            this.client.setScreen(null);
-                            ClientPlayNetworking.send(new InInventoryC2SPacket(this.girl.getId(),false));
-                        }
-                    }
-                ).dimensions(startX, y, buttonWidth, buttonHeight).build());
+                this.drawButton(dynamicLabel, action, startX, y, buttonWidth, buttonHeight);
             }
 
             for (int i = 0; i < InventoryButtonRegistry.BUTTONS_RIGHT.size(); i++) {
@@ -113,15 +147,7 @@ public class GirlInventoryScreen extends HandledScreen<GirlInventoryScreenHandle
                     dynamicLabel = Text.literal("Stop Following");
                 }
 
-                this.addDrawableChild(ButtonWidget.builder(
-                    dynamicLabel,
-                    btn -> {
-                        if (girl != null && client != null && player != null) {
-                            action.action().accept(girl, player);  // Run the button's logic
-                            this.client.setScreen(null);
-                        }
-                    }
-                ).dimensions(centerX + 176 + paddingX, y, buttonWidth, buttonHeight).build());
+                this.drawButton(dynamicLabel, action, centerX + 176 + paddingX, y, buttonWidth, buttonHeight);
             }
         }
 

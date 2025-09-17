@@ -71,13 +71,14 @@ public class SceneEntity extends AbstractGirlEntity{
         if (this.isSceneActive()) return;
 
         if (this.isSitting()) this.setSitting(false);
-        if (!this.isStripped()){
+
+        this.setCurrentSceneOptions(option);
+
+        if (!this.isStripped() && option.needsToStrip()){
             this.requestStrip();
             this.messageAsEntity(rider, "Be there in a bit, just need to take these clothes off");
             return;
         }
-
-        this.setCurrentSceneOptions(option);
 
         if (isBedScene()) {
             //  Check for a bed before starting

@@ -48,8 +48,8 @@ public class PleasureCraftPackets {
                                     case "stripOrDressup" -> girl.requestStrip(true, context.player());
                                     case "breakUp" -> girl.breakUp(context.player());
                                     case "setBase" -> girl.setBasePosHere();
-                                    case "talk" -> ServerPlayNetworking.send(context.player(), new SceneOptionsS2CPacket(girl.getId(), girl.getSceneOptions()));
-                                    case "testAnim1" -> girl.playAnimation("downed",false,false);
+                                    case "talk" -> ServerPlayNetworking.send(context.player(), new SceneOptionsS2CPacket(girl.getId(), girl.getCurrentRelationshipLevel(), girl.getSceneOptions()));
+//                                    case "testAnim1" -> girl.playAnimation("downed",false,false);
                                     case "goToBase" -> girl.teleportToBase();
                                     case "sit" -> girl.setSitting(!girl.isSitting());
                                     case "follow" -> girl.setFollowing(!girl.isFollowing());
@@ -162,7 +162,7 @@ public class PleasureCraftPackets {
 
         ClientPlayNetworking.registerGlobalReceiver(SceneOptionsS2CPacket.ID, (packet, context) -> {
             context.client().execute(() -> {
-                MinecraftClient.getInstance().setScreen(new GirlSceneScreen(packet.entityId(), packet.options()));
+                MinecraftClient.getInstance().setScreen(new GirlSceneScreen(packet.entityId(), packet.currentRelationshipLevel(),packet.options()));
             });
         });
 

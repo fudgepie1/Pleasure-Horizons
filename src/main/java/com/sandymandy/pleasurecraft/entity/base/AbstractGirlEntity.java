@@ -81,9 +81,8 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
     public Vec3d previousVelocity = Vec3d.ZERO;
     public Vec3d clientPassengerBonePos = Vec3d.ZERO;
     public Vec3d serverPassengerBonePos = Vec3d.ZERO;
-    public final int maxRelationshipLevel = 3;
     private int ticksSinceLastHit;
-    public int currentRelationshipLevel;
+    private int currentRelationshipLevel;
     private static final int MAX_TICKS_NO_HIT = 20 * 20;
     public float previousYaw = 0;
     public float passengerYOffset = 0f;
@@ -94,9 +93,6 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
     private boolean requestMoveToBed = false;
     private boolean inInventory = false;
     public BlockPos targetBedPos;
-
-
-
 
     protected Item getTameItem() {
         return Items.DANDELION;
@@ -110,6 +106,8 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
         return "null";
     }
 
+    public int getMaxRelationshipLevel(){return 8;}
+
     public int getSizeGUI(){return 20;}
 
     public float getYAxisGUI(){return 0.0625F;}
@@ -117,6 +115,8 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
     public List<SceneOptions> getSceneOptions() {
         return new ArrayList<>();
     }
+
+    public int getCurrentRelationshipLevel(){ return this.currentRelationshipLevel;}
 
 
     protected Map<EquipmentSlot, List<String>> getClothingBones() {
@@ -275,6 +275,19 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
                 }
 
                 if (this.isOwner(player)) {
+
+                    if (itemInHand.equals(getTameItem())) {
+                        if(currentRelationshipLevel < getMaxRelationshipLevel()){
+                            itemStack.decrementUnlessCreative(1, player);
+                            player.sendMessage(Text.literal("She Liked The Gift"), true);
+                            currentRelationshipLevel++;
+                            return ActionResult.CONSUME;
+                        }
+                        else {
+                            return ActionResult.FAIL;
+                        }
+                    }
+
                     if (player.isSneaking()) {
                         this.setSitting(!this.isSitting());
                         this.jumping = false;
@@ -288,9 +301,10 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
                         getLookControl().lookAt(player, this.getMaxHeadRotation() + 20, this.getMaxLookPitchChange());
                         return ActionResult.SUCCESS;
                     }
+
                 }
                 else {
-                    if ((itemInHand.equals(getTameItem()))) {
+                    if (itemInHand.equals(getTameItem())) {
                         player.sendMessage(Text.literal("She's Already In A Relationship With Someone"), true);
                         return ActionResult.FAIL;
                     }
@@ -329,7 +343,6 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
             this.setOwner(player);
             this.navigation.stop();
             setTarget(null);
-            this.setSitting(true);
             this.getWorld().sendEntityStatus(this, EntityStatuses.ADD_POSITIVE_PLAYER_REACTION_PARTICLES);
             player.sendMessage(Text.literal("You Asked " + getGirlDisplayName() + " Out And She Said §aYes" ), true);
             this.setBasePosHere();
@@ -452,6 +465,7 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
             this.setOwnerUuid(null); // Remove the owner UUID
             this.setSitting(false); // Ensure the entity is not sitting
             this.setStripped(false);
+            this.currentRelationshipLevel = 0;
             if(!isTamed() && !isOwner(player)){
                 player.sendMessage(Text.literal("§cYou Broke Up With " + getGirlDisplayName()), true);
             }

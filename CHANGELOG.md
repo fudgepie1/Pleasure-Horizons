@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.4
+- Improved the animation handling
+- Added a relationship system
+- Added a custom village that contains the girls
+
 ## 0.3.3
 - Fixed a bug where the entity wouldn't take any knockback after unfreezing
 - Made the entity check and move to nearby beds for bed scenes
@@ -28,3 +33,4 @@
 ## TODO
 - Fix the animation randomizer in the Scene
 - Make the AI more advance.
+- Add Relationship/Leveling System and in menu
