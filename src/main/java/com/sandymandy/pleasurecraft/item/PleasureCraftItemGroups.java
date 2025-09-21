@@ -17,6 +17,8 @@ public class PleasureCraftItemGroups {
                     .entries((displayContext, entries) -> {
                       entries.add(PleasureCraftItems.LUCY_SPAWN_EGG);
                       entries.add(PleasureCraftItems.BIA_SPAWN_EGG);
+                      entries.add(PleasureCraftItems.ZHONGEZI_SPAWN_EGG);
+
 
 
 

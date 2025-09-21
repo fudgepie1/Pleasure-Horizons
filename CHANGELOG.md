@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.1
+- Fixed a bug where you would still be invisible when exiting a scene.
+- Made the girls not attack other girls when if the owner attacked them.
+- Add a new girl called Zhongezi
+- Made the girls render the item in their hands
+- Improved Lucy's outfit.
+
 ## 0.4
 - Fixed the relationship level not saving.
 - Made the relationship level reset when you break up with a girl.
@@ -42,4 +49,5 @@
 - Fix the animation randomizer in the Scene.
 - Make the AI more advance.
 - Fix Attacking animation.
+- Fix Holding item.
 - Dialog.

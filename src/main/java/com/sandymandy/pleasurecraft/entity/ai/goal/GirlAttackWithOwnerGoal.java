@@ -12,37 +12,48 @@ public class GirlAttackWithOwnerGoal extends TrackTargetGoal {
     private final TameableGirlEntity tameable;
     private LivingEntity attacking;
     private int lastAttackTime;
+    private final Class<?>[] doNotTarget;
 
-    public GirlAttackWithOwnerGoal(TameableGirlEntity tameable) {
+    public GirlAttackWithOwnerGoal(TameableGirlEntity tameable, Class<?>... doNotTarget) {
         super(tameable, false);
         this.tameable = tameable;
+        this.doNotTarget = doNotTarget;
         this.setControls(EnumSet.of(Goal.Control.TARGET));
     }
 
     @Override
     public boolean canStart() {
         if (this.tameable.isTamed() && !this.tameable.isSitting()) {
-            LivingEntity livingEntity = this.tameable.getOwner();
-            if (livingEntity == null) {
+            LivingEntity owner = this.tameable.getOwner();
+            if (owner == null) {
                 return false;
-            } else {
-                this.attacking = livingEntity.getAttacking();
-                int i = livingEntity.getLastAttackTime();
-                return i != this.lastAttackTime && this.canTrack(this.attacking, TargetPredicate.DEFAULT) && this.tameable.canAttackWithOwner(this.attacking, livingEntity);
             }
-        } else {
-            return false;
+
+            this.attacking = owner.getAttacking();
+            int i = owner.getLastAttackTime();
+
+            if (i != this.lastAttackTime && this.attacking != null) {
+                for (Class<?> clazz : this.doNotTarget) {
+                    if (clazz.isAssignableFrom(this.attacking.getClass())) {
+                        return false;
+                    }
+                }
+
+                return this.canTrack(this.attacking, TargetPredicate.DEFAULT)
+                        && this.tameable.canAttackWithOwner(this.attacking, owner);
+            }
         }
+
+        return false;
     }
 
     @Override
     public void start() {
         this.mob.setTarget(this.attacking);
-        LivingEntity livingEntity = this.tameable.getOwner();
-        if (livingEntity != null) {
-            this.lastAttackTime = livingEntity.getLastAttackTime();
+        LivingEntity owner = this.tameable.getOwner();
+        if (owner != null) {
+            this.lastAttackTime = owner.getLastAttackTime();
         }
-
         super.start();
     }
 }

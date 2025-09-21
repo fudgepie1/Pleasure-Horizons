@@ -42,7 +42,7 @@
         public static void registerSounds() {
             SceneKeyframeRegistry.registerSoundEvents();
 
-            PleasureCraft.LOGGER.info("Registered Lucy sounds.");
+            PleasureCraft.LOGGER.info("Registered sounds for PleasureCraft.");
         }
 
         private static SoundEvent registerSound(String soundPath) {

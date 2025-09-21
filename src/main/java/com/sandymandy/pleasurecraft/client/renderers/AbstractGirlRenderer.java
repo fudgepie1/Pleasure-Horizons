@@ -1,6 +1,5 @@
 package com.sandymandy.pleasurecraft.client.renderers;
 
-import com.sandymandy.pleasurecraft.entity.base.AbstractGirlEntity;
 import com.sandymandy.pleasurecraft.entity.base.SceneEntity;
 import com.sandymandy.pleasurecraft.util.renderer.OffsetVertexConsumer;
 import net.minecraft.client.render.RenderLayer;
@@ -8,20 +7,79 @@ import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.ModelTransformationMode;
+import net.minecraft.item.ShieldItem;
+import net.minecraft.item.SwordItem;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec2f;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.cache.object.BakedGeoModel;
 import software.bernie.geckolib.cache.object.GeoBone;
 import software.bernie.geckolib.model.GeoModel;
 import software.bernie.geckolib.renderer.GeoEntityRenderer;
+import software.bernie.geckolib.renderer.layer.BlockAndItemGeoLayer;
 
 import java.util.Map;
 
 public abstract class AbstractGirlRenderer<T extends SceneEntity> extends GeoEntityRenderer<T> {
 
+
+    protected ItemStack mainHandItem;
+
     public AbstractGirlRenderer(EntityRendererFactory.Context renderManager, GeoModel<T> model) {
         super(renderManager, model);
+        this.addRenderLayer(new BlockAndItemGeoLayer<T>(this) {
+            private float heldItemScale = 1.0F;
+
+            @Override
+            @Nullable
+            protected ItemStack getStackForBone(GeoBone bone, T entity) {
+                if (bone.getName().equals("weapon")) {
+                     return AbstractGirlRenderer.this.mainHandItem;
+                }
+                return null;
+            }
+
+            @Override
+            protected ModelTransformationMode getTransformTypeForStack(GeoBone bone, ItemStack stack, T entity) {
+                // Always treat it as if held in the right hand
+                return ModelTransformationMode.THIRD_PERSON_RIGHT_HAND;
+            }
+
+            @Override
+            protected void renderStackForBone(
+                    MatrixStack matrices,
+                    GeoBone bone,
+                    ItemStack stack,
+                    T entity,
+                    VertexConsumerProvider bufferSource,
+                    float tickDelta,
+                    int light,
+                    int overlay
+            ) {
+                if (stack == AbstractGirlRenderer.this.mainHandItem) {
+                    // Rotate around X -90°
+                    matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(-90.0F));
+                    if (stack.getItem() instanceof ShieldItem) {
+                        matrices.translate(0.0F, 0.125F, -0.25F);
+                    }
+                    else if (stack.getItem() instanceof SwordItem){
+                        matrices.translate(0.0F, 0.05F, 0.0F);
+                        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(10.0F));
+                        matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(5.0F));
+                    }
+                }
+
+                this.heldItemScale = 0.7F;
+                matrices.scale(this.heldItemScale, this.heldItemScale, this.heldItemScale);
+
+                super.renderStackForBone(matrices, bone, stack, entity, bufferSource, tickDelta, light, overlay);
+            }
+        });
+
+
     }
 
     @Override
@@ -36,6 +94,7 @@ public abstract class AbstractGirlRenderer<T extends SceneEntity> extends GeoEnt
                           VertexConsumerProvider bufferSource, VertexConsumer buffer,
                           boolean isReRender, float partialTick, int packedLight,
                           int packedOverlay, int color) {
+        this.mainHandItem = entity.getMainHandStack();
 
         super.preRender(poseStack, entity, model, bufferSource, buffer, isReRender,
                 partialTick, packedLight, packedOverlay, color);

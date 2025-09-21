@@ -23,6 +23,9 @@ public class PleasureCraftItems {
     public static final Item BIA_SPAWN_EGG = registerItem("bia_spawn_egg",
             setting -> new SpawnEggItem(PleasureCraftEntities.BIA, setting));
 
+    public static final Item ZHONGEZI_SPAWN_EGG = registerItem("zhongzi_spawn_egg",
+            setting -> new SpawnEggItem(PleasureCraftEntities.ZHONGEZI, setting));
+
 
     private static Item registerItem(String name, Function<Item.Settings, Item> factory) {
         Identifier id = Identifier.of(PleasureCraft.MOD_ID, name);
@@ -32,11 +35,12 @@ public class PleasureCraftItems {
 
 
     public static void registerModItems(){
-        PleasureCraft.LOGGER.info("Registering Items for " + PleasureCraft.MOD_ID);
+        PleasureCraft.LOGGER.info("Registering Items for PleasureCraft");
 
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.SPAWN_EGGS).register(entries -> {
             entries.add(LUCY_SPAWN_EGG);
             entries.add(BIA_SPAWN_EGG);
+            entries.add(ZHONGEZI_SPAWN_EGG);
         });
     }
 }

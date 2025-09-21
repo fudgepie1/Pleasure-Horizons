@@ -4,6 +4,7 @@ package com.sandymandy.pleasurecraft;
 import com.sandymandy.pleasurecraft.client.PleasureCraftKeybinds;
 import com.sandymandy.pleasurecraft.client.renderers.BiaRenderer;
 import com.sandymandy.pleasurecraft.client.renderers.LucyRenderer;
+import com.sandymandy.pleasurecraft.client.renderers.ZhongeziRenderer;
 import com.sandymandy.pleasurecraft.entity.PleasureCraftEntities;
 import com.sandymandy.pleasurecraft.networking.PleasureCraftPackets;
 import com.sandymandy.pleasurecraft.networking.C2S.CumKeybindC2SPacket;
@@ -26,6 +27,7 @@ public class PleasureCraftClient implements ClientModInitializer {
 
         EntityRendererRegistry.register(PleasureCraftEntities.LUCY, LucyRenderer::new);
         EntityRendererRegistry.register(PleasureCraftEntities.BIA, BiaRenderer::new);
+        EntityRendererRegistry.register(PleasureCraftEntities.ZHONGEZI, ZhongeziRenderer::new);
         PleasureCraftKeybinds.register();
         PleasureCraftPackets.registerS2CPackets();
         handleKeybinds();

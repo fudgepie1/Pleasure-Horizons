@@ -2,7 +2,6 @@ package com.sandymandy.pleasurecraft.client.models;
 
 import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.entity.base.AbstractGirlEntity;
-import com.sandymandy.pleasurecraft.entity.base.SceneEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
@@ -30,10 +29,20 @@ public abstract class AbstractGirlModel<T extends AbstractGirlEntity> extends Ge
     }
 
     @Override
-    public abstract Identifier getTextureResource(T animatable, GeoRenderer<T> renderer);
+    public Identifier getTextureResource(T animatable, GeoRenderer<T> renderer) {
+
+        String filePath = "textures/entities/" + animatable.getGirlID() + ".png";
+
+        return Identifier.of(PleasureCraft.MOD_ID, filePath);
+    }
 
     @Override
-    public abstract Identifier getAnimationResource(T animatable);
+    public Identifier getAnimationResource(T animatable) {
+
+        String filePath = "animations/" + animatable.getGirlID() + ".animation.json";
+
+        return Identifier.of(PleasureCraft.MOD_ID, filePath);
+    }
 
     @Override
     public void setCustomAnimations(T girl, long instanceId, AnimationState<T> animationState) {

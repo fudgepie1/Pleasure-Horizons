@@ -13,7 +13,7 @@ public class PleasureCraftTrackedData {
             TrackedDataHandler.create(ScenePhase.CODEC);
 
     public static void registerTrackedData(){
-        PleasureCraft.LOGGER.info("Registering custom TrackedDataHandlers");
+        PleasureCraft.LOGGER.info("Registering custom TrackedDataHandlers for PleasureCraft");
         TrackedDataHandlerRegistry.register(PleasureCraftTrackedData.SCENE_OPTION);
         TrackedDataHandlerRegistry.register(PleasureCraftTrackedData.SCENE_PHASE);
     }

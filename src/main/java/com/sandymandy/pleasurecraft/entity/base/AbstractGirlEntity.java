@@ -193,8 +193,8 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
         this.goalSelector.add(8, new ConditionalGoal(new LookAtEntityGoal(this, PlayerEntity.class, 6.0F),() -> !isMovementLocked()));
         this.goalSelector.add(9, new ConditionalGoal(new LookAroundGoal(this),() -> !isMovementLocked()));
         this.targetSelector.add(1, new GirlTrackOwnerAttackerGoal(this));
-        this.targetSelector.add(2, new GirlAttackWithOwnerGoal(this));
-        this.targetSelector.add(3, new RevengeGoal(this, PlayerEntity.class));
+        this.targetSelector.add(2, new GirlAttackWithOwnerGoal(this, AbstractGirlEntity.class));
+        this.targetSelector.add(3, new RevengeGoal(this, PlayerEntity.class, AbstractGirlEntity.class));
     }
 
 

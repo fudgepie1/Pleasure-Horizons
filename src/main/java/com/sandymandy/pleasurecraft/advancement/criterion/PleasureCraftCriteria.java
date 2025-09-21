@@ -22,6 +22,6 @@ public class PleasureCraftCriteria {
     }
 
     public static void registerAdvancementCriteria() {
-        PleasureCraft.LOGGER.info("Registering Advancement Criteria for " + PleasureCraft.MOD_ID);
+        PleasureCraft.LOGGER.info("Registering Advancement Criteria for PleasureCraft");
     }
 }

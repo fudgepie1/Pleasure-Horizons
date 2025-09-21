@@ -31,8 +31,7 @@ public class SceneEntity extends AbstractGirlEntity{
     private static final TrackedData<com.sandymandy.pleasurecraft.util.ScenePhase> CURRENT_SCENE_PHASE = DataTracker.registerData(SceneEntity.class, PleasureCraftTrackedData.SCENE_PHASE);
     private static final TrackedData<String> SOUND = DataTracker.registerData(SceneEntity.class, TrackedDataHandlerRegistry.STRING);
 
-
-    private int timer = 0 ;
+    private int timer = 0;
     private int introIndex = 0;
     private String lastSceneAnim = "";
     private final float cumThreshold = 5f;
@@ -155,10 +154,7 @@ public class SceneEntity extends AbstractGirlEntity{
         if (this.hasPassengers()) {
             this.removeAllPassengers();
         }
-
-        for (PlayerEntity player : this.getWorld().getPlayers()) {
-            if (!player.hasVehicle()) player.setInvisible(false);
-        }
+        scenePlayer.setInvisible(false);
     }
 
     public void setKeyHeld(boolean held) {
@@ -325,9 +321,6 @@ public class SceneEntity extends AbstractGirlEntity{
             default -> true;
         };
         if(!this.hasPassengers() && this.isSceneActive() && isStopPhase) stopScene();
-
-
-        if (scenePlayer != null) scenePlayer.setInvisible(true);
 
         // Handle scene phases
         if(!this.getWorld().isClient()) {
