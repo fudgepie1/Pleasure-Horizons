@@ -7,6 +7,7 @@ import net.minecraft.network.codec.PacketCodecs;
 
 public enum ScenePhase {
     NONE,
+    DIALOG,
     LAYING_DOWN,
     BED_IDLE,
     INTRO,

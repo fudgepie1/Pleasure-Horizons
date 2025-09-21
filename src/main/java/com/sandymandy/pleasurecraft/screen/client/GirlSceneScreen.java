@@ -1,9 +1,7 @@
 package com.sandymandy.pleasurecraft.screen.client;
 
 import com.sandymandy.pleasurecraft.PleasureCraft;
-import com.sandymandy.pleasurecraft.networking.C2S.InInventoryC2SPacket;
 import com.sandymandy.pleasurecraft.networking.C2S.StartSceneC2SPacket;
-import com.sandymandy.pleasurecraft.screen.InventoryButtonAction;
 import com.sandymandy.pleasurecraft.util.SceneOptions;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.MinecraftClient;
@@ -33,7 +31,7 @@ public class GirlSceneScreen extends Screen {
     protected void init() {
         int y = this.height / 4;
         for (SceneOptions sceneOptions : sceneOptions) {
-            ButtonWidget buttonWidget = ButtonWidget.builder(Text.of(sceneOptions.name()), button -> {
+            ButtonWidget buttonWidget = ButtonWidget.builder(Text.of(sceneOptions.displayName()), button -> {
                 ClientPlayNetworking.send(new StartSceneC2SPacket(
                         this.entityId,
                         sceneOptions

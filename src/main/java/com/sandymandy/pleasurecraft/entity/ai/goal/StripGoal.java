@@ -2,20 +2,20 @@ package com.sandymandy.pleasurecraft.entity.ai.goal;
 
 import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.entity.base.SceneEntity;
+import com.sandymandy.pleasurecraft.util.SceneOptions;
 import net.minecraft.entity.ai.goal.Goal;
+import net.minecraft.entity.player.PlayerEntity;
 
 import java.util.EnumSet;
 
 public class StripGoal extends Goal {
-    private final SceneEntity girl;
-    private int stripTimer;
-    private final int stripTimerThreshold ;
+    private final SceneEntity girl; ;
     private boolean stripTrigged = false;
     private boolean started = false;
+    private SceneOptions sceneOptions = SceneOptions.EMPTY;
 
-    public StripGoal(SceneEntity girl, int amountOfTickUntilStrip) {
+    public StripGoal(SceneEntity girl) {
         this.girl = girl;
-        this.stripTimerThreshold = amountOfTickUntilStrip;        // 3 seconds (20 ticks per second)
         this.setControls(EnumSet.of(Control.MOVE, Control.LOOK, Control.JUMP));
     }
 
@@ -27,9 +27,13 @@ public class StripGoal extends Goal {
 
     @Override
     public void start() {
-        this.stripTimer = 0;                  // reset timer every time it starts
         girl.setFreeze(true);
         girl.playAnimation("strip", false, false); // play strip anim
+        if(!girl.stripOptions.equals(SceneOptions.EMPTY))
+        {
+            this.sceneOptions = girl.stripOptions;
+            girl.stripOptions = SceneOptions.EMPTY;
+        }
         stripTrigged = false;
         started = true;
     }
@@ -38,10 +42,7 @@ public class StripGoal extends Goal {
     public void tick() {
         if(started) {
             if (!girl.isFrozenInPlace()) girl.setFreeze(true);
-            stripTimer++;
-//            PleasureCraft.LOGGER.info(stripTimer+"");
-            if (stripTimer >= stripTimerThreshold && !stripTrigged) {
-//                PleasureCraft.LOGGER.info("TRIGGERD STRIP_________________________________________________________________");
+            if (girl.getSoundEvent().equals("becomeNude") && !stripTrigged) {
                 girl.setStripped(!girl.isStripped()); // toggle stripped state
                 stripTrigged = true;
             }
@@ -57,7 +58,10 @@ public class StripGoal extends Goal {
     @Override
     public void stop() {
         girl.setFreeze(false);
-//        PleasureCraft.LOGGER.info("Stopped");
         started = false;
+        if(!this.sceneOptions.equals(SceneOptions.EMPTY)){
+            girl.startScene(this.sceneOptions);
+            this.sceneOptions = SceneOptions.EMPTY;
+        }
     }
 }

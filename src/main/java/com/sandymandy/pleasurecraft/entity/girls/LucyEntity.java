@@ -12,7 +12,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.world.World;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -33,7 +32,7 @@ public class LucyEntity extends SceneEntity {
     }
 
     @Override
-    protected String getGirlID() {
+    public String getGirlID() {
         return "lucy";
     }
 
@@ -51,44 +50,33 @@ public class LucyEntity extends SceneEntity {
     @Override
     public List<SceneOptions> getSceneOptions() {
         return List.of(
-                new SceneOptions("Paizuri",
+                SceneOptions.of("Paizuri",
                         6,
                         List.of("paizuri_intro"),
                         List.of("paizuri_slow"),
                         List.of("paizuri_fast"),
                         "paizuri_cum",
-                        true,
-                        false,
-                        0,
-                        new ArrayList<>()),
+                        true),
 
-                new SceneOptions("Blow Job",
+
+                SceneOptions.of("Blow Job",
                         8,
                         List.of("blowjob_intro"),
                         List.of("blowjob_slow"),
                         List.of("blowjob_fast"),
                         "blowjob_cum",
-                        false,
-                        false,
-                        0,
-                        new ArrayList<>()),
+                        false),
 
-                new SceneOptions("Doggy",
+                SceneOptions.of("Doggy",
                         10,
                         List.of("doggy_intro"),
                         List.of("doggy_slow"),
-                        List.of("doggy_fast1","doggy_fast2"),
+                        List.of("doggy_fast1"),
                         "doggy_cum",
-                        true,
                         true,
                         0f,
                         List.of("doggy_lay_on_bed", "doggy_bed_idle"))
                 );
-    }
-
-    @Override
-    protected Map<EquipmentSlot, List<String>> getClothingBones() {
-        return super.getClothingBones();
     }
 
     public static DefaultAttributeContainer.Builder createAttributes() {

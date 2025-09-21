@@ -21,7 +21,6 @@ import java.util.EnumSet;
 public class BedGoal extends Goal {
     private final SceneEntity entity;
     private final double speed;
-    private PlayerEntity player;
     private final EntityNavigation navigation;
     private Direction bedFacing;
     private Vec3d snapPos;
@@ -50,8 +49,6 @@ public class BedGoal extends Goal {
 
     @Override
     public void start() {
-        this.player = (PlayerEntity) this.entity.getOwner();
-
         var state = this.entity.getWorld().getBlockState(this.entity.targetBedPos);
         if (state.contains(Properties.HORIZONTAL_FACING)) {
             this.bedFacing = state.get(Properties.HORIZONTAL_FACING);
@@ -90,7 +87,7 @@ public class BedGoal extends Goal {
 
     private void handleMovement(){
         if (this.entity.squaredDistanceTo(this.entity.targetBedPos.toCenterPos()) <= 3) {
-            if (player != null) {
+            if (this.entity.scenePlayer != null) {
                 this.navigation.stop();
                 // Make the entity Face the direction of the bed
                 if (bedFacing != null) {
@@ -118,9 +115,9 @@ public class BedGoal extends Goal {
 
     private void startOnContact(){
         if(!entity.isWaitingAtBed()) return;
-        if(this.entity.squaredDistanceTo(this.player) <= 1.5 && entity.getCurrentScenePhase().equals(ScenePhase.BED_IDLE)){
+        if(this.entity.squaredDistanceTo(this.entity.scenePlayer) <= 1.5 && entity.getCurrentScenePhase().equals(ScenePhase.BED_IDLE)){
             this.entity.setPosition(scenePos);
-            this.entity.onSceneStart(player);
+            this.entity.onSceneStart();
         }
     }
 

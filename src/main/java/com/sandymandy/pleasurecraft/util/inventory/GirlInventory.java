@@ -53,6 +53,10 @@ public interface GirlInventory extends Inventory {
         };
     }
 
+    default ItemStack getHandStack() {
+        return getStack(MAIN_HAND_SLOT);
+    }
+
     default void setArmorStack(EquipmentSlot slot, ItemStack stack) {
         switch (slot) {
             case FEET -> setStack(ARMOR_FEET_SLOT, stack);

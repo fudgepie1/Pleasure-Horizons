@@ -64,9 +64,11 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
     private static final TrackedData<Boolean> OVERRIDE_HOLD = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<Boolean> OVERRIDE_ANIM_PLAYING = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<Boolean> IS_PLAYER_MODEL_SLIM = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+    private static final TrackedData<Boolean> HAVING_SEX = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     public static final TrackedData<Float> SCENE_PROGRESS = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.FLOAT);
     private static final TrackedData<String> OVERRIDE_ANIM = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.STRING);
     private static final TrackedData<String> SCENE_ANIM = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.STRING);
+    private static final TrackedData<Integer> RELATIONSHIP_LEVEL = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.INTEGER);
     private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
     public Map<String, Boolean> boneVisibility = new HashMap<>();
     public Map<String, Identifier> boneTextureOverrides = new HashMap<>();
@@ -75,14 +77,12 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
     public final Map<EquipmentSlot, Boolean> clothingVisibility = new EnumMap<>(EquipmentSlot.class);
     public final Map<EquipmentSlot, Boolean> armorVisibility = new EnumMap<>(EquipmentSlot.class);
     public final Map<EquipmentSlot, Boolean> nudeBodyVisibility = new EnumMap<>(EquipmentSlot.class);
-    private final GirlInventory inventory = GirlInventory.ofSize();
     private BlockPos basePos;
     private LivingEntity attackTarget;
     public Vec3d previousVelocity = Vec3d.ZERO;
     public Vec3d clientPassengerBonePos = Vec3d.ZERO;
     public Vec3d serverPassengerBonePos = Vec3d.ZERO;
     private int ticksSinceLastHit;
-    private int currentRelationshipLevel;
     private static final int MAX_TICKS_NO_HIT = 20 * 20;
     public float previousYaw = 0;
     public float passengerYOffset = 0f;
@@ -92,7 +92,9 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
     private boolean requestStrip = false;
     private boolean requestMoveToBed = false;
     private boolean inInventory = false;
+    public SceneOptions stripOptions = SceneOptions.EMPTY;
     public BlockPos targetBedPos;
+    private boolean requestMoveToPlayer;
 
     protected Item getTameItem() {
         return Items.DANDELION;
@@ -102,7 +104,7 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
         return "Null";
     }
 
-    protected String getGirlID() {
+    public String getGirlID() {
         return "null";
     }
 
@@ -116,23 +118,15 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
         return new ArrayList<>();
     }
 
-    public int getCurrentRelationshipLevel(){ return this.currentRelationshipLevel;}
+    public record ClothingBones(EquipmentSlot slot, boolean hideNude){
+        public static ClothingBones of(EquipmentSlot slot, boolean hideNude){
+            return new ClothingBones(slot, hideNude);
+        }
 
-
-    protected Map<EquipmentSlot, List<String>> getClothingBones() {
-        Map<EquipmentSlot, List<String>> clothing = new HashMap<>();
-
-        clothing.put(EquipmentSlot.HEAD, new ArrayList<>());
-
-        clothing.put(EquipmentSlot.CHEST, new ArrayList<>());
-
-        clothing.put(EquipmentSlot.LEGS, new ArrayList<>());
-
-        clothing.put(EquipmentSlot.FEET, new ArrayList<>());
-
-        return clothing;
+        public static ClothingBones of(EquipmentSlot slot){
+            return new ClothingBones(slot, false);
+        }
     }
-    // Armor bones mapped by EquipmentSlot
 
     protected Map<EquipmentSlot, List<String>> getArmorBones() {
         Map<EquipmentSlot, List<String>> armor = new HashMap<>();
@@ -167,24 +161,14 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
     }
 
     protected Map<EquipmentSlot, List<String>> getNudeBodyBones() {
-        Map<EquipmentSlot, List<String>> body = new HashMap<>();
 
-        body.put(EquipmentSlot.HEAD, new ArrayList<>());
 
-        body.put(EquipmentSlot.CHEST, new ArrayList<>(List.of(
-                "boobR",
-                "boobL"
+
+
+
+        return Map.of(EquipmentSlot.LEGS, new ArrayList<>(List.of(
+                "vagina"
         )));
-
-        body.put(EquipmentSlot.LEGS, new ArrayList<>(List.of(
-                "vagina",
-                "fleshL",
-                "fleshR"
-        )));
-
-        body.put(EquipmentSlot.FEET, new ArrayList<>());
-
-        return body;
     }
 
 
@@ -205,36 +189,16 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
         builder.add(OVERRIDE_HOLD, false);
         builder.add(OVERRIDE_ANIM_PLAYING, false);
         builder.add(IS_PLAYER_MODEL_SLIM, false);
+        builder.add(HAVING_SEX, false);
         builder.add(SCENE_PROGRESS,0f);
+        builder.add(RELATIONSHIP_LEVEL,0);
         builder.add(OVERRIDE_ANIM,"");
         builder.add(SCENE_ANIM,"");
 
     }
 
 
-    public GirlInventory getInventory() {
-        return inventory;
-    }
 
-    @Override
-    public Iterable<ItemStack> getArmorItems() {
-        return List.of(
-                inventory.getArmorStack(EquipmentSlot.FEET),
-                inventory.getArmorStack(EquipmentSlot.LEGS),
-                inventory.getArmorStack(EquipmentSlot.CHEST),
-                inventory.getArmorStack(EquipmentSlot.HEAD)
-        );
-    }
-
-    @Override
-    public ItemStack getEquippedStack(EquipmentSlot slot) {
-        return inventory.getArmorStack(slot);
-    }
-
-    @Override
-    public void equipStack(EquipmentSlot slot, ItemStack stack) {
-        inventory.setArmorStack(slot, stack);
-    }
 
     @Override
     protected void initGoals() {
@@ -271,16 +235,18 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
                     FoodComponent foodComponent = itemStack.get(DataComponentTypes.FOOD);
                     float f = foodComponent != null ? foodComponent.nutrition() : 1.0F;
                     this.heal(2.0F * f);
-                    return ActionResult.SUCCESS;
+                    player.getWorld().sendEntityStatus(this, EntityStatuses.CONSUME_ITEM);
+                    return ActionResult.CONSUME;
                 }
 
                 if (this.isOwner(player)) {
 
                     if (itemInHand.equals(getTameItem())) {
-                        if(currentRelationshipLevel < getMaxRelationshipLevel()){
+                        if(getCurrentRelationshipLevel() < getMaxRelationshipLevel()){
                             itemStack.decrementUnlessCreative(1, player);
                             player.sendMessage(Text.literal("She Liked The Gift"), true);
-                            currentRelationshipLevel++;
+                            setCurrentRelationshipLevel(getCurrentRelationshipLevel() + 1);
+                            player.getWorld().sendEntityStatus(this, EntityStatuses.ADD_BREEDING_PARTICLES);
                             return ActionResult.CONSUME;
                         }
                         else {
@@ -348,6 +314,21 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
             this.setBasePosHere();
         } else {
             this.getWorld().sendEntityStatus(this, EntityStatuses.ADD_NEGATIVE_PLAYER_REACTION_PARTICLES);
+        }
+    }
+
+    public void breakUp(PlayerEntity player) {
+        if(!player.getWorld().isClient){
+            this.setTamed(false,true); // Mark the entity as untamed
+            this.setOwnerUuid(null); // Remove the owner UUID
+            this.setSitting(false); // Ensure the entity is not sitting
+            this.setStripped(false);
+            this.setCurrentRelationshipLevel(0);
+            if(!isTamed() && !isOwner(player)){
+                player.sendMessage(Text.literal("§cYou Broke Up With " + getGirlDisplayName()), true);
+            }
+            this.getWorld().sendEntityStatus(this, EntityStatuses.ADD_VILLAGER_ANGRY_PARTICLES);
+
         }
     }
 
@@ -430,7 +411,7 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
     public float getSceneProgress(){
         return this.dataTracker.get(SCENE_PROGRESS);
     }
-    
+
     public boolean isWaitingAtBed(){
         return this.dataTracker.get(WAITING_AT_BED);
     }
@@ -447,6 +428,18 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
         return this.dataTracker.get(IS_PLAYER_MODEL_SLIM);
     }
 
+    public void setHavingSex(boolean state) {
+        this.dataTracker.set(HAVING_SEX, state);
+    }
+
+    public boolean isHavingSex() {
+        return this.dataTracker.get(HAVING_SEX);
+    }
+
+    public int getCurrentRelationshipLevel() { return this.dataTracker.get(RELATIONSHIP_LEVEL);}
+    public void setCurrentRelationshipLevel(int var) { this.dataTracker.set(RELATIONSHIP_LEVEL, var);}
+
+
 
     public boolean isFoodItem(ItemStack stack) {
         return stack.isIn(ItemTags.WOLF_FOOD);
@@ -457,18 +450,6 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
         this.setCustomName(Text.of(getGirlDisplayName()));
         this.setCustomNameVisible(true);
         return true;
-    }
-
-    public void breakUp(PlayerEntity player) {
-        if(!player.getWorld().isClient){
-            this.setTamed(false,true); // Mark the entity as untamed
-            this.setOwnerUuid(null); // Remove the owner UUID
-            this.setSitting(false); // Ensure the entity is not sitting
-            this.setStripped(false);
-            if(!isTamed() && !isOwner(player)){
-                player.sendMessage(Text.literal("§cYou Broke Up With " + getGirlDisplayName()), true);
-            }
-        }
     }
 
     public void setBasePosHere(){
@@ -554,6 +535,7 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
         nbt.putBoolean("SitSate", this.isSitting());
         nbt.putBoolean("StripState", this.isStripped());
         nbt.putBoolean("SceneState", this.isSceneActive());
+        nbt.putInt("RelationshipLevel", this.getCurrentRelationshipLevel());
 
         if (this.basePos != null) {
             nbt.putInt("BaseX", this.basePos.getX());
@@ -571,6 +553,7 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
         Inventories.readNbt(nbt, this.inventory.getItems(), registryLookup);
         this.setSitting(nbt.getBoolean("SitSate"));
         this.setStripped(nbt.getBoolean("StripState"));
+        this.setCurrentRelationshipLevel(nbt.getInt("RelationshipLevel"));
         if (nbt.contains("BaseX") && nbt.contains("BaseY") && nbt.contains("BaseZ")) {
             int x = nbt.getInt("BaseX");
             int y = nbt.getInt("BaseY");
@@ -609,11 +592,19 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
     }
 
     public void requestStrip() {
-        requestStrip(false, null);
+        requestStrip(false, null, null);
     }
 
-    public void requestStrip(boolean sendMessage, @Nullable PlayerEntity player) {
+    public void requestStrip(SceneOptions options) {
+        requestStrip(false, null, options);
+    }
+
+    public void requestStrip(boolean sendMessage, @Nullable PlayerEntity player, @Nullable SceneOptions options) {
         this.requestStrip = true;
+
+        if(options != null){
+            this.stripOptions = options;
+        }
 
         if(sendMessage){
             if(player != null) messageAsEntity(player,"okie then, just for you tho ^_~");
@@ -636,53 +627,38 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
         boolean stripped = isStripped();
 
         for (EquipmentSlot slot : EquipmentSlot.values()) {
-            clothingVisibility.put(slot, !stripped && this.inventory.getArmorStack(slot).isEmpty());
-            armorVisibility.put(slot, !stripped && !this.inventory.getArmorStack(slot).isEmpty());
-            nudeBodyVisibility.put(slot, this.inventory.getArmorStack(slot).isEmpty() || stripped);
-
-
+            boolean hasArmor = !this.inventory.getArmorStack(slot).isEmpty();
+            armorVisibility.put(slot, hasArmor &! stripped);
         }
 
-        // --- send packet to client ---
-        List<Boolean> clothingList = Arrays.stream(EquipmentSlot.values())
-                .map(s -> clothingVisibility.getOrDefault(s, false))
-                .toList();
 
         List<Boolean> armorList = Arrays.stream(EquipmentSlot.values())
                 .map(s -> armorVisibility.getOrDefault(s, false))
                 .toList();
 
-        List<Boolean> nudeBodyList = Arrays.stream(EquipmentSlot.values())
-                .map(s -> nudeBodyVisibility.getOrDefault(s, false))
-                .toList();
-
 
         ClothingArmorVisibilityS2CPacket packet =
-                new ClothingArmorVisibilityS2CPacket(this.getId(), clothingList, armorList, nudeBodyList);
+                new ClothingArmorVisibilityS2CPacket(this.getId(), armorList);
 
         for (ServerPlayerEntity player : Objects.requireNonNull(this.getServer()).getPlayerManager().getPlayerList()) {
             ServerPlayNetworking.send(player, packet);
         }
-
     }
 
     public void applyClothingAndArmor() {
         if (!this.getWorld().isClient()) return;
 
         for (EquipmentSlot slot : EquipmentSlot.values()) {
-            List<String> clothingBones = getClothingBones().get(slot);
-            if (clothingBones != null) {
-                toggleModelBones(clothingBones, clothingVisibility.getOrDefault(slot, true));
-            }
-
-            List<String> nudeBody = getNudeBodyBones().get(slot);
-            if(nudeBody != null){
-                toggleModelBones(nudeBody, nudeBodyVisibility.getOrDefault(slot, true));
-            }
-
             List<String> armorBones = getArmorBones().get(slot);
             if (armorBones != null) {
                 toggleModelBones(armorBones, armorVisibility.getOrDefault(slot, false));
+
+
+                // Special rule: hide vagina if armor is in legs slot
+                if (slot == EquipmentSlot.LEGS) {
+                    boolean legsCovered = armorVisibility.getOrDefault(slot, false);
+                    toggleModelBones(Collections.singletonList("vagina"), !legsCovered);
+                }
             }
 
             if (!this.inventory.getArmorStack(slot).isEmpty()) {
@@ -949,4 +925,18 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
         }
         return false;
     }
+
+    public void requestMoveToPlayer() {
+        this.requestMoveToPlayer = true;
+    }
+
+    public boolean shouldMoveToPlayer() {
+        if (requestMoveToPlayer) {
+            requestMoveToPlayer = false;
+            return true;
+        }
+        return false;
+    }
+
+
 }

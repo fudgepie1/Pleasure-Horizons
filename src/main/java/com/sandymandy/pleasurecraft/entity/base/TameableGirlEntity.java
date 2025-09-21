@@ -1,6 +1,7 @@
 package com.sandymandy.pleasurecraft.entity.base;
 
 import com.sandymandy.pleasurecraft.advancement.criterion.PleasureCraftCriteria;
+import com.sandymandy.pleasurecraft.util.inventory.GirlInventory;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.LeavesBlock;
 import net.minecraft.component.DataComponentTypes;
@@ -32,6 +33,7 @@ import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -44,6 +46,7 @@ public class TameableGirlEntity extends PathAwareEntity implements Tameable {
     protected static final TrackedData<Byte> TAMEABLE_FLAGS = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.BYTE);
     protected static final TrackedData<Optional<UUID>> OWNER_UUID = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.OPTIONAL_UUID);
     private static final TrackedData<Boolean> SITTING = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+    public final GirlInventory inventory = GirlInventory.ofSize();
     public Vec3d prevVelocity = Vec3d.ZERO;
 
 
@@ -57,6 +60,35 @@ public class TameableGirlEntity extends PathAwareEntity implements Tameable {
         builder.add(TAMEABLE_FLAGS, (byte)0);
         builder.add(OWNER_UUID, Optional.empty());
         builder.add(SITTING, false);
+    }
+
+    public GirlInventory getInventory() {
+        return inventory;
+    }
+
+    @Override
+    public Iterable<ItemStack> getArmorItems() {
+        return List.of(
+                inventory.getArmorStack(EquipmentSlot.FEET),
+                inventory.getArmorStack(EquipmentSlot.LEGS),
+                inventory.getArmorStack(EquipmentSlot.CHEST),
+                inventory.getArmorStack(EquipmentSlot.HEAD)
+        );
+    }
+
+    @Override
+    public ItemStack getEquippedStack(EquipmentSlot slot) {
+        return inventory.getArmorStack(slot);
+    }
+
+    @Override
+    public ItemStack getMainHandStack() {
+        return inventory.getHandStack();
+    }
+
+    @Override
+    public void equipStack(EquipmentSlot slot, ItemStack stack) {
+        inventory.setArmorStack(slot, stack);
     }
 
     @Override

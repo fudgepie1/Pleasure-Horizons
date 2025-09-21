@@ -6,12 +6,14 @@ import com.sandymandy.pleasurecraft.networking.C2S.*;
 import com.sandymandy.pleasurecraft.networking.S2C.ClothingArmorVisibilityS2CPacket;
 import com.sandymandy.pleasurecraft.networking.S2C.SceneOptionsS2CPacket;
 import com.sandymandy.pleasurecraft.screen.client.GirlSceneScreen;
+import com.sandymandy.pleasurecraft.util.PleasureCraftSounds;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.sound.SoundEvents;
 
 import java.util.Objects;
 
@@ -29,6 +31,7 @@ public class PleasureCraftPackets {
         PayloadTypeRegistry.playC2S().register(AnimationFinishC2SPacket.ID, AnimationFinishC2SPacket.CODEC);
         PayloadTypeRegistry.playC2S().register(ScenePhaseSyncC2SPacket.ID, ScenePhaseSyncC2SPacket.CODEC);
         PayloadTypeRegistry.playC2S().register(StopSceneOnServerC2SPacket.ID, StopSceneOnServerC2SPacket.CODEC);
+        PayloadTypeRegistry.playC2S().register(SoundEventSyncC2SPacket.ID, SoundEventSyncC2SPacket.CODEC);
 
 
         // --- S2C (server → client) ---
@@ -45,14 +48,23 @@ public class PleasureCraftPackets {
                             var entity = context.player().getWorld().getEntityById(packet.entityId());
                             if (entity instanceof SceneEntity girl) {
                                 switch (packet.actionId()) {
-                                    case "stripOrDressup" -> girl.requestStrip(true, context.player());
+                                    case "stripOrDressup" -> girl.requestStrip(true, context.player(), null);
                                     case "breakUp" -> girl.breakUp(context.player());
                                     case "setBase" -> girl.setBasePosHere();
                                     case "talk" -> ServerPlayNetworking.send(context.player(), new SceneOptionsS2CPacket(girl.getId(), girl.getCurrentRelationshipLevel(), girl.getSceneOptions()));
-//                                    case "testAnim1" -> girl.playAnimation("downed",false,false);
                                     case "goToBase" -> girl.teleportToBase();
                                     case "sit" -> girl.setSitting(!girl.isSitting());
                                     case "follow" -> girl.setFollowing(!girl.isFollowing());
+                                    case "testSound" -> {
+                                        girl.playSound(PleasureCraftSounds.LUCY_MOAN, 2f, 1f);
+                                        girl.playSound(PleasureCraftSounds.TOUCH, 2f, 1f);
+                                        girl.playSound(PleasureCraftSounds.CLAP, 2f, 1f);
+                                        girl.playSound(PleasureCraftSounds.CUMINFLATION, 2f, 1f);
+                                        girl.playSound(PleasureCraftSounds.BELLJINGLE, 2f, 1f);
+                                        girl.playSound(PleasureCraftSounds.LUCY_HEAVYBREATHING, 2f, 1f);
+                                        girl.playSound(PleasureCraftSounds.LUCY_HUH, 2f, 1f);
+                                        girl.playSound(PleasureCraftSounds.LUCY_HMPH, 2f, 1f);
+                                    }
                                     default -> PleasureCraft.LOGGER.warn("Unknown Girl interaction: " + packet.actionId());
                                 }
                             }
@@ -103,7 +115,7 @@ public class PleasureCraftPackets {
                 (packet, context) -> Objects.requireNonNull(context.player().getServer()).execute(() -> {
                     var entity = context.player().getWorld().getEntityById(packet.entityId());
                     if (entity instanceof SceneEntity girl) {
-                        girl.startScene(context.player(), packet.sceneOptions());
+                        girl.startScene(packet.sceneOptions());
                     }
                 }));
 
@@ -138,6 +150,15 @@ public class PleasureCraftPackets {
                         girl.stopScene();
                     }
                 }));
+
+        ServerPlayNetworking.registerGlobalReceiver(SoundEventSyncC2SPacket.ID,
+                (packet, context) -> Objects.requireNonNull(context.player().getServer()).execute(() -> {
+                            var entity = context.player().getWorld().getEntityById(packet.entityId());
+                            if (entity instanceof SceneEntity girl) {
+                                girl.setSoundEvent(packet.soundEvent());
+                            }
+                        }
+                ));
     }
 
     public static void registerS2CPackets(){
@@ -151,9 +172,7 @@ public class PleasureCraftPackets {
                     if (entity instanceof SceneEntity girl) {
                         int i = 0;
                         for (EquipmentSlot slot : EquipmentSlot.values()) {
-                            girl.clothingVisibility.put(slot, packet.clothing().get(i));
                             girl.armorVisibility.put(slot, packet.armor().get(i));
-                            girl.nudeBodyVisibility.put(slot, packet.nudeBody().get(i));
                             i++;
                         }
                         girl.applyClothingAndArmor();

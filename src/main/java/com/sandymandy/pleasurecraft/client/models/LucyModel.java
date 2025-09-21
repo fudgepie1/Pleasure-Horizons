@@ -8,11 +8,6 @@ import software.bernie.geckolib.renderer.GeoRenderer;
 public class LucyModel extends AbstractGirlModel<LucyEntity> {
 
     @Override
-    public Identifier getModelResource(LucyEntity entity, GeoRenderer<LucyEntity> renderer) {
-        return Identifier.of(PleasureCraft.MOD_ID, "geo/lucy.geo.json");
-    }
-
-    @Override
     public Identifier getTextureResource(LucyEntity entity, GeoRenderer<LucyEntity> renderer) {
         return Identifier.of(PleasureCraft.MOD_ID, "textures/entities/lucy.png");
     }
@@ -21,7 +16,4 @@ public class LucyModel extends AbstractGirlModel<LucyEntity> {
     public Identifier getAnimationResource(LucyEntity entity) {
         return Identifier.of(PleasureCraft.MOD_ID, "animations/lucy.animation.json");
     }
-
-
-
 }

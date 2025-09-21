@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4
+- Fixed the relationship level not saving
+- Made the relationship level reset when you break up with a girl
+- Made the girls come to you when starting a scene that doesn't require a bed, instead of just teleporting you to her
+- Improved the way I handle Clothing to match Fapcraft
+- Fixed the animations not properly easing
+- Added Sounds
+
 ## 0.3.4
 - Improved the animation handling
 - Added a Relationship system
@@ -33,3 +41,5 @@
 ## TODO
 - Fix the animation randomizer in the Scene
 - Make the AI more advance.
+- Fix Attacking animation.
+- Dialog

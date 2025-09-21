@@ -12,9 +12,7 @@ import java.util.List;
 
 public record ClothingArmorVisibilityS2CPacket(
         int entityId,
-        List<Boolean> clothing,
-        List<Boolean> armor,
-        List<Boolean> nudeBody
+        List<Boolean> armor
 ) implements CustomPayload {
 
     public static final Id<ClothingArmorVisibilityS2CPacket> ID =
@@ -23,9 +21,7 @@ public record ClothingArmorVisibilityS2CPacket(
     public static final PacketCodec<RegistryByteBuf, ClothingArmorVisibilityS2CPacket> CODEC =
             PacketCodec.tuple(
                     PacketCodecs.VAR_INT, ClothingArmorVisibilityS2CPacket::entityId,
-                    PacketCodecs.collection(ArrayList::new, PacketCodecs.BOOLEAN), ClothingArmorVisibilityS2CPacket::clothing,
                     PacketCodecs.collection(ArrayList::new, PacketCodecs.BOOLEAN), ClothingArmorVisibilityS2CPacket::armor,
-                    PacketCodecs.collection(ArrayList::new, PacketCodecs.BOOLEAN), ClothingArmorVisibilityS2CPacket::nudeBody,
                     ClothingArmorVisibilityS2CPacket::new
             );
 

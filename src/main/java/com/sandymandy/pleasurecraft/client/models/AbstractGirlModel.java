@@ -1,5 +1,7 @@
 package com.sandymandy.pleasurecraft.client.models;
 
+import com.sandymandy.pleasurecraft.PleasureCraft;
+import com.sandymandy.pleasurecraft.entity.base.AbstractGirlEntity;
 import com.sandymandy.pleasurecraft.entity.base.SceneEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.Identifier;
@@ -11,10 +13,21 @@ import software.bernie.geckolib.model.GeoModel;
 import software.bernie.geckolib.model.data.EntityModelData;
 import software.bernie.geckolib.renderer.GeoRenderer;
 
-public abstract class AbstractGirlModel<T extends SceneEntity> extends GeoModel<T> {
+public abstract class AbstractGirlModel<T extends AbstractGirlEntity> extends GeoModel<T> {
 
     @Override
-    public abstract Identifier getModelResource(T animatable, GeoRenderer<T> renderer);
+    public Identifier getModelResource(T animatable, GeoRenderer<T> renderer) {
+        // Check if entity is stripped
+        boolean stripped = animatable.isStripped();
+
+        // Pick the folder based on stripped/dressed state
+        String folder = stripped ? "nude" : "dressed";
+
+        // Use the model file provided by your getModelFile() method
+        String filePath = "geo/" + folder + "/" + animatable.getGirlID() + ".geo.json";
+
+        return Identifier.of(PleasureCraft.MOD_ID, filePath);
+    }
 
     @Override
     public abstract Identifier getTextureResource(T animatable, GeoRenderer<T> renderer);

@@ -6,6 +6,7 @@ import com.sandymandy.pleasurecraft.item.PleasureCraftItemGroups;
 import com.sandymandy.pleasurecraft.item.PleasureCraftItems;
 import com.sandymandy.pleasurecraft.networking.PleasureCraftPackets;
 import com.sandymandy.pleasurecraft.screen.GirlInventoryScreenHandler;
+import com.sandymandy.pleasurecraft.util.PleasureCraftSounds;
 import com.sandymandy.pleasurecraft.util.PleasureCraftTrackedData;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
@@ -47,6 +48,7 @@ public class PleasureCraft implements ModInitializer {
 		PleasureCraftPackets.registerC2SPackets();
 		PleasureCraftCriteria.registerAdvancementCriteria();
 		PleasureCraftTrackedData.registerTrackedData();
+		PleasureCraftSounds.registerSounds();
 	}
 
 	public record GirlScreenData(int entityId) {

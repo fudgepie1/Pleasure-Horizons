@@ -17,10 +17,10 @@ public class PleasureCraftEntities {
     public static final Identifier BIA_ID = Identifier.of(PleasureCraft.MOD_ID, "bia");
 
     private static final RegistryKey<EntityType<?>> LUCY_KEY =
-            RegistryKey.of(RegistryKeys.ENTITY_TYPE, Identifier.of(PleasureCraft.MOD_ID, "bia"));
+            RegistryKey.of(RegistryKeys.ENTITY_TYPE, LUCY_ID);
 
     private static final RegistryKey<EntityType<?>> BIA_KEY =
-            RegistryKey.of(RegistryKeys.ENTITY_TYPE, Identifier.of(PleasureCraft.MOD_ID, "bia"));
+            RegistryKey.of(RegistryKeys.ENTITY_TYPE, BIA_ID);
 
     public static final EntityType<LucyEntity> LUCY = Registry.register(
             Registries.ENTITY_TYPE,

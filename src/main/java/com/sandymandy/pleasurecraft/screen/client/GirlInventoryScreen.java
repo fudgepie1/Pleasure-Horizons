@@ -128,9 +128,7 @@ public class GirlInventoryScreen extends HandledScreen<GirlInventoryScreenHandle
                 int y = startY + i * (buttonHeight + paddingY);
                 Text dynamicLabel = action.label();
 
-                if (action.label().getString().equals("Strip") && girl.isStripped()) {
-                    dynamicLabel = Text.literal("Dress Up");
-                }
+
 
                 this.drawButton(dynamicLabel, action, startX, y, buttonWidth, buttonHeight);
             }
@@ -145,6 +143,10 @@ public class GirlInventoryScreen extends HandledScreen<GirlInventoryScreenHandle
                 }
                 else if (action.label().getString().equals("Follow Me") && girl.isFollowing()){
                     dynamicLabel = Text.literal("Stop Following");
+                }
+
+                if (action.label().getString().equals("Strip") && girl.isStripped()) {
+                    dynamicLabel = Text.literal("Dress Up");
                 }
 
                 this.drawButton(dynamicLabel, action, centerX + 176 + paddingX, y, buttonWidth, buttonHeight);

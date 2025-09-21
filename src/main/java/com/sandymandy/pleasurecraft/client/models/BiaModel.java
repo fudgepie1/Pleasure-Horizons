@@ -8,11 +8,6 @@ import software.bernie.geckolib.renderer.GeoRenderer;
 public class BiaModel extends AbstractGirlModel<BiaEntity> {
 
     @Override
-    public Identifier getModelResource(BiaEntity entity, GeoRenderer<BiaEntity> renderer) {
-        return Identifier.of(PleasureCraft.MOD_ID, "geo/bia.geo.json");
-    }
-
-    @Override
     public Identifier getTextureResource(BiaEntity entity, GeoRenderer<BiaEntity> renderer) {
         return Identifier.of(PleasureCraft.MOD_ID, "textures/entities/bia.png");
     }
