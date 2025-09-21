@@ -20,6 +20,8 @@
         public static final SoundEvent SLIDE = registerSound("misc.slide");
         public static final SoundEvent SMALLINSERTS = registerSound("misc.smallinserts");
         public static final SoundEvent TOUCH = registerSound("misc.touch");
+        public static final SoundEvent PLOB = registerSound("misc.plob");
+
 
 //  LUCY_________________________________________________________________________________________________________________
         public static final SoundEvent LUCY_AFTERSSESSIONMOAN = registerSound("lucy.aftersessionmoan");

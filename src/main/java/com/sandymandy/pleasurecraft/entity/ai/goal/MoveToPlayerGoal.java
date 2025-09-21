@@ -1,9 +1,7 @@
 package com.sandymandy.pleasurecraft.entity.ai.goal;
 
 import com.sandymandy.pleasurecraft.entity.base.SceneEntity;
-import com.sandymandy.pleasurecraft.util.ScenePhase;
 import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 
 import java.util.EnumSet;
@@ -11,7 +9,7 @@ import java.util.EnumSet;
 public class MoveToPlayerGoal extends Goal {
     private final SceneEntity girl;
     private boolean started = false;
-    private double speed;
+    private final double speed;
 
     public MoveToPlayerGoal(SceneEntity girl, double speed) {
         this.girl = girl;
@@ -22,10 +20,6 @@ public class MoveToPlayerGoal extends Goal {
     @Override
     public boolean canStart() {
         return girl.shouldMoveToPlayer();
-    }
-
-    @Override
-    public void start() {
     }
 
     @Override

@@ -8,18 +8,18 @@ import com.sandymandy.pleasurecraft.entity.ai.goal.StripGoal;
 import com.sandymandy.pleasurecraft.networking.C2S.*;
 import com.sandymandy.pleasurecraft.util.*;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.registry.tag.BlockTags;
+import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import software.bernie.geckolib.animation.*;
-import software.bernie.geckolib.animation.keyframe.event.CustomInstructionKeyframeEvent;
-import software.bernie.geckolib.animation.keyframe.event.ParticleKeyframeEvent;
 import software.bernie.geckolib.animation.keyframe.event.SoundKeyframeEvent;
 
 import java.util.List;
@@ -235,40 +235,70 @@ public class SceneEntity extends AbstractGirlEntity{
 
     private void soundEventHandler() {
         String key = getSoundEvent();
-        if (key == null || key.isEmpty()) return;
 
         // If this is the same key as last time, skip
         if (key.equals(lastSoundKey)) {
-            return;
+            setSoundEvent("");
         }
 
         // Update last key
         lastSoundKey = key;
 
+    }
+
+    private void soundHandler() {
+        String key = getSoundEvent();
+
         // Get all sounds for this key
         List<SoundEvent> sounds = SceneKeyframeRegistry.getSound(this.getGirlID(), key);
-        List<String> messages = SceneKeyframeRegistry.getMessage(this.getGirlID(), key);
 
         // Play all sounds sequentially (or simultaneously)
         for (SoundEvent sound : sounds) {
             this.playSound(sound, 1.0f, 1.0f);
         }
+    }
 
-        for (String message : messages) {
-            this.messageAsEntity(message);
+    private void messageHandler(){
+        String key = getSoundEvent();
+
+        List<String> messagesGirl = SceneKeyframeRegistry.getMessage(this.getGirlID(), key);
+        List<String> messagesPlayer = SceneKeyframeRegistry.getMessage("player", key);
+
+        for (String messageGirl : messagesGirl) {
+            this.messageAsEntity(scenePlayer, messageGirl);
         }
+
+        for (String messagePlayer : messagesPlayer) {
+            this.messageAsOwner(scenePlayer, messagePlayer);
+        }
+    }
+
+
+    private void handleSceneFootstepSounds(){
+        BlockPos posBelow = this.getBlockPos().down();
+        BlockState state = this.getWorld().getBlockState(posBelow);
+        BlockSoundGroup soundGroup = state.getSoundGroup();
+        SoundEvent stepSound = soundGroup.getStepSound();
+
+        if(getSoundEvent().equals("paizuri_startStep")){
+            this.playSound(stepSound, 1.0f, 1.0f);
+        }
+
     }
 
     @Override
     public void tick() {
         super.tick();
         this.setSceneProgress(sceneProgress);
+        soundEventHandler();
 
         PleasureCraft.LOGGER.info(getSoundEvent());
 
 
 
-        soundEventHandler();
+        soundHandler();
+        messageHandler();
+        handleSceneFootstepSounds();
 
         this.scenePlayer = (PlayerEntity) this.getOwner();
 
@@ -297,8 +327,7 @@ public class SceneEntity extends AbstractGirlEntity{
         if(!this.hasPassengers() && this.isSceneActive() && isStopPhase) stopScene();
 
 
-        PlayerEntity player = (PlayerEntity) this.getFirstPassenger();
-        if (player != null) player.setInvisible(true);
+        if (scenePlayer != null) scenePlayer.setInvisible(true);
 
         // Handle scene phases
         if(!this.getWorld().isClient()) {
@@ -332,8 +361,8 @@ public class SceneEntity extends AbstractGirlEntity{
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllerRegistrar) {
-        controllerRegistrar.add(new AnimationController<>(this, "scene", 4, this::handleSceneAnimations).setSoundKeyframeHandler(new SoundKeyframeHandler(this)).setParticleKeyframeHandler(new ParticleKeyframeHandler(this)).setCustomInstructionKeyframeHandler(new CustomKeyframeHandler(this)));
-        controllerRegistrar.add(new AnimationController<>(this, "movement", 4, this::handleDefaultAnimations).setSoundKeyframeHandler(new SoundKeyframeHandler(this)).setParticleKeyframeHandler(new ParticleKeyframeHandler(this)).setCustomInstructionKeyframeHandler(new CustomKeyframeHandler(this)));
+        controllerRegistrar.add(new AnimationController<>(this, "scene", 4, this::handleSceneAnimations).setSoundKeyframeHandler(new SoundKeyframeHandler(this)));
+        controllerRegistrar.add(new AnimationController<>(this, "movement", 4, this::handleDefaultAnimations).setSoundKeyframeHandler(new SoundKeyframeHandler(this)));
 
 
         // Attack controller, higher priority so it can override
@@ -345,7 +374,6 @@ public class SceneEntity extends AbstractGirlEntity{
         // Calculate horizontal velocity (not required, but kept from original)
         double dx = this.getX() - this.prevX;
         double dz = this.getZ() - this.prevZ;
-        float velocity = (float)Math.sqrt(dx * dx + dz * dz);
 
         // Detect swing (built-in swing progress > 0)
         if (this.getHandSwingProgress(state.getPartialTick()) > 0.0F && !this.swinging) {
@@ -522,7 +550,7 @@ public class SceneEntity extends AbstractGirlEntity{
         return this.getCurrentSceneOptions().isBedScene();
     }
 
-    private class SoundKeyframeHandler implements AnimationController.SoundKeyframeHandler<SceneEntity> {
+    private static class SoundKeyframeHandler implements AnimationController.SoundKeyframeHandler<SceneEntity> {
         private final SceneEntity entity;
 
         public SoundKeyframeHandler(SceneEntity entity) {
@@ -536,33 +564,4 @@ public class SceneEntity extends AbstractGirlEntity{
             ClientPlayNetworking.send(new SoundEventSyncC2SPacket(this.entity.getId(), key));
         }
     }
-
-
-    private class ParticleKeyframeHandler implements AnimationController.ParticleKeyframeHandler<SceneEntity> {
-        private SceneEntity entity;
-
-        public ParticleKeyframeHandler(SceneEntity entity) {
-            this.entity = entity;
-        }
-
-        @Override
-        public void handle(ParticleKeyframeEvent<SceneEntity> particleKeyframeEvent) {
-
-        }
-    }
-
-    private class CustomKeyframeHandler implements AnimationController.CustomKeyframeHandler<SceneEntity> {
-        private SceneEntity entity;
-
-        public CustomKeyframeHandler(SceneEntity entity) {
-            this.entity = entity;
-        }
-
-        @Override
-        public void handle(CustomInstructionKeyframeEvent<SceneEntity> customInstructionKeyframeEvent) {
-
-        }
-    }
-
-
 }

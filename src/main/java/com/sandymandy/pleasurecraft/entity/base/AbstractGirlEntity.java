@@ -5,10 +5,9 @@ import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.entity.ai.goal.*;
 import com.sandymandy.pleasurecraft.networking.C2S.BonePosSyncC2SPacket;
 import com.sandymandy.pleasurecraft.networking.S2C.ClothingArmorVisibilityS2CPacket;
-import com.sandymandy.pleasurecraft.util.SceneOptions;
 import com.sandymandy.pleasurecraft.screen.GirlInventoryScreenHandlerFactory;
 import com.sandymandy.pleasurecraft.util.PleasureCraftMessages;
-import com.sandymandy.pleasurecraft.util.inventory.GirlInventory;
+import com.sandymandy.pleasurecraft.util.SceneOptions;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.client.MinecraftClient;
@@ -74,9 +73,7 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
     public Map<String, Identifier> boneTextureOverrides = new HashMap<>();
     public Map<String, Identifier> playerTexture = new HashMap<>();
     public Map<String, Vec2f> boneUVOffsets = new HashMap<>();
-    public final Map<EquipmentSlot, Boolean> clothingVisibility = new EnumMap<>(EquipmentSlot.class);
     public final Map<EquipmentSlot, Boolean> armorVisibility = new EnumMap<>(EquipmentSlot.class);
-    public final Map<EquipmentSlot, Boolean> nudeBodyVisibility = new EnumMap<>(EquipmentSlot.class);
     private BlockPos basePos;
     private LivingEntity attackTarget;
     public Vec3d previousVelocity = Vec3d.ZERO;
@@ -118,16 +115,6 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
         return new ArrayList<>();
     }
 
-    public record ClothingBones(EquipmentSlot slot, boolean hideNude){
-        public static ClothingBones of(EquipmentSlot slot, boolean hideNude){
-            return new ClothingBones(slot, hideNude);
-        }
-
-        public static ClothingBones of(EquipmentSlot slot){
-            return new ClothingBones(slot, false);
-        }
-    }
-
     protected Map<EquipmentSlot, List<String>> getArmorBones() {
         Map<EquipmentSlot, List<String>> armor = new HashMap<>();
 
@@ -159,18 +146,6 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
 
         return armor;
     }
-
-    protected Map<EquipmentSlot, List<String>> getNudeBodyBones() {
-
-
-
-
-
-        return Map.of(EquipmentSlot.LEGS, new ArrayList<>(List.of(
-                "vagina"
-        )));
-    }
-
 
     protected AbstractGirlEntity(EntityType<? extends TameableGirlEntity> entityType, World world) {
         super(entityType, world);
@@ -516,10 +491,6 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
         return null;
     }
 
-    public Map<String, Identifier> getBoneTextureOverrides() {
-        return this.boneTextureOverrides;
-    }
-
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
         return cache;
@@ -652,8 +623,6 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
             List<String> armorBones = getArmorBones().get(slot);
             if (armorBones != null) {
                 toggleModelBones(armorBones, armorVisibility.getOrDefault(slot, false));
-
-
                 // Special rule: hide vagina if armor is in legs slot
                 if (slot == EquipmentSlot.LEGS) {
                     boolean legsCovered = armorVisibility.getOrDefault(slot, false);
@@ -875,6 +844,14 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
             new PleasureCraftMessages().PlayerSpecificMessage(playerEntity,finalMessage);
         }
 
+    }
+
+    public void messageAsOwner(@Nullable PlayerEntity playerEntity, String message) {
+        if (this.getWorld().isClient()) return;
+        if (playerEntity == null) return;
+        GameProfile profile = playerEntity.getGameProfile();
+        String finalMessage = "<" + profile.getName() + "> " + message;
+        new PleasureCraftMessages().PlayerSpecificMessage(playerEntity, finalMessage);
     }
 
 

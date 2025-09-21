@@ -119,6 +119,12 @@
       { "name": "pleasurecraft:misc/touch/touch1", "stream": false }
     ]
   },
+  "misc.plob": {
+    "subtitle": "subtitles.plob",
+    "sounds": [
+      { "name": "pleasurecraft:misc/plob/plob0", "stream": false }
+    ]
+  },
   "lucy.aftersessionmoan": {
     "subtitle": "subtitles.aftersessionmoan",
     "sounds": [
