@@ -1,51 +1,71 @@
 package com.sandymandy.pleasurecraft.client.renderers;
 
+import com.mojang.datafixers.util.Either;
 import com.sandymandy.pleasurecraft.entity.base.SceneEntity;
+import com.sandymandy.pleasurecraft.networking.C2S.BonePosSyncC2SPacket;
+import com.sandymandy.pleasurecraft.util.PleasureCraftDataTickets;
 import com.sandymandy.pleasurecraft.util.renderer.OffsetVertexConsumer;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRendererFactory;
+import net.minecraft.client.render.entity.state.LivingEntityRenderState;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.item.ItemDisplayContext;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ModelTransformationMode;
 import net.minecraft.item.ShieldItem;
-import net.minecraft.item.SwordItem;
+import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec2f;
+import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Vector3d;
 import software.bernie.geckolib.cache.object.BakedGeoModel;
 import software.bernie.geckolib.cache.object.GeoBone;
 import software.bernie.geckolib.model.GeoModel;
 import software.bernie.geckolib.renderer.GeoEntityRenderer;
+import software.bernie.geckolib.renderer.base.GeoRenderState;
 import software.bernie.geckolib.renderer.layer.BlockAndItemGeoLayer;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-public abstract class AbstractGirlRenderer<T extends SceneEntity> extends GeoEntityRenderer<T> {
+public abstract class AbstractGirlRenderer<T extends SceneEntity, R extends LivingEntityRenderState & GeoRenderState> extends GeoEntityRenderer<T, R> {
 
 
     protected ItemStack mainHandItem;
 
     public AbstractGirlRenderer(EntityRendererFactory.Context renderManager, GeoModel<T> model) {
         super(renderManager, model);
-        this.addRenderLayer(new BlockAndItemGeoLayer<T>(this) {
+        this.addRenderLayer(new BlockAndItemGeoLayer<T, Void, R>(this) {
             private float heldItemScale = 1.0F;
 
             @Override
-            @Nullable
-            protected ItemStack getStackForBone(GeoBone bone, T entity) {
-                if (bone.getName().equals("weapon")) {
-                     return AbstractGirlRenderer.this.mainHandItem;
-                }
-                return null;
+            protected List<RenderData<R>> getRelevantBones(R renderState, BakedGeoModel model) {
+                List<RenderData<R>> list = new ArrayList<>();
+
+                // Weapon bone
+                list.add(new RenderData<>(
+                        "weapon",
+                        ItemDisplayContext.THIRD_PERSON_RIGHT_HAND,
+                        (bone, state) -> {
+                            // Return Either<ItemStack, BlockState>
+                            ItemStack stack = AbstractGirlRenderer.this.mainHandItem;
+                            return Either.left(stack);
+                        }
+                ));
+
+                return list;
             }
 
             @Override
-            protected ModelTransformationMode getTransformTypeForStack(GeoBone bone, ItemStack stack, T entity) {
-                // Always treat it as if held in the right hand
-                return ModelTransformationMode.THIRD_PERSON_RIGHT_HAND;
+            public void addRenderData(T animatable, Void relatedObject, R renderState) {
+                // You don’t need extra data for this layer,
+                // but you could attach custom tickets if needed
             }
 
             @Override
@@ -53,19 +73,19 @@ public abstract class AbstractGirlRenderer<T extends SceneEntity> extends GeoEnt
                     MatrixStack matrices,
                     GeoBone bone,
                     ItemStack stack,
-                    T entity,
+                    ItemDisplayContext displayContext,
+                    R renderState,
                     VertexConsumerProvider bufferSource,
-                    float tickDelta,
                     int light,
                     int overlay
             ) {
-                if (stack == AbstractGirlRenderer.this.mainHandItem) {
+                if (bone.getName().equals("weapon") && stack == AbstractGirlRenderer.this.mainHandItem) {
                     // Rotate around X -90°
                     matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(-90.0F));
+
                     if (stack.getItem() instanceof ShieldItem) {
                         matrices.translate(0.0F, 0.125F, -0.25F);
-                    }
-                    else if (stack.getItem() instanceof SwordItem){
+                    } else if (stack.isIn(ItemTags.SWORDS)) {
                         matrices.translate(0.0F, 0.05F, 0.0F);
                         matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(10.0F));
                         matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(5.0F));
@@ -75,32 +95,44 @@ public abstract class AbstractGirlRenderer<T extends SceneEntity> extends GeoEnt
                 this.heldItemScale = 0.7F;
                 matrices.scale(this.heldItemScale, this.heldItemScale, this.heldItemScale);
 
-                super.renderStackForBone(matrices, bone, stack, entity, bufferSource, tickDelta, light, overlay);
+                // Call parent to actually render
+                super.renderStackForBone(matrices, bone, stack, displayContext, renderState, bufferSource, light, overlay);
             }
+
         });
 
 
     }
 
     @Override
-    public void defaultRender(MatrixStack poseStack, T animatable, VertexConsumerProvider bufferSource,
-                              @Nullable RenderLayer renderType, @Nullable VertexConsumer buffer,
-                              float partialTick, int packedLight) {
-        super.defaultRender(poseStack, animatable, bufferSource, renderType, buffer, partialTick, packedLight);
+    public void addRenderData(T animatable, Void relatedObject, R renderState) {
+        renderState.addGeckolibData(PleasureCraftDataTickets.IS_STRIPPED, animatable.isStripped());
+        renderState.addGeckolibData(PleasureCraftDataTickets.GIRL_ID, animatable.getGirlID());
+        renderState.addGeckolibData(PleasureCraftDataTickets.ENTITY_ID, animatable.getId());
+        renderState.addGeckolibData(PleasureCraftDataTickets.GIRL_FIRST_PASSENGER, animatable.getFirstPassenger());
+        renderState.addGeckolibData(PleasureCraftDataTickets.GIRL_MAIN_HAND_STACK, animatable.getMainHandStack());
+        renderState.addGeckolibData(PleasureCraftDataTickets.GIRL_BONE_VISIBILITY, animatable.boneVisibility);
+        renderState.addGeckolibData(PleasureCraftDataTickets.GIRL_BONE_UV_OFFSETS, animatable.boneUVOffsets);
+        renderState.addGeckolibData(PleasureCraftDataTickets.GIRL_BONE_TEXTURE_OVERRIDES, new HashMap<>(animatable.boneTextureOverrides));
+        renderState.addGeckolibData(PleasureCraftDataTickets.PLAYER_TEXTURES, new HashMap<>(animatable.playerTexture));
+        renderState.addGeckolibData(PleasureCraftDataTickets.PASSENGER_BONE_NAME, animatable.passengerBoneName);
     }
 
     @Override
-    public void preRender(MatrixStack poseStack, T entity, BakedGeoModel model,
-                          VertexConsumerProvider bufferSource, VertexConsumer buffer,
-                          boolean isReRender, float partialTick, int packedLight,
-                          int packedOverlay, int color) {
-        this.mainHandItem = entity.getMainHandStack();
+    public void defaultRender(R renderState, MatrixStack poseStack, VertexConsumerProvider bufferSource, @Nullable RenderLayer renderType, @Nullable VertexConsumer buffer) {
+        super.defaultRender(renderState, poseStack, bufferSource, renderType, buffer);
+    }
 
-        super.preRender(poseStack, entity, model, bufferSource, buffer, isReRender,
-                partialTick, packedLight, packedOverlay, color);
+    @Override
+    public void preRender(R renderState, MatrixStack poseStack, BakedGeoModel model, @Nullable VertexConsumerProvider bufferSource, @Nullable VertexConsumer buffer, boolean isReRender, int packedLight, int packedOverlay, int renderColor) {
+        this.mainHandItem = renderState.getGeckolibData(PleasureCraftDataTickets.GIRL_MAIN_HAND_STACK);
 
-        if (entity.boneVisibility != null) {
-            for (Map.Entry<String, Boolean> entry : entity.boneVisibility.entrySet()) {
+        super.preRender(renderState, poseStack, model, bufferSource, buffer, isReRender, packedLight, packedOverlay, renderColor);
+
+        Map<String, Boolean> boneVisibility = renderState.getGeckolibData(PleasureCraftDataTickets.GIRL_BONE_VISIBILITY);
+
+        if (boneVisibility != null) {
+            for (Map.Entry<String, Boolean> entry : boneVisibility.entrySet()) {
                 String boneName = entry.getKey();
                 boolean isVisible = entry.getValue();
 
@@ -113,46 +145,95 @@ public abstract class AbstractGirlRenderer<T extends SceneEntity> extends GeoEnt
     }
 
     @Override
-    public void renderFinal(MatrixStack matrices, T entity, BakedGeoModel model,
-                            VertexConsumerProvider vertexConsumers, VertexConsumer vertexConsumer,
-                            float tickDelta, int light, int overlay, int color) {
+    public void renderFinal(R renderState, MatrixStack poseStack, BakedGeoModel model, VertexConsumerProvider bufferSource, @Nullable VertexConsumer buffer, int packedLight, int packedOverlay, int renderColor) {
+        String passengerBoneName = renderState.getGeckolibData(PleasureCraftDataTickets.PASSENGER_BONE_NAME);
 
-        entity.handlePassengerBone(getGeoModel().getBone(entity.passengerBoneName).get());
+        GeoBone bone = getGeoModel().getBone(passengerBoneName).get();
 
-        super.renderFinal(matrices, entity, model, vertexConsumers, vertexConsumer,
-                tickDelta, light, overlay, color);
-
-
+        Vector3d bonePos = bone.getWorldPosition();
+        Vec3d passengerBonePos = new Vec3d(bonePos.x, bonePos.y, bonePos.z);
+        ClientPlayNetworking.send(new BonePosSyncC2SPacket(renderState.getGeckolibData(PleasureCraftDataTickets.ENTITY_ID), passengerBonePos));
+        super.renderFinal(renderState, poseStack, model, bufferSource, buffer, packedLight, packedOverlay, renderColor);
     }
 
     @Override
-    public void applyRenderLayers(MatrixStack poseStack, T animatable, BakedGeoModel model, @Nullable RenderLayer renderType, VertexConsumerProvider bufferSource, @Nullable VertexConsumer buffer, float partialTick, int packedLight, int packedOverlay, int renderColor) {
-        super.applyRenderLayers(poseStack, animatable, model, renderType, bufferSource, buffer, partialTick, packedLight, packedOverlay, renderColor);
-    }
-
-    @Override
-    public void renderRecursively(MatrixStack poseStack, T animatable, GeoBone bone,
-                                  RenderLayer renderType, VertexConsumerProvider bufferSource,
-                                  VertexConsumer buffer, boolean isReRender,
-                                  float partialTick, int packedLight, int packedOverlay,
+    public void applyRenderLayers(R renderState,
+                                  MatrixStack poseStack,
+                                  BakedGeoModel model,
+                                  @Nullable RenderLayer renderType,
+                                  VertexConsumerProvider bufferSource,
+                                  @Nullable VertexConsumer buffer,
+                                  int packedLight,
+                                  int packedOverlay,
                                   int renderColor) {
 
-        VertexConsumer targetBuffer = buffer;
+        // First call super to run normal layers
+        super.applyRenderLayers(renderState, poseStack, model, renderType, bufferSource, buffer, packedLight, packedOverlay, renderColor);
 
-        // Apply per-bone texture override if present
-        if (animatable.boneTextureOverrides != null && animatable.boneTextureOverrides.containsKey(bone.getName())) {
-            var tex = animatable.getBoneTexture(bone.getName());
-            if (tex != null) {
-                // Create a RenderLayer for this specific texture
-                RenderLayer overrideLayer = RenderLayer.getEntityTranslucent(tex);
-                // Get a buffer for that layer
-                targetBuffer = bufferSource.getBuffer(overrideLayer);
+        // Now perform overlays for any bones needing a texture override
+        Map<String, Identifier> boneTexOverrides = renderState.getGeckolibData(PleasureCraftDataTickets.GIRL_BONE_TEXTURE_OVERRIDES);
+        Map<String, Identifier> playerTextures = renderState.getGeckolibData(PleasureCraftDataTickets.PLAYER_TEXTURES);
+
+        if (boneTexOverrides != null && !boneTexOverrides.isEmpty()) {
+            for (Map.Entry<String, Identifier> e : boneTexOverrides.entrySet()) {
+                String boneName = e.getKey();
+                Identifier tex = e.getValue();
+                if (tex == null) continue;
+
+                // get the bone from the model
+                model.getBone(boneName).ifPresent(bone -> {
+                    // prepare a translucent entity layer for this texture
+                    RenderLayer overrideLayer = RenderLayer.getEntityTranslucent(tex);
+                    VertexConsumer overrideBuffer = bufferSource.getBuffer(overrideLayer);
+
+                    // call GeoEntityRenderer's implementation directly to draw this bone with overrideBuffer
+                    super.renderRecursively(renderState, poseStack, bone, overrideLayer, bufferSource, overrideBuffer, false, packedLight, packedOverlay, renderColor);
+                });
             }
         }
 
-        // Apply per-bone UV offset if present
-        if (animatable.boneUVOffsets != null && animatable.boneUVOffsets.containsKey(bone.getName())) {
-            Vec2f offset = animatable.getBoneUVOffset(bone.getName());
+        // Player textures overlay (render on top of whatever)
+        if (playerTextures != null && !playerTextures.isEmpty()) {
+            for (Map.Entry<String, Identifier> e : playerTextures.entrySet()) {
+                String boneName = e.getKey();
+                Identifier playerTex = e.getValue();
+                if (playerTex == null) continue;
+
+                model.getBone(boneName).ifPresent(bone -> {
+                    RenderLayer playerLayer = RenderLayer.getEntityTranslucent(playerTex);
+                    VertexConsumer playerBuffer = bufferSource.getBuffer(playerLayer);
+
+                    super.renderRecursively(renderState, poseStack, bone, playerLayer, bufferSource, playerBuffer, false, packedLight, packedOverlay, renderColor);
+                });
+            }
+        }
+    }
+
+    @Override
+    public void renderRecursively(R renderState,
+                                  MatrixStack poseStack,
+                                  GeoBone bone,
+                                  RenderLayer renderType,
+                                  VertexConsumerProvider bufferSource,
+                                  VertexConsumer buffer,
+                                  boolean isReRender,
+                                  int packedLight,
+                                  int packedOverlay,
+                                  int renderColor) {
+
+        Map<String, Identifier> boneTexOverrides = renderState.getGeckolibData(PleasureCraftDataTickets.GIRL_BONE_TEXTURE_OVERRIDES);
+        Map<String, Vec2f> boneUVOffsets = renderState.getGeckolibData(PleasureCraftDataTickets.GIRL_BONE_UV_OFFSETS);
+
+        // Skip rendering this bone in the base pass if it has a texture override
+        if (boneTexOverrides != null && boneTexOverrides.containsKey(bone.getName())) {
+            return;
+        }
+
+        VertexConsumer targetBuffer = buffer;
+
+        // Still allow UV offset
+        if (boneUVOffsets != null && boneUVOffsets.containsKey(bone.getName())) {
+            Vec2f offset = boneUVOffsets.get(bone.getName());
             if (offset != null) {
                 OffsetVertexConsumer offsetBuffer = new OffsetVertexConsumer();
                 offsetBuffer.setup(targetBuffer, offset.x, offset.y);
@@ -160,24 +241,58 @@ public abstract class AbstractGirlRenderer<T extends SceneEntity> extends GeoEnt
             }
         }
 
-        // Call the super method with the final buffer (possibly UV offset + texture override)
-        super.renderRecursively(poseStack, animatable, bone, renderType, bufferSource,
-                targetBuffer, isReRender, partialTick, packedLight, packedOverlay, renderColor);
-
-        // 4. Render the player texture last if present
-        if (animatable.playerTexture != null && animatable.playerTexture.containsKey(bone.getName())) {
-            Identifier playerTex = animatable.playerTexture.get(bone.getName());
-            if (playerTex != null) {
-                RenderLayer playerLayer = RenderLayer.getEntityTranslucent(playerTex);
-                VertexConsumer playerBuffer = bufferSource.getBuffer(playerLayer);
-
-
-                // Render the bone again with the player texture on top
-                super.renderRecursively(poseStack, animatable, bone, renderType, bufferSource,
-                        playerBuffer, isReRender, partialTick, packedLight, packedOverlay, renderColor);
-            }
-
-
-        }
+        super.renderRecursively(renderState, poseStack, bone, renderType, bufferSource,
+                targetBuffer, isReRender, packedLight, packedOverlay, renderColor);
     }
+
+//    @Override
+//    public void renderRecursively(MatrixStack poseStack, T animatable, GeoBone bone,
+//                                  RenderLayer renderType, VertexConsumerProvider bufferSource,
+//                                  VertexConsumer buffer, boolean isReRender,
+//                                  float partialTick, int packedLight, int packedOverlay,
+//                                  int renderColor) {
+//
+//        VertexConsumer targetBuffer = buffer;
+//
+//        // Apply per-bone texture override if present
+//        if (animatable.boneTextureOverrides != null && animatable.boneTextureOverrides.containsKey(bone.getName())) {
+//            var tex = animatable.getBoneTexture(bone.getName());
+//            if (tex != null) {
+//                // Create a RenderLayer for this specific texture
+//                RenderLayer overrideLayer = RenderLayer.getEntityTranslucent(tex);
+//                // Get a buffer for that layer
+//                targetBuffer = bufferSource.getBuffer(overrideLayer);
+//            }
+//        }
+//
+//        // Apply per-bone UV offset if present
+//        if (animatable.boneUVOffsets != null && animatable.boneUVOffsets.containsKey(bone.getName())) {
+//            Vec2f offset = animatable.getBoneUVOffset(bone.getName());
+//            if (offset != null) {
+//                OffsetVertexConsumer offsetBuffer = new OffsetVertexConsumer();
+//                offsetBuffer.setup(targetBuffer, offset.x, offset.y);
+//                targetBuffer = offsetBuffer;
+//            }
+//        }
+//
+//        // Call the super method with the final buffer (possibly UV offset + texture override)
+//        super.renderRecursively(poseStack, animatable, bone, renderType, bufferSource,
+//                targetBuffer, isReRender, partialTick, packedLight, packedOverlay, renderColor);
+//
+//        // 4. Render the player texture last if present
+//        if (animatable.playerTexture != null && animatable.playerTexture.containsKey(bone.getName())) {
+//            Identifier playerTex = animatable.playerTexture.get(bone.getName());
+//            if (playerTex != null) {
+//                RenderLayer playerLayer = RenderLayer.getEntityTranslucent(playerTex);
+//                VertexConsumer playerBuffer = bufferSource.getBuffer(playerLayer);
+//
+//
+//                // Render the bone again with the player texture on top
+//                super.renderRecursively(poseStack, animatable, bone, renderType, bufferSource,
+//                        playerBuffer, isReRender, partialTick, packedLight, packedOverlay, renderColor);
+//            }
+//
+//
+//        }
+//    }
 }

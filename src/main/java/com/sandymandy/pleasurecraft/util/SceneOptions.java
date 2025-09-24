@@ -23,7 +23,7 @@ public class SceneOptions{
 
     public static final SceneOptions EMPTY = new SceneOptions("", 0,new ArrayList<>(),new ArrayList<>(),new ArrayList<>(),"",false, false, 0f, new ArrayList<>());
 
-    public static final PacketCodec<RegistryByteBuf, SceneOptions> CODEC = PacketCodecExtra.tuple(
+    public static final PacketCodec<RegistryByteBuf, SceneOptions> PACKET_CODEC = PacketCodecExtra.tuple(
             PacketCodecs.STRING, SceneOptions::displayName,
             PacketCodecs.VAR_INT, SceneOptions::requiredRelationshipLevel,
             PacketCodecs.collection(ArrayList::new , PacketCodecs.STRING), SceneOptions::introAnim,

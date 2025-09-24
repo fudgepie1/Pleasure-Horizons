@@ -7,6 +7,7 @@ import com.sandymandy.pleasurecraft.networking.C2S.BonePosSyncC2SPacket;
 import com.sandymandy.pleasurecraft.networking.S2C.ClothingArmorVisibilityS2CPacket;
 import com.sandymandy.pleasurecraft.screen.GirlInventoryScreenHandlerFactory;
 import com.sandymandy.pleasurecraft.util.PleasureCraftMessages;
+import com.sandymandy.pleasurecraft.util.PleasureCraftTrackedData;
 import com.sandymandy.pleasurecraft.util.SceneOptions;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -68,13 +69,14 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
     private static final TrackedData<String> OVERRIDE_ANIM = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.STRING);
     private static final TrackedData<String> SCENE_ANIM = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.STRING);
     private static final TrackedData<Integer> RELATIONSHIP_LEVEL = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.INTEGER);
+    private static final TrackedData<Vec3d> PASSENGER_BONE_POSITION = DataTracker.registerData(AbstractGirlEntity.class, PleasureCraftTrackedData.VEC3D);
+    private static final TrackedData<BlockPos> BASE_POS = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.BLOCK_POS);
     private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
     public Map<String, Boolean> boneVisibility = new HashMap<>();
     public Map<String, Identifier> boneTextureOverrides = new HashMap<>();
     public Map<String, Identifier> playerTexture = new HashMap<>();
     public Map<String, Vec2f> boneUVOffsets = new HashMap<>();
     public final Map<EquipmentSlot, Boolean> armorVisibility = new EnumMap<>(EquipmentSlot.class);
-    private BlockPos basePos;
     private LivingEntity attackTarget;
     public Vec3d previousVelocity = Vec3d.ZERO;
     public Vec3d clientPassengerBonePos = Vec3d.ZERO;
@@ -167,9 +169,10 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
         builder.add(HAVING_SEX, false);
         builder.add(SCENE_PROGRESS,0f);
         builder.add(RELATIONSHIP_LEVEL,0);
+        builder.add(PASSENGER_BONE_POSITION, Vec3d.ZERO);
+        builder.add(BASE_POS, this.getBlockPos());
         builder.add(OVERRIDE_ANIM,"");
         builder.add(SCENE_ANIM,"");
-
     }
 
 
@@ -281,7 +284,7 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
 
     private void tryTame(PlayerEntity player) {
         if (this.random.nextInt(3) == 0) {
-            this.setOwner(player);
+            this.setTamedBy(player);
             this.navigation.stop();
             setTarget(null);
             this.getWorld().sendEntityStatus(this, EntityStatuses.ADD_POSITIVE_PLAYER_REACTION_PARTICLES);
@@ -295,7 +298,7 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
     public void breakUp(PlayerEntity player) {
         if(!player.getWorld().isClient){
             this.setTamed(false,true); // Mark the entity as untamed
-            this.setOwnerUuid(null); // Remove the owner UUID
+            this.setOwner((LivingEntity) null); // Remove the owner UUID
             this.setSitting(false); // Ensure the entity is not sitting
             this.setStripped(false);
             this.setCurrentRelationshipLevel(0);
@@ -412,7 +415,20 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
     }
 
     public int getCurrentRelationshipLevel() { return this.dataTracker.get(RELATIONSHIP_LEVEL);}
+
     public void setCurrentRelationshipLevel(int var) { this.dataTracker.set(RELATIONSHIP_LEVEL, var);}
+
+    public void setPassengerBonePosition(Vec3d position){
+        this.dataTracker.set(PASSENGER_BONE_POSITION, position);
+    }
+
+    public Vec3d getPassengerBonePosition(){
+        return this.dataTracker.get(PASSENGER_BONE_POSITION);
+    }
+
+    public void setBasePos(BlockPos block){this.dataTracker.set(BASE_POS, block);}
+
+    public BlockPos getBasePos(){return this.dataTracker.get(BASE_POS);}
 
 
 
@@ -428,22 +444,12 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
     }
 
     public void setBasePosHere(){
-        this.basePos = this.getBlockPos();
-    }
-
-    public void setBasePos(BlockPos pos) {
-        this.basePos = pos;
-    }
-
-    public BlockPos getBasePos(){
-        return basePos;
+        setBasePos(this.getBlockPos());
     }
 
     public void teleportToBase() {
-        if (this.basePos != null && this.getWorld() != null) {
-            setSitting(true);
-            this.teleport(this.basePos.getX(), this.basePos.getY(), this.basePos.getZ(), false);
-        }
+        setSitting(true);
+        this.teleport(this.getBasePos().getX(), this.getBasePos().getY(), this.getBasePos().getZ(), false);
     }
 
     public void toggleModelBones(List<String> bones, boolean visible){
@@ -508,11 +514,10 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
         nbt.putBoolean("SceneState", this.isSceneActive());
         nbt.putInt("RelationshipLevel", this.getCurrentRelationshipLevel());
 
-        if (this.basePos != null) {
-            nbt.putInt("BaseX", this.basePos.getX());
-            nbt.putInt("BaseY", this.basePos.getY());
-            nbt.putInt("BaseZ", this.basePos.getZ());
-        }
+        nbt.putInt("BaseX", this.getBasePos().getX());
+        nbt.putInt("BaseY", this.getBasePos().getY());
+        nbt.putInt("BaseZ", this.getBasePos().getZ());
+
     }
 
 
@@ -522,14 +527,14 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
 
         RegistryWrapper.WrapperLookup registryLookup = this.getWorld().getRegistryManager();
         Inventories.readNbt(nbt, this.inventory.getItems(), registryLookup);
-        this.setSitting(nbt.getBoolean("SitSate"));
-        this.setStripped(nbt.getBoolean("StripState"));
-        this.setCurrentRelationshipLevel(nbt.getInt("RelationshipLevel"));
+        this.setSitting(nbt.getBoolean("SitSate").get());
+        this.setStripped(nbt.getBoolean("StripState").get());
+        this.setCurrentRelationshipLevel(nbt.getInt("RelationshipLevel").get());
         if (nbt.contains("BaseX") && nbt.contains("BaseY") && nbt.contains("BaseZ")) {
-            int x = nbt.getInt("BaseX");
-            int y = nbt.getInt("BaseY");
-            int z = nbt.getInt("BaseZ");
-            this.basePos = new BlockPos(x, y, z);
+            int x = nbt.getInt("BaseX").get();
+            int y = nbt.getInt("BaseY").get();
+            int z = nbt.getInt("BaseZ").get();
+            this.setBasePos(new BlockPos(x, y, z));
         }
     }
 
@@ -663,34 +668,10 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
         return success;
     }
 
-    public void handlePassengerBone(GeoBone bone){
-        if (bone != null) {
-            Vector3d bonePos = bone.getWorldPosition();
-            this.clientPassengerBonePos = new Vec3d(bonePos.x, bonePos.y, bonePos.z);
-            ClientPlayNetworking.send(new BonePosSyncC2SPacket(this.getId(), this.clientPassengerBonePos));
-
-        }
-
-
-    }
-
-    public void cachePassengerBone(boolean valid,Vec3d pos){
-        if (valid) {
-            this.serverPassengerBonePos = pos;
-
-        }
-    }
 
     public Vec3d getPassengerBone(){
-        if(this.getWorld().isClient()){
-            return clientPassengerBonePos;
-        }
-        else {
-            return serverPassengerBonePos;
-        }
+        return getPassengerBonePosition();
     }
-
-
 
     @Override
     public Vec3d updatePassengerForDismount(LivingEntity passenger) {
@@ -738,27 +719,21 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
         if(this.isTamed() && (this.getHealth() - amount <= 0.0F) &! (damageType.equals("outOfWorld") || damageType.equals("genericKill") || isMovementLocked())) {
             this.setHealth(getMaxHealth());
             // If basePos is still null, fall back to current position
-            BlockPos respawnPos = (this.basePos != null)
-                    ? this.basePos
-                    : this.getBlockPos();
 
             // Send a message referencing whichever Pos we have
             new PleasureCraftMessages().GlobleMessage(
                     this.getWorld(),
                     getGirlDisplayName() + " died and respawned at base: " +
-                            respawnPos.getX() + ", " +
-                            respawnPos.getY() + ", " +
-                            respawnPos.getZ()
+                            this.getBasePos().getX() + ", " +
+                            this.getBasePos().getY() + ", " +
+                            this.getBasePos().getZ()
             );
 
             // Drops inventory as if she died
             this.dropInventory(world);
 
-            // If basePos was null, make sure to set it now so future hits won’t NPE
-            if (this.basePos == null) {
-                this.basePos = respawnPos;
-            }
             teleportToBase();
+
 
             return false;
         }

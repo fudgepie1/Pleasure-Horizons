@@ -24,7 +24,7 @@ public class GirlSitGoal extends Goal {
     public boolean canStart() {
         if (!this.tameable.isTamed()) {
             return false;
-        } else if (this.tameable.isInsideWaterOrBubbleColumn()) {
+        } else if (this.tameable.isTouchingWater()) {
             return false;
         } else if (!this.tameable.isOnGround()) {
             return false;

@@ -18,7 +18,7 @@ public record SceneOptionsS2CPacket(int entityId, int currentRelationshipLevel,L
             PacketCodec.tuple(
                     PacketCodecs.VAR_INT, SceneOptionsS2CPacket::entityId,
                     PacketCodecs.VAR_INT, SceneOptionsS2CPacket::currentRelationshipLevel,
-                    PacketCodecs.collection(ArrayList::new, SceneOptions.CODEC), SceneOptionsS2CPacket::options,
+                    PacketCodecs.collection(ArrayList::new, SceneOptions.PACKET_CODEC), SceneOptionsS2CPacket::options,
                     SceneOptionsS2CPacket::new
             );
 

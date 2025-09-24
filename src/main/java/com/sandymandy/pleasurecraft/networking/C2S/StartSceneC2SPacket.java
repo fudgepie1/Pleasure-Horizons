@@ -15,7 +15,7 @@ public record StartSceneC2SPacket(int entityId, SceneOptions sceneOptions) imple
     public static final PacketCodec<RegistryByteBuf, StartSceneC2SPacket> CODEC =
             PacketCodec.tuple(
                     PacketCodecs.VAR_INT, StartSceneC2SPacket::entityId,
-                    SceneOptions.CODEC, StartSceneC2SPacket::sceneOptions,
+                    SceneOptions.PACKET_CODEC, StartSceneC2SPacket::sceneOptions,
                     StartSceneC2SPacket::new
             );
 

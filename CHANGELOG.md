@@ -51,3 +51,4 @@
 - Fix Attacking animation.
 - Fix Holding item.
 - Dialog.
+- FreeCam integration 

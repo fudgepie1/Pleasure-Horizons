@@ -15,7 +15,7 @@ public record ScenePhaseSyncC2SPacket(int entityId, ScenePhase phase) implements
     public static final PacketCodec<RegistryByteBuf, ScenePhaseSyncC2SPacket> CODEC =
             PacketCodec.tuple(
                     PacketCodecs.VAR_INT, ScenePhaseSyncC2SPacket::entityId,
-                    ScenePhase.CODEC, ScenePhaseSyncC2SPacket::phase,
+                    ScenePhase.PACKET_CODEC, ScenePhaseSyncC2SPacket::phase,
                     ScenePhaseSyncC2SPacket::new
             );
 

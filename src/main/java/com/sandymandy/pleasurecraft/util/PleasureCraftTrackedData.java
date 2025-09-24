@@ -1,20 +1,27 @@
 package com.sandymandy.pleasurecraft.util;
 
 import com.sandymandy.pleasurecraft.PleasureCraft;
+import net.fabricmc.fabric.api.object.builder.v1.entity.FabricTrackedDataRegistry;
 import net.minecraft.entity.data.TrackedDataHandler;
-import net.minecraft.entity.data.TrackedDataHandlerRegistry;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Vec3d;
 
 public class PleasureCraftTrackedData {
 
     public static final TrackedDataHandler<SceneOptions> SCENE_OPTION =
-            TrackedDataHandler.create(SceneOptions.CODEC);
+            TrackedDataHandler.create(SceneOptions.PACKET_CODEC);
 
     public static final TrackedDataHandler<ScenePhase> SCENE_PHASE =
-            TrackedDataHandler.create(ScenePhase.CODEC);
+            TrackedDataHandler.create(ScenePhase.PACKET_CODEC);
+
+    public static final TrackedDataHandler<Vec3d> VEC3D =
+            TrackedDataHandler.create(Vec3d.PACKET_CODEC);
 
     public static void registerTrackedData(){
         PleasureCraft.LOGGER.info("Registering custom TrackedDataHandlers for PleasureCraft");
-        TrackedDataHandlerRegistry.register(PleasureCraftTrackedData.SCENE_OPTION);
-        TrackedDataHandlerRegistry.register(PleasureCraftTrackedData.SCENE_PHASE);
+        FabricTrackedDataRegistry.register(Identifier.of(PleasureCraft.MOD_ID, "scene_option"), PleasureCraftTrackedData.SCENE_OPTION);
+        FabricTrackedDataRegistry.register(Identifier.of(PleasureCraft.MOD_ID, "scene_phase"), PleasureCraftTrackedData.SCENE_PHASE);
+        FabricTrackedDataRegistry.register(Identifier.of(PleasureCraft.MOD_ID, "vec3d"), PleasureCraftTrackedData.VEC3D);
+
     }
 }

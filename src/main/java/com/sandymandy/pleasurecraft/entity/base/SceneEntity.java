@@ -19,8 +19,14 @@ import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import software.bernie.geckolib.animation.*;
-import software.bernie.geckolib.animation.keyframe.event.SoundKeyframeEvent;
+import software.bernie.geckolib.animatable.manager.AnimatableManager;
+import software.bernie.geckolib.animatable.processing.AnimationController;
+import software.bernie.geckolib.animatable.processing.AnimationTest;
+import software.bernie.geckolib.animation.Animation;
+import software.bernie.geckolib.animation.PlayState;
+import software.bernie.geckolib.animation.RawAnimation;
+import software.bernie.geckolib.animation.keyframe.event.KeyFrameEvent;
+import software.bernie.geckolib.animation.keyframe.event.data.SoundKeyframeData;
 
 import java.util.List;
 
@@ -183,7 +189,7 @@ public class SceneEntity extends AbstractGirlEntity{
         return list.get(index);
     }
 
-    private PlayState setSceneAnimIfChanged(AnimationState<?> state, String anim, Animation.LoopType loop) {
+    private PlayState setSceneAnimIfChanged(AnimationTest<?> state, String anim, Animation.LoopType loop) {
         if (anim == null || anim.isEmpty()) return null;
 
         // Only reset if different from last
@@ -288,7 +294,7 @@ public class SceneEntity extends AbstractGirlEntity{
         this.setSceneProgress(sceneProgress);
         soundEventHandler();
 
-        PleasureCraft.LOGGER.info(getSoundEvent());
+//        PleasureCraft.LOGGER.info(getSoundEvent());
 
 
 
@@ -354,53 +360,96 @@ public class SceneEntity extends AbstractGirlEntity{
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllerRegistrar) {
-        controllerRegistrar.add(new AnimationController<>(this, "scene", 4, this::handleSceneAnimations).setSoundKeyframeHandler(new SoundKeyframeHandler(this)));
-        controllerRegistrar.add(new AnimationController<>(this, "movement", 4, this::handleDefaultAnimations).setSoundKeyframeHandler(new SoundKeyframeHandler(this)));
+//        controllerRegistrar.add(new AnimationController<>("scene", 4, this::handleSceneAnimations).setSoundKeyframeHandler(new SoundKeyframeHandler(this)));
+        controllerRegistrar.add(new AnimationController<>("movement", 4, this::handleDefaultAnimations).setSoundKeyframeHandler(new SoundKeyframeHandler(this)));
 
 
         // Attack controller, higher priority so it can override
-        controllerRegistrar.add(new AnimationController<>(this, "attack", 2, this::handleAttackAnimations));
-
-    }
-
-    private PlayState handleAttackAnimations(AnimationState<SceneEntity> state) {
-        // Calculate horizontal velocity (not required, but kept from original)
-        double dx = this.getX() - this.prevX;
-        double dz = this.getZ() - this.prevZ;
-
-        // Detect swing (built-in swing progress > 0)
-        if (this.getHandSwingProgress(state.getPartialTick()) > 0.0F && !this.swinging) {
-            this.swinging = true;
-            this.lastSwing = this.getWorld().getTime();
-        }
-
-        // End swing after 7 ticks
-        if (this.swinging && this.lastSwing + 7L <= this.getWorld().getTime()) {
-            this.swinging = false;
-        }
-
-        // If swinging and controller is idle, play correct animation
-        if (this.swinging && state.getController().getAnimationState() == AnimationController.State.STOPPED) {
-//            state.resetCurrentAnimation();
-
-
-//            this.messageAsEntity("Swing");
-            return state.setAndContinue(RawAnimation.begin().then(getAnimationPath("attack1"), Animation.LoopType.PLAY_ONCE));
-        }
-        else {
-//            this.messageAsEntity("Not Swing");
-            return PlayState.CONTINUE;
-        }
+//        controllerRegistrar.add(new AnimationController<>("attack", 2, this::handleAttackAnimations));
 
 
     }
 
-    private PlayState handleDefaultAnimations(AnimationState<SceneEntity> state) {
-        if (isSceneActive()) {
-            return PlayState.STOP; // Defer to scene controller during scenes
+//    private PlayState handleAttackAnimations(AnimationTest<SceneEntity> state) {
+//        // Calculate horizontal velocity (not required, but kept from original)
+////        double dx = this.getX() - this.prevX;
+////        double dz = this.getZ() - this.prevZ;
+//
+//        // Detect swing (built-in swing progress > 0)
+////        if (this.getHandSwingProgress(state.getPartialTick()) > 0.0F && !this.swinging) {
+////            this.swinging = true;
+////            this.lastSwing = this.getWorld().getTime();
+////        }
+//
+//        // End swing after 7 ticks
+//        if (this.swinging && this.lastSwing + 7L <= this.getWorld().getTime()) {
+//            this.swinging = false;
+//        }
+//
+//        // If swinging and controller is idle, play correct animation
+//        if (this.swinging && state.controller().getAnimationState() == AnimationController.State.STOPPED) {
+////            state.resetCurrentAnimation();
+//
+//
+////            this.messageAsEntity("Swing");
+//            return state.setAndContinue(RawAnimation.begin().then(getAnimationPath("attack1"), Animation.LoopType.PLAY_ONCE));
+//        }
+//        else {
+////            this.messageAsEntity("Not Swing");
+//            return PlayState.CONTINUE;
+//        }
+//
+//
+//    }
+
+    private PlayState handleDefaultAnimations(AnimationTest<SceneEntity> state) {
+        if (isSceneActive() && getOverrideAnim().isEmpty()) {
+            final AnimationController<?> controller = state.controller();
+            final SceneOptions options = this.getCurrentSceneOptions();
+
+
+            // Notify server when an animation finishes (only once per cycle)
+            if (controller.hasAnimationFinished() && !lastSceneAnim.isEmpty()) {
+                ClientPlayNetworking.send(new AnimationFinishC2SPacket(this.getId()));
+                lastSceneAnim = ""; // prevent spamming until new anim set
+            }
+
+            switch (getCurrentScenePhase()) {
+                case LAYING_DOWN -> {
+                    String laying = options.bedIdle().isEmpty() ? "null" : options.bedIdle().getFirst();
+                    return setSceneAnimIfChanged(state, laying, Animation.LoopType.PLAY_ONCE);
+                }
+                case BED_IDLE -> {
+                    String bedIdle = options.bedIdle().isEmpty() ? "null" : options.bedIdle().getLast();
+                    return setSceneAnimIfChanged(state, bedIdle, Animation.LoopType.LOOP);
+                }
+                case INTRO -> {
+                    List<String> intros = options.introAnim();
+                    if (intros.isEmpty()) {
+                        playPhase(ScenePhase.SLOW);
+                        return PlayState.CONTINUE;
+                    }
+                    String current = intros.get(Math.min(introIndex, intros.size() - 1));
+                    return setSceneAnimIfChanged(state, current, Animation.LoopType.PLAY_ONCE);
+                }
+                case SLOW -> {
+                    String slow = options.slowAnim().isEmpty() ? "null" : getRandomFromList(options.slowAnim());
+                    return setSceneAnimIfChanged(state, slow, Animation.LoopType.LOOP);
+                }
+                case FAST -> {
+                    String fast = options.fastAnim().isEmpty() ? "null" : getRandomFromList(options.fastAnim());
+                    return setSceneAnimIfChanged(state, fast, Animation.LoopType.LOOP);
+                }
+                case CUM -> {
+                    return setSceneAnimIfChanged(state, options.cumAnim(), Animation.LoopType.PLAY_ONCE);
+                }
+                default -> {
+                    return PlayState.STOP;
+                } // Defer to scene controller during scenes
+            }
         }
         else {
-            AnimationController<?> controller = state.getController();
+            AnimationController<?> controller = state.controller();
             String overrideAnim = this.getOverrideAnim();
             boolean overrideLoop = this.getOverrideLoopState();
             boolean overrideHold = this.getOverrideHoldState();
@@ -441,52 +490,52 @@ public class SceneEntity extends AbstractGirlEntity{
 
     }
 
-    private PlayState handleSceneAnimations(AnimationState<SceneEntity> state) {
-        if (!isSceneActive() || !getOverrideAnim().isEmpty()) return PlayState.STOP;
-        final AnimationController<?> controller = state.getController();
-        final SceneOptions options = this.getCurrentSceneOptions();
-
-
-        // Notify server when an animation finishes (only once per cycle)
-        if (controller.hasAnimationFinished() && !lastSceneAnim.isEmpty()) {
-            ClientPlayNetworking.send(new AnimationFinishC2SPacket(this.getId()));
-            lastSceneAnim = ""; // prevent spamming until new anim set
-        }
-
-        switch (getCurrentScenePhase()) {
-            case LAYING_DOWN -> {
-                String laying = options.bedIdle().isEmpty() ? "null" : options.bedIdle().getFirst();
-                return setSceneAnimIfChanged(state, laying, Animation.LoopType.PLAY_ONCE);
-            }
-            case BED_IDLE -> {
-                String bedIdle = options.bedIdle().isEmpty() ? "null" : options.bedIdle().getLast();
-                return setSceneAnimIfChanged(state, bedIdle, Animation.LoopType.LOOP);
-            }
-            case INTRO -> {
-                List<String> intros = options.introAnim();
-                if (intros.isEmpty()) {
-                    playPhase(ScenePhase.SLOW);
-                    return PlayState.CONTINUE;
-                }
-                String current = intros.get(Math.min(introIndex, intros.size() - 1));
-                return setSceneAnimIfChanged(state, current, Animation.LoopType.PLAY_ONCE);
-            }
-            case SLOW -> {
-                String slow = options.slowAnim().isEmpty() ? "null" : getRandomFromList(options.slowAnim());
-                return setSceneAnimIfChanged(state, slow, Animation.LoopType.LOOP);
-            }
-            case FAST -> {
-                String fast = options.fastAnim().isEmpty() ? "null" : getRandomFromList(options.fastAnim());
-                return setSceneAnimIfChanged(state, fast, Animation.LoopType.LOOP);
-            }
-            case CUM -> {
-                return setSceneAnimIfChanged(state, options.cumAnim(), Animation.LoopType.PLAY_ONCE);
-            }
-            default -> {
-                return PlayState.STOP;
-            }
-        }
-    }
+//    private PlayState handleSceneAnimations(AnimationTest<SceneEntity> state) {
+//        if (!isSceneActive() || !getOverrideAnim().isEmpty()) return PlayState.STOP;
+//        final AnimationController<?> controller = state.controller();
+//        final SceneOptions options = this.getCurrentSceneOptions();
+//
+//
+//        // Notify server when an animation finishes (only once per cycle)
+//        if (controller.hasAnimationFinished() && !lastSceneAnim.isEmpty()) {
+//            ClientPlayNetworking.send(new AnimationFinishC2SPacket(this.getId()));
+//            lastSceneAnim = ""; // prevent spamming until new anim set
+//        }
+//
+//        switch (getCurrentScenePhase()) {
+//            case LAYING_DOWN -> {
+//                String laying = options.bedIdle().isEmpty() ? "null" : options.bedIdle().getFirst();
+//                return setSceneAnimIfChanged(state, laying, Animation.LoopType.PLAY_ONCE);
+//            }
+//            case BED_IDLE -> {
+//                String bedIdle = options.bedIdle().isEmpty() ? "null" : options.bedIdle().getLast();
+//                return setSceneAnimIfChanged(state, bedIdle, Animation.LoopType.LOOP);
+//            }
+//            case INTRO -> {
+//                List<String> intros = options.introAnim();
+//                if (intros.isEmpty()) {
+//                    playPhase(ScenePhase.SLOW);
+//                    return PlayState.CONTINUE;
+//                }
+//                String current = intros.get(Math.min(introIndex, intros.size() - 1));
+//                return setSceneAnimIfChanged(state, current, Animation.LoopType.PLAY_ONCE);
+//            }
+//            case SLOW -> {
+//                String slow = options.slowAnim().isEmpty() ? "null" : getRandomFromList(options.slowAnim());
+//                return setSceneAnimIfChanged(state, slow, Animation.LoopType.LOOP);
+//            }
+//            case FAST -> {
+//                String fast = options.fastAnim().isEmpty() ? "null" : getRandomFromList(options.fastAnim());
+//                return setSceneAnimIfChanged(state, fast, Animation.LoopType.LOOP);
+//            }
+//            case CUM -> {
+//                return setSceneAnimIfChanged(state, options.cumAnim(), Animation.LoopType.PLAY_ONCE);
+//            }
+//            default -> {
+//                return PlayState.STOP;
+//            }
+//        }
+//    }
 
     public void animationFinished(){
         if (this.getWorld().isClient()) return;
@@ -508,7 +557,7 @@ public class SceneEntity extends AbstractGirlEntity{
     }
 
 
-    private String getDefaultAnimation(AnimationState<?> state) {
+    private String getDefaultAnimation(AnimationTest<?> state) {
         if (!this.isOnGround() && !isSitting()) return "fly";
         if (state.isMoving() && !isSitting()) return "walk";
         if (isSitting()) return "sit";
@@ -543,7 +592,8 @@ public class SceneEntity extends AbstractGirlEntity{
         return this.getCurrentSceneOptions().isBedScene();
     }
 
-    private static class SoundKeyframeHandler implements AnimationController.SoundKeyframeHandler<SceneEntity> {
+    private static class SoundKeyframeHandler implements AnimationController.KeyframeEventHandler<SceneEntity, SoundKeyframeData> {
+
         private final SceneEntity entity;
 
         public SoundKeyframeHandler(SceneEntity entity) {
@@ -551,9 +601,10 @@ public class SceneEntity extends AbstractGirlEntity{
         }
 
         @Override
-        public void handle(SoundKeyframeEvent<SceneEntity> event) {
-            if(!this.entity.getWorld().isClient()) return;
-            String key = event.getKeyframeData().getSound();
+        public void handle(KeyFrameEvent<SceneEntity, SoundKeyframeData> event) {
+            if (!this.entity.getWorld().isClient()) return;
+
+            String key = event.keyframeData().getSound();
             ClientPlayNetworking.send(new SoundEventSyncC2SPacket(this.entity.getId(), key));
         }
     }

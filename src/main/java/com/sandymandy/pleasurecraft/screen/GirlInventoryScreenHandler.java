@@ -2,17 +2,16 @@ package com.sandymandy.pleasurecraft.screen;
 
 import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.entity.base.AbstractGirlEntity;
-import com.sandymandy.pleasurecraft.util.inventory.slot.PublicArmorSlot;
 import com.sandymandy.pleasurecraft.util.inventory.GirlInventory;
+import com.sandymandy.pleasurecraft.util.inventory.slot.PublicArmorSlot;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
-
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.SwordItem;
+import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.util.Identifier;
@@ -82,7 +81,7 @@ public class GirlInventoryScreenHandler extends ScreenHandler {
         this.addSlot(new Slot(inventory, GirlInventory.MAIN_HAND_SLOT, 125, 63) {
             @Override
             public boolean canInsert(ItemStack stack) {
-                return stack.getItem() instanceof SwordItem;
+                return stack.isIn(ItemTags.SWORDS);
             }
         });
 

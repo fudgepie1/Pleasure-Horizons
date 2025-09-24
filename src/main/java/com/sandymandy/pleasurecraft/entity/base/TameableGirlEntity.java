@@ -2,6 +2,7 @@ package com.sandymandy.pleasurecraft.entity.base;
 
 import com.sandymandy.pleasurecraft.advancement.criterion.PleasureCraftCriteria;
 import com.sandymandy.pleasurecraft.util.inventory.GirlInventory;
+import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.LeavesBlock;
 import net.minecraft.component.DataComponentTypes;
@@ -16,6 +17,7 @@ import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.mob.PathAwareEntity;
+import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -23,7 +25,6 @@ import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.scoreboard.Team;
-import net.minecraft.server.ServerConfigHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Hand;
@@ -33,9 +34,7 @@ import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 public class TameableGirlEntity extends PathAwareEntity implements Tameable {
      /**
@@ -43,8 +42,10 @@ public class TameableGirlEntity extends PathAwareEntity implements Tameable {
      * #isInSittingPose() sitting pose} and the {@code 4} flag for {@linkplain
      * #isTamed() tamed}.
      */
-    protected static final TrackedData<Byte> TAMEABLE_FLAGS = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.BYTE);
-    protected static final TrackedData<Optional<UUID>> OWNER_UUID = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.OPTIONAL_UUID);
+     protected static final TrackedData<Byte> TAMEABLE_FLAGS = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.BYTE);
+    protected static final TrackedData<Optional<LazyEntityReference<LivingEntity>>> OWNER_UUID = DataTracker.registerData(
+            TameableGirlEntity.class, TrackedDataHandlerRegistry.LAZY_ENTITY_REFERENCE
+    );
     private static final TrackedData<Boolean> SITTING = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     public final GirlInventory inventory = GirlInventory.ofSize();
     public Vec3d prevVelocity = Vec3d.ZERO;
@@ -67,16 +68,6 @@ public class TameableGirlEntity extends PathAwareEntity implements Tameable {
     }
 
     @Override
-    public Iterable<ItemStack> getArmorItems() {
-        return List.of(
-                inventory.getArmorStack(EquipmentSlot.FEET),
-                inventory.getArmorStack(EquipmentSlot.LEGS),
-                inventory.getArmorStack(EquipmentSlot.CHEST),
-                inventory.getArmorStack(EquipmentSlot.HEAD)
-        );
-    }
-
-    @Override
     public ItemStack getEquippedStack(EquipmentSlot slot) {
         return inventory.getArmorStack(slot);
     }
@@ -94,8 +85,9 @@ public class TameableGirlEntity extends PathAwareEntity implements Tameable {
     @Override
     public void writeCustomDataToNbt(NbtCompound nbt) {
         super.writeCustomDataToNbt(nbt);
-        if (this.getOwnerUuid() != null) {
-            nbt.putUuid("Owner", this.getOwnerUuid());
+        LazyEntityReference<LivingEntity> lazyEntityReference = this.getOwnerReference();
+        if (lazyEntityReference != null) {
+            lazyEntityReference.writeNbt(nbt, "Owner");
         }
 
         nbt.putBoolean("Sitting", this.isSitting());
@@ -104,27 +96,20 @@ public class TameableGirlEntity extends PathAwareEntity implements Tameable {
     @Override
     public void readCustomDataFromNbt(NbtCompound nbt) {
         super.readCustomDataFromNbt(nbt);
-        UUID uUID;
-        if (nbt.containsUuid("Owner")) {
-            uUID = nbt.getUuid("Owner");
-        } else {
-            String string = nbt.getString("Owner");
-            uUID = ServerConfigHandler.getPlayerUuidByName(this.getServer(), string);
-        }
-
-        if (uUID != null) {
+        LazyEntityReference<LivingEntity> lazyEntityReference = LazyEntityReference.fromNbtOrPlayerName(nbt, "Owner", this.getWorld());
+        if (lazyEntityReference != null) {
             try {
-                this.setOwnerUuid(uUID);
+                this.dataTracker.set(OWNER_UUID, Optional.of(lazyEntityReference));
                 this.setTamed(true, false);
             } catch (Throwable var4) {
                 this.setTamed(false, true);
             }
         } else {
-            this.setOwnerUuid(null);
+            this.dataTracker.set(OWNER_UUID, Optional.empty());
             this.setTamed(false, true);
         }
 
-        this.setSitting(nbt.getBoolean("Sitting"));
+        this.setSitting(nbt.getBoolean("Sitting").get());
         this.setInSittingPose(this.isSitting());
     }
 
@@ -156,7 +141,7 @@ public class TameableGirlEntity extends PathAwareEntity implements Tameable {
             double d = this.random.nextGaussian() * 0.02;
             double e = this.random.nextGaussian() * 0.02;
             double f = this.random.nextGaussian() * 0.02;
-            this.getWorld().addParticle(particleEffect, this.getParticleX(1.0), this.getRandomBodyY() + 0.5, this.getParticleZ(1.0), d, e, f);
+            this.getWorld().addParticleClient(particleEffect, this.getParticleX(1.0), this.getRandomBodyY() + 0.5, this.getParticleZ(1.0), d, e, f);
         }
     }
 
@@ -206,25 +191,28 @@ public class TameableGirlEntity extends PathAwareEntity implements Tameable {
 
     @Nullable
     @Override
-    public UUID getOwnerUuid() {
-        return (UUID)this.dataTracker.get(OWNER_UUID).orElse(null);
+    public LazyEntityReference<LivingEntity> getOwnerReference() {
+        return (LazyEntityReference<LivingEntity>)this.dataTracker.get(OWNER_UUID).orElse(null);
     }
 
-    public void setOwnerUuid(@Nullable UUID uuid) {
-        this.dataTracker.set(OWNER_UUID, Optional.ofNullable(uuid));
+    public void setOwner(@Nullable LivingEntity owner) {
+        this.dataTracker.set(OWNER_UUID, Optional.ofNullable(owner).map(LazyEntityReference::new));
     }
 
-    public void setOwner(PlayerEntity player) {
+    public void setOwner(@Nullable LazyEntityReference<LivingEntity> owner) {
+        this.dataTracker.set(OWNER_UUID, Optional.ofNullable(owner));
+    }
+
+    public void setTamedBy(PlayerEntity player) {
         this.setTamed(true, true);
-        this.setOwnerUuid(player.getUuid());
+        this.setOwner(player);
         if (player instanceof ServerPlayerEntity serverPlayerEntity) {
-            PleasureCraftCriteria.TAME_GIRL.trigger(serverPlayerEntity, this);
-        }
+            PleasureCraftCriteria.TAME_GIRL.trigger(serverPlayerEntity, this);        }
     }
 
     @Override
     public boolean canTarget(LivingEntity target) {
-        return !this.isOwner(target) && super.canTarget(target);
+        return this.isOwner(target) ? false : super.canTarget(target);
     }
 
     public boolean isOwner(LivingEntity entity) {
@@ -235,17 +223,24 @@ public class TameableGirlEntity extends PathAwareEntity implements Tameable {
         return true;
     }
 
+    @Nullable
     @Override
     public Team getScoreboardTeam() {
-        if (this.isTamed()) {
-            LivingEntity livingEntity = this.getOwner();
-            if (livingEntity != null) {
-                return livingEntity.getScoreboardTeam();
+        Team team = super.getScoreboardTeam();
+        if (team != null) {
+            return team;
+        } else {
+            if (this.isTamed()) {
+                LivingEntity livingEntity = this.getTopLevelOwner();
+                if (livingEntity != null) {
+                    return livingEntity.getScoreboardTeam();
+                }
             }
-        }
 
-        return super.getScoreboardTeam();
+            return null;
+        }
     }
+
 
     @Override
     protected boolean isInSameTeam(Entity other) {
@@ -357,14 +352,7 @@ public class TameableGirlEntity extends PathAwareEntity implements Tameable {
             }
 
             super.tick();
-
         }
-    }
-
-    @Override
-    public void tick() {
-        super.tick();
-        this.prevVelocity = this.getVelocity();
     }
 
     protected void eat(PlayerEntity player, Hand hand, ItemStack stack) {
