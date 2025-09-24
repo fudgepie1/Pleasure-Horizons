@@ -11,7 +11,6 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.util.Identifier;
@@ -59,11 +58,9 @@ public class GirlInventoryScreenHandler extends ScreenHandler {
         this.girl = girlEntity;
 
         Inventory inventory;
-        if (girl != null) {
-            inventory = girl.getInventory(); // ← Use your custom implementation, not a copy
-        } else {
-            inventory = new SimpleInventory(GirlInventory.TOTAL_SLOTS);
-        }
+
+        inventory = girl.getInventory(); // ← Use your custom implementation, not a copy
+
         this.inventory = inventory;
 
         checkSize(inventory, GirlInventory.TOTAL_SLOTS);
@@ -78,12 +75,7 @@ public class GirlInventoryScreenHandler extends ScreenHandler {
         }
 
         // ───── Main Hand Slot = index 0 ─────
-        this.addSlot(new Slot(inventory, GirlInventory.MAIN_HAND_SLOT, 125, 63) {
-            @Override
-            public boolean canInsert(ItemStack stack) {
-                return stack.isIn(ItemTags.SWORDS);
-            }
-        });
+        this.addSlot(new Slot(inventory, GirlInventory.MAIN_HAND_SLOT, 125, 63));
 
         for (int i = 0; i < 4; i++) {
             EquipmentSlot equipmentSlot = EQUIPMENT_SLOT_ORDER[i];
