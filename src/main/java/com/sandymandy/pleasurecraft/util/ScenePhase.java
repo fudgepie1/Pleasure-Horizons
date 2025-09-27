@@ -10,8 +10,8 @@ public enum ScenePhase {
     LAYING_DOWN,
     BED_IDLE,
     INTRO,
-    SLOW,
-    FAST,
+    MOVING,
+    HAVING_SEX,
     CUM;
 
     /**

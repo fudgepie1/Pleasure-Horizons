@@ -83,6 +83,7 @@ public class GirlInventoryScreenHandler extends ScreenHandler {
             this.addSlot(new PublicArmorSlot(inventory, girl, equipmentSlot,
                     GirlInventory.ARMOR_END - i, 8, 6 + i * 18, identifier));
         }
+
         /*
         * Armor end = ARMOR_HEAD_SLOT
         *

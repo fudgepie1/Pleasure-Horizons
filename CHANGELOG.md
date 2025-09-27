@@ -3,10 +3,12 @@
 ## 0.5
 - Fixed a bug where you would still be invisible when exiting a scene.
 - Made the girls not attack other girls when if the owner attacked them.
-- Add a new girl called Zhongezi
+- Replaced Bia with a new girl called Zong
+- Add a new girl called Mika
 - Made the girls render the item in their hands
 - Improved Lucy's outfit.
 - Updated to 1.21.5
+- Improved the thrust system when in the doggy scene with Zong
 
 ## 0.4
 - Fixed the relationship level not saving.

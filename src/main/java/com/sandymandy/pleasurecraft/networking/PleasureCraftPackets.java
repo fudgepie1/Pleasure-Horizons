@@ -13,7 +13,6 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.sound.SoundEvents;
 
 import java.util.Objects;
 
@@ -107,7 +106,7 @@ public class PleasureCraftPackets {
                 (packet, context) -> Objects.requireNonNull(context.player().getServer()).execute(() -> {
                     var entity = context.player().getVehicle();
                     if (entity instanceof SceneEntity girl) {
-                        girl.setKeyHeld(packet.held());
+                        girl.setThrusting(packet.held());
                     }
                 }));
 
@@ -155,7 +154,7 @@ public class PleasureCraftPackets {
                 (packet, context) -> Objects.requireNonNull(context.player().getServer()).execute(() -> {
                             var entity = context.player().getWorld().getEntityById(packet.entityId());
                             if (entity instanceof SceneEntity girl) {
-                                girl.setSoundEvent(packet.soundEvent());
+                                girl.setAnimationKeyFrameEventState(packet.soundEvent());
                             }
                         }
                 ));

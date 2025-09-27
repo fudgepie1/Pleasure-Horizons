@@ -4,7 +4,6 @@ import com.sandymandy.pleasurecraft.entity.base.AbstractGirlEntity;
 import com.sandymandy.pleasurecraft.entity.base.SceneEntity;
 import com.sandymandy.pleasurecraft.util.SceneOptions;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.mob.MobEntity;
@@ -13,7 +12,6 @@ import net.minecraft.item.Items;
 import net.minecraft.world.World;
 
 import java.util.List;
-import java.util.Map;
 
 public class LucyEntity extends SceneEntity {
 
@@ -85,9 +83,5 @@ public class LucyEntity extends SceneEntity {
                 .add(EntityAttributes.MOVEMENT_SPEED, .20)
                 .add(EntityAttributes.TEMPT_RANGE, 5)
                 .add(EntityAttributes.ATTACK_DAMAGE, 2);
-
-
     }
-
-
 }

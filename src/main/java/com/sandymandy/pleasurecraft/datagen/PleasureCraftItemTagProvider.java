@@ -15,8 +15,6 @@ public class PleasureCraftItemTagProvider extends FabricTagProvider.ItemTagProvi
 
     @Override
     protected void configure(RegistryWrapper.WrapperLookup wrapperLookup) {
-        getOrCreateTagBuilder(PleasureCraftTags.Items.TRANSFORMABLE_ITEMS)
-                .add(PleasureCraftItems.LUCY_SPAWN_EGG)
-                .add(PleasureCraftItems.BIA_SPAWN_EGG);
+
     }
 }

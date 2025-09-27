@@ -2,14 +2,14 @@ package com.sandymandy.pleasurecraft;
 
 
 import com.sandymandy.pleasurecraft.client.PleasureCraftKeybinds;
-import com.sandymandy.pleasurecraft.client.renderers.BiaRenderer;
+import com.sandymandy.pleasurecraft.client.renderers.MikaRenderer;
 import com.sandymandy.pleasurecraft.client.renderers.LucyRenderer;
-import com.sandymandy.pleasurecraft.client.renderers.ZhongeziRenderer;
-import com.sandymandy.pleasurecraft.entity.PleasureCraftEntities;
+import com.sandymandy.pleasurecraft.client.renderers.ZongRenderer;
 import com.sandymandy.pleasurecraft.networking.PleasureCraftPackets;
 import com.sandymandy.pleasurecraft.networking.C2S.CumKeybindC2SPacket;
 import com.sandymandy.pleasurecraft.networking.C2S.ThrustKeybindC2SPacket;
 import com.sandymandy.pleasurecraft.screen.client.GirlInventoryScreen;
+import com.sandymandy.pleasurecraft.util.GirlRegistry;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -25,9 +25,9 @@ public class PleasureCraftClient implements ClientModInitializer {
     public void onInitializeClient() {
         HandledScreens.register(PleasureCraft.GIRL_INVENTORY_SCREEN_HANDLER, GirlInventoryScreen::new);
 
-        EntityRendererRegistry.register(PleasureCraftEntities.LUCY, LucyRenderer::new);
-        EntityRendererRegistry.register(PleasureCraftEntities.BIA, BiaRenderer::new);
-        EntityRendererRegistry.register(PleasureCraftEntities.ZHONGEZI, ZhongeziRenderer::new);
+        EntityRendererRegistry.register(GirlRegistry.LUCY, LucyRenderer::new);
+        EntityRendererRegistry.register(GirlRegistry.MIKA, MikaRenderer::new);
+        EntityRendererRegistry.register(GirlRegistry.ZONG, ZongRenderer::new);
         PleasureCraftKeybinds.register();
         PleasureCraftPackets.registerS2CPackets();
         handleKeybinds();

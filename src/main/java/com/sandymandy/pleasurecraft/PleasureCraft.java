@@ -1,16 +1,15 @@
 package com.sandymandy.pleasurecraft;
 
 import com.sandymandy.pleasurecraft.advancement.criterion.PleasureCraftCriteria;
-import com.sandymandy.pleasurecraft.entity.PleasureCraftEntities;
 import com.sandymandy.pleasurecraft.item.PleasureCraftItemGroups;
 import com.sandymandy.pleasurecraft.item.PleasureCraftItems;
 import com.sandymandy.pleasurecraft.networking.PleasureCraftPackets;
 import com.sandymandy.pleasurecraft.screen.GirlInventoryScreenHandler;
+import com.sandymandy.pleasurecraft.util.GirlRegistry;
 import com.sandymandy.pleasurecraft.util.PleasureCraftSounds;
 import com.sandymandy.pleasurecraft.util.PleasureCraftTrackedData;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
-import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
@@ -41,7 +40,7 @@ public class PleasureCraft implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		PleasureCraftEntities.register();
+		GirlRegistry.register();
 		PleasureCraftItemGroups.registerItemGroups();
 		PleasureCraftItems.registerModItems();
 		PleasureCraftPackets.registerPackets();

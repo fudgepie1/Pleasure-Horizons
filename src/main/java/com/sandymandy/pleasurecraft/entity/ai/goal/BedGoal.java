@@ -93,6 +93,7 @@ public class BedGoal extends Goal {
                     float yaw = Direction.getHorizontalDegreesOrThrow(bedFacing); // Direction → yaw in degrees
                     this.entity.setYaw(yaw);
                     this.entity.setHeadYaw(yaw);
+                    this.entity.setBodyYaw(yaw);
                 }
 
                 //Make the entity freeze

@@ -32,7 +32,7 @@ public class SceneKeyframeRegistry {
 
         //Fast
         registerSound( "lucy","paizuriFastMSG1", PleasureCraftSounds.POUNDING);
-        registerRandomSounds( "lucy","paizuriFastMSG1", List.of(PleasureCraftSounds.LUCY_AHH, PleasureCraftSounds.LUCY_MMM));
+        registerSound( "lucy","paizuriFastMSG1", List.of(PleasureCraftSounds.LUCY_AHH, PleasureCraftSounds.LUCY_MMM));
     }
 
     private static void lucyBlowJob(){
@@ -54,7 +54,7 @@ public class SceneKeyframeRegistry {
         registerSound( "lucy","bjiMSG8", PleasureCraftSounds.PLOB);
         registerSound( "lucy","bjiMSG9", PleasureCraftSounds.LUCY_GIGGLE);
         registerMessage("lucy","bjiMSG9", "Hihihi~");
-        registerRandomSounds( "lucy","bjiMSG11", List.of(PleasureCraftSounds.LUCY_LIPSOUND, PleasureCraftSounds.LUCY_BJMOAN));
+        registerSound( "lucy","bjiMSG11", List.of(PleasureCraftSounds.LUCY_LIPSOUND, PleasureCraftSounds.LUCY_BJMOAN));
 
         //Slow
         registerSound( "lucy","bjiMSG12", PleasureCraftSounds.LUCY_LIPSOUND);
@@ -95,12 +95,12 @@ public class SceneKeyframeRegistry {
 
         //Slow
         registerSound("lucy","doggySlowMSG1", PleasureCraftSounds.POUNDING);
-        registerRandomSounds("lucy","doggySlowMSG1", List.of(PleasureCraftSounds.LUCY_MOAN, PleasureCraftSounds.LUCY_HEAVYBREATHING, PleasureCraftSounds.LUCY_MMM));
+        registerSound("lucy","doggySlowMSG1", List.of(PleasureCraftSounds.LUCY_MOAN, PleasureCraftSounds.LUCY_HEAVYBREATHING, PleasureCraftSounds.LUCY_MMM));
         registerSound("lucy","doggySlowMSG2", PleasureCraftSounds.LUCY_LIGHTBREATHING);
 
         //Fast
         registerSound("lucy","doggyFastMSG1", PleasureCraftSounds.POUNDING);
-        registerRandomSounds("lucy","doggyFastMSG1", List.of(PleasureCraftSounds.LUCY_MOAN, PleasureCraftSounds.LUCY_HEAVYBREATHING, PleasureCraftSounds.LUCY_AHH));
+        registerSound("lucy","doggyFastMSG1", List.of(PleasureCraftSounds.LUCY_MOAN, PleasureCraftSounds.LUCY_HEAVYBREATHING, PleasureCraftSounds.LUCY_AHH));
 
         //Cum
         registerSound("lucy","doggyCumMSG1", PleasureCraftSounds.POUNDING);
@@ -122,7 +122,7 @@ public class SceneKeyframeRegistry {
     }
 
     // --- Register a randomizable sound list ---
-    public static void registerRandomSounds(String girls, String key, List<SoundEvent> events) {
+    public static void registerSound(String girls, String key, List<SoundEvent> events) {
         String[] girlsArray = girls.replaceAll("\\s+", "").split(",");
         for (String girl : girlsArray) {
             SceneKey sceneKey = new SceneKey(girl, key);
@@ -160,8 +160,5 @@ public class SceneKeyframeRegistry {
     public static List<String> getMessage(String girl, String key) {
         return CHAT_MESSAGES.getOrDefault(new SceneKey(girl, key), Collections.emptyList());
     }
-
-
-
 
     public record SceneKey(String girl, String key) {}}

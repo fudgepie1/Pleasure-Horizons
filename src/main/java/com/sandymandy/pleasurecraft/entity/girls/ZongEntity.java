@@ -4,7 +4,6 @@ import com.sandymandy.pleasurecraft.entity.base.AbstractGirlEntity;
 import com.sandymandy.pleasurecraft.entity.base.SceneEntity;
 import com.sandymandy.pleasurecraft.util.SceneOptions;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.mob.MobEntity;
@@ -13,27 +12,26 @@ import net.minecraft.item.Items;
 import net.minecraft.world.World;
 
 import java.util.List;
-import java.util.Map;
 
-public class BiaEntity extends SceneEntity {
+public class ZongEntity extends SceneEntity {
 
-    public BiaEntity(EntityType<? extends AbstractGirlEntity> entityType, World world) {
+    public ZongEntity(EntityType<? extends AbstractGirlEntity> entityType, World world) {
         super(entityType, world);
     }
 
     @Override
     protected Item getTameItem() {
-        return Items.OXEYE_DAISY;
+        return Items.POPPY;
     }
 
     @Override
     protected String getGirlDisplayName() {
-        return "Bia";
+        return "Zong";
     }
 
     @Override
     public String getGirlID() {
-        return "bia";
+            return "zong";
     }
 
     @Override
@@ -56,7 +54,7 @@ public class BiaEntity extends SceneEntity {
                         8,
                         List.of("prone_doggy_intro"),
                         List.of("prone_doggy_slow"),
-                        List.of("prone_doggy_hard1"/*,"prone_doggy_hard2","prone_doggy_hard3"*/),
+                        List.of("prone_doggy_hard1","prone_doggy_hard2","prone_doggy_hard3"),
                         "prone_doggy_cum",
                         true,
                         1f,
@@ -70,9 +68,5 @@ public class BiaEntity extends SceneEntity {
                 .add(EntityAttributes.MOVEMENT_SPEED, .20)
                 .add(EntityAttributes.TEMPT_RANGE, 5)
                 .add(EntityAttributes.ATTACK_DAMAGE, 2);
-
     }
-
-
-
 }

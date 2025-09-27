@@ -1,0 +1,20 @@
+package com.sandymandy.pleasurecraft.util;
+
+import com.sandymandy.pleasurecraft.entity.PleasureCraftEntities;
+import com.sandymandy.pleasurecraft.entity.girls.MikaEntity;
+import com.sandymandy.pleasurecraft.entity.girls.LucyEntity;
+import com.sandymandy.pleasurecraft.entity.girls.ZongEntity;
+import net.minecraft.entity.EntityType;
+
+public class GirlRegistry {
+    public static final EntityType<LucyEntity> LUCY = PleasureCraftEntities.registerGirl("lucy", LucyEntity::new, 0.5f, 1.95f, LucyEntity::createAttributes);
+
+    public static final EntityType<MikaEntity> MIKA = PleasureCraftEntities.registerGirl("mika", MikaEntity::new, 0.5f, 1.95f, MikaEntity::createAttributes);
+
+    public static final EntityType<ZongEntity> ZONG = PleasureCraftEntities.registerGirl("zong", ZongEntity::new, 0.5f, 1.65f, ZongEntity::createAttributes);
+
+    public static void register() {
+        // Trigger attribute registration
+        PleasureCraftEntities.registerAttributes();
+    }
+}

@@ -1,10 +1,8 @@
 package com.sandymandy.pleasurecraft.entity.ai.goal;
 
-import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.entity.base.SceneEntity;
 import com.sandymandy.pleasurecraft.util.SceneOptions;
 import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.entity.player.PlayerEntity;
 
 import java.util.EnumSet;
 
@@ -42,7 +40,7 @@ public class StripGoal extends Goal {
     public void tick() {
         if(started) {
             if (!girl.isFrozenInPlace()) girl.setFreeze(true);
-            if (girl.getSoundEvent().equals("becomeNude") && !stripTrigged) {
+            if (girl.getAnimationKeyFrameEvent().equals("becomeNude") && !stripTrigged) {
                 girl.setStripped(!girl.isStripped()); // toggle stripped state
                 stripTrigged = true;
             }

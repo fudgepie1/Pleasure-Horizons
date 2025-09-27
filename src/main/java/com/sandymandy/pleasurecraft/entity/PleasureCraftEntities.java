@@ -1,62 +1,92 @@
 package com.sandymandy.pleasurecraft.entity;
 
 import com.sandymandy.pleasurecraft.PleasureCraft;
-import com.sandymandy.pleasurecraft.entity.girls.BiaEntity;
-import com.sandymandy.pleasurecraft.entity.girls.LucyEntity;
-import com.sandymandy.pleasurecraft.entity.girls.ZhongeziEntity;
-import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
+import com.sandymandy.pleasurecraft.entity.base.AbstractGirlEntity;
+import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
+import net.minecraft.entity.attribute.DefaultAttributeContainer;
+import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroups;
+import net.minecraft.item.SpawnEggItem;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.Identifier;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.BiFunction;
+import java.util.function.Supplier;
+
 public class PleasureCraftEntities {
-    public static final Identifier LUCY_ID = Identifier.of(PleasureCraft.MOD_ID, "lucy");
-    public static final Identifier BIA_ID = Identifier.of(PleasureCraft.MOD_ID, "bia");
-    public static final Identifier ZHONGEZI_ID = Identifier.of(PleasureCraft.MOD_ID, "zhongezi");
 
+    private static final List<Runnable> ATTRIBUTE_REGISTRATIONS = new ArrayList<>();
+    private static final List<Item> AUTO_SPAWN_EGGS = new ArrayList<>();
+    private static final List<EntityType<? extends MobEntity>> GIRLS = new ArrayList<>();
 
-    private static final RegistryKey<EntityType<?>> LUCY_KEY =
-            RegistryKey.of(RegistryKeys.ENTITY_TYPE, LUCY_ID);
+    /**
+     * Registers a girl entity using the entity's own getGirlID() method for ID generation.
+     */
+    public static <T extends AbstractGirlEntity> EntityType<T> registerGirl(
+            String id,
+            BiFunction<EntityType<T>, net.minecraft.world.World, T> factory,
+            float width,
+            float height,
+            Supplier<DefaultAttributeContainer.Builder> attributes
+    ) {
+        try {
+            // Create a temporary instance to get the girl ID
 
-    private static final RegistryKey<EntityType<?>> BIA_KEY =
-            RegistryKey.of(RegistryKeys.ENTITY_TYPE, BIA_ID);
+            Identifier identifier = Identifier.of(PleasureCraft.MOD_ID, id);
+            RegistryKey<EntityType<?>> key = RegistryKey.of(RegistryKeys.ENTITY_TYPE, identifier);
 
-    private static final RegistryKey<EntityType<?>> ZHONGEZI_KEY =
-            RegistryKey.of(RegistryKeys.ENTITY_TYPE, ZHONGEZI_ID);
+            EntityType<T> type = Registry.register(
+                    Registries.ENTITY_TYPE,
+                    identifier,
+                    EntityType.Builder.create(factory::apply, SpawnGroup.CREATURE)
+                            .dimensions(width, height)
+                            .build(key)
+            );
 
-    public static final EntityType<LucyEntity> LUCY = Registry.register(
-            Registries.ENTITY_TYPE,
-            LUCY_ID,
-            EntityType.Builder.create(LucyEntity::new, SpawnGroup.CREATURE)
-                    .dimensions(0.5f, 1.95f)
-                    .build(LUCY_KEY)
-    );
+            ATTRIBUTE_REGISTRATIONS.add(() ->
+                    net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry.register(type, attributes.get())
+            );
 
-    public static final EntityType<BiaEntity> BIA = Registry.register(
-            Registries.ENTITY_TYPE,
-            BIA_ID,
-            EntityType.Builder.create(BiaEntity::new, SpawnGroup.CREATURE)
-                    .dimensions(0.5f, 1.65f)
-                    .build(BIA_KEY)
-    );
+            // Auto spawn egg
+            Identifier eggId = Identifier.of(PleasureCraft.MOD_ID, id + "_spawn_egg");
+            Item egg = Registry.register(Registries.ITEM, eggId,
+                    new SpawnEggItem(type, new Item.Settings().registryKey(RegistryKey.of(RegistryKeys.ITEM, eggId))));
+            AUTO_SPAWN_EGGS.add(egg);
 
-    public static final EntityType<ZhongeziEntity> ZHONGEZI = Registry.register(
-            Registries.ENTITY_TYPE,
-            ZHONGEZI_ID,
-            EntityType.Builder.create(ZhongeziEntity::new, SpawnGroup.CREATURE)
-                    .dimensions(0.5f, 1.65f)
-                    .build(ZHONGEZI_KEY)
-    );
-
-    public static void register() {
-        // Attributes
-        FabricDefaultAttributeRegistry.register(LUCY, LucyEntity.createAttributes());
-        FabricDefaultAttributeRegistry.register(BIA, BiaEntity.createAttributes());
-        FabricDefaultAttributeRegistry.register(ZHONGEZI, ZhongeziEntity.createAttributes());
+            GIRLS.add(type);
+            return type;
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to register girl entity: " + id, e);
+        }
     }
-}
 
+    public static void registerAttributes() {
+        ATTRIBUTE_REGISTRATIONS.forEach(Runnable::run);
+    }
+
+    // Helpers for item group icon or dynamic access
+    public static Item getFirstSpawnEgg() {
+        return AUTO_SPAWN_EGGS.isEmpty() ? null : AUTO_SPAWN_EGGS.get(0);
+    }
+
+    public static void registerSpawnEggsToGroup() {
+        ItemGroupEvents.modifyEntriesEvent(ItemGroups.SPAWN_EGGS).register(entries -> AUTO_SPAWN_EGGS.forEach(entries::add));
+    }
+
+    public static List<EntityType<? extends MobEntity>> getAllGirls() {
+        return List.copyOf(GIRLS);
+    }
+
+    public static List<Item> getAllSpawnEggs() {
+        return List.copyOf(AUTO_SPAWN_EGGS);
+    }
+
+}
