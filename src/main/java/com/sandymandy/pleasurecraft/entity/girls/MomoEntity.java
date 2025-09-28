@@ -9,14 +9,13 @@ import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
-import net.minecraft.util.math.Vec2f;
 import net.minecraft.world.World;
 
 import java.util.List;
 
-public class ZongEntity extends SceneEntity {
+public class MomoEntity extends SceneEntity {
 
-    public ZongEntity(EntityType<? extends AbstractGirlEntity> entityType, World world) {
+    public MomoEntity(EntityType<? extends AbstractGirlEntity> entityType, World world) {
         super(entityType, world);
     }
 
@@ -27,12 +26,12 @@ public class ZongEntity extends SceneEntity {
 
     @Override
     protected String getGirlDisplayName() {
-        return "Zong";
+        return "Momo";
     }
 
     @Override
     public String getGirlID() {
-            return "zong";
+            return "momo";
     }
 
     @Override
@@ -54,7 +53,7 @@ public class ZongEntity extends SceneEntity {
 
                 SceneOptions.of("Doggy",
                         8,
-                        List.of("prone_doggy_intro"),
+                        List.of("prone_doggy_intro", "prone_doggy_insert"),
                         List.of("prone_doggy_slow"),
                         List.of("prone_doggy_hard1","prone_doggy_hard2","prone_doggy_hard3"),
                         "prone_doggy_cum",
@@ -67,7 +66,7 @@ public class ZongEntity extends SceneEntity {
 
     public static DefaultAttributeContainer.Builder createAttributes() {
         return MobEntity.createMobAttributes()
-                .add(EntityAttributes.MAX_HEALTH, 20)
+                .add(EntityAttributes.MAX_HEALTH, 15)
                 .add(EntityAttributes.MOVEMENT_SPEED, .20)
                 .add(EntityAttributes.TEMPT_RANGE, 15)
                 .add(EntityAttributes.ATTACK_DAMAGE, 2);

@@ -52,8 +52,9 @@ public abstract class AbstractGirlModel<T extends AbstractGirlEntity> extends Ge
     public void setCustomAnimations(AnimationState<T> animationState) {
 
         GeoBone head = getAnimationProcessor().getBone("head");
+        boolean isSceneActive = animationState.renderState().getGeckolibData(PleasureCraftDataTickets.IS_IN_SCENE);
 
-        if (head != null) {
+        if (head != null && !isSceneActive) {
             float pitch = animationState.getData(DataTickets.ENTITY_PITCH);
             float yaw = animationState.getData(DataTickets.ENTITY_YAW);
 

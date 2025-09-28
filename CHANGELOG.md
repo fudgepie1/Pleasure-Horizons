@@ -3,12 +3,12 @@
 ## 0.5
 - Fixed a bug where you would still be invisible when exiting a scene.
 - Made the girls not attack other girls when if the owner attacked them.
-- Replaced Bia with a new girl called Zong
+- Replaced Bia with a new girl called Momo
 - Add a new girl called Mika (based on ellie)
 - Made the girls render the item in their hands
 - Improved Lucy's outfit.
 - Updated to 1.21.5
-- Improved the thrust system when in the doggy scene with Zong
+- Improved the thrust system when in the doggy scene with Momo
 
 ## 0.4
 - Fixed the relationship level not saving.
