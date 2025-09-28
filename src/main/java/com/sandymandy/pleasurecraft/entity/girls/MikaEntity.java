@@ -35,7 +35,7 @@ public class MikaEntity extends SceneEntity {
     }
 
     @Override
-    public int getSizeGUI(){return 35;}
+    public int getSizeGUI(){return 25;}
 
     @Override
     public List<SceneOptions> getSceneOptions() {
@@ -44,10 +44,10 @@ public class MikaEntity extends SceneEntity {
 
     public static DefaultAttributeContainer.Builder createAttributes() {
         return MobEntity.createMobAttributes()
-                .add(EntityAttributes.MAX_HEALTH, 20)
-                .add(EntityAttributes.MOVEMENT_SPEED, .20)
-                .add(EntityAttributes.TEMPT_RANGE, 5)
-                .add(EntityAttributes.ATTACK_DAMAGE, 2);
+                .add(EntityAttributes.MAX_HEALTH, 30)
+                .add(EntityAttributes.MOVEMENT_SPEED, .15)
+                .add(EntityAttributes.TEMPT_RANGE, 15)
+                .add(EntityAttributes.ATTACK_DAMAGE, 5);
 
     }
 }

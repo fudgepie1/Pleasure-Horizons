@@ -77,10 +77,6 @@ public class PleasureCraftEntities {
         return AUTO_SPAWN_EGGS.isEmpty() ? null : AUTO_SPAWN_EGGS.get(0);
     }
 
-    public static void registerSpawnEggsToGroup() {
-        ItemGroupEvents.modifyEntriesEvent(ItemGroups.SPAWN_EGGS).register(entries -> AUTO_SPAWN_EGGS.forEach(entries::add));
-    }
-
     public static List<EntityType<? extends MobEntity>> getAllGirls() {
         return List.copyOf(GIRLS);
     }

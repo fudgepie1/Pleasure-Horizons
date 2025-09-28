@@ -1,5 +1,6 @@
 package com.sandymandy.pleasurecraft.entity.base;
 
+import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.entity.ai.goal.BedGoal;
 import com.sandymandy.pleasurecraft.entity.ai.goal.MoveToPlayerGoal;
 import com.sandymandy.pleasurecraft.entity.ai.goal.StopMovementGoal;
@@ -28,6 +29,7 @@ import software.bernie.geckolib.animation.keyframe.event.KeyFrameEvent;
 import software.bernie.geckolib.animation.keyframe.event.data.SoundKeyframeData;
 
 import java.util.List;
+import java.util.Random;
 
 import static com.sandymandy.pleasurecraft.util.Utils.Round;
 
@@ -36,6 +38,7 @@ public class SceneEntity extends AbstractGirlEntity{
     private static final TrackedData<ScenePhase> CURRENT_SCENE_PHASE = DataTracker.registerData(SceneEntity.class, PleasureCraftTrackedData.SCENE_PHASE);
     private static final TrackedData<String> ANIMATION_KEY_FRAME_EVENT = DataTracker.registerData(SceneEntity.class, TrackedDataHandlerRegistry.STRING);
     private static final TrackedData<Boolean> THRUSTING = DataTracker.registerData(SceneEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+    private static final Random RANDOM = new Random();
 
     private int timer = 0;
     private int introIndex = 0;
@@ -49,7 +52,6 @@ public class SceneEntity extends AbstractGirlEntity{
     public PlayerEntity scenePlayer = (PlayerEntity) this.getOwner();
     private static final float SLOW_SPEED = 0.002f;
     private static final float FAST_SPEED = 0.01f;
-    private static float CURRENT_SPEED = SLOW_SPEED;
 
 
     protected SceneEntity(EntityType<? extends AbstractGirlEntity> entityType, World world) {
@@ -189,9 +191,8 @@ public class SceneEntity extends AbstractGirlEntity{
     }
 
     private String getRandomFromList(List<String> list) {
-        if (list.size() == 1) return list.getFirst();
-        int index = this.getWorld().getRandom().nextInt(list.size());
-        return list.get(index);
+        PleasureCraft.LOGGER.info(list.get(RANDOM.nextInt(list.size())));
+        return list.get(RANDOM.nextInt(list.size()));
     }
 
     private PlayState setSceneAnimIfChanged(AnimationTest<?> state, String anim, Animation.LoopType loop) {
@@ -299,21 +300,13 @@ public class SceneEntity extends AbstractGirlEntity{
         if(!this.getCurrentScenePhase().equals(ScenePhase.HAVING_SEX)){
             return;
         }
-
-        String key = getAnimationKeyFrameEvent();
-
-        // Player is holding thrust key?
         boolean thrustKeyDown = isThrusting();
-
-        // Switch into FAST when keyframe event == "switch" and key held
-        if (key.contains("Switch") && thrustKeyDown) {
-            CURRENT_SPEED = FAST_SPEED;
-        }
-
-        // Reset handling
-        if (key.contains("Reset") && !thrustKeyDown) {
-            CURRENT_SPEED = SLOW_SPEED;
-        }
+            if (thrustKeyDown) {
+                sceneProgress += FAST_SPEED;
+            }
+            else {
+                sceneProgress += SLOW_SPEED;
+            }
     }
 
     @Override
@@ -353,7 +346,6 @@ public class SceneEntity extends AbstractGirlEntity{
         // Handle scene speed
         if(!this.getWorld().isClient()) {
             handleSceneSpeed();
-            sceneProgress += CURRENT_SPEED;
         }
     }
 
@@ -439,20 +431,29 @@ public class SceneEntity extends AbstractGirlEntity{
                     return setSceneAnimIfChanged(state, current, Animation.LoopType.PLAY_ONCE);
                 }
                 case HAVING_SEX -> {
-
-                    String key = getAnimationKeyFrameEvent();
-
-                    // Player is holding thrust key?
                     boolean thrustKeyDown = isThrusting();
 
-                    if (key.contains("Switch") && thrustKeyDown) {
-                        return setSceneAnimIfChanged(state, getRandomFromList(options.fastAnim()), Animation.LoopType.LOOP);
-                    }
-                    else if (key.contains("Reset") && thrustKeyDown) {
-                        return setSceneAnimIfChanged(state, getRandomFromList(options.fastAnim()), Animation.LoopType.LOOP);
+                    if(options.useKeyFrameEvents){
+                        String key = getAnimationKeyFrameEvent();
+
+                        if (key.contains("Switch") && thrustKeyDown) {
+                            return setSceneAnimIfChanged(state, getRandomFromList(options.fastAnim()), Animation.LoopType.LOOP);
+                        }
+                        else if (key.contains("Reset") && thrustKeyDown) {
+                            return setSceneAnimIfChanged(state, getRandomFromList(options.fastAnim()), Animation.LoopType.LOOP);
+                        }
+                        else {
+                            return setSceneAnimIfChanged(state, getRandomFromList(options.slowAnim()), Animation.LoopType.LOOP);
+                        }
                     }
                     else {
-                        return setSceneAnimIfChanged(state, getRandomFromList(options.slowAnim()), Animation.LoopType.LOOP);
+                        if(thrustKeyDown){
+                            return setSceneAnimIfChanged(state, getRandomFromList(options.fastAnim()), Animation.LoopType.LOOP);
+                        }
+                        else {
+                            return setSceneAnimIfChanged(state, getRandomFromList(options.slowAnim()), Animation.LoopType.LOOP);
+                        }
+
                     }
                 }
                 case CUM -> {

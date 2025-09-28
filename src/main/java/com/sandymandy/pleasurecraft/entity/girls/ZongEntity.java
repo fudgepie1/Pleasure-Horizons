@@ -9,6 +9,7 @@ import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
+import net.minecraft.util.math.Vec2f;
 import net.minecraft.world.World;
 
 import java.util.List;
@@ -47,6 +48,7 @@ public class ZongEntity extends SceneEntity {
                         List.of("anal_fast"),
                         "anal_cum",
                         true,
+                        false,
                         0f,
                         List.of("anal_lay_on_bed", "anal_bed_idle")),
 
@@ -57,6 +59,7 @@ public class ZongEntity extends SceneEntity {
                         List.of("prone_doggy_hard1","prone_doggy_hard2","prone_doggy_hard3"),
                         "prone_doggy_cum",
                         true,
+                        true,
                         1f,
                         List.of("sit_down", "sit_down_idle"))
         );
@@ -66,7 +69,7 @@ public class ZongEntity extends SceneEntity {
         return MobEntity.createMobAttributes()
                 .add(EntityAttributes.MAX_HEALTH, 20)
                 .add(EntityAttributes.MOVEMENT_SPEED, .20)
-                .add(EntityAttributes.TEMPT_RANGE, 5)
+                .add(EntityAttributes.TEMPT_RANGE, 15)
                 .add(EntityAttributes.ATTACK_DAMAGE, 2);
     }
 }

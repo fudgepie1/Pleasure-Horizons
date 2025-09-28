@@ -72,6 +72,7 @@ public class LucyEntity extends SceneEntity {
                         List.of("doggy_fast1"),
                         "doggy_cum",
                         true,
+                        false,
                         0f,
                         List.of("doggy_lay_on_bed", "doggy_bed_idle"))
                 );
@@ -81,7 +82,7 @@ public class LucyEntity extends SceneEntity {
         return MobEntity.createMobAttributes()
                 .add(EntityAttributes.MAX_HEALTH, 20)
                 .add(EntityAttributes.MOVEMENT_SPEED, .20)
-                .add(EntityAttributes.TEMPT_RANGE, 5)
+                .add(EntityAttributes.TEMPT_RANGE, 15)
                 .add(EntityAttributes.ATTACK_DAMAGE, 2);
     }
 }

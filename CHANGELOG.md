@@ -4,7 +4,7 @@
 - Fixed a bug where you would still be invisible when exiting a scene.
 - Made the girls not attack other girls when if the owner attacked them.
 - Replaced Bia with a new girl called Zong
-- Add a new girl called Mika
+- Add a new girl called Mika (based on ellie)
 - Made the girls render the item in their hands
 - Improved Lucy's outfit.
 - Updated to 1.21.5
