@@ -364,7 +364,7 @@ public class SceneEntity extends AbstractGirlEntity{
 
 
         // Attack controller, higher priority so it can override
-//        controllerRegistrar.add(new AnimationController<>("attack", 2, this::handleAttackAnimations));
+       //controllerRegistrar.add(new AnimationController<>("attack", 2, this::handleAttackAnimations));
 
 
     }
