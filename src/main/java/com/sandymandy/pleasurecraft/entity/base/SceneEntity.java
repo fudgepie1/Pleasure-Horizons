@@ -9,6 +9,7 @@ import com.sandymandy.pleasurecraft.networking.C2S.*;
 import com.sandymandy.pleasurecraft.util.*;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.block.BlockState;
+import net.minecraft.entity.AnimationState;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
@@ -38,10 +39,10 @@ public class SceneEntity extends AbstractGirlEntity{
     private static final TrackedData<ScenePhase> CURRENT_SCENE_PHASE = DataTracker.registerData(SceneEntity.class, PleasureCraftTrackedData.SCENE_PHASE);
     private static final TrackedData<String> ANIMATION_KEY_FRAME_EVENT = DataTracker.registerData(SceneEntity.class, TrackedDataHandlerRegistry.STRING);
     private static final TrackedData<Boolean> THRUSTING = DataTracker.registerData(SceneEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+    private static final TrackedData<Integer> INTRO_INDEX = DataTracker.registerData(SceneEntity.class, TrackedDataHandlerRegistry.INTEGER);
     private static final Random RANDOM = new Random();
 
     private int timer = 0;
-    private int introIndex = 0;
     private String lastSceneAnim = "";
     private final float cumThreshold = 5f;
     private float sceneProgress = 0f;
@@ -65,6 +66,7 @@ public class SceneEntity extends AbstractGirlEntity{
         builder.add(CURRENT_SCENE_PHASE, ScenePhase.NONE);
         builder.add(ANIMATION_KEY_FRAME_EVENT,"");
         builder.add(THRUSTING,false);
+        builder.add(INTRO_INDEX, 0);
     }
 
     public void setCurrentSceneOptions(SceneOptions options){
@@ -97,6 +99,14 @@ public class SceneEntity extends AbstractGirlEntity{
 
     public boolean isThrusting(){
         return this.dataTracker.get(THRUSTING);
+    }
+
+    public void setIntroIndex(int num){
+        this.dataTracker.set(INTRO_INDEX, num);
+    }
+
+    public int getIntroIndex(){
+        return this.dataTracker.get(INTRO_INDEX);
     }
 
     public void startScene(SceneOptions option) {
@@ -148,7 +158,7 @@ public class SceneEntity extends AbstractGirlEntity{
         setThrusting(false);
         this.targetBedPos = null;
         scenePlayer.startRiding(this, false);
-        introIndex = 0;
+        setIntroIndex(0);
         lastSceneAnim = "";
         playPhase(ScenePhase.INTRO);
 
@@ -161,7 +171,7 @@ public class SceneEntity extends AbstractGirlEntity{
             ClientPlayNetworking.send(new StopSceneOnServerC2SPacket(this.getId()));
             return;
         }
-        introIndex = 0;
+        setIntroIndex(0);
         onSceneStop();
         setCurrentScenePhase(ScenePhase.NONE);
         this.getNavigation().stop();
@@ -181,7 +191,7 @@ public class SceneEntity extends AbstractGirlEntity{
         }
         setCurrentScenePhase(phase);
         lastSceneAnim = "";
-        if (phase != ScenePhase.INTRO) introIndex = 0;
+        if (phase != ScenePhase.INTRO) setIntroIndex(0);
     }
 
     public void tryTriggerCum() {
@@ -364,7 +374,7 @@ public class SceneEntity extends AbstractGirlEntity{
 
 
         // Attack controller, higher priority so it can override
-       //controllerRegistrar.add(new AnimationController<>("attack", 2, this::handleAttackAnimations));
+        //controllerRegistrar.add(new AnimationController<>("attack", 2, this::handleAttackAnimations));
 
 
     }
@@ -407,7 +417,7 @@ public class SceneEntity extends AbstractGirlEntity{
             final SceneOptions options = this.getCurrentSceneOptions();
 
             // Notify server when an animation finishes (only once per cycle)
-            if (controller.hasAnimationFinished() && !lastSceneAnim.isEmpty()) {
+            if ((controller.hasAnimationFinished() || controller.getAnimationState() == AnimationController.State.PAUSED) && !lastSceneAnim.isEmpty()) {
                 ClientPlayNetworking.send(new AnimationFinishC2SPacket(this.getId()));
                 lastSceneAnim = ""; // prevent spamming until new anim set
             }
@@ -415,7 +425,7 @@ public class SceneEntity extends AbstractGirlEntity{
             switch (getCurrentScenePhase()) {
                 case LAYING_DOWN -> {
                     String laying = options.bedIdle().isEmpty() ? "null" : options.bedIdle().getFirst();
-                    return setSceneAnimIfChanged(state, laying, Animation.LoopType.PLAY_ONCE);
+                    return setSceneAnimIfChanged(state, laying, Animation.LoopType.HOLD_ON_LAST_FRAME);
                 }
                 case BED_IDLE -> {
                     String bedIdle = options.bedIdle().isEmpty() ? "null" : options.bedIdle().getLast();
@@ -427,24 +437,31 @@ public class SceneEntity extends AbstractGirlEntity{
                         playPhase(ScenePhase.HAVING_SEX);
                         return PlayState.CONTINUE;
                     }
-                    String current = intros.get(Math.min(introIndex, intros.size() - 1));
-                    return setSceneAnimIfChanged(state, current, Animation.LoopType.PLAY_ONCE);
+                    String current = intros.get(Math.min(getIntroIndex(), intros.size() - 1));
+                    return setSceneAnimIfChanged(state, current, Animation.LoopType.HOLD_ON_LAST_FRAME);
                 }
                 case HAVING_SEX -> {
                     boolean thrustKeyDown = isThrusting();
 
                     if(options.useKeyFrameEvents){
                         String key = getAnimationKeyFrameEvent();
+                        String anim = getRandomFromList(options.slowAnim);
 
                         if (key.contains("Switch") && thrustKeyDown) {
+                            anim = getRandomFromList(options.fastAnim());
+                        }
+
+                        if (key.contains("Reset") && thrustKeyDown) {
                             return setSceneAnimIfChanged(state, getRandomFromList(options.fastAnim()), Animation.LoopType.LOOP);
                         }
-                        else if (key.contains("Reset") && thrustKeyDown) {
-                            return setSceneAnimIfChanged(state, getRandomFromList(options.fastAnim()), Animation.LoopType.LOOP);
+
+                        if (key.contains("Reset") && !thrustKeyDown) {
+                            anim = getRandomFromList(options.slowAnim);
                         }
-                        else {
-                            return setSceneAnimIfChanged(state, getRandomFromList(options.slowAnim()), Animation.LoopType.LOOP);
-                        }
+
+
+
+                        return setSceneAnimIfChanged(state, anim, Animation.LoopType.LOOP);
                     }
                     else {
                         if(thrustKeyDown){
@@ -513,8 +530,8 @@ public class SceneEntity extends AbstractGirlEntity{
         switch (getCurrentScenePhase()) {
             case INTRO -> {
                 List<String> intros = getCurrentSceneOptions().introAnim();
-                if (introIndex < intros.size() - 1) {
-                    introIndex++;
+                if (getIntroIndex() < intros.size() - 1) {
+                    setIntroIndex(getIntroIndex() + 1);
                 } else {
                     playPhase(ScenePhase.HAVING_SEX);
                 }

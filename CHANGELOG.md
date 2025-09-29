@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.1
+- Fixed a bug where you would do a 360 when switching from the intro animation.
+- Fixed the bug where the second intro animation would not play.
+
 ## 0.5
 - Fixed a bug where you would still be invisible when exiting a scene.
 - Made the girls not attack other girls when if the owner attacked them.
@@ -49,9 +53,9 @@
 - Removed jiggle physics as it was frame rate depended.
 
 ## TODO
-- Fix the animation randomizer in the Scene.
-- Make the AI more advance.
-- Fix Attacking animation.
-- Fix Holding item.
-- Dialog.
-- FreeCam integration 
+- [x] Fix the animation randomizer in the Scene.
+- [ ] Make the AI more advance.
+- [ ] Fix Attacking animation.
+- [ ] Fix Holding item.
+- [ ] Dialog.
+- [ ] FreeCam integration 
