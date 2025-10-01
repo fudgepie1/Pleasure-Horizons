@@ -20,7 +20,7 @@ public class PleasureCraftHud {
                     PlayerEntity localPlayer = client.player;
 
                     if (localPlayer != null && localPlayer.getVehicle() instanceof SceneEntity scene) {
-                        SceneProgressOverlay.setActive(true);
+                        if(scene.getAnimationKeyFrameEvent().equals("sexUIon")) SceneProgressOverlay.setActive(true);
                         SceneProgressOverlay.render(context, scene.getSceneProgress(), scene.getCumThreshold());
                     } else {
                         SceneProgressOverlay.setActive(false);

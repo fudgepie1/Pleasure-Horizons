@@ -1,6 +1,5 @@
 package com.sandymandy.pleasurecraft.entity.base;
 
-import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.entity.ai.goal.BedGoal;
 import com.sandymandy.pleasurecraft.entity.ai.goal.MoveToPlayerGoal;
 import com.sandymandy.pleasurecraft.entity.ai.goal.StopMovementGoal;
@@ -8,7 +7,6 @@ import com.sandymandy.pleasurecraft.entity.ai.goal.StripGoal;
 import com.sandymandy.pleasurecraft.networking.C2S.*;
 import com.sandymandy.pleasurecraft.registries.PleasureCraftTrackedData;
 import com.sandymandy.pleasurecraft.registries.SceneKeyframeRegistry;
-import com.sandymandy.pleasurecraft.util.PleasureCraftMessages;
 import com.sandymandy.pleasurecraft.util.SceneOptions;
 import com.sandymandy.pleasurecraft.util.ScenePhase;
 import com.sandymandy.pleasurecraft.util.Utils;
@@ -36,8 +34,6 @@ import software.bernie.geckolib.animation.keyframe.event.data.SoundKeyframeData;
 import java.util.List;
 import java.util.Random;
 
-import static com.sandymandy.pleasurecraft.util.Utils.Round;
-
 public class SceneEntity extends AbstractGirlEntity{
     private static final TrackedData<SceneOptions> CURRENT_SCENE_OPTIONS = DataTracker.registerData(SceneEntity.class, PleasureCraftTrackedData.SCENE_OPTION);
     private static final TrackedData<ScenePhase> CURRENT_SCENE_PHASE = DataTracker.registerData(SceneEntity.class, PleasureCraftTrackedData.SCENE_PHASE);
@@ -48,15 +44,13 @@ public class SceneEntity extends AbstractGirlEntity{
     private static final TrackedData<Integer> INTRO_INDEX = DataTracker.registerData(SceneEntity.class, TrackedDataHandlerRegistry.INTEGER);
     private static final Random RANDOM = new Random();
 
-    private int timer = 0;
     private String lastSceneAnim = "";
     public String passengerBoneName = "Torso2";
     BlockPos bedPos;
     private boolean swinging = false;
     private long lastSwing = 0L;
     public PlayerEntity scenePlayer = (PlayerEntity) this.getOwner();
-    private static final float SLOW_SPEED = 0.002f;
-    private static final float FAST_SPEED = 0.01f;
+    private static final float PROGRESS_SPEED = 0.1f;
 
 
     protected SceneEntity(EntityType<? extends AbstractGirlEntity> entityType, World world) {
@@ -244,16 +238,6 @@ public class SceneEntity extends AbstractGirlEntity{
     private void onSceneActive(){
         if(this.getWorld().isClient()) return;
 
-        timer ++;
-
-        if(timer >= 20 && !(this.getSceneProgress() == 0f) && !this.getWorld().isClient && this.getSceneProgress() < (this.getCumThreshold() + 0.2f) && isHavingSex()){
-            if(this.getSceneProgress() >= this.getCumThreshold()){
-                new PleasureCraftMessages().GlobleMessage(this.getWorld(),"Scene Progress: READY TO CUM");
-            }
-            else new PleasureCraftMessages().GlobleMessage(this.getWorld(),"Scene Progress: "+Round(getSceneProgress(), 2));
-            timer = 0;
-        }
-
         if(bedPos != null && isBedScene() && !Utils.checkForBlockAt(this.getWorld(),bedPos,null,BlockTags.BEDS)){
             stopScene();
         }
@@ -334,16 +318,13 @@ public class SceneEntity extends AbstractGirlEntity{
         if(!this.getCurrentScenePhase().equals(ScenePhase.HAVING_SEX)){
             return;
         }
+        String key = getAnimationKeyFrameEvent();
 
-        boolean thrustKeyDown = isThrusting();
-            if (thrustKeyDown) {
-                this.setSceneProgress(this.getSceneProgress() + FAST_SPEED);
-            }
-            else {
-                this.setSceneProgress(this.getSceneProgress() + SLOW_SPEED);
-            }
+        if (key.contains("Switch") || key.contains("Reset") || key.contains("thrust")) {
+            this.setSceneProgress(this.getSceneProgress() + PROGRESS_SPEED);
+        }
 
-//            sceneProgress = Math.clamp(sceneProgress, 0, this.getCumThreshold());
+        this.setSceneProgress(Math.clamp(this.getSceneProgress(), 0, this.getCumThreshold()));
     }
 
     @Override
@@ -354,22 +335,6 @@ public class SceneEntity extends AbstractGirlEntity{
         soundHandler();
         messageHandler();
         handleSceneFootstepSounds();
-
-        PleasureCraft.LOGGER.info(this.getSceneProgress()+"");
-
-//        if(this.hasPassengers()) {
-//        if (this.getWorld().isClient()) {
-//                if(Objects.requireNonNull(this.getFirstPassenger()).equals(this.getOwner())) {
-//                    if ("sexUIon".equals(getAnimationKeyFrameEvent())) {
-//                        SceneProgressOverlay.setActive(true);
-//                    } else if ("sexUIoff".equals(getAnimationKeyFrameEvent()) || !this.isSceneActive()) {
-//                        SceneProgressOverlay.setActive(false);
-//                    }
-//                }
-//            }
-//        }
-
-
 
         playerModelLogic();
 
