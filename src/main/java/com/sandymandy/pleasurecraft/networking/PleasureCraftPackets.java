@@ -2,8 +2,10 @@ package com.sandymandy.pleasurecraft.networking;
 
 import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.entity.base.SceneEntity;
+import com.sandymandy.pleasurecraft.hud.SceneProgressOverlay;
 import com.sandymandy.pleasurecraft.networking.C2S.*;
 import com.sandymandy.pleasurecraft.networking.S2C.ClothingArmorVisibilityS2CPacket;
+import com.sandymandy.pleasurecraft.networking.S2C.PlayCumHudAnimationS2CPacket;
 import com.sandymandy.pleasurecraft.networking.S2C.SceneOptionsS2CPacket;
 import com.sandymandy.pleasurecraft.screen.client.GirlSceneScreen;
 import com.sandymandy.pleasurecraft.registries.PleasureCraftSoundEvents;
@@ -36,6 +38,7 @@ public class PleasureCraftPackets {
         // --- S2C (server → client) ---
         PayloadTypeRegistry.playS2C().register(ClothingArmorVisibilityS2CPacket.ID, ClothingArmorVisibilityS2CPacket.CODEC);
         PayloadTypeRegistry.playS2C().register(SceneOptionsS2CPacket.ID, SceneOptionsS2CPacket.CODEC);
+        PayloadTypeRegistry.playS2C().register(PlayCumHudAnimationS2CPacket.ID, PlayCumHudAnimationS2CPacket.CODEC);
 
 
     }
@@ -183,6 +186,14 @@ public class PleasureCraftPackets {
                 MinecraftClient.getInstance().setScreen(new GirlSceneScreen(packet.entityId(), packet.currentRelationshipLevel(),packet.options()));
             });
         });
+
+        ClientPlayNetworking.registerGlobalReceiver(
+                PlayCumHudAnimationS2CPacket.ID,
+                (packet, context) -> {
+                    // trigger the HUD animation locally
+                    context.client().execute(SceneProgressOverlay::triggerCumAnimation);
+                }
+        );
 
     }
 

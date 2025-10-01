@@ -7,6 +7,10 @@ import net.minecraft.util.Identifier;
 
 public class SceneProgressOverlay {
     private static final Identifier SCENE_PROGRESS_BAR_TEXTURE = Identifier.of(PleasureCraft.MOD_ID, "textures/gui/scene_progress_bar.png");
+    private static final Identifier READY_TO_CUM_TEXTURE = Identifier.of(PleasureCraft.MOD_ID, "textures/gui/cum_button.png");
+    private static boolean animatingCum = false;
+    private static long cumStartTime = 0L;
+    private static final long CUM_ANIM_DURATION = 500; // ms
 
     private static boolean active = false;
 
@@ -18,8 +22,12 @@ public class SceneProgressOverlay {
         return active;
     }
 
+    public static void triggerCumAnimation() {
+        animatingCum = true;
+        cumStartTime = System.currentTimeMillis();
+    }
 
-    public static void render(DrawContext context, float sceneProgress, float cumThreshold){
+    public static void render(DrawContext context, float sceneProgress, float cumThreshold) {
         if (!active) return;
 
         float ratio = cumThreshold > 0 ? (sceneProgress / cumThreshold) : 0f;
@@ -27,46 +35,79 @@ public class SceneProgressOverlay {
 
         int texWidth = 48;
         int texHeight = 175;
-
-        // --- Scale factor ---
         float scale = 1f;
 
-        // Original background size
         int scaledWidth = (int)(texWidth * scale);
         int scaledHeight = (int)(texHeight * scale);
 
-        // Position in top-left corner (with 10px padding)
-        int x = 10;
-        int yTop = 10;
+        int x = 36;
+        int y = 10;
 
         // --- Background ---
-        context.drawTexture(
-                RenderLayer::getGuiTextured, SCENE_PROGRESS_BAR_TEXTURE,
-                x, yTop,
-                0, 0,                 // u,v in texture
-                scaledWidth, scaledHeight,    // draw size on screen (scaled)
-                scaledWidth, scaledHeight,  // original texture size
-                0xFFFFFFFF
-        );
+        context.drawTexture(RenderLayer::getGuiTextured, SCENE_PROGRESS_BAR_TEXTURE,
+                x, y,
+                0, 0,
+                scaledWidth, scaledHeight,
+                texWidth, texHeight,
+                0xFFFFFFFF);
 
-        // --- Fill: plain white rectangle ---
+        // --- Ready to cum message ---
+        float cumScale = .4f;
+        int cumXPadding = 10;
+        int cumU = 0;
+        int cumV = 0;
+        int cropWidth = (int)(256 * cumScale);
+        int cropHeight = (int)(52 * cumScale);
+        int cumWidth = (int)(256 * cumScale);
+        int cumHeight = (int) (106 * cumScale);
+        int cumYPadding = texHeight + 5;
+
+        if(ratio == 1f) {
+            cumV = (int) (55 * cumScale);
+        }
+
+        if(!animatingCum)
+            context.drawTexture(RenderLayer::getGuiTextured, READY_TO_CUM_TEXTURE,
+                    cumXPadding, y + cumYPadding,
+                    cumU, cumV,
+                    cropWidth, cropHeight,
+                    cumWidth, cumHeight,
+                    0xFFFFFFFF);
+
+        // --- Fill ---
         int insetX = (int)(8 * scale);
         int insetY = (int)(8 * scale);
         int fillWidth = scaledWidth - (insetX * 2);
         int fillHeightMax = scaledHeight - (insetY * 2);
 
-        int filledHeight = (int)(ratio * fillHeightMax);
-        if (filledHeight > 0) {
-            int fillX = x + insetX;
-            int fillY = (yTop + scaledHeight - insetY) - filledHeight; // bottom-anchored inside frame
+        int fillX = x + insetX;
+        int baseFillBottom = y + scaledHeight - insetY;
 
-            int color = 0xEFEFEFEF; // solid white
-            context.fill(
-                    fillX, fillY,
-                    fillX + fillWidth, (yTop + scaledHeight - insetY),
-                    color
-            );
+        if (animatingCum) {
+            long elapsed = System.currentTimeMillis() - cumStartTime;
+            float t = Math.min(elapsed / (float) CUM_ANIM_DURATION, 1f);
+
+            // Y offset: move the whole bar upward over time
+            int yOffset = (int)(scaledHeight * t * 2); // move up by up to 1 full bar height
+
+            int fillY = baseFillBottom - fillHeightMax - yOffset;
+
+            int color = 0xFFFFFFFF;
+            context.fill(fillX, fillY, fillX + fillWidth, baseFillBottom - yOffset, color);
+
+            if (t >= 1f) {
+                setActive(false); // hide overlay after cum
+                animatingCum = false;
+            }
+        } else {
+            int filledHeight = (int)(ratio * fillHeightMax);
+            if (filledHeight > 0) {
+                int fillY = baseFillBottom - filledHeight;
+                int color = 0xEFEFEFEF;
+                context.fill(fillX, fillY, fillX + fillWidth, baseFillBottom, color);
+            }
         }
+
     }
 
 }

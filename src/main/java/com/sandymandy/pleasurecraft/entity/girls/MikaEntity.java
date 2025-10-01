@@ -46,7 +46,7 @@ public class MikaEntity extends SceneEntity {
                         List.of("carry_slow1"),
                         List.of("carry_fast"),
                         "carry_cum",
-                        2.5f,
+                        .2f,
                         false)
         );
     }

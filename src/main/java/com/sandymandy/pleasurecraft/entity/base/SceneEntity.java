@@ -5,12 +5,14 @@ import com.sandymandy.pleasurecraft.entity.ai.goal.MoveToPlayerGoal;
 import com.sandymandy.pleasurecraft.entity.ai.goal.StopMovementGoal;
 import com.sandymandy.pleasurecraft.entity.ai.goal.StripGoal;
 import com.sandymandy.pleasurecraft.networking.C2S.*;
+import com.sandymandy.pleasurecraft.networking.S2C.PlayCumHudAnimationS2CPacket;
 import com.sandymandy.pleasurecraft.registries.PleasureCraftTrackedData;
 import com.sandymandy.pleasurecraft.registries.SceneKeyframeRegistry;
 import com.sandymandy.pleasurecraft.util.SceneOptions;
 import com.sandymandy.pleasurecraft.util.ScenePhase;
 import com.sandymandy.pleasurecraft.util.Utils;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.data.DataTracker;
@@ -18,6 +20,7 @@ import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.registry.tag.BlockTags;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.math.BlockPos;
@@ -215,6 +218,13 @@ public class SceneEntity extends AbstractGirlEntity{
     public void tryTriggerCum() {
         if (this.isSceneActive() && this.getSceneProgress() >= this.getCumThreshold() && getCurrentScenePhase() != ScenePhase.CUM) {
             playPhase(ScenePhase.CUM);
+
+            if (!this.getWorld().isClient()) {
+                if (this.getFirstPassenger() instanceof ServerPlayerEntity rider) {
+                    // send packet to rider only
+                    ServerPlayNetworking.send(rider, new PlayCumHudAnimationS2CPacket());
+                }
+            }
         }
     }
 
