@@ -3,13 +3,11 @@ package com.sandymandy.pleasurecraft.entity.base;
 import com.mojang.authlib.GameProfile;
 import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.entity.ai.goal.*;
-import com.sandymandy.pleasurecraft.networking.C2S.BonePosSyncC2SPacket;
 import com.sandymandy.pleasurecraft.networking.S2C.ClothingArmorVisibilityS2CPacket;
 import com.sandymandy.pleasurecraft.screen.GirlInventoryScreenHandlerFactory;
 import com.sandymandy.pleasurecraft.util.PleasureCraftMessages;
-import com.sandymandy.pleasurecraft.util.PleasureCraftTrackedData;
+import com.sandymandy.pleasurecraft.registries.PleasureCraftTrackedData;
 import com.sandymandy.pleasurecraft.util.SceneOptions;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.PlayerSkinProvider;
@@ -44,11 +42,9 @@ import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Vector3d;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animatable.instance.SingletonAnimatableInstanceCache;
-import software.bernie.geckolib.cache.object.GeoBone;
 
 import java.util.*;
 
@@ -65,7 +61,6 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
     private static final TrackedData<Boolean> OVERRIDE_ANIM_PLAYING = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<Boolean> IS_PLAYER_MODEL_SLIM = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<Boolean> HAVING_SEX = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
-    public static final TrackedData<Float> SCENE_PROGRESS = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.FLOAT);
     private static final TrackedData<String> OVERRIDE_ANIM = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.STRING);
     private static final TrackedData<String> SCENE_ANIM = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.STRING);
     private static final TrackedData<Integer> RELATIONSHIP_LEVEL = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.INTEGER);
@@ -79,8 +74,6 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
     public final Map<EquipmentSlot, Boolean> armorVisibility = new EnumMap<>(EquipmentSlot.class);
     private LivingEntity attackTarget;
     public Vec3d previousVelocity = Vec3d.ZERO;
-    public Vec3d clientPassengerBonePos = Vec3d.ZERO;
-    public Vec3d serverPassengerBonePos = Vec3d.ZERO;
     private int ticksSinceLastHit;
     private static final int MAX_TICKS_NO_HIT = 20 * 20;
     public float previousYaw = 0;
@@ -167,7 +160,6 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
         builder.add(OVERRIDE_ANIM_PLAYING, false);
         builder.add(IS_PLAYER_MODEL_SLIM, false);
         builder.add(HAVING_SEX, false);
-        builder.add(SCENE_PROGRESS,0f);
         builder.add(RELATIONSHIP_LEVEL,0);
         builder.add(PASSENGER_BONE_POSITION, Vec3d.ZERO);
         builder.add(BASE_POS, this.getBlockPos());
@@ -380,14 +372,6 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
 
     public boolean getOverrideHoldState(){
         return this.dataTracker.get(OVERRIDE_HOLD);
-    }
-
-    public void setSceneProgress(float progress){
-        this.dataTracker.set(SCENE_PROGRESS, progress);
-    }
-
-    public float getSceneProgress(){
-        return this.dataTracker.get(SCENE_PROGRESS);
     }
 
     public boolean isWaitingAtBed(){

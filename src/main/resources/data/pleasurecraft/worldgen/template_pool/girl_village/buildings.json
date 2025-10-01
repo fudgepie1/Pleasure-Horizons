@@ -4,7 +4,7 @@
     "elements": [{
         "weight": 1,
         "element": {
-            "location": "pleasurecraft:girl_village/houses/basic_house1",
+            "location": "pleasurecraft:girl_village/houses/basic_house_1",
             "processors": "minecraft:empty",
             "projection": "rigid",
             "element_type": "minecraft:single_pool_element"

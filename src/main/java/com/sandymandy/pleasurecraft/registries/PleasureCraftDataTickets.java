@@ -1,4 +1,4 @@
-package com.sandymandy.pleasurecraft.util;
+package com.sandymandy.pleasurecraft.registries;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;

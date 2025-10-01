@@ -84,35 +84,46 @@ public class BedGoal extends Goal {
         startOnContact();
     }
 
-    private void handleMovement(){
-        if (this.entity.squaredDistanceTo(this.entity.targetBedPos.toCenterPos()) <= 3) {
+    private void handleMovement() {
+        if (this.entity.squaredDistanceTo(this.entity.targetBedPos.toCenterPos()) <= 3.0D) {
             if (this.entity.scenePlayer != null) {
                 this.navigation.stop();
-                // Make the entity Face the direction of the bed
-                if (bedFacing != null) {
-                    float yaw = Direction.getHorizontalDegreesOrThrow(bedFacing); // Direction → yaw in degrees
-                    this.entity.setYaw(yaw);
-                    this.entity.setHeadYaw(yaw);
-                    this.entity.setBodyYaw(yaw);
+
+                // Compute target yaw once
+                float targetYaw = this.entity.getYaw();
+                if (this.bedFacing != null) {
+                    targetYaw = Direction.getHorizontalDegreesOrThrow(this.bedFacing);
                 }
 
-                //Make the entity freeze
+                // Freeze state first
                 this.entity.setWaitingAtBedState(true);
 
-                // Snap to Bed
-                this.entity.setPosition(snapPos);
+                // Server-authoritative snap: position + yaw together
+                if (!this.entity.getWorld().isClient()) {
+                    this.entity.refreshPositionAndAngles(
+                            this.snapPos.x, this.snapPos.y, this.snapPos.z,
+                            targetYaw, this.entity.getPitch()
+                    );
+                }
 
-                // Start the Scene
-                if(!this.entity.isSceneActive()){
+                // Mirror to model this tick (safe on both sides)
+                this.entity.setYaw(targetYaw);
+                this.entity.setHeadYaw(targetYaw);
+                this.entity.setBodyYaw(targetYaw);
+
+                // Keep LookControl from fighting the snap while waiting
+                this.entity.getLookControl().lookAt(
+                        this.entity.getX(), this.entity.getEyeY(), this.entity.getZ()
+                );
+
+                if (!this.entity.isSceneActive()) {
                     this.entity.playPhase(ScenePhase.LAYING_DOWN);
                 }
             }
-        }
-        else if (!entity.isWaitingAtBed()) {
-            this.navigation.startMovingAlong(pathToBed, this.speed);
+        } else if (!this.entity.isWaitingAtBed()) {
+            this.navigation.startMovingAlong(this.pathToBed, this.speed);
         }
     }
-
     private void startOnContact(){
         if(!entity.isWaitingAtBed()) return;
         if(this.entity.squaredDistanceTo(this.entity.scenePlayer) <= 1.5 && entity.getCurrentScenePhase().equals(ScenePhase.BED_IDLE)){

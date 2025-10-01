@@ -1,4 +1,4 @@
-    package com.sandymandy.pleasurecraft.util;
+    package com.sandymandy.pleasurecraft.registries;
 
     import com.sandymandy.pleasurecraft.PleasureCraft;
     import net.minecraft.registry.Registries;
@@ -6,7 +6,7 @@
     import net.minecraft.sound.SoundEvent;
     import net.minecraft.util.Identifier;
 
-    public class PleasureCraftSounds {
+    public class PleasureCraftSoundEvents {
 
 //  MISC_________________________________________________________________________________________________________________
         public static final SoundEvent BEDRUSTLE = registerSound("misc.bedrustle");
@@ -42,7 +42,7 @@
         public static void registerSounds() {
             SceneKeyframeRegistry.registerSoundEvents();
 
-            PleasureCraft.LOGGER.info("Registered sounds for PleasureCraft.");
+            PleasureCraft.LOGGER.info("Registered SoundEvents for PleasureCraft.");
         }
 
         private static SoundEvent registerSound(String soundPath) {

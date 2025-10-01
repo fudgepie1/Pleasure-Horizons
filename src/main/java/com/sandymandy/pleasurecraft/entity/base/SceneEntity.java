@@ -6,10 +6,14 @@ import com.sandymandy.pleasurecraft.entity.ai.goal.MoveToPlayerGoal;
 import com.sandymandy.pleasurecraft.entity.ai.goal.StopMovementGoal;
 import com.sandymandy.pleasurecraft.entity.ai.goal.StripGoal;
 import com.sandymandy.pleasurecraft.networking.C2S.*;
-import com.sandymandy.pleasurecraft.util.*;
+import com.sandymandy.pleasurecraft.registries.PleasureCraftTrackedData;
+import com.sandymandy.pleasurecraft.registries.SceneKeyframeRegistry;
+import com.sandymandy.pleasurecraft.util.PleasureCraftMessages;
+import com.sandymandy.pleasurecraft.util.SceneOptions;
+import com.sandymandy.pleasurecraft.util.ScenePhase;
+import com.sandymandy.pleasurecraft.util.Utils;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.block.BlockState;
-import net.minecraft.entity.AnimationState;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
@@ -38,14 +42,14 @@ public class SceneEntity extends AbstractGirlEntity{
     private static final TrackedData<SceneOptions> CURRENT_SCENE_OPTIONS = DataTracker.registerData(SceneEntity.class, PleasureCraftTrackedData.SCENE_OPTION);
     private static final TrackedData<ScenePhase> CURRENT_SCENE_PHASE = DataTracker.registerData(SceneEntity.class, PleasureCraftTrackedData.SCENE_PHASE);
     private static final TrackedData<String> ANIMATION_KEY_FRAME_EVENT = DataTracker.registerData(SceneEntity.class, TrackedDataHandlerRegistry.STRING);
+    public static final TrackedData<Float> SCENE_PROGRESS = DataTracker.registerData(SceneEntity.class, TrackedDataHandlerRegistry.FLOAT);
+    public static final TrackedData<Float> CUM_THRESHOLD = DataTracker.registerData(SceneEntity.class, TrackedDataHandlerRegistry.FLOAT);
     private static final TrackedData<Boolean> THRUSTING = DataTracker.registerData(SceneEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<Integer> INTRO_INDEX = DataTracker.registerData(SceneEntity.class, TrackedDataHandlerRegistry.INTEGER);
     private static final Random RANDOM = new Random();
 
     private int timer = 0;
     private String lastSceneAnim = "";
-    private final float cumThreshold = 5f;
-    private float sceneProgress = 0f;
     public String passengerBoneName = "Torso2";
     BlockPos bedPos;
     private boolean swinging = false;
@@ -65,6 +69,8 @@ public class SceneEntity extends AbstractGirlEntity{
         builder.add(CURRENT_SCENE_OPTIONS, SceneOptions.EMPTY);
         builder.add(CURRENT_SCENE_PHASE, ScenePhase.NONE);
         builder.add(ANIMATION_KEY_FRAME_EVENT,"");
+        builder.add(SCENE_PROGRESS,0f);
+        builder.add(CUM_THRESHOLD,5f);
         builder.add(THRUSTING,false);
         builder.add(INTRO_INDEX, 0);
     }
@@ -103,6 +109,22 @@ public class SceneEntity extends AbstractGirlEntity{
 
     public void setIntroIndex(int num){
         this.dataTracker.set(INTRO_INDEX, num);
+    }
+
+    public void setSceneProgress(float progress){
+        this.dataTracker.set(SCENE_PROGRESS, progress);
+    }
+
+    public float getSceneProgress(){
+        return this.dataTracker.get(SCENE_PROGRESS);
+    }
+
+    public void setCumThreshold(float threshold){
+        this.dataTracker.set(CUM_THRESHOLD, threshold);
+    }
+
+    public float getCumThreshold(){
+        return this.dataTracker.get(CUM_THRESHOLD);
     }
 
     public int getIntroIndex(){
@@ -154,7 +176,8 @@ public class SceneEntity extends AbstractGirlEntity{
     public void onSceneStart() {
         scenePlayer.setInvisible(true);
 
-        this.sceneProgress = 0f;
+        this.setSceneProgress(0f);
+        this.setCumThreshold(getCurrentSceneOptions().cumThreshold());
         setThrusting(false);
         this.targetBedPos = null;
         scenePlayer.startRiding(this, false);
@@ -172,6 +195,7 @@ public class SceneEntity extends AbstractGirlEntity{
             return;
         }
         setIntroIndex(0);
+        this.setSceneProgress(0f);
         onSceneStop();
         setCurrentScenePhase(ScenePhase.NONE);
         this.getNavigation().stop();
@@ -195,13 +219,13 @@ public class SceneEntity extends AbstractGirlEntity{
     }
 
     public void tryTriggerCum() {
-        if (this.isSceneActive() && this.getSceneProgress() >= cumThreshold && getCurrentScenePhase() != ScenePhase.CUM) {
+        if (this.isSceneActive() && this.getSceneProgress() >= this.getCumThreshold() && getCurrentScenePhase() != ScenePhase.CUM) {
             playPhase(ScenePhase.CUM);
         }
     }
 
     private String getRandomFromList(List<String> list) {
-        PleasureCraft.LOGGER.info(list.get(RANDOM.nextInt(list.size())));
+//        PleasureCraft.LOGGER.info(list.get(RANDOM.nextInt(list.size())));
         return list.get(RANDOM.nextInt(list.size()));
     }
 
@@ -222,8 +246,8 @@ public class SceneEntity extends AbstractGirlEntity{
 
         timer ++;
 
-        if(timer >= 20 && !(sceneProgress == 0f) && !this.getWorld().isClient && sceneProgress < (cumThreshold + 0.2f) && isHavingSex()){
-            if(sceneProgress >= cumThreshold){
+        if(timer >= 20 && !(this.getSceneProgress() == 0f) && !this.getWorld().isClient && this.getSceneProgress() < (this.getCumThreshold() + 0.2f) && isHavingSex()){
+            if(this.getSceneProgress() >= this.getCumThreshold()){
                 new PleasureCraftMessages().GlobleMessage(this.getWorld(),"Scene Progress: READY TO CUM");
             }
             else new PleasureCraftMessages().GlobleMessage(this.getWorld(),"Scene Progress: "+Round(getSceneProgress(), 2));
@@ -310,25 +334,42 @@ public class SceneEntity extends AbstractGirlEntity{
         if(!this.getCurrentScenePhase().equals(ScenePhase.HAVING_SEX)){
             return;
         }
+
         boolean thrustKeyDown = isThrusting();
             if (thrustKeyDown) {
-                sceneProgress += FAST_SPEED;
+                this.setSceneProgress(this.getSceneProgress() + FAST_SPEED);
             }
             else {
-                sceneProgress += SLOW_SPEED;
+                this.setSceneProgress(this.getSceneProgress() + SLOW_SPEED);
             }
+
+//            sceneProgress = Math.clamp(sceneProgress, 0, this.getCumThreshold());
     }
 
     @Override
     public void tick() {
+        this.scenePlayer = (PlayerEntity) this.getOwner();
         super.tick();
-        this.setSceneProgress(sceneProgress);
         keyFrameEventHandler();
         soundHandler();
         messageHandler();
         handleSceneFootstepSounds();
 
-        this.scenePlayer = (PlayerEntity) this.getOwner();
+        PleasureCraft.LOGGER.info(this.getSceneProgress()+"");
+
+//        if(this.hasPassengers()) {
+//        if (this.getWorld().isClient()) {
+//                if(Objects.requireNonNull(this.getFirstPassenger()).equals(this.getOwner())) {
+//                    if ("sexUIon".equals(getAnimationKeyFrameEvent())) {
+//                        SceneProgressOverlay.setActive(true);
+//                    } else if ("sexUIoff".equals(getAnimationKeyFrameEvent()) || !this.isSceneActive()) {
+//                        SceneProgressOverlay.setActive(false);
+//                    }
+//                }
+//            }
+//        }
+
+
 
         playerModelLogic();
 
@@ -443,9 +484,9 @@ public class SceneEntity extends AbstractGirlEntity{
                 case HAVING_SEX -> {
                     boolean thrustKeyDown = isThrusting();
 
-                    if(options.useKeyFrameEvents){
+                    if(options.useKeyFrameEvents()){
                         String key = getAnimationKeyFrameEvent();
-                        String anim = getRandomFromList(options.slowAnim);
+                        String anim = getRandomFromList(options.slowAnim());
 
                         if (key.contains("Switch") && thrustKeyDown) {
                             anim = getRandomFromList(options.fastAnim());
@@ -456,7 +497,7 @@ public class SceneEntity extends AbstractGirlEntity{
                         }
 
                         if (key.contains("Reset") && !thrustKeyDown) {
-                            anim = getRandomFromList(options.slowAnim);
+                            anim = getRandomFromList(options.slowAnim());
                         }
 
 

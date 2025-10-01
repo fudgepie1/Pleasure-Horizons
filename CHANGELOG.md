@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.5.2
+- Fixed a bug where the girls wouldn't spawn in the villages.
+- Added Mika and replaced Bia with Momo from the village entity pool.
+- Added a progress bar when in a scene
+
 ## 0.5.1
 - Fixed a bug where you would do a 360 when switching from the intro animation.
 - Fixed the bug where the second intro animation would not play.

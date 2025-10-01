@@ -48,29 +48,32 @@ public class LucyEntity extends SceneEntity {
     @Override
     public List<SceneOptions> getSceneOptions() {
         return List.of(
-                SceneOptions.of("Paizuri",
+                SceneOptions.create("Paizuri",
                         6,
                         List.of("paizuri_intro"),
                         List.of("paizuri_slow"),
                         List.of("paizuri_fast"),
                         "paizuri_cum",
+                        4,
                         true),
 
 
-                SceneOptions.of("Blow Job",
+                SceneOptions.create("Blow Job",
                         8,
                         List.of("blowjob_intro"),
                         List.of("blowjob_slow"),
                         List.of("blowjob_fast"),
                         "blowjob_cum",
+                        4,
                         false),
 
-                SceneOptions.of("Doggy",
+                SceneOptions.create("Doggy",
                         10,
                         List.of("doggy_intro"),
                         List.of("doggy_slow"),
                         List.of("doggy_fast1"),
                         "doggy_cum",
+                        6f,
                         true,
                         false,
                         0f,

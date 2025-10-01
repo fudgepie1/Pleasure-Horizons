@@ -3,7 +3,7 @@ package com.sandymandy.pleasurecraft.client.renderers;
 import com.mojang.datafixers.util.Either;
 import com.sandymandy.pleasurecraft.entity.base.SceneEntity;
 import com.sandymandy.pleasurecraft.networking.C2S.BonePosSyncC2SPacket;
-import com.sandymandy.pleasurecraft.util.PleasureCraftDataTickets;
+import com.sandymandy.pleasurecraft.registries.PleasureCraftDataTickets;
 import com.sandymandy.pleasurecraft.util.renderer.OffsetVertexConsumer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.render.RenderLayer;
@@ -41,7 +41,7 @@ public abstract class AbstractGirlRenderer<T extends SceneEntity, R extends Livi
 
     public AbstractGirlRenderer(EntityRendererFactory.Context renderManager, GeoModel<T> model) {
         super(renderManager, model);
-        this.addRenderLayer(new BlockAndItemGeoLayer<T, Void, R>(this) {
+        this.addRenderLayer(new BlockAndItemGeoLayer<>(this) {
             private float heldItemScale = 1.0F;
 
             @Override

@@ -26,6 +26,14 @@
         "weight": 2,
         "element": {
             "element_type": "minecraft:single_pool_element",
+            "location": "pleasurecraft:girl_village/streets/street_curve_small",
+            "processors": "minecraft:empty",
+            "projection": "terrain_matching"
+        }
+    },{
+        "weight": 2,
+        "element": {
+            "element_type": "minecraft:single_pool_element",
             "location": "pleasurecraft:girl_village/streets/street_t",
             "processors": "minecraft:empty",
             "projection": "terrain_matching"

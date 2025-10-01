@@ -8,8 +8,9 @@ import com.sandymandy.pleasurecraft.client.renderers.MomoRenderer;
 import com.sandymandy.pleasurecraft.networking.PleasureCraftPackets;
 import com.sandymandy.pleasurecraft.networking.C2S.CumKeybindC2SPacket;
 import com.sandymandy.pleasurecraft.networking.C2S.ThrustKeybindC2SPacket;
+import com.sandymandy.pleasurecraft.registries.PleasureCraftHud;
 import com.sandymandy.pleasurecraft.screen.client.GirlInventoryScreen;
-import com.sandymandy.pleasurecraft.util.GirlRegistry;
+import com.sandymandy.pleasurecraft.registries.GirlRegistry;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -30,6 +31,7 @@ public class PleasureCraftClient implements ClientModInitializer {
         EntityRendererRegistry.register(GirlRegistry.MOMO, MomoRenderer::new);
         PleasureCraftKeybinds.register();
         PleasureCraftPackets.registerS2CPackets();
+        PleasureCraftHud.register();
         handleKeybinds();
     }
 

@@ -39,7 +39,16 @@ public class MikaEntity extends SceneEntity {
 
     @Override
     public List<SceneOptions> getSceneOptions() {
-        return List.of();
+        return List.of(
+                SceneOptions.create("Face fuck",
+                        6,
+                        List.of("carry_intro"),
+                        List.of("carry_slow1"),
+                        List.of("carry_fast"),
+                        "carry_cum",
+                        2.5f,
+                        false)
+        );
     }
 
     public static DefaultAttributeContainer.Builder createAttributes() {

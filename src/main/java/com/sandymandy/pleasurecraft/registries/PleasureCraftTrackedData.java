@@ -1,6 +1,8 @@
-package com.sandymandy.pleasurecraft.util;
+package com.sandymandy.pleasurecraft.registries;
 
 import com.sandymandy.pleasurecraft.PleasureCraft;
+import com.sandymandy.pleasurecraft.util.SceneOptions;
+import com.sandymandy.pleasurecraft.util.ScenePhase;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricTrackedDataRegistry;
 import net.minecraft.entity.data.TrackedDataHandler;
 import net.minecraft.util.Identifier;

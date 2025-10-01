@@ -64,8 +64,7 @@ public class GirlSceneScreen extends Screen {
         int iconX = this.width / 2 - 10; // position from top-left corner
         int iconY = this.height / 4 - 30;
 
-        context.drawTexture(RenderLayer::getGuiTextured, RELATIONSHIP_ICON,
-                iconX, iconY, 0, 0, 18, 18, 18, 18);
+        context.drawTexture(RenderLayer::getGuiTextured, RELATIONSHIP_ICON, iconX, iconY, 0, 0, 18, 18, 18, 18);
 
         // draw the number next to it
         context.drawText(MinecraftClient.getInstance().textRenderer,

@@ -6,7 +6,7 @@ import com.sandymandy.pleasurecraft.networking.C2S.*;
 import com.sandymandy.pleasurecraft.networking.S2C.ClothingArmorVisibilityS2CPacket;
 import com.sandymandy.pleasurecraft.networking.S2C.SceneOptionsS2CPacket;
 import com.sandymandy.pleasurecraft.screen.client.GirlSceneScreen;
-import com.sandymandy.pleasurecraft.util.PleasureCraftSounds;
+import com.sandymandy.pleasurecraft.registries.PleasureCraftSoundEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -55,14 +55,14 @@ public class PleasureCraftPackets {
                                     case "sit" -> girl.setSitting(!girl.isSitting());
                                     case "follow" -> girl.setFollowing(!girl.isFollowing());
                                     case "testSound" -> {
-                                        girl.playSound(PleasureCraftSounds.LUCY_MOAN, 2f, 1f);
-                                        girl.playSound(PleasureCraftSounds.TOUCH, 2f, 1f);
-                                        girl.playSound(PleasureCraftSounds.CLAP, 2f, 1f);
-                                        girl.playSound(PleasureCraftSounds.CUMINFLATION, 2f, 1f);
-                                        girl.playSound(PleasureCraftSounds.BELLJINGLE, 2f, 1f);
-                                        girl.playSound(PleasureCraftSounds.LUCY_HEAVYBREATHING, 2f, 1f);
-                                        girl.playSound(PleasureCraftSounds.LUCY_HUH, 2f, 1f);
-                                        girl.playSound(PleasureCraftSounds.LUCY_HMPH, 2f, 1f);
+                                        girl.playSound(PleasureCraftSoundEvents.LUCY_MOAN, 2f, 1f);
+                                        girl.playSound(PleasureCraftSoundEvents.TOUCH, 2f, 1f);
+                                        girl.playSound(PleasureCraftSoundEvents.CLAP, 2f, 1f);
+                                        girl.playSound(PleasureCraftSoundEvents.CUMINFLATION, 2f, 1f);
+                                        girl.playSound(PleasureCraftSoundEvents.BELLJINGLE, 2f, 1f);
+                                        girl.playSound(PleasureCraftSoundEvents.LUCY_HEAVYBREATHING, 2f, 1f);
+                                        girl.playSound(PleasureCraftSoundEvents.LUCY_HUH, 2f, 1f);
+                                        girl.playSound(PleasureCraftSoundEvents.LUCY_HMPH, 2f, 1f);
                                     }
                                     default -> PleasureCraft.LOGGER.warn("Unknown Girl interaction: " + packet.actionId());
                                 }

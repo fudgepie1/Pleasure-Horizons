@@ -40,23 +40,25 @@ public class MomoEntity extends SceneEntity {
     @Override
     public List<SceneOptions> getSceneOptions() {
         return List.of(
-                SceneOptions.of("Anal",
+                SceneOptions.create("Anal",
                         6,
                         List.of("anal_intro"),
                         List.of("anal_slow"),
                         List.of("anal_fast"),
                         "anal_cum",
+                        6f,
                         true,
                         false,
                         0f,
                         List.of("anal_lay_on_bed", "anal_bed_idle")),
 
-                SceneOptions.of("Doggy",
+                SceneOptions.create("Doggy",
                         8,
                         List.of("prone_doggy_intro", "prone_doggy_insert"),
                         List.of("prone_doggy_slow"),
                         List.of("prone_doggy_hard1","prone_doggy_hard2","prone_doggy_hard3"),
                         "prone_doggy_cum",
+                        6f,
                         true,
                         true,
                         1f,

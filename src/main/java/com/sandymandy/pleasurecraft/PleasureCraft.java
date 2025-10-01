@@ -5,9 +5,9 @@ import com.sandymandy.pleasurecraft.item.PleasureCraftItemGroups;
 import com.sandymandy.pleasurecraft.item.PleasureCraftItems;
 import com.sandymandy.pleasurecraft.networking.PleasureCraftPackets;
 import com.sandymandy.pleasurecraft.screen.GirlInventoryScreenHandler;
-import com.sandymandy.pleasurecraft.util.GirlRegistry;
-import com.sandymandy.pleasurecraft.util.PleasureCraftSounds;
-import com.sandymandy.pleasurecraft.util.PleasureCraftTrackedData;
+import com.sandymandy.pleasurecraft.registries.GirlRegistry;
+import com.sandymandy.pleasurecraft.registries.PleasureCraftSoundEvents;
+import com.sandymandy.pleasurecraft.registries.PleasureCraftTrackedData;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
 import net.minecraft.network.RegistryByteBuf;
@@ -30,13 +30,13 @@ public class PleasureCraft implements ModInitializer {
 					new ExtendedScreenHandlerType<>(GirlInventoryScreenHandler::new, GirlScreenData.PACKET_CODEC)
 			);
 
-	public static final ExtendedScreenHandlerType<GirlInventoryScreenHandler, GirlScreenData> GIRL_TALK_SCREEN_HANDLER =
+/*	public static final ExtendedScreenHandlerType<GirlInventoryScreenHandler, GirlScreenData> GIRL_TALK_SCREEN_HANDLER =
 			Registry.register(
 					Registries.SCREEN_HANDLER,
 					Identifier.of(PleasureCraft.MOD_ID, "girl_talk_screen"),
 					new ExtendedScreenHandlerType<>(GirlInventoryScreenHandler::new, GirlScreenData.PACKET_CODEC)
 			);
-
+*/
 
 	@Override
 	public void onInitialize() {
@@ -47,7 +47,7 @@ public class PleasureCraft implements ModInitializer {
 		PleasureCraftPackets.registerC2SPackets();
 		PleasureCraftCriteria.registerAdvancementCriteria();
 		PleasureCraftTrackedData.registerTrackedData();
-		PleasureCraftSounds.registerSounds();
+		PleasureCraftSoundEvents.registerSounds();
 	}
 
 	public record GirlScreenData(int entityId) {
