@@ -5,7 +5,26 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [
   ],
-  "client": [],
+  "client": [
+    "OptionsMixin",
+    "BlockStateBaseMixin",
+    "BubbleColumnAmbientSoundHandlerMixin",
+    "CameraMixin",
+    "ClientPacketListenerMixin",
+    "EntityMixin",
+    "EntityRenderDispatcherMixin",
+    "EntityRendererMixin",
+    "GameRendererMixin",
+    "GuiMixin",
+    "ItemInHandRendererMixin",
+    "LevelRendererMixin",
+    "LightTextureMixin",
+    "LivingEntityMixin",
+    "LocalPlayerMixin",
+    "MinecraftMixin",
+    "EntityRenderDispatcherAccessor",
+    "MultiPlayerGameModeMixin"
+  ],
   "injectors": {
     "defaultRequire": 1
   }

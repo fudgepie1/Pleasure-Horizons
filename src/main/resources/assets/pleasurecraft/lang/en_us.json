@@ -71,5 +71,179 @@
 
   "subtitles.sadoh": "Sad Oh",
 
-  "subtitles.sigh": "Sigh"
+  "subtitles.sigh": "Sigh",
+
+  "category.freecam.freecam": "Freecam",
+
+  "key.freecam.toggle": "Toggle Freecam",
+
+  "key.freecam.playerControl": "Control Player",
+
+  "key.freecam.tripodReset": "Reset Tripod",
+
+  "key.freecam.configGui": "Config GUI",
+
+  "msg.freecam.enable": "Freecam has been enabled.",
+
+  "msg.freecam.disable": "Freecam has been disabled.",
+
+  "msg.freecam.openTripod": "Opening camera %s",
+
+  "msg.freecam.closeTripod": "Closing camera %s",
+
+  "msg.freecam.tripodReset": "Reset camera %s",
+
+  "text.autoconfig.freecam.option.freecamOptions": "Freecam Options",
+
+  "text.autoconfig.freecam.option.freecamOptions.@Tooltip": "Click to open the Freecam Options",
+
+  "text.autoconfig.freecam.title": "PleasureCraft Options",
+
+  "text.autoconfig.freecam.option.freecamOptions.controls": "Key Bindings",
+
+  "text.autoconfig.freecam.option.freecamOptions.controls.@Tooltip": "Freecam key bindings.",
+
+  "text.autoconfig.freecam.option.freecamOptions.movement": "Movement Options",
+
+  "text.autoconfig.freecam.option.freecamOptions.movement.@Tooltip": "How the camera moves.",
+
+  "text.autoconfig.freecam.option.freecamOptions.movement.flightMode": "Flight Mode",
+
+  "text.autoconfig.freecam.option.freecamOptions.movement.flightMode.@Tooltip": "The type of flight used by freecam.",
+
+  "text.autoconfig.freecam.option.movement.flightMode.default": "Default",
+
+  "text.autoconfig.freecam.option.movement.flightMode.creative": "Creative",
+
+  "text.autoconfig.freecam.option.freecamOptions.movement.horizontalSpeed": "Horizontal Speed",
+
+  "text.autoconfig.freecam.option.freecamOptions.movement.horizontalSpeed.@Tooltip": "The horizontal speed of freecam.",
+
+  "text.autoconfig.freecam.option.freecamOptions.movement.verticalSpeed": "Vertical Speed",
+
+  "text.autoconfig.freecam.option.freecamOptions.movement.verticalSpeed.@Tooltip": "The vertical speed of freecam.",
+
+  "text.autoconfig.freecam.option.freecamOptions.collision": "Collision Options",
+
+  "text.autoconfig.freecam.option.freecamOptions.collision.@Tooltip": "Which blocks you can travel through in freecam.",
+
+  "text.autoconfig.freecam.option.freecamOptions.collision.ignoreTransparent": "Ignore Transparent Blocks",
+
+  "text.autoconfig.freecam.option.freecamOptions.collision.ignoreTransparent.@Tooltip": "Allows travelling through transparent blocks in freecam.",
+
+  "text.autoconfig.freecam.option.freecamOptions.collision.ignoreOpenable": "Ignore Openable Blocks",
+
+  "text.autoconfig.freecam.option.freecamOptions.collision.ignoreOpenable.@Tooltip": "Allows travelling through doors/trapdoors/gates in freecam.",
+
+  "text.autoconfig.freecam.option.freecamOptions.collision.ignoreCustom": "Custom Ignore List",
+
+  "text.autoconfig.freecam.option.freecamOptions.collision.ignoreCustom.@Tooltip[0]": "Allows travelling through specific blocks in freecam.",
+
+  "text.autoconfig.freecam.option.freecamOptions.collision.ignoreCustom.@ModrinthTooltip[1]": "\u00A7cNOTE: Can only be used in singleplayer, creative, or with operator status.",
+
+  "text.autoconfig.freecam.option.freecamOptions.collision.whitelist.ids": "Ignore IDs",
+
+  "text.autoconfig.freecam.option.freecamOptions.collision.whitelist.ids.@Tooltip[0]": "Use block id, e.g. \"grass_block\".",
+
+  "text.autoconfig.freecam.option.freecamOptions.collision.whitelist.ids.@Tooltip[1]": "If the namespace is omitted, \"minecraft:\" is assumed.",
+
+  "text.autoconfig.freecam.option.freecamOptions.collision.whitelist.patterns": "Ignore Regular Expressions",
+
+  "text.autoconfig.freecam.option.freecamOptions.collision.whitelist.patterns.@Tooltip[0]": "Use Regular Expression syntax.",
+
+  "text.autoconfig.freecam.option.freecamOptions.collision.whitelist.patterns.@Tooltip[1]": "Matched against full block id, e.g. \"minecraft:grass_block\".",
+
+  "text.autoconfig.freecam.option.freecamOptions.collision.ignoreAll": "Ignore All Collision",
+
+  "text.autoconfig.freecam.option.freecamOptions.collision.ignoreAll.@Tooltip[0]": "Allows travelling through all blocks in freecam.",
+
+  "text.autoconfig.freecam.option.freecamOptions.collision.ignoreAll.@Tooltip[1]": "§eOverrides above settings.",
+
+  "text.autoconfig.freecam.option.freecamOptions.collision.ignoreAll.@ModrinthTooltip[2]": "§cNOTE: Can only be used in singleplayer, creative, or with operator status.",
+
+  "text.autoconfig.freecam.option.freecamOptions.collision.alwaysCheck": "Always Check Initial Collision",
+
+  "text.autoconfig.freecam.option.freecamOptions.collision.alwaysCheck.@Tooltip[0]": "Whether §7Initial Perspective§r should check for",
+
+  "text.autoconfig.freecam.option.freecamOptions.collision.alwaysCheck.@Tooltip[1]": "collision, even when using §7Ignore All Collision§r.",
+
+  "text.autoconfig.freecam.option.freecamOptions.visual": "Visual Options",
+
+  "text.autoconfig.freecam.option.freecamOptions.visual.@Tooltip": "The look of freecam.",
+
+  "text.autoconfig.freecam.option.freecamOptions.visual.perspective": "Initial Perspective",
+
+  "text.autoconfig.freecam.option.freecamOptions.visual.perspective.@Tooltip": "The initial perspective of the camera.",
+
+  "text.autoconfig.freecam.option.visual.perspective.firstPerson": "First Person",
+
+  "text.autoconfig.freecam.option.visual.perspective.thirdPerson": "Third Person",
+
+  "text.autoconfig.freecam.option.visual.perspective.thirdPersonMirror": "Mirror",
+
+  "text.autoconfig.freecam.option.visual.perspective.inside": "Inside",
+
+  "text.autoconfig.freecam.option.freecamOptions.visual.showPlayer": "Show Player",
+
+  "text.autoconfig.freecam.option.freecamOptions.visual.showPlayer.@Tooltip": "Shows your player in its original position.",
+
+  "text.autoconfig.freecam.option.freecamOptions.visual.showHand": "Show Hand",
+
+  "text.autoconfig.freecam.option.freecamOptions.visual.showHand.@Tooltip": "Whether you can see your hand in freecam.",
+
+  "text.autoconfig.freecam.option.freecamOptions.visual.fullBright": "Full Brightness",
+
+  "text.autoconfig.freecam.option.freecamOptions.visual.fullBright.@Tooltip": "Increases brightness while in freecam.",
+
+  "text.autoconfig.freecam.option.freecamOptions.visual.showSubmersion": "Show Submersion Fog",
+
+  "text.autoconfig.freecam.option.freecamOptions.visual.showSubmersion.@Tooltip": "Whether you see a fog overlay underwater, in lava, or powdered snow.",
+
+  "text.autoconfig.freecam.option.freecamOptions.utility": "Utility Options",
+
+  "text.autoconfig.freecam.option.freecamOptions.utility.@Tooltip": "Freecam enhancements.",
+
+  "text.autoconfig.freecam.option.freecamOptions.utility.disableOnDamage": "Disable on Damage",
+
+  "text.autoconfig.freecam.option.freecamOptions.utility.disableOnDamage.@Tooltip": "Disables freecam when damage is received.",
+
+  "text.autoconfig.freecam.option.freecamOptions.utility.freezePlayer": "Freeze Player",
+
+  "text.autoconfig.freecam.option.freecamOptions.utility.freezePlayer.@Tooltip[0]": "Prevents player movement while freecam is active.",
+
+  "text.autoconfig.freecam.option.freecamOptions.utility.freezePlayer.@Tooltip[1]": "§cWARNING: Multiplayer usage not advised.",
+
+  "text.autoconfig.freecam.option.freecamOptions..freezePlayer.@ModrinthTooltip[1]": "§cNOTE: Can only be used in singleplayer, creative, or with operator status.",
+
+  "text.autoconfig.freecam.option.freecamOptions.utility.allowInteract": "Allow Interaction",
+
+  "text.autoconfig.freecam.option.freecamOptions.utility.allowInteract.@Tooltip[0]": "Whether you can interact with blocks/entities in freecam.",
+
+  "text.autoconfig.freecam.option.freecamOptions.utility.allowInteract.@Tooltip[1]": "§cWARNING: Multiplayer usage not advised.",
+
+  "text.autoconfig.freecam.option.freecamOptions.utility.allowInteract.@ModrinthTooltip[1]": "§cNOTE: Can only be used in singleplayer, creative, or with operator status.",
+
+  "text.autoconfig.freecam.option.freecamOptions.utility.allowInteract.@ModrinthTooltip[2]": "§c*Unless, using interaction mode 'Player'",
+
+  "text.autoconfig.freecam.option.freecamOptions.utility.interactionMode": "Interaction Mode",
+
+  "text.autoconfig.freecam.option.freecamOptions.utility.interactionMode.@Tooltip": "The source of block/entity interactions.",
+
+  "text.autoconfig.freecam.option.utility.interactionMode.camera": "Camera",
+
+  "text.autoconfig.freecam.option.utility.interactionMode.player": "Player",
+
+  "text.autoconfig.freecam.option.freecamOptions.notification": "Notification Options",
+
+  "text.autoconfig.freecam.option.freecamOptions.notification.@Tooltip": "Show or hide notifications.",
+
+  "text.autoconfig.freecam.option.freecamOptions.notification.notifyFreecam": "Freecam Notifications",
+
+  "text.autoconfig.freecam.option.freecamOptions.notification.notifyFreecam.@Tooltip": "Notifies you when entering/exiting freecam.",
+
+  "text.autoconfig.freecam.option.freecamOptions.notification.notifyTripod": "Tripod Notifications",
+
+  "text.autoconfig.freecam.option.freecamOptions.notification.notifyTripod.@Tooltip": "Notifies you when entering/exiting tripod cameras.",
+
+  "text.autoconfig.freecam.error.freecamOptions.invalidRegex": "Invalid regex: %s"
 }
