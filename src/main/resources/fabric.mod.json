@@ -23,8 +23,14 @@
 		],
 		"fabric-datagen": [
 			"com.sandymandy.pleasurecraft.PleasureCraftDataGenerator"
-		]
+		],
+        "modmenu": [
+          "com.sandymandy.pleasurecraft.ModMenuIntegration"
+        ]
 	},
+  "mixins": [
+    "pleasurecraft.mixins.json"
+  ],
 	"depends": {
 		"fabricloader": ">=0.16.14",
 		"minecraft": "~1.21.5",
