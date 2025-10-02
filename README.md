@@ -51,6 +51,8 @@ https://discord.gg/bjRXDZU3Xa
 - [Fabric Loader](https://fabricmc.net/)
 - [Fabric API](https://modrinth.com/mod/fabric-api)
 - [GeckoLib](https://modrinth.com/mod/geckolib)
+- [Cloth Config](https://modrinth.com/mod/cloth-config)
+- [Mod Menu (Optional)](https://modrinth.com/mod/modmenu)
 - Minecraft **1.21+**
 
 ---
