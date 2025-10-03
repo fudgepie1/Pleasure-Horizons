@@ -347,8 +347,6 @@ public class SceneEntity extends AbstractGirlEntity{
         messageHandler();
         handleSceneFootstepSounds();
 
-        PleasureCraft.LOGGER.info(this.getPassengerBonePosition()+"");
-
         playerModelLogic();
 
         if(!this.getWorld().isClient()) {

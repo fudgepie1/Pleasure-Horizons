@@ -57,16 +57,6 @@ public class PleasureCraftPackets {
                                     case "goToBase" -> girl.teleportToBase();
                                     case "sit" -> girl.setSitting(!girl.isSitting());
                                     case "follow" -> girl.setFollowing(!girl.isFollowing());
-                                    case "testSound" -> {
-                                        girl.playSound(PleasureCraftSoundEvents.LUCY_MOAN, 2f, 1f);
-                                        girl.playSound(PleasureCraftSoundEvents.TOUCH, 2f, 1f);
-                                        girl.playSound(PleasureCraftSoundEvents.CLAP, 2f, 1f);
-                                        girl.playSound(PleasureCraftSoundEvents.CUMINFLATION, 2f, 1f);
-                                        girl.playSound(PleasureCraftSoundEvents.BELLJINGLE, 2f, 1f);
-                                        girl.playSound(PleasureCraftSoundEvents.LUCY_HEAVYBREATHING, 2f, 1f);
-                                        girl.playSound(PleasureCraftSoundEvents.LUCY_HUH, 2f, 1f);
-                                        girl.playSound(PleasureCraftSoundEvents.LUCY_HMPH, 2f, 1f);
-                                    }
                                     default -> PleasureCraft.LOGGER.warn("Unknown Girl interaction: " + packet.actionId());
                                 }
                             }
@@ -77,7 +67,7 @@ public class PleasureCraftPackets {
                 (packet, context) -> Objects.requireNonNull(context.player().getServer()).execute(() -> {
                             var entity = context.player().getWorld().getEntityById(packet.entityId());
                             if (entity instanceof SceneEntity girl) {
-                                girl.handlePassengerBone(packet.position());
+                                girl.setPassengerBonePosition(packet.position());
                             }
 
                         }

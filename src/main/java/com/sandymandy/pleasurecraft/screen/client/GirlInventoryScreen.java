@@ -5,7 +5,7 @@ import com.sandymandy.pleasurecraft.entity.base.AbstractGirlEntity;
 import com.sandymandy.pleasurecraft.networking.C2S.InInventoryC2SPacket;
 import com.sandymandy.pleasurecraft.screen.GirlInventoryScreenHandler;
 import com.sandymandy.pleasurecraft.screen.InventoryButtonAction;
-import com.sandymandy.pleasurecraft.screen.InventoryButtonRegistry;
+import com.sandymandy.pleasurecraft.registries.InventoryButtonRegistry;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;

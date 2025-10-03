@@ -180,7 +180,7 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
         builder.add(IS_PLAYER_MODEL_SLIM, false);
         builder.add(HAVING_SEX, false);
         builder.add(RELATIONSHIP_LEVEL,0);
-        builder.add(PASSENGER_BONE_POSITION, this.getPos());
+        builder.add(PASSENGER_BONE_POSITION, Vec3d.ZERO);
         builder.add(BASE_POS, this.getBlockPos());
         builder.add(OVERRIDE_ANIM,"");
         builder.add(SCENE_ANIM,"");
@@ -520,10 +520,6 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
         nbt.putInt("BaseY", this.getBasePos().getY());
         nbt.putInt("BaseZ", this.getBasePos().getZ());
 
-        nbt.putDouble("PassengerX", this.getPassengerBonePosition().getX());
-        nbt.putDouble("PassengerY", this.getPassengerBonePosition().getY());
-        nbt.putDouble("PassengerZ", this.getPassengerBonePosition().getZ());
-
     }
 
 
@@ -542,12 +538,6 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
             int z = nbt.getInt("BaseZ").get();
             this.setBasePos(new BlockPos(x, y, z));
         }
-
-        double x = nbt.getInt("PassengerX").get();
-        double y = nbt.getInt("PassengerY").get();
-        double z = nbt.getInt("PassengerZ").get();
-        this.setPassengerBonePosition(new Vec3d(x, y, z));
-
     }
 
     public void tick() {
@@ -680,19 +670,24 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
         return success;
     }
 
-    public void handlePassengerBone(Vec3d pos) {
-        boolean isZero = pos.lengthSquared() < 1.0E-12; // ~0
-        setPassengerBonePosition(isZero ? this.getPos() : pos.add(0, this.passengerYOffset, 0));
+    public Vec3d getPassengerPos() {
+        boolean isZero = this.getPassengerBonePosition().lengthSquared() < 1.0E-12; // ~0
+        if(isZero){
+            return this.getPos().add(0, this.passengerYOffset, 0);
+        }
+        else {
+            return this.getPassengerBonePosition().add(0, this.passengerYOffset, 0);
+        }
     }
 
     @Override
     public Vec3d updatePassengerForDismount(LivingEntity passenger) {
-        return this.getPassengerBonePosition();
+        return this.getPassengerPos();
     }
 
     @Override
     public Vec3d getPassengerRidingPos(Entity passenger) {
-        return this.getPassengerBonePosition();
+        return this.getPassengerPos();
     }
 
     @Override
