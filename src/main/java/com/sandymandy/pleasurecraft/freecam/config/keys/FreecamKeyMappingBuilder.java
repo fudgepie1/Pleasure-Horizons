@@ -1,4 +1,4 @@
-package com.sandymandy.pleasurecraft.config.keys;
+package com.sandymandy.pleasurecraft.freecam.config.keys;
 
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_UNKNOWN;
 

@@ -1,7 +1,7 @@
 package com.sandymandy.pleasurecraft.mixins;
 
 import net.minecraft.client.network.ClientPlayNetworkHandler;
-import com.sandymandy.pleasurecraft.Freecam;
+import com.sandymandy.pleasurecraft.freecam.Freecam;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;

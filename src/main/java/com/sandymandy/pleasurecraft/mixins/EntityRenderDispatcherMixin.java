@@ -3,7 +3,7 @@ package com.sandymandy.pleasurecraft.mixins;
 import net.minecraft.client.render.Frustum;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.entity.Entity;
-import com.sandymandy.pleasurecraft.util.FreeCamera;
+import com.sandymandy.pleasurecraft.freecam.FreeCamera;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;

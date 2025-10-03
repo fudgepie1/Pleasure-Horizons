@@ -3,8 +3,8 @@ package com.sandymandy.pleasurecraft.mixins;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.client.render.LightmapTextureManager;
-import com.sandymandy.pleasurecraft.Freecam;
-import com.sandymandy.pleasurecraft.config.ModConfig;
+import com.sandymandy.pleasurecraft.freecam.Freecam;
+import com.sandymandy.pleasurecraft.freecam.config.ModConfig;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 

@@ -1,7 +1,7 @@
-package com.sandymandy.pleasurecraft.tripod;
+package com.sandymandy.pleasurecraft.freecam.tripod;
 
 import net.minecraft.world.dimension.DimensionType;
-import com.sandymandy.pleasurecraft.util.FreecamPosition;
+import com.sandymandy.pleasurecraft.freecam.FreecamPosition;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.EnumMap;
@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.sandymandy.pleasurecraft.Freecam.MC;
+import static com.sandymandy.pleasurecraft.freecam.Freecam.MC;
 
 public class TripodRegistry {
     private final Map<DimensionType, Map<TripodSlot, FreecamPosition>> tripods = new HashMap<>();

@@ -1,4 +1,4 @@
-package com.sandymandy.pleasurecraft.config;
+package com.sandymandy.pleasurecraft.freecam.config;
 
 import me.shedaniel.autoconfig.ConfigHolder;
 import net.minecraft.block.BarrierBlock;

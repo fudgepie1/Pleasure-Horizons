@@ -1,4 +1,4 @@
-package com.sandymandy.pleasurecraft.config.keys;
+package com.sandymandy.pleasurecraft.freecam.config.keys;
 
 import java.util.function.Consumer;
 import net.minecraft.client.option.KeyBinding;
@@ -17,7 +17,7 @@ public class FreecamKeyMapping extends KeyBinding implements TextureTickListener
     }
 
     FreecamKeyMapping(String translationKey, InputUtil.Type type, int code, Consumer<FreecamKeyMapping> onTick) {
-        super("key.freecam." + translationKey, type, code, "category.freecam.freecam");
+        super("key.freecam." + translationKey, type, code, "key.categories.freecam");
         this.onTick = onTick;
     }
 

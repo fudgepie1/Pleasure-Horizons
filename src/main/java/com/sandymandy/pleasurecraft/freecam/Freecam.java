@@ -1,4 +1,4 @@
-package com.sandymandy.pleasurecraft;
+package com.sandymandy.pleasurecraft.freecam;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.input.Input;
@@ -10,12 +10,10 @@ import net.minecraft.entity.Entity;
 import net.minecraft.text.Text;
 import net.minecraft.util.PlayerInput;
 import net.minecraft.util.math.ChunkPos;
-import com.sandymandy.pleasurecraft.config.ModBindings;
-import com.sandymandy.pleasurecraft.config.ModConfig;
-import com.sandymandy.pleasurecraft.tripod.TripodRegistry;
-import com.sandymandy.pleasurecraft.tripod.TripodSlot;
-import com.sandymandy.pleasurecraft.util.FreeCamera;
-import com.sandymandy.pleasurecraft.util.FreecamPosition;
+import com.sandymandy.pleasurecraft.freecam.config.ModBindings;
+import com.sandymandy.pleasurecraft.freecam.config.ModConfig;
+import com.sandymandy.pleasurecraft.freecam.tripod.TripodRegistry;
+import com.sandymandy.pleasurecraft.freecam.tripod.TripodSlot;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 

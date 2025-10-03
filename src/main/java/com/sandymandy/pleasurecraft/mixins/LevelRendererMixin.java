@@ -8,8 +8,8 @@ import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Vec3d;
-import com.sandymandy.pleasurecraft.Freecam;
-import com.sandymandy.pleasurecraft.config.ModConfig;
+import com.sandymandy.pleasurecraft.freecam.Freecam;
+import com.sandymandy.pleasurecraft.freecam.config.ModConfig;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -19,7 +19,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
 
-import static com.sandymandy.pleasurecraft.Freecam.MC;
+import static com.sandymandy.pleasurecraft.freecam.Freecam.MC;
 import static org.spongepowered.asm.mixin.injection.callback.LocalCapture.CAPTURE_FAILHARD;
 
 @Mixin(WorldRenderer.class)

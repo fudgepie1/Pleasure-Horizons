@@ -1,4 +1,4 @@
-package com.sandymandy.pleasurecraft.config.gui;
+package com.sandymandy.pleasurecraft.freecam.config.gui;
 
 import me.shedaniel.autoconfig.annotation.ConfigEntry;
 import me.shedaniel.autoconfig.gui.registry.GuiRegistry;
@@ -6,13 +6,13 @@ import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 import me.shedaniel.clothconfig2.gui.entries.KeyCodeEntry;
 import me.shedaniel.clothconfig2.impl.builders.KeyCodeBuilder;
 import net.minecraft.text.Text;
-import com.sandymandy.pleasurecraft.config.ModBindings;
+import com.sandymandy.pleasurecraft.freecam.config.ModBindings;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.sandymandy.pleasurecraft.config.gui.AutoConfigExtensions.ENTRY_BUILDER;
+import static com.sandymandy.pleasurecraft.freecam.config.gui.AutoConfigExtensions.ENTRY_BUILDER;
 
 class ModBindingsConfigImpl {
 

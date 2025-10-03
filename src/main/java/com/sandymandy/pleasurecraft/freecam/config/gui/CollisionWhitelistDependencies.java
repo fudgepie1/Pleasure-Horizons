@@ -1,10 +1,10 @@
-package com.sandymandy.pleasurecraft.config.gui;
+package com.sandymandy.pleasurecraft.freecam.config.gui;
 
 import me.shedaniel.autoconfig.gui.registry.GuiRegistry;
 import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
-import com.sandymandy.pleasurecraft.config.ModConfig;
+import com.sandymandy.pleasurecraft.freecam.config.ModConfig;
 
-import static com.sandymandy.pleasurecraft.config.gui.AutoConfigExtensions.isField;
+import static com.sandymandy.pleasurecraft.freecam.config.gui.AutoConfigExtensions.isField;
 
 class CollisionWhitelistDependencies {
 

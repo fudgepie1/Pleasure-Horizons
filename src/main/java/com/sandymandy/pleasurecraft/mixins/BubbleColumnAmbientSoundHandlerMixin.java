@@ -2,7 +2,7 @@ package com.sandymandy.pleasurecraft.mixins;
 
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.sound.BubbleColumnSoundPlayer;
-import com.sandymandy.pleasurecraft.util.FreeCamera;
+import com.sandymandy.pleasurecraft.freecam.FreeCamera;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;

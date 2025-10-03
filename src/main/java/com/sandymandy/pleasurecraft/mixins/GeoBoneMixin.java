@@ -1,6 +1,6 @@
 package com.sandymandy.pleasurecraft.mixins;
 
-import com.sandymandy.pleasurecraft.util.GeoBoneExtension;
+import com.sandymandy.pleasurecraft.util.renderer.GeoBoneExtension;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import software.bernie.geckolib.cache.object.GeoBone;

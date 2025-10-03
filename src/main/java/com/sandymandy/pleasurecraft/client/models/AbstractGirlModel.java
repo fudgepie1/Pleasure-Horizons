@@ -2,7 +2,7 @@ package com.sandymandy.pleasurecraft.client.models;
 
 import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.entity.base.AbstractGirlEntity;
-import com.sandymandy.pleasurecraft.util.GeoBoneExtension;
+import com.sandymandy.pleasurecraft.util.renderer.GeoBoneExtension;
 import com.sandymandy.pleasurecraft.registries.PleasureCraftDataTickets;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.Identifier;

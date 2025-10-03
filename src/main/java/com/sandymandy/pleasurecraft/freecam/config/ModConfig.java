@@ -1,4 +1,4 @@
-package com.sandymandy.pleasurecraft.config;
+package com.sandymandy.pleasurecraft.freecam.config;
 
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.ConfigData;
@@ -8,10 +8,10 @@ import me.shedaniel.autoconfig.annotation.ConfigEntry;
 import me.shedaniel.autoconfig.annotation.ConfigEntry.Gui.EnumHandler.EnumDisplayOption;
 import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
 import me.shedaniel.clothconfig2.gui.entries.SelectionListEntry;
-import com.sandymandy.pleasurecraft.config.gui.AutoConfigExtensions;
-import com.sandymandy.pleasurecraft.config.gui.ValidateRegex;
-import com.sandymandy.pleasurecraft.config.gui.BoundedContinuous;
-import com.sandymandy.pleasurecraft.config.gui.ModBindingsConfig;
+import com.sandymandy.pleasurecraft.freecam.config.gui.AutoConfigExtensions;
+import com.sandymandy.pleasurecraft.freecam.config.gui.ValidateRegex;
+import com.sandymandy.pleasurecraft.freecam.config.gui.BoundedContinuous;
+import com.sandymandy.pleasurecraft.freecam.config.gui.ModBindingsConfig;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;

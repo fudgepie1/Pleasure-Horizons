@@ -1,4 +1,4 @@
-package com.sandymandy.pleasurecraft.config.keys;
+package com.sandymandy.pleasurecraft.freecam.config.keys;
 
 @FunctionalInterface
 public interface HoldAction {

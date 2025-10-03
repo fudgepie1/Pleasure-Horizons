@@ -1,4 +1,4 @@
-package com.sandymandy.pleasurecraft.config.gui;
+package com.sandymandy.pleasurecraft.freecam.config.gui;
 
 import com.google.common.util.concurrent.AtomicDouble;
 import me.shedaniel.clothconfig2.gui.entries.TooltipListEntry;
@@ -23,7 +23,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import static com.sandymandy.pleasurecraft.Freecam.MC;
+import static com.sandymandy.pleasurecraft.freecam.Freecam.MC;
 
 class DoubleSliderEntry extends TooltipListEntry<Double> {
     private final Slider sliderWidget;

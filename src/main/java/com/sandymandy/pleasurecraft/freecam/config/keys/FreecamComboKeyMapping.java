@@ -1,4 +1,4 @@
-package com.sandymandy.pleasurecraft.config.keys;
+package com.sandymandy.pleasurecraft.freecam.config.keys;
 
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
