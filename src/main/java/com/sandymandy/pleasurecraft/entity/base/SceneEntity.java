@@ -1,5 +1,6 @@
 package com.sandymandy.pleasurecraft.entity.base;
 
+import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.entity.ai.goal.BedGoal;
 import com.sandymandy.pleasurecraft.entity.ai.goal.MoveToPlayerGoal;
 import com.sandymandy.pleasurecraft.entity.ai.goal.StopMovementGoal;
@@ -48,7 +49,7 @@ public class SceneEntity extends AbstractGirlEntity{
     private static final Random RANDOM = new Random();
 
     private String lastSceneAnim = "";
-    public String passengerBoneName = "Torso2";
+    public String passengerBoneName = "boyCam";
     BlockPos bedPos;
     private boolean swinging = false;
     private long lastSwing = 0L;
@@ -345,6 +346,8 @@ public class SceneEntity extends AbstractGirlEntity{
         soundHandler();
         messageHandler();
         handleSceneFootstepSounds();
+
+        PleasureCraft.LOGGER.info(this.getPassengerBonePosition()+"");
 
         playerModelLogic();
 

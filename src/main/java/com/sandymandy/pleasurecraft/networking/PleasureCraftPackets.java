@@ -77,7 +77,7 @@ public class PleasureCraftPackets {
                 (packet, context) -> Objects.requireNonNull(context.player().getServer()).execute(() -> {
                             var entity = context.player().getWorld().getEntityById(packet.entityId());
                             if (entity instanceof SceneEntity girl) {
-                                girl.setPassengerBonePosition(packet.position());
+                                girl.handlePassengerBone(packet.position());
                             }
 
                         }

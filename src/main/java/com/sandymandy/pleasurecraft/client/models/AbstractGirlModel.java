@@ -2,6 +2,7 @@ package com.sandymandy.pleasurecraft.client.models;
 
 import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.entity.base.AbstractGirlEntity;
+import com.sandymandy.pleasurecraft.util.GeoBoneExtension;
 import com.sandymandy.pleasurecraft.registries.PleasureCraftDataTickets;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.Identifier;
@@ -61,14 +62,15 @@ public abstract class AbstractGirlModel<T extends AbstractGirlEntity> extends Ge
             head.setRotY(-yaw * MathHelper.RADIANS_PER_DEGREE);
         }
 
-        var headBone = this.getAnimationProcessor().getBone("Head2");
+        GeoBone headBone = this.getAnimationProcessor().getBone("Head2");
         if (headBone != null) {
             MinecraftClient client = MinecraftClient.getInstance();
 
             boolean isFirstPerson = client.options.getPerspective().isFirstPerson();
             boolean isPlayerRider = client.cameraEntity == animationState.renderState().getGeckolibData(PleasureCraftDataTickets.GIRL_FIRST_PASSENGER);
 
-            headBone.setHidden(isFirstPerson && isPlayerRider);
+            ((GeoBoneExtension) headBone).setHiddenWithoutHidingChildren(isFirstPerson && isPlayerRider);
         }
+
     }
 }

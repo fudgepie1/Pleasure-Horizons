@@ -77,7 +77,7 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
     private int ticksSinceLastHit;
     private static final int MAX_TICKS_NO_HIT = 20 * 20;
     public float previousYaw = 0;
-    public float passengerYOffset = 0f;
+    public float passengerYOffset = -0.8f;
     public String currentAnimState = "idle";
     public boolean currentLoopState = false;
     public boolean currentHoldState = false;
@@ -100,14 +100,33 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
         return "null";
     }
 
-    protected int getMaxRelationshipLevel(){return 8;}
-
     public int getSizeGUI(){return 20;}
 
     public float getYAxisGUI(){return 0.0625F;}
 
     public List<SceneOptions> getSceneOptions() {
         return new ArrayList<>();
+    }
+
+    protected int maxRelationshipLevel() {
+        try {
+            // Get all scene options
+            List<SceneOptions> options = getSceneOptions();
+
+            // If null or empty, return default
+            if (options == null || options.isEmpty()) {
+                return 4;
+            }
+
+            // Find max requiredRelationshipLevel
+            return options.stream()
+                    .map(SceneOptions::requiredRelationshipLevel)
+                    .max(Integer::compareTo)
+                    .orElse(4); // fallback if stream is empty
+        } catch (Exception e) {
+            // In case something unexpected happens
+            return 4;
+        }
     }
 
     protected Map<EquipmentSlot, List<String>> getArmorBones() {
@@ -212,7 +231,7 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
                 if (this.isOwner(player)) {
 
                     if (itemInHand.equals(getTameItem())) {
-                        if(getCurrentRelationshipLevel() < getMaxRelationshipLevel()){
+                        if(getCurrentRelationshipLevel() < maxRelationshipLevel()){
                             itemStack.decrementUnlessCreative(1, player);
                             player.sendMessage(Text.literal("She Liked The Gift"), true);
                             setCurrentRelationshipLevel(getCurrentRelationshipLevel() + 1);
@@ -451,7 +470,6 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
         }
     }
 
-
     public void overrideBoneTexture(String boneName, Identifier texture) {
         if (this.boneTextureOverrides == null) this.boneTextureOverrides = new HashMap<>();
         this.boneTextureOverrides.put(boneName, texture);
@@ -652,6 +670,10 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
         return success;
     }
 
+    public void handlePassengerBone(Vec3d pos) {
+        boolean isZero = pos.lengthSquared() < 1.0E-12; // ~0
+        setPassengerBonePosition(isZero ? this.getPos() : pos.add(0, this.passengerYOffset, 0));
+    }
 
     public Vec3d getPassengerBone(){
         return getPassengerBonePosition();
@@ -659,19 +681,12 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
 
     @Override
     public Vec3d updatePassengerForDismount(LivingEntity passenger) {
-        return this.getPassengerBone().add(0,1,0);
+        return this.getPassengerBone();
     }
 
     @Override
     public Vec3d getPassengerRidingPos(Entity passenger) {
-        /*This is not based on the local coordinates from the entity. it is the global coordinates based on the world. It also has a base offset of -0.6 on the Y Axis
-        * This is also based on the client not the server*/
-        if(this.getPassengerBone() == Vec3d.ZERO){
-            return this.getPos().add(0,this.passengerYOffset,0);
-        }
-        else {
-            return this.getPassengerBone().add(0,this.passengerYOffset,0);
-        }
+        return this.getPassengerBone();
     }
 
     @Override

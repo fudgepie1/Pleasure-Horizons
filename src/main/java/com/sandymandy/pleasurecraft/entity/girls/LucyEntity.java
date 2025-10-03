@@ -35,11 +35,6 @@ public class LucyEntity extends SceneEntity {
     }
 
     @Override
-    protected int getMaxRelationshipLevel() {
-        return 10;
-    }
-
-    @Override
     public int getSizeGUI(){return 29;}
 
     @Override

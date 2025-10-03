@@ -46,8 +46,32 @@ public class MikaEntity extends SceneEntity {
                         List.of("carry_slow1"),
                         List.of("carry_fast"),
                         "carry_cum",
-                        .2f,
-                        false)
+                        2.5f,
+                        false),
+
+                SceneOptions.create("Missionary",
+                        8,
+                        List.of("missionary_intro"),
+                        List.of("missionary_slow"),
+                        List.of("missionary_fast"),
+                        "missionary_cum",
+                        6f,
+                        true,
+                        false,
+                        0.5f,
+                        List.of("sit_down", "sit_down_idle")),
+
+                SceneOptions.create("Cowgirl",
+                        10,
+                        List.of("cowgirl_intro"),
+                        List.of("cowgirl_slow"),
+                        List.of("cowgirl_fast"),
+                        "cowgirl_cum",
+                        6f,
+                        true,
+                        false,
+                        0.5f,
+                        List.of("sit_down", "sit_down_idle"))
         );
     }
 
