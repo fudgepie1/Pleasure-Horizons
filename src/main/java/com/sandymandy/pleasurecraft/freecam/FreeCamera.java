@@ -231,11 +231,11 @@ public class FreeCamera extends ClientPlayerEntity {
 
     @Override
     public void tickMovement() {
-        if (ModConfig.INSTANCE.movement.flightMode.equals(ModConfig.FlightMode.DEFAULT)) {
+        if (ModConfig.INSTANCE.freecamOptions.movement.flightMode.equals(ModConfig.FlightMode.DEFAULT)) {
             getAbilities().setFlySpeed(0);
-            Motion.doMotion(this, ModConfig.INSTANCE.movement.horizontalSpeed, ModConfig.INSTANCE.movement.verticalSpeed);
+            Motion.doMotion(this, ModConfig.INSTANCE.freecamOptions.movement.horizontalSpeed, ModConfig.INSTANCE.freecamOptions.movement.verticalSpeed);
         } else {
-            getAbilities().setFlySpeed((float) ModConfig.INSTANCE.movement.verticalSpeed / 10);
+            getAbilities().setFlySpeed((float) ModConfig.INSTANCE.freecamOptions.movement.verticalSpeed / 10);
         }
         super.tickMovement();
         getAbilities().flying = true;
