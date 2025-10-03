@@ -63,6 +63,6 @@ public class MinecraftMixin {
 
     @Unique
     private static boolean freecam$allowInteract() {
-        return ModConfig.INSTANCE.utility.allowInteract && ModConfig.INSTANCE.utility.interactionMode.equals(PLAYER);
+        return ModConfig.INSTANCE.freecamOptions.utility.allowInteract && ModConfig.INSTANCE.freecamOptions.utility.interactionMode.equals(PLAYER);
     }
 }

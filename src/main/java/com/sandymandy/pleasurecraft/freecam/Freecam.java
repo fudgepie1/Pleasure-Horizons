@@ -56,7 +56,7 @@ public class Freecam {
                 mc.player.input = input;
             }
 
-            mc.gameRenderer.setRenderHand(ModConfig.INSTANCE.visual.showHand);
+            mc.gameRenderer.setRenderHand(ModConfig.INSTANCE.freecamOptions.visual.showHand);
         }
     }
 
@@ -181,7 +181,7 @@ public class Freecam {
         MC.setCameraEntity(freeCamera);
         activeTripod = tripod;
 
-        if (ModConfig.INSTANCE.notification.notifyTripod) {
+        if (ModConfig.INSTANCE.freecamOptions.notification.notifyTripod) {
             MC.player.sendMessage(Text.translatable("msg.freecam.openTripod", tripod), true);
         }
     }
@@ -191,7 +191,7 @@ public class Freecam {
         onDisable();
 
         if (MC.player != null) {
-            if (ModConfig.INSTANCE.notification.notifyTripod) {
+            if (ModConfig.INSTANCE.freecamOptions.notification.notifyTripod) {
                 MC.player.sendMessage(Text.translatable("msg.freecam.closeTripod", activeTripod), true);
             }
         }
@@ -205,7 +205,7 @@ public class Freecam {
         freeCamera.spawn();
         MC.setCameraEntity(freeCamera);
 
-        if (ModConfig.INSTANCE.notification.notifyFreecam) {
+        if (ModConfig.INSTANCE.freecamOptions.notification.notifyFreecam) {
             MC.player.sendMessage(Text.translatable("msg.freecam.enable"), true);
         }
     }
@@ -214,7 +214,7 @@ public class Freecam {
         onDisable();
 
         if (MC.player != null) {
-            if (ModConfig.INSTANCE.notification.notifyFreecam) {
+            if (ModConfig.INSTANCE.freecamOptions.notification.notifyFreecam) {
                 MC.player.sendMessage(Text.translatable("msg.freecam.disable"), true);
             }
         }
@@ -222,7 +222,7 @@ public class Freecam {
 
     private static void onEnable() {
         MC.chunkCullingEnabled = false;
-        MC.gameRenderer.setRenderHand(ModConfig.INSTANCE.visual.showHand);
+        MC.gameRenderer.setRenderHand(ModConfig.INSTANCE.freecamOptions.visual.showHand);
 
         rememberedF5 = MC.options.getPerspective();
         if (MC.gameRenderer.getCamera().isThirdPerson()) {
@@ -257,7 +257,7 @@ public class Freecam {
             tripods.put(tripod, null);
         }
 
-        if (ModConfig.INSTANCE.notification.notifyTripod) {
+        if (ModConfig.INSTANCE.freecamOptions.notification.notifyTripod) {
             MC.player.sendMessage(Text.translatable("msg.freecam.tripodReset", tripod), true);
         }
     }
@@ -296,8 +296,8 @@ public class Freecam {
         }
         freeCamera.copyPositionAndRotation(MC.player);
         freeCamera.applyPerspective(
-                ModConfig.INSTANCE.visual.perspective,
-                ModConfig.INSTANCE.collision.alwaysCheck || !(ModConfig.INSTANCE.collision.ignoreAll)
+                ModConfig.INSTANCE.freecamOptions.visual.perspective,
+                ModConfig.INSTANCE.freecamOptions.collision.alwaysCheck || !(ModConfig.INSTANCE.freecamOptions.collision.ignoreAll)
         );
     }
 

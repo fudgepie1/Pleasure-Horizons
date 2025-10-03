@@ -13,7 +13,7 @@ public class LightTextureMixin {
 
     @WrapOperation(method = "update", at = @At(value = "INVOKE", target = "Ljava/lang/Double;floatValue()F", ordinal = 1))
     private float onSetBrightnessFactor(Double instance, Operation<Float> original) {
-        if (Freecam.isEnabled() && ModConfig.INSTANCE.visual.fullBright) {
+        if (Freecam.isEnabled() && ModConfig.INSTANCE.freecamOptions.visual.fullBright) {
             return Float.MAX_VALUE;
         }
         return original.call(instance);
