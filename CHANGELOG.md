@@ -5,6 +5,7 @@
 - Added Mika and replaced Bia with Momo from the village entity pool.
 - Added a progress bar when in a scene
 - Added 3 new scenes to Mika: Face Fuck, Missionary and CowGirl
+- Integrated FreeCam (By **NotNightSky**)
 
 ## 0.5.1
 - Fixed a bug where you would do a 360 when switching from the intro animation.

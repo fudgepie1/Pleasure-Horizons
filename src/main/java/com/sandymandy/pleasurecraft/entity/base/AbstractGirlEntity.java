@@ -180,7 +180,7 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
         builder.add(IS_PLAYER_MODEL_SLIM, false);
         builder.add(HAVING_SEX, false);
         builder.add(RELATIONSHIP_LEVEL,0);
-        builder.add(PASSENGER_BONE_POSITION, Vec3d.ZERO);
+        builder.add(PASSENGER_BONE_POSITION, this.getPos());
         builder.add(BASE_POS, this.getBlockPos());
         builder.add(OVERRIDE_ANIM,"");
         builder.add(SCENE_ANIM,"");
@@ -520,6 +520,10 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
         nbt.putInt("BaseY", this.getBasePos().getY());
         nbt.putInt("BaseZ", this.getBasePos().getZ());
 
+        nbt.putDouble("PassengerX", this.getPassengerBonePosition().getX());
+        nbt.putDouble("PassengerY", this.getPassengerBonePosition().getY());
+        nbt.putDouble("PassengerZ", this.getPassengerBonePosition().getZ());
+
     }
 
 
@@ -538,6 +542,12 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
             int z = nbt.getInt("BaseZ").get();
             this.setBasePos(new BlockPos(x, y, z));
         }
+
+        double x = nbt.getInt("PassengerX").get();
+        double y = nbt.getInt("PassengerY").get();
+        double z = nbt.getInt("PassengerZ").get();
+        this.setPassengerBonePosition(new Vec3d(x, y, z));
+
     }
 
     public void tick() {
@@ -675,18 +685,14 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
         setPassengerBonePosition(isZero ? this.getPos() : pos.add(0, this.passengerYOffset, 0));
     }
 
-    public Vec3d getPassengerBone(){
-        return getPassengerBonePosition();
-    }
-
     @Override
     public Vec3d updatePassengerForDismount(LivingEntity passenger) {
-        return this.getPassengerBone();
+        return this.getPassengerBonePosition();
     }
 
     @Override
     public Vec3d getPassengerRidingPos(Entity passenger) {
-        return this.getPassengerBone();
+        return this.getPassengerBonePosition();
     }
 
     @Override
