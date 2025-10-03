@@ -28,7 +28,7 @@ public class GameRendererMixin {
     @ModifyVariable(method = "findCrosshairTarget", at = @At("HEAD"), argsOnly = true)
     private Entity onUpdateTargetedEntity(Entity entity) {
         if (Freecam.isEnabled() && (Freecam.isPlayerControlEnabled()
-                || ModConfig.INSTANCE.utility.interactionMode.equals(ModConfig.InteractionMode.PLAYER))) {
+                || ModConfig.INSTANCE.freecamOptions.utility.interactionMode.equals(ModConfig.InteractionMode.PLAYER))) {
             return MC.player;
         }
         return entity;
@@ -38,6 +38,6 @@ public class GameRendererMixin {
 
     @Unique
     private static boolean freecam$allowInteract() {
-        return ModConfig.INSTANCE.utility.allowInteract && ModConfig.INSTANCE.utility.interactionMode.equals(PLAYER);
+        return ModConfig.INSTANCE.freecamOptions.utility.allowInteract && ModConfig.INSTANCE.freecamOptions.utility.interactionMode.equals(PLAYER);
     }
 }

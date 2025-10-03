@@ -33,7 +33,7 @@ public class ModConfig implements ConfigData {
     }
 
     @ConfigEntry.Gui.Tooltip
-    @ConfigEntry.Gui.CollapsibleObject(startExpanded = true)
+    @ConfigEntry.Gui.CollapsibleObject(startExpanded = false)
     public FreecamOptions freecamOptions = new FreecamOptions();
     public static class FreecamOptions {
         @ConfigEntry.Gui.CollapsibleObject
@@ -60,7 +60,6 @@ public class ModConfig implements ConfigData {
         private Object keys;
     }
 
-    public MovementConfig movement = new MovementConfig();
     public static class MovementConfig {
         @ConfigEntry.Gui.Tooltip
         @ConfigEntry.Gui.EnumHandler(option = EnumDisplayOption.BUTTON)
@@ -75,7 +74,6 @@ public class ModConfig implements ConfigData {
         public double verticalSpeed = 1.0;
     }
 
-    public CollisionConfig collision = new CollisionConfig();
     public static class CollisionConfig {
         @ConfigEntry.Gui.Tooltip
         public boolean ignoreTransparent = false;
@@ -102,7 +100,6 @@ public class ModConfig implements ConfigData {
         public boolean alwaysCheck = false;
     }
 
-    public VisualConfig visual = new VisualConfig();
     public static class VisualConfig {
         @ConfigEntry.Gui.Tooltip
         @ConfigEntry.Gui.EnumHandler(option = EnumDisplayOption.BUTTON)
@@ -121,7 +118,6 @@ public class ModConfig implements ConfigData {
         public boolean showSubmersion = false;
     }
 
-    public UtilityConfig utility = new UtilityConfig();
     public static class UtilityConfig {
         @ConfigEntry.Gui.Tooltip
         public boolean disableOnDamage = true;
@@ -134,8 +130,7 @@ public class ModConfig implements ConfigData {
         @ConfigEntry.Gui.EnumHandler(option = EnumDisplayOption.BUTTON)
         public InteractionMode interactionMode = InteractionMode.CAMERA;
     }
-
-    public NotificationConfig notification = new NotificationConfig();
+    
     public static class NotificationConfig {
         @ConfigEntry.Gui.Tooltip
         public boolean notifyFreecam = true;
