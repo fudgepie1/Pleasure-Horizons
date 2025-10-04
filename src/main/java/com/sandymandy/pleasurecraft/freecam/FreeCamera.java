@@ -17,7 +17,7 @@ import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.resource.featuretoggle.FeatureSet;
 import net.minecraft.server.ServerLinks;
 import net.minecraft.util.math.BlockPos;
-import com.sandymandy.pleasurecraft.freecam.config.ModConfig;
+import com.sandymandy.pleasurecraft.config.ModConfig;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Collections;
@@ -231,11 +231,11 @@ public class FreeCamera extends ClientPlayerEntity {
 
     @Override
     public void tickMovement() {
-        if (ModConfig.INSTANCE.freecamOptions.movement.flightMode.equals(ModConfig.FlightMode.DEFAULT)) {
+        if (ModConfig.INSTANCE.movement.flightMode.equals(ModConfig.FlightMode.DEFAULT)) {
             getAbilities().setFlySpeed(0);
-            Motion.doMotion(this, ModConfig.INSTANCE.freecamOptions.movement.horizontalSpeed, ModConfig.INSTANCE.freecamOptions.movement.verticalSpeed);
+            Motion.doMotion(this, ModConfig.INSTANCE.movement.horizontalSpeed, ModConfig.INSTANCE.movement.verticalSpeed);
         } else {
-            getAbilities().setFlySpeed((float) ModConfig.INSTANCE.freecamOptions.movement.verticalSpeed / 10);
+            getAbilities().setFlySpeed((float) ModConfig.INSTANCE.movement.verticalSpeed / 10);
         }
         super.tickMovement();
         getAbilities().flying = true;

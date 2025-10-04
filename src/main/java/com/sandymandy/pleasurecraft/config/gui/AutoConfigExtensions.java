@@ -1,4 +1,4 @@
-package com.sandymandy.pleasurecraft.freecam.config.gui;
+package com.sandymandy.pleasurecraft.config.gui;
 
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.ConfigData;

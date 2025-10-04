@@ -1,4 +1,4 @@
-package com.sandymandy.pleasurecraft.freecam.config.gui;
+package com.sandymandy.pleasurecraft.config.gui;
 
 import com.google.common.util.concurrent.AtomicDouble;
 import me.shedaniel.clothconfig2.gui.entries.TooltipListEntry;

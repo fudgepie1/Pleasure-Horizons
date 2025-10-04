@@ -1,14 +1,14 @@
 package com.sandymandy.pleasurecraft.mixins;
 
 import com.sandymandy.pleasurecraft.freecam.Freecam;
-import com.sandymandy.pleasurecraft.freecam.config.ModConfig;
+import com.sandymandy.pleasurecraft.config.ModConfig;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import static com.sandymandy.pleasurecraft.freecam.Freecam.MC;
-import static com.sandymandy.pleasurecraft.freecam.config.ModConfig.InteractionMode.PLAYER;
+import static com.sandymandy.pleasurecraft.config.ModConfig.InteractionMode.PLAYER;
 
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.entity.Entity;
@@ -28,7 +28,7 @@ public class GameRendererMixin {
     @ModifyVariable(method = "findCrosshairTarget", at = @At("HEAD"), argsOnly = true)
     private Entity onUpdateTargetedEntity(Entity entity) {
         if (Freecam.isEnabled() && (Freecam.isPlayerControlEnabled()
-                || ModConfig.INSTANCE.freecamOptions.utility.interactionMode.equals(ModConfig.InteractionMode.PLAYER))) {
+                || ModConfig.INSTANCE.utility.interactionMode.equals(ModConfig.InteractionMode.PLAYER))) {
             return MC.player;
         }
         return entity;
@@ -38,6 +38,6 @@ public class GameRendererMixin {
 
     @Unique
     private static boolean freecam$allowInteract() {
-        return ModConfig.INSTANCE.freecamOptions.utility.allowInteract && ModConfig.INSTANCE.freecamOptions.utility.interactionMode.equals(PLAYER);
+        return ModConfig.INSTANCE.utility.allowInteract && ModConfig.INSTANCE.utility.interactionMode.equals(PLAYER);
     }
 }

@@ -5,7 +5,7 @@ import net.minecraft.client.render.Camera;
 import net.minecraft.entity.Entity;
 import net.minecraft.world.BlockView;
 import com.sandymandy.pleasurecraft.freecam.Freecam;
-import com.sandymandy.pleasurecraft.freecam.config.ModConfig;
+import com.sandymandy.pleasurecraft.config.ModConfig;
 import com.sandymandy.pleasurecraft.freecam.FreeCamera;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -36,7 +36,7 @@ public class CameraMixin {
     // Removes the submersion overlay when underwater, in lava, or powdered snow.
     @Inject(method = "getSubmersionType", at = @At("HEAD"), cancellable = true)
     public void onGetSubmersionType(CallbackInfoReturnable<CameraSubmersionType> cir) {
-        if (Freecam.isEnabled() && !ModConfig.INSTANCE.freecamOptions.visual.showSubmersion) {
+        if (Freecam.isEnabled() && !ModConfig.INSTANCE.visual.showSubmersion) {
             cir.setReturnValue(CameraSubmersionType.NONE);
         }
     }

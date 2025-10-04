@@ -1,7 +1,7 @@
 package com.sandymandy.pleasurecraft.mixins;
 
 import com.sandymandy.pleasurecraft.freecam.Freecam;
-import com.sandymandy.pleasurecraft.freecam.config.ModConfig;
+import com.sandymandy.pleasurecraft.config.ModConfig;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import static com.sandymandy.pleasurecraft.freecam.Freecam.MC;
-import static com.sandymandy.pleasurecraft.freecam.config.ModConfig.FlightMode.CREATIVE;
+import static com.sandymandy.pleasurecraft.config.ModConfig.FlightMode.CREATIVE;
 
 import net.minecraft.entity.LivingEntity;
 
@@ -22,15 +22,15 @@ public abstract class LivingEntityMixin {
     // Allows for the horizontal speed of creative flight to be configured separately from vertical speed.
     @Inject(method = "getMovementSpeed()F", at = @At("HEAD"), cancellable = true)
     private void onGetMovementSpeed(CallbackInfoReturnable<Float> cir) {
-        if (Freecam.isEnabled() && ModConfig.INSTANCE.freecamOptions.movement.flightMode.equals(CREATIVE) && this.equals(Freecam.getFreeCamera())) {
-            cir.setReturnValue((float) (ModConfig.INSTANCE.freecamOptions.movement.horizontalSpeed / 10) * (Freecam.getFreeCamera().isSprinting() ? 2 : 1));
+        if (Freecam.isEnabled() && ModConfig.INSTANCE.movement.flightMode.equals(CREATIVE) && this.equals(Freecam.getFreeCamera())) {
+            cir.setReturnValue((float) (ModConfig.INSTANCE.movement.horizontalSpeed / 10) * (Freecam.getFreeCamera().isSprinting() ? 2 : 1));
         }
     }
 
     // Disables freecam upon receiving damage if disableOnDamage is enabled.
     @Inject(method = "setHealth", at = @At("HEAD"))
     private void onSetHealth(float health, CallbackInfo ci) {
-        if (Freecam.isEnabled() && ModConfig.INSTANCE.freecamOptions.utility.disableOnDamage && this.equals(MC.player)) {
+        if (Freecam.isEnabled() && ModConfig.INSTANCE.utility.disableOnDamage && this.equals(MC.player)) {
             if (!MC.player.isCreative() && getHealth() > health) {
                 Freecam.disableNextTick();
             }

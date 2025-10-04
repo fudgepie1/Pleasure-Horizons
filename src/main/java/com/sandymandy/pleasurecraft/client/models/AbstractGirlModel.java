@@ -1,6 +1,7 @@
 package com.sandymandy.pleasurecraft.client.models;
 
 import com.sandymandy.pleasurecraft.PleasureCraft;
+import com.sandymandy.pleasurecraft.config.ModConfig;
 import com.sandymandy.pleasurecraft.entity.base.AbstractGirlEntity;
 import com.sandymandy.pleasurecraft.util.renderer.GeoBoneExtension;
 import com.sandymandy.pleasurecraft.registries.PleasureCraftDataTickets;
@@ -70,6 +71,11 @@ public abstract class AbstractGirlModel<T extends AbstractGirlEntity> extends Ge
             boolean isPlayerRider = client.cameraEntity == animationState.renderState().getGeckolibData(PleasureCraftDataTickets.GIRL_FIRST_PASSENGER);
 
             ((GeoBoneExtension) headBone).setHiddenWithoutHidingChildren(isFirstPerson && isPlayerRider);
+        }
+
+        GeoBone boobWindow = this.getAnimationProcessor().getBone("boobWindow");
+        if (boobWindow != null) {
+            boobWindow.setHidden(ModConfig.INSTANCE.girls.boobWindow);
         }
 
     }

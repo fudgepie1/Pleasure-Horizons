@@ -6,6 +6,8 @@
 - Added a progress bar when in a scene
 - Added 3 new scenes to Mika: Face Fuck, Missionary and CowGirl
 - Integrated FreeCam (By **NotNightSky**)
+- Added an option to have a boob window in the armor
+- Implemented Mod Menu
 
 ## 0.5.1
 - Fixed a bug where you would do a 360 when switching from the intro animation.
@@ -61,8 +63,9 @@
 
 ## TODO
 - [x] Fix the animation randomizer in the Scene.
+- [x] FreeCam integration
+- [ ] Togglable Boob Window
 - [ ] Make the AI more advance.
 - [ ] Fix Attacking animation.
 - [ ] Fix Holding item.
 - [ ] Dialog.
-- [ ] FreeCam integration 

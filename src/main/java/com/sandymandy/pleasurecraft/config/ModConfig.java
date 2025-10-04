@@ -1,4 +1,4 @@
-package com.sandymandy.pleasurecraft.freecam.config;
+package com.sandymandy.pleasurecraft.config;
 
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.ConfigData;
@@ -8,16 +8,16 @@ import me.shedaniel.autoconfig.annotation.ConfigEntry;
 import me.shedaniel.autoconfig.annotation.ConfigEntry.Gui.EnumHandler.EnumDisplayOption;
 import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
 import me.shedaniel.clothconfig2.gui.entries.SelectionListEntry;
-import com.sandymandy.pleasurecraft.freecam.config.gui.AutoConfigExtensions;
-import com.sandymandy.pleasurecraft.freecam.config.gui.ValidateRegex;
-import com.sandymandy.pleasurecraft.freecam.config.gui.BoundedContinuous;
-import com.sandymandy.pleasurecraft.freecam.config.gui.ModBindingsConfig;
+import com.sandymandy.pleasurecraft.config.gui.AutoConfigExtensions;
+import com.sandymandy.pleasurecraft.config.gui.ValidateRegex;
+import com.sandymandy.pleasurecraft.config.gui.BoundedContinuous;
+import com.sandymandy.pleasurecraft.config.gui.ModBindingsConfig;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Config(name = "freecam")
+@Config(name = "pleasurecraft")
 public class ModConfig implements ConfigData {
 
     @ConfigEntry.Gui.Excluded
@@ -32,28 +32,38 @@ public class ModConfig implements ConfigData {
         CollisionBehavior.onConfigChange(holder, INSTANCE); // Listener isn't called on initial load...
     }
 
-    @ConfigEntry.Gui.Tooltip
-    @ConfigEntry.Gui.CollapsibleObject(startExpanded = false)
-    public FreecamOptions freecamOptions = new FreecamOptions();
-    public static class FreecamOptions {
-        @ConfigEntry.Gui.CollapsibleObject
-        public ControlsConfig controls = new ControlsConfig();
+    @ConfigEntry.Gui.CollapsibleObject
+    public GirlConfig girls = new GirlConfig();
 
-        @ConfigEntry.Gui.CollapsibleObject
-        public MovementConfig movement = new MovementConfig();
 
-        @ConfigEntry.Gui.CollapsibleObject
-        public CollisionConfig collision = new CollisionConfig();
-
-        @ConfigEntry.Gui.CollapsibleObject
-        public VisualConfig visual = new VisualConfig();
-
-        @ConfigEntry.Gui.CollapsibleObject
-        public UtilityConfig utility = new UtilityConfig();
-
-        @ConfigEntry.Gui.CollapsibleObject
-        public NotificationConfig notification = new NotificationConfig();
+    public static class GirlConfig {
+        @ConfigEntry.Gui.Tooltip
+        public boolean boobWindow = false;
     }
+
+    @ConfigEntry.Category("freecam")
+    @ConfigEntry.Gui.CollapsibleObject
+    public ControlsConfig controls = new ControlsConfig();
+
+    @ConfigEntry.Category("freecam")
+    @ConfigEntry.Gui.CollapsibleObject
+    public MovementConfig movement = new MovementConfig();
+
+    @ConfigEntry.Category("freecam")
+    @ConfigEntry.Gui.CollapsibleObject
+    public CollisionConfig collision = new CollisionConfig();
+
+    @ConfigEntry.Category("freecam")
+    @ConfigEntry.Gui.CollapsibleObject
+    public VisualConfig visual = new VisualConfig();
+
+    @ConfigEntry.Category("freecam")
+    @ConfigEntry.Gui.CollapsibleObject
+    public UtilityConfig utility = new UtilityConfig();
+
+    @ConfigEntry.Category("freecam")
+    @ConfigEntry.Gui.CollapsibleObject
+    public NotificationConfig notification = new NotificationConfig();
 
     public static class ControlsConfig {
         @ModBindingsConfig
@@ -146,7 +156,7 @@ public class ModConfig implements ConfigData {
         private final String key;
 
         FlightMode(String name) {
-            this.key = "text.autoconfig.freecam.option.movement.flightMode." + name;
+            this.key = "text.autoconfig.pleasurecraft.option.movement.flightMode." + name;
         }
 
         @Override
@@ -162,7 +172,7 @@ public class ModConfig implements ConfigData {
         private final String key;
 
         InteractionMode(String name) {
-            this.key = "text.autoconfig.freecam.option.utility.interactionMode." + name;
+            this.key = "text.autoconfig.pleasurecraft.option.utility.interactionMode." + name;
         }
 
         @Override
@@ -180,7 +190,7 @@ public class ModConfig implements ConfigData {
         private final String key;
 
         Perspective(String name) {
-            this.key = "text.autoconfig.freecam.option.visual.perspective." + name;
+            this.key = "text.autoconfig.pleasurecraft.option.visual.perspective." + name;
         }
 
         @Override

@@ -329,6 +329,7 @@ public class SceneEntity extends AbstractGirlEntity{
         if(!this.getCurrentScenePhase().equals(ScenePhase.HAVING_SEX)){
             return;
         }
+
         String key = getAnimationKeyFrameEvent();
 
         if (key.contains("Switch") || key.contains("Reset") || key.contains("thrust")) {

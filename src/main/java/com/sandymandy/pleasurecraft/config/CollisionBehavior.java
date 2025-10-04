@@ -1,4 +1,4 @@
-package com.sandymandy.pleasurecraft.freecam.config;
+package com.sandymandy.pleasurecraft.config;
 
 import me.shedaniel.autoconfig.ConfigHolder;
 import net.minecraft.block.BarrierBlock;
@@ -34,19 +34,19 @@ public class CollisionBehavior {
 
     @SuppressWarnings("RedundantIfStatement")
     public static boolean isIgnored(Block block) {
-        if (ModConfig.INSTANCE.freecamOptions.collision.ignoreAll) {
+        if (ModConfig.INSTANCE.collision.ignoreAll) {
             return true;
         }
 
-        if (ModConfig.INSTANCE.freecamOptions.collision.ignoreTransparent && transparent.test(block)) {
+        if (ModConfig.INSTANCE.collision.ignoreTransparent && transparent.test(block)) {
             return true;
         }
 
-        if (ModConfig.INSTANCE.freecamOptions.collision.ignoreOpenable && openable.test(block)) {
+        if (ModConfig.INSTANCE.collision.ignoreOpenable && openable.test(block)) {
             return true;
         }
 
-        if (ModConfig.INSTANCE.freecamOptions.collision.ignoreCustom && custom.test(block)) {
+        if (ModConfig.INSTANCE.collision.ignoreCustom && custom.test(block)) {
             return true;
         }
 
@@ -54,11 +54,11 @@ public class CollisionBehavior {
     }
 
     static ActionResult onConfigChange(ConfigHolder<ModConfig> holder, ModConfig config) {
-        String[] ids = config.freecamOptions.collision.whitelist.ids.stream()
+        String[] ids = config.collision.whitelist.ids.stream()
                 .map(id -> id.contains(":") ? id : "minecraft:" + id)
                 .toArray(String[]::new);
 
-        Pattern[] patterns = config.freecamOptions.collision.whitelist.patterns.stream()
+        Pattern[] patterns = config.collision.whitelist.patterns.stream()
                 .map(Pattern::compile)
                 .toArray(Pattern[]::new);
 

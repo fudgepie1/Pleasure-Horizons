@@ -1,8 +1,8 @@
-package com.sandymandy.pleasurecraft.freecam.config.gui;
+package com.sandymandy.pleasurecraft.config.gui;
 
 import me.shedaniel.autoconfig.annotation.ConfigEntry;
 import me.shedaniel.clothconfig2.gui.entries.KeyCodeEntry;
-import com.sandymandy.pleasurecraft.freecam.config.ModBindings;
+import com.sandymandy.pleasurecraft.config.ModBindings;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

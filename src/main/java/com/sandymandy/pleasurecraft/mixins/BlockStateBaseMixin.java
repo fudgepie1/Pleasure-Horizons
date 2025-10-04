@@ -9,8 +9,8 @@ import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import com.sandymandy.pleasurecraft.freecam.Freecam;
-import com.sandymandy.pleasurecraft.freecam.config.CollisionBehavior;
-import com.sandymandy.pleasurecraft.freecam.config.ModConfig;
+import com.sandymandy.pleasurecraft.config.CollisionBehavior;
+import com.sandymandy.pleasurecraft.config.ModConfig;
 import com.sandymandy.pleasurecraft.freecam.FreeCamera;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -27,7 +27,7 @@ public abstract class BlockStateBaseMixin {
     private void onGetCollisionShape(BlockView world, BlockPos pos, ShapeContext context, CallbackInfoReturnable<VoxelShape> cir) {
         if (context instanceof EntityShapeContext entityShapeContext && entityShapeContext.getEntity() instanceof FreeCamera) {
             // Return early if "Always Check Initial Collision" is on and Freecam isn't enabled yet
-            if (ModConfig.INSTANCE.freecamOptions.collision.alwaysCheck && !Freecam.isEnabled()) {
+            if (ModConfig.INSTANCE.collision.alwaysCheck && !Freecam.isEnabled()) {
                 return;
             }
             // Otherwise, check the collision config

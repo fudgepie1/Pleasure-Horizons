@@ -1,4 +1,4 @@
-package com.sandymandy.pleasurecraft.freecam.config.keys;
+package com.sandymandy.pleasurecraft.config.keys;
 
 import java.util.function.Consumer;
 import net.minecraft.client.option.KeyBinding;

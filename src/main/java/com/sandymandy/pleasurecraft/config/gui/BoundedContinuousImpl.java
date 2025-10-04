@@ -1,4 +1,4 @@
-package com.sandymandy.pleasurecraft.freecam.config.gui;
+package com.sandymandy.pleasurecraft.config.gui;
 
 import me.shedaniel.autoconfig.gui.registry.GuiRegistry;
 import me.shedaniel.autoconfig.util.Utils;
@@ -7,7 +7,7 @@ import java.util.Collections;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import static com.sandymandy.pleasurecraft.freecam.config.gui.AutoConfigExtensions.RESET_TEXT;
+import static com.sandymandy.pleasurecraft.config.gui.AutoConfigExtensions.RESET_TEXT;
 
 class BoundedContinuousImpl {
 

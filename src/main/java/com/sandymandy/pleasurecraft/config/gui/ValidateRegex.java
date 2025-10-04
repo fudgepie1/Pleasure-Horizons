@@ -1,4 +1,4 @@
-package com.sandymandy.pleasurecraft.freecam.config.gui;
+package com.sandymandy.pleasurecraft.config.gui;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

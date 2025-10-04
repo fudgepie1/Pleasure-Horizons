@@ -1,7 +1,7 @@
 package com.sandymandy.pleasurecraft.mixins;
 
 import com.sandymandy.pleasurecraft.freecam.Freecam;
-import com.sandymandy.pleasurecraft.freecam.config.ModConfig;
+import com.sandymandy.pleasurecraft.config.ModConfig;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -71,6 +71,6 @@ public class EntityMixin {
 
     @Unique
     private boolean freecam$allowFreeze() {
-        return ModConfig.INSTANCE.freecamOptions.utility.freezePlayer && !Freecam.isPlayerControlEnabled();
+        return ModConfig.INSTANCE.utility.freezePlayer && !Freecam.isPlayerControlEnabled();
     }
 }
