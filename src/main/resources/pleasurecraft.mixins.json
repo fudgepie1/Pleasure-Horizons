@@ -6,16 +6,16 @@
   "mixins": [
   ],
   "client": [
-    "GeoBoneMixin",
-    "OptionsMixin",
     "BlockStateBaseMixin",
     "BubbleColumnAmbientSoundHandlerMixin",
     "CameraMixin",
     "ClientPacketListenerMixin",
     "EntityMixin",
+    "EntityRenderDispatcherAccessor",
     "EntityRenderDispatcherMixin",
     "EntityRendererMixin",
     "GameRendererMixin",
+    "GeoBoneMixin",
     "GuiMixin",
     "ItemInHandRendererMixin",
     "LevelRendererMixin",
@@ -23,8 +23,9 @@
     "LivingEntityMixin",
     "LocalPlayerMixin",
     "MinecraftMixin",
-    "EntityRenderDispatcherAccessor",
-    "MultiPlayerGameModeMixin"
+    "MultiPlayerGameModeMixin",
+    "OptionsMixin",
+    "ScreenHandlerMixin"
   ],
   "injectors": {
     "defaultRequire": 1
