@@ -19,10 +19,6 @@ class CollisionDependencies {
     private CollisionDependencies() {}
 
     static void apply(GuiRegistry guiRegistry) {
-        // FIXME These transformers assume that no subsequent GUI transformers will replace
-        //       the widgets. That's fine, so long as nothing changes, however a dedicated
-        //       AutoConfig requirements API would be better.
-        //
         // NOTE The Cloth Config Requirements API is currently marked "unstable", although
         //      significant changes seem unlikely.
 
