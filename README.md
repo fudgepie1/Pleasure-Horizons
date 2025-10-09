@@ -52,7 +52,9 @@ https://discord.gg/bjRXDZU3Xa
 > Before you can do anything with the girls you need to tame and improve your relationship with them by using the corresponding flower
 > 
 > **Momo**: Poppy
+>
 > **Lucy**: Allium
+>
 > **Mika**: Open Eyeblossoms
 > 
 > Then just right click on the girl to open up the entity GUI.
