@@ -46,7 +46,8 @@ https://discord.gg/bjRXDZU3Xa
 
 ---
 
-**Frequently Asked Questions**
+## Frequently Asked Questions
+
 ➞ **How do I interact with the girls**
 > Before you can do anything with the girls you need to tame and improve your relationship with them by using the corresponding flower
 > 
