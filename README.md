@@ -46,6 +46,25 @@ https://discord.gg/bjRXDZU3Xa
 
 ---
 
+**Frequently Asked Questions**
+➞ **How do I interact with the girls**
+> Before you can do anything with the girls you need to tame and improve your relationship with them by using the corresponding flower
+> 
+> **Momo**: Poppy
+> **Lucy**: Allium
+> **Mika**: Open Eyeblossoms
+> 
+> Then just right click on the girl to open up the entity GUI.
+> To start a scene just level them up to at least level 4 then click the talk button. which then opens up all the possible scene interactions 
+
+➞ **Can you add "x" character**
+> Maybe, if you have a model and animations that you made or got permission to use then i could add said character later down the line
+
+➞ **How do I thrust and cum when having sex with the girls**
+> The default button for thrusting is "Z" and the default button for cumming is "V" but they can be changed in the change keybind screen
+
+---
+
 ## Requirements
 
 - [Fabric Loader](https://fabricmc.net/)
@@ -53,7 +72,7 @@ https://discord.gg/bjRXDZU3Xa
 - [GeckoLib](https://modrinth.com/mod/geckolib)
 - [Cloth Config](https://modrinth.com/mod/cloth-config)
 - [Mod Menu (Optional)](https://modrinth.com/mod/modmenu)
-- Minecraft **1.21+**
+- Minecraft **1.21+** _(just check in with the faq on the discord)_
 
 ---
 
