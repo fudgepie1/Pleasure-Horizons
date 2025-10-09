@@ -116,6 +116,7 @@ public abstract class AbstractGirlRenderer<T extends SceneEntity, R extends Livi
         renderState.addGeckolibData(PleasureCraftDataTickets.GIRL_BONE_UV_OFFSETS, animatable.boneUVOffsets);
         renderState.addGeckolibData(PleasureCraftDataTickets.GIRL_BONE_TEXTURE_OVERRIDES, new HashMap<>(animatable.boneTextureOverrides));
         renderState.addGeckolibData(PleasureCraftDataTickets.PLAYER_TEXTURES, new HashMap<>(animatable.playerTexture));
+        renderState.addGeckolibData(PleasureCraftDataTickets.GIRL_BONE_COLOR_OVERRIDES, new HashMap<>(animatable.boneColorOverrides));
         renderState.addGeckolibData(PleasureCraftDataTickets.PASSENGER_BONE_NAME, animatable.passengerBoneName);
     }
 
@@ -193,6 +194,7 @@ public abstract class AbstractGirlRenderer<T extends SceneEntity, R extends Livi
             }
         }
 
+
         // Player textures overlay (render on top of whatever)
         if (playerTextures != null && !playerTextures.isEmpty()) {
             for (Map.Entry<String, Identifier> e : playerTextures.entrySet()) {
@@ -208,6 +210,8 @@ public abstract class AbstractGirlRenderer<T extends SceneEntity, R extends Livi
                 });
             }
         }
+
+
     }
 
     @Override
@@ -224,6 +228,7 @@ public abstract class AbstractGirlRenderer<T extends SceneEntity, R extends Livi
 
         Map<String, Identifier> boneTexOverrides = renderState.getGeckolibData(PleasureCraftDataTickets.GIRL_BONE_TEXTURE_OVERRIDES);
         Map<String, Vec2f> boneUVOffsets = renderState.getGeckolibData(PleasureCraftDataTickets.GIRL_BONE_UV_OFFSETS);
+        Map<String, Integer> boneColorOverrides = renderState.getGeckolibData(PleasureCraftDataTickets.GIRL_BONE_COLOR_OVERRIDES);
 
         // Skip rendering this bone in the base pass if it has a texture override
         if (boneTexOverrides != null && boneTexOverrides.containsKey(bone.getName())) {
@@ -231,6 +236,8 @@ public abstract class AbstractGirlRenderer<T extends SceneEntity, R extends Livi
         }
 
         VertexConsumer targetBuffer = buffer;
+
+        int targetColor = renderColor;
 
         // Still allow UV offset
         if (boneUVOffsets != null && boneUVOffsets.containsKey(bone.getName())) {
@@ -242,7 +249,14 @@ public abstract class AbstractGirlRenderer<T extends SceneEntity, R extends Livi
             }
         }
 
+        if (boneColorOverrides != null && !boneColorOverrides.isEmpty()) {
+            Integer color = boneColorOverrides.get(bone.getName());
+            if (color != null){
+                targetColor = color;
+            }
+        }
+
         super.renderRecursively(renderState, poseStack, bone, renderType, bufferSource,
-                targetBuffer, isReRender, packedLight, packedOverlay, renderColor);
+                targetBuffer, isReRender, packedLight, packedOverlay, targetColor);
     }
 }

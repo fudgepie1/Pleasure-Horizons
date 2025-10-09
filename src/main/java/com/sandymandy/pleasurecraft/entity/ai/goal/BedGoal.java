@@ -1,7 +1,7 @@
 package com.sandymandy.pleasurecraft.entity.ai.goal;
 
 import com.sandymandy.pleasurecraft.entity.base.SceneEntity;
-import com.sandymandy.pleasurecraft.util.ScenePhase;
+import com.sandymandy.pleasurecraft.util.variables.ScenePhase;
 import com.sandymandy.pleasurecraft.util.Utils;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.ai.pathing.BirdNavigation;

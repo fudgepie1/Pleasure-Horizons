@@ -1,6 +1,5 @@
 package com.sandymandy.pleasurecraft.entity.base;
 
-import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.entity.ai.goal.BedGoal;
 import com.sandymandy.pleasurecraft.entity.ai.goal.MoveToPlayerGoal;
 import com.sandymandy.pleasurecraft.entity.ai.goal.StopMovementGoal;
@@ -9,8 +8,8 @@ import com.sandymandy.pleasurecraft.networking.C2S.*;
 import com.sandymandy.pleasurecraft.networking.S2C.PlayCumHudAnimationS2CPacket;
 import com.sandymandy.pleasurecraft.registries.PleasureCraftTrackedData;
 import com.sandymandy.pleasurecraft.registries.SceneKeyframeRegistry;
-import com.sandymandy.pleasurecraft.util.SceneOptions;
-import com.sandymandy.pleasurecraft.util.ScenePhase;
+import com.sandymandy.pleasurecraft.util.variables.SceneOptions;
+import com.sandymandy.pleasurecraft.util.variables.ScenePhase;
 import com.sandymandy.pleasurecraft.util.Utils;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -262,9 +261,12 @@ public class SceneEntity extends AbstractGirlEntity{
 
         this.toggleModelBones(List.of("RightLeg", "LeftLeg", "Torso2"), isActivePhase );
 
-        this.toggleModelBones(List.of("rightLowerArmAlex", "rightArmAlex", "leftLowerArmAlex", "leftArmAlex"), isPlayerModelSlim() && isActivePhase );
+        List<String> Slim = List.of("rightArmAlex", "rightLowerArmAlex", "leftLowerArmAlex", "leftArmAlex");
+        List<String> Wide = List.of("rightArmSteve", "rightLowerArmSteve", "leftLowerArmSteve", "leftArmSteve");
 
-        this.toggleModelBones(List.of("rightLowerArmSteve", "rightArmSteve", "leftLowerArmSteve", "leftArmSteve"), !isPlayerModelSlim() && isActivePhase );
+        this.toggleModelBones(Slim , isPlayerModelSlim() && isActivePhase );
+
+        this.toggleModelBones(Wide , !isPlayerModelSlim() && isActivePhase );
 
     }
     private String lastSoundKey = null;

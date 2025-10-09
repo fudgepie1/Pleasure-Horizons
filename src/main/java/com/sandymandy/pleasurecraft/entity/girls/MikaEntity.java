@@ -2,7 +2,7 @@ package com.sandymandy.pleasurecraft.entity.girls;
 
 import com.sandymandy.pleasurecraft.entity.base.AbstractGirlEntity;
 import com.sandymandy.pleasurecraft.entity.base.SceneEntity;
-import com.sandymandy.pleasurecraft.util.SceneOptions;
+import com.sandymandy.pleasurecraft.util.variables.SceneOptions;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;

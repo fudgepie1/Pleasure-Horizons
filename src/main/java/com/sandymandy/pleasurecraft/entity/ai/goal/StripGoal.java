@@ -1,7 +1,7 @@
 package com.sandymandy.pleasurecraft.entity.ai.goal;
 
 import com.sandymandy.pleasurecraft.entity.base.SceneEntity;
-import com.sandymandy.pleasurecraft.util.SceneOptions;
+import com.sandymandy.pleasurecraft.util.variables.SceneOptions;
 import net.minecraft.entity.ai.goal.Goal;
 
 import java.util.EnumSet;

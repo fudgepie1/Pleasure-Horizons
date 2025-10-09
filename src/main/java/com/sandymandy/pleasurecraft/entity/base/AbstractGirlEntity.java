@@ -7,12 +7,14 @@ import com.sandymandy.pleasurecraft.networking.S2C.ClothingArmorVisibilityS2CPac
 import com.sandymandy.pleasurecraft.screen.GirlInventoryScreenHandlerFactory;
 import com.sandymandy.pleasurecraft.util.PleasureCraftMessages;
 import com.sandymandy.pleasurecraft.registries.PleasureCraftTrackedData;
-import com.sandymandy.pleasurecraft.util.SceneOptions;
+import com.sandymandy.pleasurecraft.util.variables.SceneOptions;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.PlayerSkinProvider;
 import net.minecraft.client.util.SkinTextures;
+import net.minecraft.component.ComponentMap;
 import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.DyedColorComponent;
 import net.minecraft.component.type.FoodComponent;
 import net.minecraft.entity.*;
 import net.minecraft.entity.ai.goal.*;
@@ -68,6 +70,7 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
     private static final TrackedData<BlockPos> BASE_POS = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.BLOCK_POS);
     private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
     public Map<String, Boolean> boneVisibility = new HashMap<>();
+    public Map<String, Integer> boneColorOverrides = new HashMap<>();
     public Map<String, Identifier> boneTextureOverrides = new HashMap<>();
     public Map<String, Identifier> playerTexture = new HashMap<>();
     public Map<String, Vec2f> boneUVOffsets = new HashMap<>();
@@ -187,8 +190,6 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
     }
 
 
-
-
     @Override
     protected void initGoals() {
         this.goalSelector.add(0, new GirlSitGoal(this));
@@ -209,116 +210,6 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
         this.targetSelector.add(1, new ConditionalGoal(new GirlTrackOwnerAttackerGoal(this), this::isFollowing));
         this.targetSelector.add(2, new ConditionalGoal(new GirlAttackWithOwnerGoal(this, AbstractGirlEntity.class), this::isFollowing));
         this.targetSelector.add(3, new RevengeGoal(this, PlayerEntity.class, AbstractGirlEntity.class));
-    }
-
-
-    @Override
-    public ActionResult interactMob(PlayerEntity player, Hand hand) {
-        ItemStack itemStack = player.getStackInHand(hand);
-        Item itemInHand = itemStack.getItem();
-        if(this.getOverrideAnim().isEmpty()) {
-            if (this.isTamed()) {
-                if (this.isFoodItem(itemStack) && this.getHealth() < this.getMaxHealth()) {
-                    this.getNavigation().findPathTo(player, 20);
-                    this.eat(player, hand, itemStack);
-                    FoodComponent foodComponent = itemStack.get(DataComponentTypes.FOOD);
-                    float f = foodComponent != null ? foodComponent.nutrition() : 1.0F;
-                    this.heal(2.0F * f);
-                    player.getWorld().sendEntityStatus(this, EntityStatuses.CONSUME_ITEM);
-                    return ActionResult.CONSUME;
-                }
-
-                if (this.isOwner(player)) {
-
-                    if (itemInHand.equals(getTameItem())) {
-                        if(getCurrentRelationshipLevel() < maxRelationshipLevel()){
-                            itemStack.decrementUnlessCreative(1, player);
-                            player.sendMessage(Text.literal("She Liked The Gift"), true);
-                            setCurrentRelationshipLevel(getCurrentRelationshipLevel() + 1);
-                            player.getWorld().sendEntityStatus(this, EntityStatuses.ADD_BREEDING_PARTICLES);
-                            return ActionResult.CONSUME;
-                        }
-                        else {
-                            return ActionResult.FAIL;
-                        }
-                    }
-
-                    if (player.isSneaking()) {
-                        this.setSitting(!this.isSitting());
-                        this.jumping = false;
-                        this.navigation.stop();
-                        this.setTarget(null);
-                        return ActionResult.SUCCESS.noIncrementStat();
-                    }
-                    else {
-                        player.openHandledScreen(new GirlInventoryScreenHandlerFactory(this));
-                        this.setInInventory(true);
-                        getLookControl().lookAt(player, this.getMaxHeadRotation() + 20, this.getMaxLookPitchChange());
-                        return ActionResult.SUCCESS;
-                    }
-
-                }
-                else {
-                    if (itemInHand.equals(getTameItem())) {
-                        player.sendMessage(Text.literal("She's Already In A Relationship With Someone"), true);
-                        return ActionResult.FAIL;
-                    }
-                }
-            }
-            else {
-
-                if (itemStack.isEmpty() && player.isSneaking()) {
-                    this.getNavigation().findPathTo(player, 20);
-                    player.openHandledScreen(new GirlInventoryScreenHandlerFactory(this));
-                    this.setInInventory(true);
-                    getLookControl().lookAt(player, this.getMaxHeadRotation() + 20, this.getMaxLookPitchChange());
-                    return ActionResult.SUCCESS;
-                }
-
-                if (!this.getWorld().isClient) {
-                    if (itemInHand.equals(getTameItem()) && !player.isSneaking()) {
-                        itemStack.decrementUnlessCreative(1, player);
-                        this.tryTame(player);
-                        return ActionResult.SUCCESS;
-                    } else {
-                        // Wrong item OR empty hand (not sneaking)
-                        player.sendMessage(Text.literal(
-                                "She ignores you. Maybe try giving her a " + getReadableTameItemName() + "."
-                        ), true);
-                        return ActionResult.FAIL;
-                    }
-                }
-            }
-        }
-        return super.interactMob(player, hand);
-    }
-
-    private void tryTame(PlayerEntity player) {
-        if (this.random.nextInt(3) == 0) {
-            this.setTamedBy(player);
-            this.navigation.stop();
-            setTarget(null);
-            this.getWorld().sendEntityStatus(this, EntityStatuses.ADD_POSITIVE_PLAYER_REACTION_PARTICLES);
-            player.sendMessage(Text.literal("You Asked " + getGirlDisplayName() + " Out And She Said §aYes" ), true);
-            this.setBasePosHere();
-        } else {
-            this.getWorld().sendEntityStatus(this, EntityStatuses.ADD_NEGATIVE_PLAYER_REACTION_PARTICLES);
-        }
-    }
-
-    public void breakUp(PlayerEntity player) {
-        if(!player.getWorld().isClient){
-            this.setTamed(false,true); // Mark the entity as untamed
-            this.setOwner((LivingEntity) null); // Remove the owner UUID
-            this.setSitting(false); // Ensure the entity is not sitting
-            this.setStripped(false);
-            this.setCurrentRelationshipLevel(0);
-            if(!isTamed() && !isOwner(player)){
-                player.sendMessage(Text.literal("§cYou Broke Up With " + getGirlDisplayName()), true);
-            }
-            this.getWorld().sendEntityStatus(this, EntityStatuses.ADD_VILLAGER_ANGRY_PARTICLES);
-
-        }
     }
 
     public void setFollowing(boolean follow) {
@@ -433,8 +324,6 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
 
     public BlockPos getBasePos(){return this.dataTracker.get(BASE_POS);}
 
-
-
     public boolean isFoodItem(ItemStack stack) {
         return stack.isIn(ItemTags.WOLF_FOOD);
     }
@@ -483,20 +372,123 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
         }
     }
 
-    @Nullable
-    public Vec2f getBoneUVOffset(String boneName) {
-        if (boneUVOffsets != null && boneUVOffsets.containsKey(boneName)) {
-            return boneUVOffsets.get(boneName);
+    public void overrideBoneColor(List<String> bones, int hex) {
+        if (this.boneColorOverrides == null) this.boneColorOverrides = new HashMap<>();
+
+        for(String bone : bones) {
+            this.boneColorOverrides.put(bone, hex);
         }
-        return null;
+
     }
 
-    @Nullable
-    public Identifier getBoneTexture(String boneName) {
-        if (boneTextureOverrides != null && boneTextureOverrides.containsKey(boneName)) {
-            return boneTextureOverrides.get(boneName);
+
+    @Override
+    public ActionResult interactMob(PlayerEntity player, Hand hand) {
+        ItemStack itemStack = player.getStackInHand(hand);
+        Item itemInHand = itemStack.getItem();
+        if(this.getOverrideAnim().isEmpty()) {
+            if (this.isTamed()) {
+                if (this.isFoodItem(itemStack) && this.getHealth() < this.getMaxHealth()) {
+                    this.getNavigation().findPathTo(player, 20);
+                    this.eat(player, hand, itemStack);
+                    FoodComponent foodComponent = itemStack.get(DataComponentTypes.FOOD);
+                    float f = foodComponent != null ? foodComponent.nutrition() : 1.0F;
+                    this.heal(2.0F * f);
+                    player.getWorld().sendEntityStatus(this, EntityStatuses.CONSUME_ITEM);
+                    return ActionResult.CONSUME;
+                }
+
+                if (this.isOwner(player)) {
+
+                    if (itemInHand.equals(getTameItem())) {
+                        if(getCurrentRelationshipLevel() < maxRelationshipLevel()){
+                            itemStack.decrementUnlessCreative(1, player);
+                            player.sendMessage(Text.literal("She Liked The Gift"), true);
+                            setCurrentRelationshipLevel(getCurrentRelationshipLevel() + 1);
+                            player.getWorld().sendEntityStatus(this, EntityStatuses.ADD_BREEDING_PARTICLES);
+                            return ActionResult.CONSUME;
+                        }
+                        else {
+                            return ActionResult.FAIL;
+                        }
+                    }
+
+                    if (player.isSneaking()) {
+                        this.setSitting(!this.isSitting());
+                        this.jumping = false;
+                        this.navigation.stop();
+                        this.setTarget(null);
+                        return ActionResult.SUCCESS.noIncrementStat();
+                    }
+                    else {
+                        player.openHandledScreen(new GirlInventoryScreenHandlerFactory(this));
+                        this.setInInventory(true);
+                        getLookControl().lookAt(player, this.getMaxHeadRotation() + 20, this.getMaxLookPitchChange());
+                        return ActionResult.SUCCESS;
+                    }
+
+                }
+                else {
+                    if (itemInHand.equals(getTameItem())) {
+                        player.sendMessage(Text.literal("She's Already In A Relationship With Someone"), true);
+                        return ActionResult.FAIL;
+                    }
+                }
+            }
+            else {
+
+                if (itemStack.isEmpty() && player.isSneaking()) {
+                    this.getNavigation().findPathTo(player, 20);
+                    player.openHandledScreen(new GirlInventoryScreenHandlerFactory(this));
+                    this.setInInventory(true);
+                    getLookControl().lookAt(player, this.getMaxHeadRotation() + 20, this.getMaxLookPitchChange());
+                    return ActionResult.SUCCESS;
+                }
+
+                if (!this.getWorld().isClient) {
+                    if (itemInHand.equals(getTameItem()) && !player.isSneaking()) {
+                        itemStack.decrementUnlessCreative(1, player);
+                        this.tryTame(player);
+                        return ActionResult.SUCCESS;
+                    } else {
+                        // Wrong item OR empty hand (not sneaking)
+                        player.sendMessage(Text.literal(
+                                "She ignores you. Maybe try giving her a " + getReadableTameItemName() + "."
+                        ), true);
+                        return ActionResult.FAIL;
+                    }
+                }
+            }
         }
-        return null;
+        return super.interactMob(player, hand);
+    }
+
+    private void tryTame(PlayerEntity player) {
+        if (this.random.nextInt(3) == 0) {
+            this.setTamedBy(player);
+            this.navigation.stop();
+            setTarget(null);
+            this.getWorld().sendEntityStatus(this, EntityStatuses.ADD_POSITIVE_PLAYER_REACTION_PARTICLES);
+            player.sendMessage(Text.literal("You Asked " + getGirlDisplayName() + " Out And She Said §aYes" ), true);
+            this.setBasePosHere();
+        } else {
+            this.getWorld().sendEntityStatus(this, EntityStatuses.ADD_NEGATIVE_PLAYER_REACTION_PARTICLES);
+        }
+    }
+
+    public void breakUp(PlayerEntity player) {
+        if(!player.getWorld().isClient){
+            this.setTamed(false,true); // Mark the entity as untamed
+            this.setOwner((LivingEntity) null); // Remove the owner UUID
+            this.setSitting(false); // Ensure the entity is not sitting
+            this.setStripped(false);
+            this.setCurrentRelationshipLevel(0);
+            if(!isTamed() && !isOwner(player)){
+                player.sendMessage(Text.literal("§cYou Broke Up With " + getGirlDisplayName()), true);
+            }
+            this.getWorld().sendEntityStatus(this, EntityStatuses.ADD_VILLAGER_ANGRY_PARTICLES);
+
+        }
     }
 
     @Override
@@ -639,10 +631,27 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
 
             if (!this.inventory.getArmorStack(slot).isEmpty()) {
                 String typeName = this.inventory.getArmorStack(slot).getItem().toString().toLowerCase(); // get item name
-                float uv = getArmorU(typeName);
-                this.overrideBoneUV(this.getArmorBones().get(slot),uv,0);
+                float u = getArmorU(typeName);
+                this.overrideBoneUV(this.getArmorBones().get(slot),u,0);
+
+                int color = getArmorDyedColor(inventory.getArmorStack(slot));
+                this.overrideBoneColor(armorBones, color);
             }
         }
+    }
+
+    private int getArmorDyedColor(ItemStack stack) {
+        if (stack.isEmpty()) return 0xFFFFFF;
+
+        // 1️⃣ Modern component system (1.21.5)
+        DyedColorComponent dyed = stack.get(DataComponentTypes.DYED_COLOR);
+        if (dyed != null) {
+            // Returns already-correct RGB integer
+            return dyed.rgb();
+        }
+
+        // 3️⃣ Default base color for leather (same as EquipmentModel)
+        return 0xA06540;
     }
 
 

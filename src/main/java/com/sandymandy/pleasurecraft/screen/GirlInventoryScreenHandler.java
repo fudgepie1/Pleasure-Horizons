@@ -1,6 +1,7 @@
 package com.sandymandy.pleasurecraft.screen;
 
 import com.sandymandy.pleasurecraft.PleasureCraft;
+import com.sandymandy.pleasurecraft.PleasureCraftClient;
 import com.sandymandy.pleasurecraft.entity.base.AbstractGirlEntity;
 import com.sandymandy.pleasurecraft.util.inventory.GirlInventory;
 import com.sandymandy.pleasurecraft.util.inventory.slot.PublicArmorSlot;
@@ -40,14 +41,14 @@ public class GirlInventoryScreenHandler extends ScreenHandler {
     };
 
     // The codec-compatible constructor
-    public GirlInventoryScreenHandler(int syncId, PlayerInventory playerInventory, PleasureCraft.GirlScreenData data) {
+    public GirlInventoryScreenHandler(int syncId, PlayerInventory playerInventory, PleasureCraftClient.GirlScreenData data) {
         this(syncId, playerInventory, data.entityId());
     }
 
     // This constructor gets called from the BlockEntity on the server without calling the other constructor first, the server knows the inventory of the container
     // and can therefore directly provide it as an argument. This inventory will then be synced to the client.
     public GirlInventoryScreenHandler(int syncId, PlayerInventory playerInventory, int girlId) {
-        super(PleasureCraft.GIRL_INVENTORY_SCREEN_HANDLER, syncId);
+        super(PleasureCraftClient.GIRL_INVENTORY_SCREEN_HANDLER, syncId);
         PlayerEntity player = playerInventory.player;
         World world = player.getWorld();
 

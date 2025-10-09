@@ -1,4 +1,4 @@
-package com.sandymandy.pleasurecraft.util;
+package com.sandymandy.pleasurecraft.util.variables;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.PacketCodec;

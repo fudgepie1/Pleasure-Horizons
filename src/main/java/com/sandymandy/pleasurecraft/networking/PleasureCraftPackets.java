@@ -13,8 +13,13 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.entity.equipment.EquipmentModel;
+import net.minecraft.client.render.entity.feature.ArmorFeatureRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.item.Item;
+import net.minecraft.item.equipment.ArmorMaterial;
+import net.minecraft.recipe.ArmorDyeRecipe;
 
 import java.util.Objects;
 
@@ -184,7 +189,6 @@ public class PleasureCraftPackets {
                     context.client().execute(SceneProgressOverlay::triggerCumAnimation);
                 }
         );
-
     }
 
 }

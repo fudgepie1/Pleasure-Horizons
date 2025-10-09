@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.5.3
+- Added support for dyed armor
+
 ## 0.5.2
 - Fixed a bug where the girls wouldn't spawn in the villages.
 - Added Mika and replaced Bia with Momo from the village entity pool.

@@ -2,7 +2,7 @@ package com.sandymandy.pleasurecraft.screen.client;
 
 import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.networking.C2S.StartSceneC2SPacket;
-import com.sandymandy.pleasurecraft.util.SceneOptions;
+import com.sandymandy.pleasurecraft.util.variables.SceneOptions;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;

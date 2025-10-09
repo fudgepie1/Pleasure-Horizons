@@ -1,6 +1,7 @@
 package com.sandymandy.pleasurecraft.screen;
 
 import com.sandymandy.pleasurecraft.PleasureCraft;
+import com.sandymandy.pleasurecraft.PleasureCraftClient;
 import com.sandymandy.pleasurecraft.entity.base.AbstractGirlEntity;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.entity.player.PlayerEntity;
@@ -20,7 +21,7 @@ public class GirlInventoryScreenHandlerFactory implements ExtendedScreenHandlerF
     // Called on the server → sends data to client
     @Override
     public Object getScreenOpeningData(ServerPlayerEntity player) {
-        return new PleasureCraft.GirlScreenData(girl.getId());
+        return new PleasureCraftClient.GirlScreenData(girl.getId());
     }
 
     @Override

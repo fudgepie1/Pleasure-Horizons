@@ -19,5 +19,6 @@ public class PleasureCraftDataTickets {
     public static final DataTicket<Map<String, Vec2f>> GIRL_BONE_UV_OFFSETS = (DataTicket<Map<String, Vec2f>>) (Object) DataTicket.create("girl_bone_uv_offsets", Map.class);
     public static final DataTicket<Map<String, Identifier>> GIRL_BONE_TEXTURE_OVERRIDES = (DataTicket<Map<String, Identifier>>) (Object) DataTicket.create("girl_bone_texture_overrides", Map.class);
     public static final DataTicket<Map<String, Identifier>> PLAYER_TEXTURES = (DataTicket<Map<String, Identifier>>) (Object) DataTicket.create("player_textures", Map.class);
+    public static final DataTicket<Map<String, Integer>> GIRL_BONE_COLOR_OVERRIDES = (DataTicket<Map<String, Integer>>) (Object) DataTicket.create("girl_bone_color_overrides", Map.class);
     public static final DataTicket<String> PASSENGER_BONE_NAME = DataTicket.create("passenger_bone_name", String.class);
 }

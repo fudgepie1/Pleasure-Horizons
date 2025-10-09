@@ -1,4 +1,4 @@
-package com.sandymandy.pleasurecraft.util;
+package com.sandymandy.pleasurecraft.util.variables;
 
 import com.sandymandy.pleasurecraft.networking.codec.PacketCodecExtra;
 import net.minecraft.network.RegistryByteBuf;
