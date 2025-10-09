@@ -40,9 +40,8 @@
         public static final SoundEvent LUCY_SIGH = registerSound("lucy.sigh");
 
         public static void registerSounds() {
+            PleasureCraft.LOGGER.info("Registering SoundEvents for PleasureCraft");
             SceneKeyframeRegistry.registerSoundEvents();
-
-            PleasureCraft.LOGGER.info("Registered SoundEvents for PleasureCraft.");
         }
 
         private static SoundEvent registerSound(String soundPath) {

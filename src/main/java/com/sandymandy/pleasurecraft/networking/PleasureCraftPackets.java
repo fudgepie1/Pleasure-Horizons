@@ -8,24 +8,19 @@ import com.sandymandy.pleasurecraft.networking.S2C.ClothingArmorVisibilityS2CPac
 import com.sandymandy.pleasurecraft.networking.S2C.PlayCumHudAnimationS2CPacket;
 import com.sandymandy.pleasurecraft.networking.S2C.SceneOptionsS2CPacket;
 import com.sandymandy.pleasurecraft.screen.client.GirlSceneScreen;
-import com.sandymandy.pleasurecraft.registries.PleasureCraftSoundEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.entity.equipment.EquipmentModel;
-import net.minecraft.client.render.entity.feature.ArmorFeatureRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.item.Item;
-import net.minecraft.item.equipment.ArmorMaterial;
-import net.minecraft.recipe.ArmorDyeRecipe;
 
 import java.util.Objects;
 
 public class PleasureCraftPackets {
 
     public static void registerPackets(){
+        PleasureCraft.LOGGER.info("Registering Packet Codecs for PleasureCraft");
         // --- C2S (client → server) ---
         PayloadTypeRegistry.playC2S().register(InventoryButtonC2SPacket.ID, InventoryButtonC2SPacket.CODEC);
         PayloadTypeRegistry.playC2S().register(BonePosSyncC2SPacket.ID, BonePosSyncC2SPacket.CODEC);
@@ -49,6 +44,7 @@ public class PleasureCraftPackets {
     }
 
     public static void registerC2SPackets(){
+        PleasureCraft.LOGGER.info("Registering C2S Packets for PleasureCraft");
         // --- C2S (client → server) ---
         ServerPlayNetworking.registerGlobalReceiver(InventoryButtonC2SPacket.ID,
                 (packet, context) -> Objects.requireNonNull(context.player().getServer()).execute(() -> {
@@ -158,37 +154,6 @@ public class PleasureCraftPackets {
                 ));
     }
 
-    public static void registerS2CPackets(){
-        // --- S2C (server → client) ---
-        ClientPlayNetworking.registerGlobalReceiver(ClothingArmorVisibilityS2CPacket.ID,
-                (packet, context) -> context.client().execute(() -> {
-                    var world = context.client().world;
-                    if (world == null) return;
 
-                    Entity entity = world.getEntityById(packet.entityId());
-                    if (entity instanceof SceneEntity girl) {
-                        int i = 0;
-                        for (EquipmentSlot slot : EquipmentSlot.values()) {
-                            girl.armorVisibility.put(slot, packet.armor().get(i));
-                            i++;
-                        }
-                        girl.applyClothingAndArmor();
-                    }
-                }));
-
-        ClientPlayNetworking.registerGlobalReceiver(SceneOptionsS2CPacket.ID, (packet, context) -> {
-            context.client().execute(() -> {
-                MinecraftClient.getInstance().setScreen(new GirlSceneScreen(packet.entityId(), packet.currentRelationshipLevel(),packet.options()));
-            });
-        });
-
-        ClientPlayNetworking.registerGlobalReceiver(
-                PlayCumHudAnimationS2CPacket.ID,
-                (packet, context) -> {
-                    // trigger the HUD animation locally
-                    context.client().execute(SceneProgressOverlay::triggerCumAnimation);
-                }
-        );
-    }
 
 }

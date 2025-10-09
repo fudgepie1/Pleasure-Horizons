@@ -2,6 +2,7 @@
 
 ## 0.5.3
 - Added support for dyed armor
+- Fixed a bug that made the mod crash the game if it was run on a dedicated server
 
 ## 0.5.2
 - Fixed a bug where the girls wouldn't spawn in the villages.

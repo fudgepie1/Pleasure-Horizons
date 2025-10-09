@@ -1,5 +1,6 @@
 package com.sandymandy.pleasurecraft.registries;
 
+import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.entity.PleasureCraftEntities;
 import com.sandymandy.pleasurecraft.entity.girls.MikaEntity;
 import com.sandymandy.pleasurecraft.entity.girls.LucyEntity;
@@ -14,6 +15,7 @@ public class GirlRegistry {
     public static final EntityType<MomoEntity> MOMO = PleasureCraftEntities.registerGirl("momo", MomoEntity::new, 0.5f, 1.65f, MomoEntity::createAttributes);
 
     public static void register() {
+        PleasureCraft.LOGGER.info("Registering Girls for PleasureCraft");
         // Trigger attribute registration
         PleasureCraftEntities.registerAttributes();
     }
