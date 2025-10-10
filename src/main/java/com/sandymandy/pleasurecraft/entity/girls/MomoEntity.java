@@ -25,11 +25,6 @@ public class MomoEntity extends SceneEntity {
     }
 
     @Override
-    protected String getGirlDisplayName() {
-        return "Momo";
-    }
-
-    @Override
     public String getGirlID() {
             return "momo";
     }

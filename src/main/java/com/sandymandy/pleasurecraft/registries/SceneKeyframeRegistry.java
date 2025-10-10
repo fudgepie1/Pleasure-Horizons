@@ -1,5 +1,6 @@
 package com.sandymandy.pleasurecraft.registries;
 
+import net.minecraft.client.resource.language.I18n;
 import net.minecraft.sound.SoundEvent;
 
 import java.util.*;
@@ -20,7 +21,7 @@ public class SceneKeyframeRegistry {
 
     private static void strip(){
         registerSound("lucy","stripMSG1", PleasureCraftSoundEvents.LUCY_GIGGLE);
-        registerMessage("lucy","stripMSG1", "Hihi~");
+        registerMessage("lucy","stripMSG1", I18n.translate("chat.lucy.strip.MSG1"));
     }
 
     private static void lucyPaizuri(){

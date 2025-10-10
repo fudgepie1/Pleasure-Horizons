@@ -4,15 +4,15 @@ import com.mojang.authlib.GameProfile;
 import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.entity.ai.goal.*;
 import com.sandymandy.pleasurecraft.networking.S2C.ClothingArmorVisibilityS2CPacket;
+import com.sandymandy.pleasurecraft.registries.PleasureCraftTrackedData;
 import com.sandymandy.pleasurecraft.screen.GirlInventoryScreenHandlerFactory;
 import com.sandymandy.pleasurecraft.util.PleasureCraftMessages;
-import com.sandymandy.pleasurecraft.registries.PleasureCraftTrackedData;
 import com.sandymandy.pleasurecraft.util.variables.SceneOptions;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.texture.PlayerSkinProvider;
 import net.minecraft.client.util.SkinTextures;
-import net.minecraft.component.ComponentMap;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.DyedColorComponent;
 import net.minecraft.component.type.FoodComponent;
@@ -95,12 +95,12 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
         return Items.DANDELION;
     }
 
-    protected String getGirlDisplayName() {
-        return "Null";
-    }
-
     public String getGirlID() {
         return "null";
+    }
+
+    public String getGirlDisplayName() {
+        return I18n.translate("entity.pleasurecraft." + getGirlID());
     }
 
     public int getSizeGUI(){return 20;}
@@ -628,29 +628,45 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
                     toggleModelBones(Collections.singletonList("vagina"), !legsCovered);
                 }
             }
-
-            if (!this.inventory.getArmorStack(slot).isEmpty()) {
-                String typeName = this.inventory.getArmorStack(slot).getItem().toString().toLowerCase(); // get item name
-                float u = getArmorU(typeName);
-                this.overrideBoneUV(this.getArmorBones().get(slot),u,0);
-
-                int color = getArmorDyedColor(inventory.getArmorStack(slot));
-                this.overrideBoneColor(armorBones, color);
-            }
+            displayArmor(slot);
         }
     }
 
-    private int getArmorDyedColor(ItemStack stack) {
+    private void displayArmor(EquipmentSlot slot){
+        if (this.inventory.getArmorStack(slot).isEmpty()) {
+            return;
+        }
+
+        float u = 0;
+
+        ItemStack item = this.inventory.getArmorStack(slot);
+
+        String armorType = item.toString().toLowerCase();
+
+        if (armorType.contains("turtle")) u = 0.10546875f;
+        if (armorType.contains("leather")){
+            u = 0.0703125f;
+            this.overrideBoneColor(this.getArmorBones().get(slot), getDyedArmorColor(inventory.getArmorStack(slot)));
+        }
+        if (armorType.contains("iron")) u = 0.03515625f;
+        if (armorType.contains("chain")) u = 0.052734375f;
+        if (armorType.contains("gold")) u = 0.0176f;
+        if (armorType.contains("netherite")) u = 0.087890625f;
+
+        this.overrideBoneUV(this.getArmorBones().get(slot),u,0);
+
+    }
+
+    private int getDyedArmorColor(ItemStack stack) {
         if (stack.isEmpty()) return 0xFFFFFF;
 
-        // 1️⃣ Modern component system (1.21.5)
         DyedColorComponent dyed = stack.get(DataComponentTypes.DYED_COLOR);
         if (dyed != null) {
             // Returns already-correct RGB integer
             return dyed.rgb();
         }
 
-        // 3️⃣ Default base color for leather (same as EquipmentModel)
+        // Default base color for leather (same as EquipmentModel)
         return 0xA06540;
     }
 
@@ -838,16 +854,6 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
         new PleasureCraftMessages().PlayerSpecificMessage(playerEntity, finalMessage);
     }
 
-
-    private float getArmorU(String armorType){
-        if (armorType.contains("turtle")) return 0.10546875f;
-        if (armorType.contains("leather")) return 0.0703125f;
-        if (armorType.contains("iron")) return 0.03515625f;
-        if (armorType.contains("chain")) return 0.052734375f;
-        if (armorType.contains("gold")) return 0.0176f;
-        if (armorType.contains("netherite")) return 0.087890625f;
-        return 0f;
-    }
 
     public void applySkinToBone(PlayerEntity player) {
         Identifier texture;

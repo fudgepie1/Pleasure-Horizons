@@ -25,11 +25,6 @@ public class MikaEntity extends SceneEntity {
     }
 
     @Override
-    protected String getGirlDisplayName() {
-        return "Mika";
-    }
-
-    @Override
     public String getGirlID() {
         return "mika";
     }
