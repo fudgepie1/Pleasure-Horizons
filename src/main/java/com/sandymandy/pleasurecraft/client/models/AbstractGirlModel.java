@@ -4,7 +4,7 @@ import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.config.ModConfig;
 import com.sandymandy.pleasurecraft.entity.base.AbstractGirlEntity;
 import com.sandymandy.pleasurecraft.util.renderer.GeoBoneExtension;
-import com.sandymandy.pleasurecraft.registries.PleasureCraftDataTickets;
+import com.sandymandy.pleasurecraft.registries.PleasureCraftDataTicketRegistry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
@@ -20,8 +20,8 @@ public abstract class AbstractGirlModel<T extends AbstractGirlEntity> extends Ge
     @Override
     public Identifier getModelResource(GeoRenderState renderState) {
         // Check if entity is stripped
-        boolean stripped = renderState.getOrDefaultGeckolibData(PleasureCraftDataTickets.IS_STRIPPED, false).booleanValue();
-        String girlID = renderState.getOrDefaultGeckolibData(PleasureCraftDataTickets.GIRL_ID, "");
+        boolean stripped = renderState.getOrDefaultGeckolibData(PleasureCraftDataTicketRegistry.IS_STRIPPED, false).booleanValue();
+        String girlID = renderState.getOrDefaultGeckolibData(PleasureCraftDataTicketRegistry.GIRL_ID, "");
 
 
         // Pick the folder based on stripped/dressed state
@@ -36,7 +36,7 @@ public abstract class AbstractGirlModel<T extends AbstractGirlEntity> extends Ge
 
     @Override
     public Identifier getTextureResource(GeoRenderState renderState) {
-        String girlID = renderState.getOrDefaultGeckolibData(PleasureCraftDataTickets.GIRL_ID, "");
+        String girlID = renderState.getOrDefaultGeckolibData(PleasureCraftDataTicketRegistry.GIRL_ID, "");
 
         String filePath = "textures/entities/" + girlID + ".png";
 
@@ -53,7 +53,7 @@ public abstract class AbstractGirlModel<T extends AbstractGirlEntity> extends Ge
     public void setCustomAnimations(AnimationState<T> animationState) {
 
         GeoBone head = getAnimationProcessor().getBone("head");
-        boolean isSceneActive = animationState.renderState().getGeckolibData(PleasureCraftDataTickets.IS_IN_SCENE);
+        boolean isSceneActive = animationState.renderState().getGeckolibData(PleasureCraftDataTicketRegistry.IS_IN_SCENE);
 
         if (head != null && !isSceneActive) {
             float pitch = animationState.getData(DataTickets.ENTITY_PITCH);
@@ -68,7 +68,7 @@ public abstract class AbstractGirlModel<T extends AbstractGirlEntity> extends Ge
             MinecraftClient client = MinecraftClient.getInstance();
 
             boolean isFirstPerson = client.options.getPerspective().isFirstPerson();
-            boolean isPlayerRider = client.cameraEntity == animationState.renderState().getGeckolibData(PleasureCraftDataTickets.GIRL_FIRST_PASSENGER);
+            boolean isPlayerRider = client.cameraEntity == animationState.renderState().getGeckolibData(PleasureCraftDataTicketRegistry.GIRL_FIRST_PASSENGER);
 
             ((GeoBoneExtension) headBone).setHiddenWithoutHidingChildren(isFirstPerson && isPlayerRider);
         }

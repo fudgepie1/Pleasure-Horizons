@@ -1,6 +1,5 @@
 package com.sandymandy.pleasurecraft.screen;
 
-import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.PleasureCraftClient;
 import com.sandymandy.pleasurecraft.entity.base.AbstractGirlEntity;
 import com.sandymandy.pleasurecraft.util.inventory.GirlInventory;
@@ -10,7 +9,6 @@ import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
@@ -18,6 +16,8 @@ import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
 import java.util.Map;
+
+import static com.sandymandy.pleasurecraft.registries.PleasureCraftScreenHandlerRegistry.GIRL_INVENTORY_SCREEN_HANDLER;
 
 public class GirlInventoryScreenHandler extends ScreenHandler {
     private final Inventory inventory;
@@ -48,7 +48,7 @@ public class GirlInventoryScreenHandler extends ScreenHandler {
     // This constructor gets called from the BlockEntity on the server without calling the other constructor first, the server knows the inventory of the container
     // and can therefore directly provide it as an argument. This inventory will then be synced to the client.
     public GirlInventoryScreenHandler(int syncId, PlayerInventory playerInventory, int girlId) {
-        super(PleasureCraftClient.GIRL_INVENTORY_SCREEN_HANDLER, syncId);
+        super(GIRL_INVENTORY_SCREEN_HANDLER, syncId);
         PlayerEntity player = playerInventory.player;
         World world = player.getWorld();
 

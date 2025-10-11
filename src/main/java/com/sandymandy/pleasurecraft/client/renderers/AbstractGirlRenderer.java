@@ -3,7 +3,7 @@ package com.sandymandy.pleasurecraft.client.renderers;
 import com.mojang.datafixers.util.Either;
 import com.sandymandy.pleasurecraft.entity.base.SceneEntity;
 import com.sandymandy.pleasurecraft.networking.C2S.BonePosSyncC2SPacket;
-import com.sandymandy.pleasurecraft.registries.PleasureCraftDataTickets;
+import com.sandymandy.pleasurecraft.registries.PleasureCraftDataTicketRegistry;
 import com.sandymandy.pleasurecraft.util.renderer.OffsetVertexConsumer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.render.RenderLayer;
@@ -106,18 +106,19 @@ public abstract class AbstractGirlRenderer<T extends SceneEntity, R extends Livi
 
     @Override
     public void addRenderData(T animatable, Void relatedObject, R renderState) {
-        renderState.addGeckolibData(PleasureCraftDataTickets.IS_STRIPPED, animatable.isStripped());
-        renderState.addGeckolibData(PleasureCraftDataTickets.IS_IN_SCENE, animatable.isSceneActive());
-        renderState.addGeckolibData(PleasureCraftDataTickets.GIRL_ID, animatable.getGirlID());
-        renderState.addGeckolibData(PleasureCraftDataTickets.ENTITY_ID, animatable.getId());
-        renderState.addGeckolibData(PleasureCraftDataTickets.GIRL_FIRST_PASSENGER, animatable.getFirstPassenger());
-        renderState.addGeckolibData(PleasureCraftDataTickets.GIRL_MAIN_HAND_STACK, animatable.getMainHandStack());
-        renderState.addGeckolibData(PleasureCraftDataTickets.GIRL_BONE_VISIBILITY, animatable.boneVisibility);
-        renderState.addGeckolibData(PleasureCraftDataTickets.GIRL_BONE_UV_OFFSETS, animatable.boneUVOffsets);
-        renderState.addGeckolibData(PleasureCraftDataTickets.GIRL_BONE_TEXTURE_OVERRIDES, new HashMap<>(animatable.boneTextureOverrides));
-        renderState.addGeckolibData(PleasureCraftDataTickets.PLAYER_TEXTURES, new HashMap<>(animatable.playerTexture));
-        renderState.addGeckolibData(PleasureCraftDataTickets.GIRL_BONE_COLOR_OVERRIDES, new HashMap<>(animatable.boneColorOverrides));
-        renderState.addGeckolibData(PleasureCraftDataTickets.PASSENGER_BONE_NAME, animatable.passengerBoneName);
+        renderState.addGeckolibData(PleasureCraftDataTicketRegistry.IS_STRIPPED, animatable.isStripped());
+        renderState.addGeckolibData(PleasureCraftDataTicketRegistry.IS_IN_SCENE, animatable.isSceneActive());
+        renderState.addGeckolibData(PleasureCraftDataTicketRegistry.GIRL_ID, animatable.getGirlID());
+        renderState.addGeckolibData(PleasureCraftDataTicketRegistry.ENTITY_ID, animatable.getId());
+        renderState.addGeckolibData(PleasureCraftDataTicketRegistry.GIRL_FIRST_PASSENGER, animatable.getFirstPassenger());
+        renderState.addGeckolibData(PleasureCraftDataTicketRegistry.GIRL_MAIN_HAND_STACK, animatable.getMainHandStack());
+        renderState.addGeckolibData(PleasureCraftDataTicketRegistry.GIRL_BONE_VISIBILITY, animatable.boneVisibility);
+        renderState.addGeckolibData(PleasureCraftDataTicketRegistry.GIRL_BONE_UV_OFFSETS, animatable.boneUVOffsets);
+        renderState.addGeckolibData(PleasureCraftDataTicketRegistry.GIRL_BONE_TEXTURE_OVERRIDES, new HashMap<>(animatable.boneTextureOverrides));
+        renderState.addGeckolibData(PleasureCraftDataTicketRegistry.GIRL_BONE_TEXTURE_OVERRIDES_LAYER_TWO, new HashMap<>(animatable.boneTextureOverridesLayer2));
+        renderState.addGeckolibData(PleasureCraftDataTicketRegistry.GIRL_BONE_TEXTURE_OVERRIDES_LAYER_THREE, new HashMap<>(animatable.boneTextureOverridesLayer3));
+        renderState.addGeckolibData(PleasureCraftDataTicketRegistry.GIRL_BONE_COLOR_OVERRIDES, new HashMap<>(animatable.boneColorOverrides));
+        renderState.addGeckolibData(PleasureCraftDataTicketRegistry.PASSENGER_BONE_NAME, animatable.passengerBoneName);
     }
 
     @Override
@@ -127,11 +128,11 @@ public abstract class AbstractGirlRenderer<T extends SceneEntity, R extends Livi
 
     @Override
     public void preRender(R renderState, MatrixStack poseStack, BakedGeoModel model, @Nullable VertexConsumerProvider bufferSource, @Nullable VertexConsumer buffer, boolean isReRender, int packedLight, int packedOverlay, int renderColor) {
-        this.mainHandItem = renderState.getGeckolibData(PleasureCraftDataTickets.GIRL_MAIN_HAND_STACK);
+        this.mainHandItem = renderState.getGeckolibData(PleasureCraftDataTicketRegistry.GIRL_MAIN_HAND_STACK);
 
         super.preRender(renderState, poseStack, model, bufferSource, buffer, isReRender, packedLight, packedOverlay, renderColor);
 
-        Map<String, Boolean> boneVisibility = renderState.getGeckolibData(PleasureCraftDataTickets.GIRL_BONE_VISIBILITY);
+        Map<String, Boolean> boneVisibility = renderState.getGeckolibData(PleasureCraftDataTicketRegistry.GIRL_BONE_VISIBILITY);
 
         if (boneVisibility != null) {
             for (Map.Entry<String, Boolean> entry : boneVisibility.entrySet()) {
@@ -148,13 +149,13 @@ public abstract class AbstractGirlRenderer<T extends SceneEntity, R extends Livi
 
     @Override
     public void renderFinal(R renderState, MatrixStack poseStack, BakedGeoModel model, VertexConsumerProvider bufferSource, @Nullable VertexConsumer buffer, int packedLight, int packedOverlay, int renderColor) {
-        String passengerBoneName = renderState.getGeckolibData(PleasureCraftDataTickets.PASSENGER_BONE_NAME);
+        String passengerBoneName = renderState.getGeckolibData(PleasureCraftDataTicketRegistry.PASSENGER_BONE_NAME);
 
         GeoBone bone = getGeoModel().getBone(passengerBoneName).get();
 
         Vector3d bonePos = bone.getWorldPosition();
         Vec3d passengerBonePos = new Vec3d(bonePos.x, bonePos.y, bonePos.z);
-        ClientPlayNetworking.send(new BonePosSyncC2SPacket(renderState.getGeckolibData(PleasureCraftDataTickets.ENTITY_ID), passengerBonePos));
+        ClientPlayNetworking.send(new BonePosSyncC2SPacket(renderState.getGeckolibData(PleasureCraftDataTicketRegistry.ENTITY_ID), passengerBonePos));
         super.renderFinal(renderState, poseStack, model, bufferSource, buffer, packedLight, packedOverlay, renderColor);
     }
 
@@ -173,8 +174,9 @@ public abstract class AbstractGirlRenderer<T extends SceneEntity, R extends Livi
         super.applyRenderLayers(renderState, poseStack, model, renderType, bufferSource, buffer, packedLight, packedOverlay, renderColor);
 
         // Now perform overlays for any bones needing a texture override
-        Map<String, Identifier> boneTexOverrides = renderState.getGeckolibData(PleasureCraftDataTickets.GIRL_BONE_TEXTURE_OVERRIDES);
-        Map<String, Identifier> playerTextures = renderState.getGeckolibData(PleasureCraftDataTickets.PLAYER_TEXTURES);
+        Map<String, Identifier> boneTexOverrides = renderState.getGeckolibData(PleasureCraftDataTicketRegistry.GIRL_BONE_TEXTURE_OVERRIDES);
+        Map<String, Identifier> boneTexOverridesLayer2 = renderState.getGeckolibData(PleasureCraftDataTicketRegistry.GIRL_BONE_TEXTURE_OVERRIDES_LAYER_TWO);
+        Map<String, Identifier> boneTexOverridesLayer3 = renderState.getGeckolibData(PleasureCraftDataTicketRegistry.GIRL_BONE_TEXTURE_OVERRIDES_LAYER_THREE);
 
         if (boneTexOverrides != null && !boneTexOverrides.isEmpty()) {
             for (Map.Entry<String, Identifier> e : boneTexOverrides.entrySet()) {
@@ -194,23 +196,41 @@ public abstract class AbstractGirlRenderer<T extends SceneEntity, R extends Livi
             }
         }
 
-
-        // Player textures overlay (render on top of whatever)
-        if (playerTextures != null && !playerTextures.isEmpty()) {
-            for (Map.Entry<String, Identifier> e : playerTextures.entrySet()) {
+        if (boneTexOverridesLayer2 != null && !boneTexOverridesLayer2.isEmpty()) {
+            for (Map.Entry<String, Identifier> e : boneTexOverridesLayer2.entrySet()) {
                 String boneName = e.getKey();
-                Identifier playerTex = e.getValue();
-                if (playerTex == null) continue;
+                Identifier tex = e.getValue();
+                if (tex == null) continue;
 
+                // get the bone from the model
                 model.getBone(boneName).ifPresent(bone -> {
-                    RenderLayer playerLayer = RenderLayer.getEntityTranslucent(playerTex);
-                    VertexConsumer playerBuffer = bufferSource.getBuffer(playerLayer);
+                    // prepare a translucent entity layer for this texture
+                    RenderLayer overrideLayer = RenderLayer.getEntityTranslucent(tex);
+                    VertexConsumer overrideBuffer = bufferSource.getBuffer(overrideLayer);
 
-                    super.renderRecursively(renderState, poseStack, bone, playerLayer, bufferSource, playerBuffer, false, packedLight, packedOverlay, renderColor);
+                    // call GeoEntityRenderer's implementation directly to draw this bone with overrideBuffer
+                    super.renderRecursively(renderState, poseStack, bone, overrideLayer, bufferSource, overrideBuffer, false, packedLight, packedOverlay, renderColor);
                 });
             }
         }
 
+        if (boneTexOverridesLayer3 != null && !boneTexOverridesLayer3.isEmpty()) {
+            for (Map.Entry<String, Identifier> e : boneTexOverridesLayer3.entrySet()) {
+                String boneName = e.getKey();
+                Identifier tex = e.getValue();
+                if (tex == null) continue;
+
+                // get the bone from the model
+                model.getBone(boneName).ifPresent(bone -> {
+                    // prepare a translucent entity layer for this texture
+                    RenderLayer overrideLayer = RenderLayer.getEntityTranslucent(tex);
+                    VertexConsumer overrideBuffer = bufferSource.getBuffer(overrideLayer);
+
+                    // call GeoEntityRenderer's implementation directly to draw this bone with overrideBuffer
+                    super.renderRecursively(renderState, poseStack, bone, overrideLayer, bufferSource, overrideBuffer, false, packedLight, packedOverlay, renderColor);
+                });
+            }
+        }
 
     }
 
@@ -226,9 +246,9 @@ public abstract class AbstractGirlRenderer<T extends SceneEntity, R extends Livi
                                   int packedOverlay,
                                   int renderColor) {
 
-        Map<String, Identifier> boneTexOverrides = renderState.getGeckolibData(PleasureCraftDataTickets.GIRL_BONE_TEXTURE_OVERRIDES);
-        Map<String, Vec2f> boneUVOffsets = renderState.getGeckolibData(PleasureCraftDataTickets.GIRL_BONE_UV_OFFSETS);
-        Map<String, Integer> boneColorOverrides = renderState.getGeckolibData(PleasureCraftDataTickets.GIRL_BONE_COLOR_OVERRIDES);
+        Map<String, Identifier> boneTexOverrides = renderState.getGeckolibData(PleasureCraftDataTicketRegistry.GIRL_BONE_TEXTURE_OVERRIDES);
+        Map<String, Vec2f> boneUVOffsets = renderState.getGeckolibData(PleasureCraftDataTicketRegistry.GIRL_BONE_UV_OFFSETS);
+        Map<String, Integer> boneColorOverrides = renderState.getGeckolibData(PleasureCraftDataTicketRegistry.GIRL_BONE_COLOR_OVERRIDES);
 
         // Skip rendering this bone in the base pass if it has a texture override
         if (boneTexOverrides != null && boneTexOverrides.containsKey(bone.getName())) {

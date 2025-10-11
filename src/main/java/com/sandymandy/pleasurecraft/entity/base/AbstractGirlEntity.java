@@ -4,13 +4,13 @@ import com.mojang.authlib.GameProfile;
 import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.entity.ai.goal.*;
 import com.sandymandy.pleasurecraft.networking.S2C.ClothingArmorVisibilityS2CPacket;
-import com.sandymandy.pleasurecraft.registries.PleasureCraftTrackedData;
+import com.sandymandy.pleasurecraft.registries.PleasureCraftTrackedDataRegistry;
 import com.sandymandy.pleasurecraft.screen.GirlInventoryScreenHandlerFactory;
 import com.sandymandy.pleasurecraft.util.PleasureCraftMessages;
+import com.sandymandy.pleasurecraft.util.PleasureCraftLangUtils;
 import com.sandymandy.pleasurecraft.util.variables.SceneOptions;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.texture.PlayerSkinProvider;
 import net.minecraft.client.util.SkinTextures;
 import net.minecraft.component.DataComponentTypes;
@@ -66,13 +66,14 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
     private static final TrackedData<String> OVERRIDE_ANIM = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.STRING);
     private static final TrackedData<String> SCENE_ANIM = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.STRING);
     private static final TrackedData<Integer> RELATIONSHIP_LEVEL = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.INTEGER);
-    private static final TrackedData<Vec3d> PASSENGER_BONE_POSITION = DataTracker.registerData(AbstractGirlEntity.class, PleasureCraftTrackedData.VEC3D);
+    private static final TrackedData<Vec3d> PASSENGER_BONE_POSITION = DataTracker.registerData(AbstractGirlEntity.class, PleasureCraftTrackedDataRegistry.VEC3D);
     private static final TrackedData<BlockPos> BASE_POS = DataTracker.registerData(AbstractGirlEntity.class, TrackedDataHandlerRegistry.BLOCK_POS);
     private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
     public Map<String, Boolean> boneVisibility = new HashMap<>();
     public Map<String, Integer> boneColorOverrides = new HashMap<>();
     public Map<String, Identifier> boneTextureOverrides = new HashMap<>();
-    public Map<String, Identifier> playerTexture = new HashMap<>();
+    public Map<String, Identifier> boneTextureOverridesLayer2 = new HashMap<>();
+    public Map<String, Identifier> boneTextureOverridesLayer3 = new HashMap<>();
     public Map<String, Vec2f> boneUVOffsets = new HashMap<>();
     public final Map<EquipmentSlot, Boolean> armorVisibility = new EnumMap<>(EquipmentSlot.class);
     private LivingEntity attackTarget;
@@ -100,7 +101,7 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
     }
 
     public String getGirlDisplayName() {
-        return I18n.translate("entity.pleasurecraft." + getGirlID());
+        return PleasureCraftLangUtils.getStringFromKey("entity.pleasurecraft." + getGirlID());
     }
 
     public int getSizeGUI(){return 20;}
@@ -364,6 +365,16 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
         this.boneTextureOverrides.put(boneName, texture);
     }
 
+    public void overrideBoneTextureLayer2(String boneName, Identifier texture) {
+        if (this.boneTextureOverridesLayer2 == null) this.boneTextureOverridesLayer2 = new HashMap<>();
+        this.boneTextureOverridesLayer2.put(boneName, texture);
+    }
+
+    public void overrideBoneTextureLayer3(String boneName, Identifier texture) {
+        if (this.boneTextureOverridesLayer3 == null) this.boneTextureOverridesLayer3 = new HashMap<>();
+        this.boneTextureOverridesLayer3.put(boneName, texture);
+    }
+
     public void overrideBoneUV(List<String> bones, float uOffset, float vOffset) {
         if (this.boneUVOffsets == null) this.boneUVOffsets = new HashMap<>();
 
@@ -561,36 +572,6 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
         }
     }
 
-    public void requestStrip() {
-        requestStrip(false, null, null);
-    }
-
-    public void requestStrip(SceneOptions options) {
-        requestStrip(false, null, options);
-    }
-
-    public void requestStrip(boolean sendMessage, @Nullable PlayerEntity player, @Nullable SceneOptions options) {
-        this.requestStrip = true;
-
-        if(options != null){
-            this.stripOptions = options;
-        }
-
-        if(sendMessage){
-            if(player != null) messageAsEntity(player,"okie then, just for you tho ^_~");
-            else messageAsEntity("okie then, just for you tho ^_~");
-        }
-    }
-
-    public boolean shouldStrip() {
-        if (requestStrip) {
-            requestStrip = false;
-            return true;
-        }
-        return false;
-    }
-
-
     private void updateClothingAndArmor() {
         if (this.getWorld().isClient()) return;
 
@@ -698,7 +679,7 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
     public Vec3d getPassengerPos() {
         boolean isZero = this.getPassengerBonePosition().lengthSquared() < 1.0E-12; // ~0
         if(isZero){
-            return this.getPos().add(0, this.passengerYOffset, 0);
+            return this.getPos().add(1.5, 0.9, 0);
         }
         else {
             return this.getPassengerBonePosition().add(0, this.passengerYOffset, 0);
@@ -856,13 +837,13 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
 
 
     public void applySkinToBone(PlayerEntity player) {
+        if (!this.getWorld().isClient()) return;
+
+
         Identifier texture;
 
-        // If the playerTexture is null then initialize it
-        if (this.playerTexture == null) this.playerTexture = new HashMap<>();
-
         // Set the base of the player model to Steve so if there isn't a player it has a fallback
-        this.overrideBoneTexture("steve", Identifier.of(PleasureCraft.MOD_ID, "textures/player/steve.png"));
+        this.overrideBoneTexture("steve", Identifier.ofVanilla("textures/entity/player/wide/steve.png"));
 
         if (player != null) {
             MinecraftClient client = MinecraftClient.getInstance();
@@ -876,8 +857,10 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
 
             // if isn't null set the player texture
             if (texture != null) {
-                this.playerTexture.put("steve", texture);
+                this.overrideBoneTexture("steve", texture);
             }
+
+            this.overrideBoneTextureLayer2("steve", Identifier.of(PleasureCraft.MOD_ID,"textures/player/penis.png"));
         }
     }
 
@@ -905,5 +888,24 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
         return false;
     }
 
+    public void requestStrip() {
+        this.requestStrip(null);
+    }
+
+    public void requestStrip(@Nullable SceneOptions options) {
+        this.requestStrip = true;
+
+        if(options != null){
+            this.stripOptions = options;
+        }
+    }
+
+    public boolean shouldStrip() {
+        if (requestStrip) {
+            requestStrip = false;
+            return true;
+        }
+        return false;
+    }
 
 }

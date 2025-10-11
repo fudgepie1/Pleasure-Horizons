@@ -8,7 +8,7 @@ import net.minecraft.entity.data.TrackedDataHandler;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
 
-public class PleasureCraftTrackedData {
+public class PleasureCraftTrackedDataRegistry {
 
     public static final TrackedDataHandler<SceneOptions> SCENE_OPTION =
             TrackedDataHandler.create(SceneOptions.PACKET_CODEC);
@@ -21,9 +21,9 @@ public class PleasureCraftTrackedData {
 
     public static void registerTrackedData(){
         PleasureCraft.LOGGER.info("Registering custom TrackedDataHandlers for PleasureCraft");
-        FabricTrackedDataRegistry.register(Identifier.of(PleasureCraft.MOD_ID, "scene_option"), PleasureCraftTrackedData.SCENE_OPTION);
-        FabricTrackedDataRegistry.register(Identifier.of(PleasureCraft.MOD_ID, "scene_phase"), PleasureCraftTrackedData.SCENE_PHASE);
-        FabricTrackedDataRegistry.register(Identifier.of(PleasureCraft.MOD_ID, "vec3d"), PleasureCraftTrackedData.VEC3D);
+        FabricTrackedDataRegistry.register(Identifier.of(PleasureCraft.MOD_ID, "scene_option"), PleasureCraftTrackedDataRegistry.SCENE_OPTION);
+        FabricTrackedDataRegistry.register(Identifier.of(PleasureCraft.MOD_ID, "scene_phase"), PleasureCraftTrackedDataRegistry.SCENE_PHASE);
+        FabricTrackedDataRegistry.register(Identifier.of(PleasureCraft.MOD_ID, "vec3d"), PleasureCraftTrackedDataRegistry.VEC3D);
 
     }
 }

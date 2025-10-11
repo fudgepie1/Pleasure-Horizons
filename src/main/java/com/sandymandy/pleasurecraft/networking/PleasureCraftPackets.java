@@ -51,7 +51,7 @@ public class PleasureCraftPackets {
                             var entity = context.player().getWorld().getEntityById(packet.entityId());
                             if (entity instanceof SceneEntity girl) {
                                 switch (packet.actionId()) {
-                                    case "stripOrDressup" -> girl.requestStrip(true, context.player(), null);
+                                    case "stripOrDressup" -> girl.requestStrip();
                                     case "breakUp" -> girl.breakUp(context.player());
                                     case "setBase" -> girl.setBasePosHere();
                                     case "talk" -> ServerPlayNetworking.send(context.player(), new SceneOptionsS2CPacket(girl.getId(), girl.getCurrentRelationshipLevel(), girl.getSceneOptions()));

@@ -5,8 +5,9 @@ import com.sandymandy.pleasurecraft.item.PleasureCraftItemGroups;
 import com.sandymandy.pleasurecraft.item.PleasureCraftItems;
 import com.sandymandy.pleasurecraft.networking.PleasureCraftPackets;
 import com.sandymandy.pleasurecraft.registries.GirlRegistry;
-import com.sandymandy.pleasurecraft.registries.PleasureCraftSoundEvents;
-import com.sandymandy.pleasurecraft.registries.PleasureCraftTrackedData;
+import com.sandymandy.pleasurecraft.registries.PleasureCraftScreenHandlerRegistry;
+import com.sandymandy.pleasurecraft.registries.PleasureCraftSoundEventRegistry;
+import com.sandymandy.pleasurecraft.registries.PleasureCraftTrackedDataRegistry;
 import net.fabricmc.api.ModInitializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +24,8 @@ public class PleasureCraft implements ModInitializer {
 		PleasureCraftPackets.registerPackets();
 		PleasureCraftPackets.registerC2SPackets();
 		PleasureCraftCriteria.registerAdvancementCriteria();
-		PleasureCraftTrackedData.registerTrackedData();
-		PleasureCraftSoundEvents.registerSounds();
+		PleasureCraftTrackedDataRegistry.registerTrackedData();
+		PleasureCraftSoundEventRegistry.registerSounds();
+		PleasureCraftScreenHandlerRegistry.register();
 	}
 }

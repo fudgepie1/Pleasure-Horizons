@@ -9,7 +9,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Identifier;
 
-public class PleasureCraftHud {
+public class PleasureCraftHudRegistry {
 
     public static void register() {
         HudLayerRegistrationCallback.EVENT.register(layeredDrawer -> layeredDrawer.attachLayerAfter(

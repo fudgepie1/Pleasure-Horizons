@@ -6,7 +6,7 @@
     import net.minecraft.sound.SoundEvent;
     import net.minecraft.util.Identifier;
 
-    public class PleasureCraftSoundEvents {
+    public class PleasureCraftSoundEventRegistry {
 
 //  MISC_________________________________________________________________________________________________________________
         public static final SoundEvent BEDRUSTLE = registerSound("misc.bedrustle");

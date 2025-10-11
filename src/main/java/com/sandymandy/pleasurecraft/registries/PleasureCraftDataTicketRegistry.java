@@ -8,7 +8,7 @@ import software.bernie.geckolib.constant.dataticket.DataTicket;
 
 import java.util.Map;
 
-public class PleasureCraftDataTickets {
+public class PleasureCraftDataTicketRegistry {
     public static final DataTicket<Boolean> IS_STRIPPED = DataTicket.create("is_stripped", Boolean.class);
     public static final DataTicket<Boolean> IS_IN_SCENE = DataTicket.create("is_in_scene", Boolean.class);
     public static final DataTicket<String> GIRL_ID = DataTicket.create("girl_id", String.class);
@@ -18,7 +18,8 @@ public class PleasureCraftDataTickets {
     public static final DataTicket<Map<String, Boolean>> GIRL_BONE_VISIBILITY = (DataTicket<Map<String, Boolean>>) (Object) DataTicket.create("girl_bone_visibility", Map.class);
     public static final DataTicket<Map<String, Vec2f>> GIRL_BONE_UV_OFFSETS = (DataTicket<Map<String, Vec2f>>) (Object) DataTicket.create("girl_bone_uv_offsets", Map.class);
     public static final DataTicket<Map<String, Identifier>> GIRL_BONE_TEXTURE_OVERRIDES = (DataTicket<Map<String, Identifier>>) (Object) DataTicket.create("girl_bone_texture_overrides", Map.class);
-    public static final DataTicket<Map<String, Identifier>> PLAYER_TEXTURES = (DataTicket<Map<String, Identifier>>) (Object) DataTicket.create("player_textures", Map.class);
+    public static final DataTicket<Map<String, Identifier>> GIRL_BONE_TEXTURE_OVERRIDES_LAYER_TWO = (DataTicket<Map<String, Identifier>>) (Object) DataTicket.create("girl_bone_texture_overrides_layer_two", Map.class);
+    public static final DataTicket<Map<String, Identifier>> GIRL_BONE_TEXTURE_OVERRIDES_LAYER_THREE = (DataTicket<Map<String, Identifier>>) (Object) DataTicket.create("girl_bone_texture_overrides_layer_three", Map.class);
     public static final DataTicket<Map<String, Integer>> GIRL_BONE_COLOR_OVERRIDES = (DataTicket<Map<String, Integer>>) (Object) DataTicket.create("girl_bone_color_overrides", Map.class);
     public static final DataTicket<String> PASSENGER_BONE_NAME = DataTicket.create("passenger_bone_name", String.class);
 }

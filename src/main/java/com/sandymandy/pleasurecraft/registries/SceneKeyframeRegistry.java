@@ -1,10 +1,10 @@
 package com.sandymandy.pleasurecraft.registries;
 
-import net.minecraft.client.resource.language.I18n;
+import com.sandymandy.pleasurecraft.util.PleasureCraftLangUtils;
 import net.minecraft.sound.SoundEvent;
+import software.bernie.geckolib.animatable.GeoAnimatable;
 
 import java.util.*;
-
 public class SceneKeyframeRegistry {
     private static final Map<SceneKey, List<SoundEvent>> SOUND_EVENTS = new HashMap<>();
     private static final Map<SceneKey, List<SoundEvent>> RANDOM_SOUNDS = new HashMap<>();
@@ -20,113 +20,113 @@ public class SceneKeyframeRegistry {
     }
 
     private static void strip(){
-        registerSound("lucy","stripMSG1", PleasureCraftSoundEvents.LUCY_GIGGLE);
-        registerMessage("lucy","stripMSG1", I18n.translate("chat.lucy.strip.MSG1"));
+        registerSound("lucy","stripMSG1", PleasureCraftSoundEventRegistry.LUCY_GIGGLE);
+        registerMessage("lucy, momo, mika","stripMSG1", "strip");
     }
 
     private static void lucyPaizuri(){
         //Intro
-        registerSound( "lucy","paizuriStartMSG1", PleasureCraftSoundEvents.POUNDING);
+        registerSound( "lucy","paizuriStartMSG1", PleasureCraftSoundEventRegistry.POUNDING);
 
         //Slow
-        registerSound( "lucy","paizuriSlowMSG1", PleasureCraftSoundEvents.POUNDING);
+        registerSound( "lucy","paizuriSlowMSG1", PleasureCraftSoundEventRegistry.POUNDING);
 
         //Fast
-        registerSound( "lucy","paizuriFastMSG1", PleasureCraftSoundEvents.POUNDING);
-        registerSound( "lucy","paizuriFastMSG1", List.of(PleasureCraftSoundEvents.LUCY_AHH, PleasureCraftSoundEvents.LUCY_MMM));
+        registerSound( "lucy","paizuriFastMSG1", PleasureCraftSoundEventRegistry.POUNDING);
+        registerSound( "lucy","paizuriFastMSG1", List.of(PleasureCraftSoundEventRegistry.LUCY_AHH, PleasureCraftSoundEventRegistry.LUCY_MMM));
     }
 
     private static void lucyBlowJob(){
         //Intro
-        registerSound( "lucy","bjiMSG1", PleasureCraftSoundEvents.LUCY_MMM);
-        registerMessage("lucy","bjiMSG1", "What are you...");
-        registerSound( "lucy","bjiMSG2", PleasureCraftSoundEvents.LUCY_LIGHTBREATHING);
-        registerMessage("lucy","bjiMSG2", "eh... boys...");
-        registerSound( "lucy","bjiMSG3", PleasureCraftSoundEvents.LUCY_AFTERSSESSIONMOAN);
-        registerMessage("lucy","bjiMSG3", "OHOhh...!");
-        registerSound( "lucy","bjiMSG4", PleasureCraftSoundEvents.BELLJINGLE);
-        registerSound( "lucy","bjiMSG5", PleasureCraftSoundEvents.LUCY_HMPH);
-        registerMessage("lucy","bjiMSG5", "Was this really necessary?!");
-        registerSound( "lucy","bjiMSG6", PleasureCraftSoundEvents.LUCY_LIGHTBREATHING);
-        registerMessage("lucy","bjiMSG6", "Oh~");
-        registerSound( "lucy","bjiMSG7", PleasureCraftSoundEvents.LUCY_GIGGLE);
-        registerMessage("lucy","bjiMSG7", "You like it?~");
-        registerMessage("player","bjiMSG8", "Yee");
-        registerSound( "lucy","bjiMSG8", PleasureCraftSoundEvents.PLOB);
-        registerSound( "lucy","bjiMSG9", PleasureCraftSoundEvents.LUCY_GIGGLE);
-        registerMessage("lucy","bjiMSG9", "Hihihi~");
-        registerSound( "lucy","bjiMSG11", List.of(PleasureCraftSoundEvents.LUCY_LIPSOUND, PleasureCraftSoundEvents.LUCY_BJMOAN));
+        registerSound( "lucy","bjiMSG1", PleasureCraftSoundEventRegistry.LUCY_MMM);
+        registerMessage("lucy","bjiMSG1", "blowJob.msg1");
+        registerSound( "lucy","bjiMSG2", PleasureCraftSoundEventRegistry.LUCY_LIGHTBREATHING);
+        registerMessage("lucy","bjiMSG2", "blowJob.msg2");
+        registerSound( "lucy","bjiMSG3", PleasureCraftSoundEventRegistry.LUCY_AFTERSSESSIONMOAN);
+        registerMessage("lucy","bjiMSG3", "blowJob.msg3");
+        registerSound( "lucy","bjiMSG4", PleasureCraftSoundEventRegistry.BELLJINGLE);
+        registerSound( "lucy","bjiMSG5", PleasureCraftSoundEventRegistry.LUCY_HMPH);
+        registerMessage("lucy","bjiMSG5", "blowJob.msg4");
+        registerSound( "lucy","bjiMSG6", PleasureCraftSoundEventRegistry.LUCY_LIGHTBREATHING);
+        registerMessage("lucy","bjiMSG6", "blowJob.msg5");
+        registerSound( "lucy","bjiMSG7", PleasureCraftSoundEventRegistry.LUCY_GIGGLE);
+        registerMessage("lucy","bjiMSG7", "blowJob.msg6");
+        registerMessage("player","bjiMSG8", "blowJob.msg7");
+        registerSound( "lucy","bjiMSG8", PleasureCraftSoundEventRegistry.PLOB);
+        registerSound( "lucy","bjiMSG9", PleasureCraftSoundEventRegistry.LUCY_GIGGLE);
+        registerMessage("lucy","bjiMSG9", "blowJob.msg8");
+        registerSound( "lucy","bjiMSG11", List.of(PleasureCraftSoundEventRegistry.LUCY_LIPSOUND, PleasureCraftSoundEventRegistry.LUCY_BJMOAN));
 
         //Slow
-        registerSound( "lucy","bjiMSG12", PleasureCraftSoundEvents.LUCY_LIPSOUND);
+        registerSound( "lucy","bjiMSG12", PleasureCraftSoundEventRegistry.LUCY_LIPSOUND);
 
         //Fast
-        registerSound( "lucy","bjtMSG1", PleasureCraftSoundEvents.LUCY_MMM);
-        registerSound( "lucy","bjtMSG1", PleasureCraftSoundEvents.LUCY_LIPSOUND);
+        registerSound( "lucy","bjtMSG1", PleasureCraftSoundEventRegistry.LUCY_MMM);
+        registerSound( "lucy","bjtMSG1", PleasureCraftSoundEventRegistry.LUCY_LIPSOUND);
     }
 
     private static void lucyShared(){
         //Cum for BlowJob and Parizuri
-        registerSound( "lucy","bjcMSG1", PleasureCraftSoundEvents.LUCY_BJMOAN);
-        registerSound( "lucy","bjcMSG2", PleasureCraftSoundEvents.LUCY_BJMOAN);
-        registerSound( "lucy","bjcMSG3", PleasureCraftSoundEvents.LUCY_AFTERSSESSIONMOAN);
-        registerSound( "lucy","bjcMSG4", PleasureCraftSoundEvents.LUCY_LIGHTBREATHING);
-        registerSound( "lucy","bjcMSG5", PleasureCraftSoundEvents.LUCY_LIGHTBREATHING);
-        registerSound( "lucy","bjcMSG6", PleasureCraftSoundEvents.LUCY_LIGHTBREATHING);
+        registerSound( "lucy","bjcMSG1", PleasureCraftSoundEventRegistry.LUCY_BJMOAN);
+        registerSound( "lucy","bjcMSG2", PleasureCraftSoundEventRegistry.LUCY_BJMOAN);
+        registerSound( "lucy","bjcMSG3", PleasureCraftSoundEventRegistry.LUCY_AFTERSSESSIONMOAN);
+        registerSound( "lucy","bjcMSG4", PleasureCraftSoundEventRegistry.LUCY_LIGHTBREATHING);
+        registerSound( "lucy","bjcMSG5", PleasureCraftSoundEventRegistry.LUCY_LIGHTBREATHING);
+        registerSound( "lucy","bjcMSG6", PleasureCraftSoundEventRegistry.LUCY_LIGHTBREATHING);
     }
 
 
     private static void lucyDoggy(){
         //Laying on the bed
-        registerSound( "lucy","doggyLayOnBedMSG1", PleasureCraftSoundEvents.BEDRUSTLE);
-        registerSound( "lucy","doggyLayOnBedMSG2", PleasureCraftSoundEvents.LUCY_LIGHTBREATHING);
-        registerMessage( "lucy","doggyLayOnBedMSG2", "what are you waiting for?~");
-        registerSound( "lucy","doggyLayOnBedMSG3", PleasureCraftSoundEvents.LUCY_GIGGLE);
-        registerMessage( "lucy","doggyLayOnBedMSG3", "this ass ain't gonna fuck itself...");
-        registerSound( "lucy","doggyLayOnBedMSG4", PleasureCraftSoundEvents.SLAP);
+        registerSound( "lucy","doggyLayOnBedMSG1", PleasureCraftSoundEventRegistry.BEDRUSTLE);
+        registerSound( "lucy","doggyLayOnBedMSG2", PleasureCraftSoundEventRegistry.LUCY_LIGHTBREATHING);
+        registerMessage( "lucy","doggyLayOnBedMSG2", "doggyLayOnBed.msg1");
+        registerSound( "lucy","doggyLayOnBedMSG3", PleasureCraftSoundEventRegistry.LUCY_GIGGLE);
+        registerMessage( "lucy","doggyLayOnBedMSG3", "doggyLayOnBed.msg2");
+        registerSound( "lucy","doggyLayOnBedMSG4", PleasureCraftSoundEventRegistry.SLAP);
 
         //Intro
-        registerSound("lucy","doggyIntroMSG1", PleasureCraftSoundEvents.TOUCH);
-        registerSound("lucy","doggyIntroMSG2", PleasureCraftSoundEvents.TOUCH);
-        registerSound("lucy","doggyIntroMSG3", PleasureCraftSoundEvents.BEDRUSTLE);
-        registerSound("lucy","doggyIntroMSG4", PleasureCraftSoundEvents.SMALLINSERTS);
-        registerSound("lucy","doggyIntroMSG4", PleasureCraftSoundEvents.LUCY_MMM);
-        registerSound("lucy","doggyIntroMSG5", PleasureCraftSoundEvents.POUNDING);
-        registerSound("lucy","doggyIntroMSG5", PleasureCraftSoundEvents.LUCY_MOAN);
+        registerSound("lucy","doggyIntroMSG1", PleasureCraftSoundEventRegistry.TOUCH);
+        registerSound("lucy","doggyIntroMSG2", PleasureCraftSoundEventRegistry.TOUCH);
+        registerSound("lucy","doggyIntroMSG3", PleasureCraftSoundEventRegistry.BEDRUSTLE);
+        registerSound("lucy","doggyIntroMSG4", PleasureCraftSoundEventRegistry.SMALLINSERTS);
+        registerSound("lucy","doggyIntroMSG4", PleasureCraftSoundEventRegistry.LUCY_MMM);
+        registerSound("lucy","doggyIntroMSG5", PleasureCraftSoundEventRegistry.POUNDING);
+        registerSound("lucy","doggyIntroMSG5", PleasureCraftSoundEventRegistry.LUCY_MOAN);
 
         //Slow
-        registerSound("lucy","doggySlowMSG1", PleasureCraftSoundEvents.POUNDING);
-        registerSound("lucy","doggySlowMSG1", List.of(PleasureCraftSoundEvents.LUCY_MOAN, PleasureCraftSoundEvents.LUCY_HEAVYBREATHING, PleasureCraftSoundEvents.LUCY_MMM));
-        registerSound("lucy","doggySlowMSG2", PleasureCraftSoundEvents.LUCY_LIGHTBREATHING);
+        registerSound("lucy","doggySlowMSG1", PleasureCraftSoundEventRegistry.POUNDING);
+        registerSound("lucy","doggySlowMSG1", List.of(PleasureCraftSoundEventRegistry.LUCY_MOAN, PleasureCraftSoundEventRegistry.LUCY_HEAVYBREATHING, PleasureCraftSoundEventRegistry.LUCY_MMM));
+        registerSound("lucy","doggySlowMSG2", PleasureCraftSoundEventRegistry.LUCY_LIGHTBREATHING);
 
         //Fast
-        registerSound("lucy","doggyFastMSG1", PleasureCraftSoundEvents.POUNDING);
-        registerSound("lucy","doggyFastMSG1", List.of(PleasureCraftSoundEvents.LUCY_MOAN, PleasureCraftSoundEvents.LUCY_HEAVYBREATHING, PleasureCraftSoundEvents.LUCY_AHH));
+        registerSound("lucy","doggyFastMSG1", PleasureCraftSoundEventRegistry.POUNDING);
+        registerSound("lucy","doggyFastMSG1", List.of(PleasureCraftSoundEventRegistry.LUCY_MOAN, PleasureCraftSoundEventRegistry.LUCY_HEAVYBREATHING, PleasureCraftSoundEventRegistry.LUCY_AHH));
 
         //Cum
-        registerSound("lucy","doggyCumMSG1", PleasureCraftSoundEvents.POUNDING);
-        registerSound("lucy","doggyCumMSG1", PleasureCraftSoundEvents.CUMINFLATION);
-        registerSound("lucy","doggyCumMSG1", PleasureCraftSoundEvents.LUCY_MOAN);
-        registerSound("lucy","doggyCumMSG2", PleasureCraftSoundEvents.LUCY_HEAVYBREATHING);
-        registerSound("lucy","doggyCumMSG3", PleasureCraftSoundEvents.LUCY_HEAVYBREATHING);
-        registerSound("lucy","doggyCumMSG4", PleasureCraftSoundEvents.LUCY_HEAVYBREATHING);
-        registerSound("lucy","doggyCumMSG5", PleasureCraftSoundEvents.LUCY_HEAVYBREATHING);
+        registerSound("lucy","doggyCumMSG1", PleasureCraftSoundEventRegistry.POUNDING);
+        registerSound("lucy","doggyCumMSG1", PleasureCraftSoundEventRegistry.CUMINFLATION);
+        registerSound("lucy","doggyCumMSG1", PleasureCraftSoundEventRegistry.LUCY_MOAN);
+        registerSound("lucy","doggyCumMSG2", PleasureCraftSoundEventRegistry.LUCY_HEAVYBREATHING);
+        registerSound("lucy","doggyCumMSG3", PleasureCraftSoundEventRegistry.LUCY_HEAVYBREATHING);
+        registerSound("lucy","doggyCumMSG4", PleasureCraftSoundEventRegistry.LUCY_HEAVYBREATHING);
+        registerSound("lucy","doggyCumMSG5", PleasureCraftSoundEventRegistry.LUCY_HEAVYBREATHING);
     }
 
     // --- Register a fixed sound ---
-    public static void registerSound(String girls, String key, SoundEvent event) {
+    public static void registerSound(String girls, String frameKey, SoundEvent event) {
         String[] girlsArray = girls.replaceAll("\\s+", "").split(",");
         for (String girl : girlsArray) {
-            SceneKey sceneKey = new SceneKey(girl, key);
+            SceneKey sceneKey = new SceneKey(girl, frameKey);
             SOUND_EVENTS.computeIfAbsent(sceneKey, k -> new ArrayList<>()).add(event);
         }
     }
 
     // --- Register a randomizable sound list ---
-    public static void registerSound(String girls, String key, List<SoundEvent> events) {
+    public static void registerSound(String girls, String frameKey, List<SoundEvent> events) {
         String[] girlsArray = girls.replaceAll("\\s+", "").split(",");
         for (String girl : girlsArray) {
-            SceneKey sceneKey = new SceneKey(girl, key);
+            SceneKey sceneKey = new SceneKey(girl, frameKey);
             RANDOM_SOUNDS.computeIfAbsent(sceneKey, k -> new ArrayList<>()).addAll(events);
         }
     }
@@ -149,17 +149,31 @@ public class SceneKeyframeRegistry {
         return result;
     }
 
-    public static void registerMessage(String girls, String key, String message) {
+  /**
+   * The way that this gets the messages are through the lang files like the en_us.json for US english
+   * So when you register a message you have to give it a key to grab from the lang file.
+   * <p>
+   * They are saved as {sceneMsg."girlname"."langKey"} so if I were to register the message of "Hello World" to momo with the key of "World"
+   * I would have to make a new entry in the lang file as {sceneMsg.momo.World : "Hello World"}.
+   * <p>
+   */
+    public static void registerMessage(String girls, String frameKey, String langKey) {
         String[] girlsArray = girls.replaceAll("\\s+", "").split(",");
 
         for (String girl : girlsArray) {
-            SceneKey sceneKey = new SceneKey(girl, key);
-            CHAT_MESSAGES.computeIfAbsent(sceneKey, k -> new ArrayList<>()).add(message);
+            SceneKey sceneKey = new SceneKey(girl, frameKey);
+            String key = "sceneMsg." + girl + "." + langKey;
+            CHAT_MESSAGES.computeIfAbsent(sceneKey, k -> new ArrayList<>()).add(key);
         }
     }
 
     public static List<String> getMessage(String girl, String key) {
-        return CHAT_MESSAGES.getOrDefault(new SceneKey(girl, key), Collections.emptyList());
+        List<String> keys = CHAT_MESSAGES.getOrDefault(new SceneKey(girl, key), Collections.emptyList());
+        List<String> translated = new ArrayList<>();
+        for (String langKey : keys) {
+            translated.add(PleasureCraftLangUtils.getStringFromKey(langKey));
+        }
+        return translated;
     }
 
     public record SceneKey(String girl, String key) {}}

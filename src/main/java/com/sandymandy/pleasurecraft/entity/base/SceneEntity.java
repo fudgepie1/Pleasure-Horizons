@@ -1,13 +1,15 @@
 package com.sandymandy.pleasurecraft.entity.base;
 
+import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.entity.ai.goal.BedGoal;
 import com.sandymandy.pleasurecraft.entity.ai.goal.MoveToPlayerGoal;
 import com.sandymandy.pleasurecraft.entity.ai.goal.StopMovementGoal;
 import com.sandymandy.pleasurecraft.entity.ai.goal.StripGoal;
 import com.sandymandy.pleasurecraft.networking.C2S.*;
 import com.sandymandy.pleasurecraft.networking.S2C.PlayCumHudAnimationS2CPacket;
-import com.sandymandy.pleasurecraft.registries.PleasureCraftTrackedData;
+import com.sandymandy.pleasurecraft.registries.PleasureCraftTrackedDataRegistry;
 import com.sandymandy.pleasurecraft.registries.SceneKeyframeRegistry;
+import com.sandymandy.pleasurecraft.util.PleasureCraftLangUtils;
 import com.sandymandy.pleasurecraft.util.variables.SceneOptions;
 import com.sandymandy.pleasurecraft.util.variables.ScenePhase;
 import com.sandymandy.pleasurecraft.util.Utils;
@@ -38,8 +40,8 @@ import java.util.List;
 import java.util.Random;
 
 public class SceneEntity extends AbstractGirlEntity{
-    private static final TrackedData<SceneOptions> CURRENT_SCENE_OPTIONS = DataTracker.registerData(SceneEntity.class, PleasureCraftTrackedData.SCENE_OPTION);
-    private static final TrackedData<ScenePhase> CURRENT_SCENE_PHASE = DataTracker.registerData(SceneEntity.class, PleasureCraftTrackedData.SCENE_PHASE);
+    private static final TrackedData<SceneOptions> CURRENT_SCENE_OPTIONS = DataTracker.registerData(SceneEntity.class, PleasureCraftTrackedDataRegistry.SCENE_OPTION);
+    private static final TrackedData<ScenePhase> CURRENT_SCENE_PHASE = DataTracker.registerData(SceneEntity.class, PleasureCraftTrackedDataRegistry.SCENE_PHASE);
     private static final TrackedData<String> ANIMATION_KEY_FRAME_EVENT = DataTracker.registerData(SceneEntity.class, TrackedDataHandlerRegistry.STRING);
     public static final TrackedData<Float> SCENE_PROGRESS = DataTracker.registerData(SceneEntity.class, TrackedDataHandlerRegistry.FLOAT);
     public static final TrackedData<Float> CUM_THRESHOLD = DataTracker.registerData(SceneEntity.class, TrackedDataHandlerRegistry.FLOAT);
@@ -138,7 +140,6 @@ public class SceneEntity extends AbstractGirlEntity{
 
         if (!this.isStripped() && option.needsToStrip()){
             this.requestStrip(option);
-            this.messageAsEntity(scenePlayer, "Be there in a bit, just need to take these clothes off");
             return;
         }
 
@@ -153,7 +154,7 @@ public class SceneEntity extends AbstractGirlEntity{
             );
 
             if (bedInfo == null) {
-                this.messageAsEntity(scenePlayer, "We need a bed nearby for this...");
+                this.messageAsEntity(scenePlayer, PleasureCraftLangUtils.getStringFromKey("msg.pleasurecraft.noBedFound"));
                 return;
             }
 
@@ -229,7 +230,6 @@ public class SceneEntity extends AbstractGirlEntity{
     }
 
     private String getRandomFromList(List<String> list) {
-//        PleasureCraft.LOGGER.info(list.get(RANDOM.nextInt(list.size())));
         return list.get(RANDOM.nextInt(list.size()));
     }
 
@@ -345,14 +345,13 @@ public class SceneEntity extends AbstractGirlEntity{
     public void tick() {
         this.scenePlayer = (PlayerEntity) this.getOwner();
         super.tick();
-        keyFrameEventHandler();
-        soundHandler();
-        messageHandler();
-        handleSceneFootstepSounds();
-
-        playerModelLogic();
 
         if(!this.getWorld().isClient()) {
+            keyFrameEventHandler();
+            soundHandler();
+            messageHandler();
+            handleSceneFootstepSounds();
+
             this.setSceneState(getCurrentScenePhase() != ScenePhase.NONE);
 
             boolean InSexPhases = switch (getCurrentScenePhase()) {
@@ -362,6 +361,8 @@ public class SceneEntity extends AbstractGirlEntity{
 
             this.setHavingSex(isSceneActive() && InSexPhases);
         }
+        playerModelLogic();
+
 
         // Handle scene exit
         if (this.isSceneActive()) onSceneActive();
