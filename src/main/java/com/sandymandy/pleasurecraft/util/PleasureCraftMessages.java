@@ -19,7 +19,6 @@ public class PleasureCraftMessages {
 
     public void PlayerSpecificMessage(PlayerEntity playerEntity, String messageContent){
         Text message = Text.literal(messageContent);
-
         playerEntity.sendMessage(message,false);
     }
 

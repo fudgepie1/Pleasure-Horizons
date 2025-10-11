@@ -810,32 +810,6 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
         }
     }
 
-    public void messageAsEntity(String message){
-        this.messageAsEntity(null,message);
-    }
-
-    public void messageAsEntity(@Nullable PlayerEntity playerEntity, String message){
-        if(this.getWorld().isClient()) return;
-        String finalMessage = "<"+getGirlDisplayName()+"> " + message;
-
-        if(playerEntity == null){
-            new PleasureCraftMessages().GlobleMessage(this.getWorld(), finalMessage);
-        }
-        else {
-            new PleasureCraftMessages().PlayerSpecificMessage(playerEntity,finalMessage);
-        }
-
-    }
-
-    public void messageAsOwner(@Nullable PlayerEntity playerEntity, String message) {
-        if (this.getWorld().isClient()) return;
-        if (playerEntity == null) return;
-        GameProfile profile = playerEntity.getGameProfile();
-        String finalMessage = "<" + profile.getName() + "> " + message;
-        new PleasureCraftMessages().PlayerSpecificMessage(playerEntity, finalMessage);
-    }
-
-
     public void applySkinToBone(PlayerEntity player) {
         if (!this.getWorld().isClient()) return;
 

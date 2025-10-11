@@ -1,5 +1,6 @@
 package com.sandymandy.pleasurecraft.entity.base;
 
+import com.mojang.authlib.GameProfile;
 import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.entity.ai.goal.BedGoal;
 import com.sandymandy.pleasurecraft.entity.ai.goal.MoveToPlayerGoal;
@@ -10,6 +11,7 @@ import com.sandymandy.pleasurecraft.networking.S2C.PlayCumHudAnimationS2CPacket;
 import com.sandymandy.pleasurecraft.registries.PleasureCraftTrackedDataRegistry;
 import com.sandymandy.pleasurecraft.registries.SceneKeyframeRegistry;
 import com.sandymandy.pleasurecraft.util.PleasureCraftLangUtils;
+import com.sandymandy.pleasurecraft.util.PleasureCraftMessages;
 import com.sandymandy.pleasurecraft.util.variables.SceneOptions;
 import com.sandymandy.pleasurecraft.util.variables.ScenePhase;
 import com.sandymandy.pleasurecraft.util.Utils;
@@ -154,7 +156,7 @@ public class SceneEntity extends AbstractGirlEntity{
             );
 
             if (bedInfo == null) {
-                this.messageAsEntity(scenePlayer, PleasureCraftLangUtils.getStringFromKey("msg.pleasurecraft.noBedFound"));
+                this.messageAsEntity(false, PleasureCraftLangUtils.getStringFromKey("msg.pleasurecraft.noBedFound"));
                 return;
             }
 
@@ -306,11 +308,11 @@ public class SceneEntity extends AbstractGirlEntity{
         List<String> messagesPlayer = SceneKeyframeRegistry.getMessage("player", key);
 
         for (String messageGirl : messagesGirl) {
-            this.messageAsEntity(scenePlayer, messageGirl);
+            this.messageAsEntity(false, PleasureCraftLangUtils.getStringFromKey(messageGirl));
         }
 
         for (String messagePlayer : messagesPlayer) {
-            this.messageAsOwner(scenePlayer, messagePlayer);
+            this.messageAsOwner(PleasureCraftLangUtils.getStringFromKey(messagePlayer));
         }
     }
 
@@ -345,12 +347,12 @@ public class SceneEntity extends AbstractGirlEntity{
     public void tick() {
         this.scenePlayer = (PlayerEntity) this.getOwner();
         super.tick();
+        keyFrameEventHandler();
+        soundHandler();
+        if(this.getWorld().isClient())messageHandler();
+        handleSceneFootstepSounds();
 
         if(!this.getWorld().isClient()) {
-            keyFrameEventHandler();
-            soundHandler();
-            messageHandler();
-            handleSceneFootstepSounds();
 
             this.setSceneState(getCurrentScenePhase() != ScenePhase.NONE);
 
@@ -597,6 +599,25 @@ public class SceneEntity extends AbstractGirlEntity{
 
     public boolean isBedScene(){
         return this.getCurrentSceneOptions().isBedScene();
+    }
+
+    public void messageAsEntity(boolean sendFromServer, String message){
+        String finalMessage = "<"+getGirlDisplayName()+"> " + message;
+
+        if(sendFromServer && !this.getWorld().isClient()){
+            new PleasureCraftMessages().GlobleMessage(this.getWorld(), finalMessage);
+        }
+        else {
+            new PleasureCraftMessages().PlayerSpecificMessage(scenePlayer,finalMessage);
+        }
+
+    }
+
+    public void messageAsOwner(String message) {
+
+        GameProfile profile = scenePlayer.getGameProfile();
+        String finalMessage = "<" + profile.getName() + "> " + message;
+        new PleasureCraftMessages().PlayerSpecificMessage(scenePlayer, finalMessage);
     }
 
     private static class SoundKeyframeHandler implements AnimationController.KeyframeEventHandler<SceneEntity, SoundKeyframeData> {

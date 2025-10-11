@@ -168,12 +168,7 @@ public class SceneKeyframeRegistry {
     }
 
     public static List<String> getMessage(String girl, String key) {
-        List<String> keys = CHAT_MESSAGES.getOrDefault(new SceneKey(girl, key), Collections.emptyList());
-        List<String> translated = new ArrayList<>();
-        for (String langKey : keys) {
-            translated.add(PleasureCraftLangUtils.getStringFromKey(langKey));
-        }
-        return translated;
+        return CHAT_MESSAGES.getOrDefault(new SceneKey(girl, key), Collections.emptyList());
     }
 
     public record SceneKey(String girl, String key) {}}
