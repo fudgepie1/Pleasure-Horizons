@@ -50,6 +50,15 @@ public class Utils {
 
     }
 
+    public static int withFullAlpha(int color) {
+        // If already has an alpha byte (ARGB)
+        if ((color & 0xFF000000) != 0) {
+            return color;
+        }
+        // Add FF as the alpha (shift by 24 bits)
+        return 0xFF000000 | color;
+    }
+
     // simple record to hold info
     public record BlockInfo(BlockPos pos, BlockState state, Direction facing) {}
 

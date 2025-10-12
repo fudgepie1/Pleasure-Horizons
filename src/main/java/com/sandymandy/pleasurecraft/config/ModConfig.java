@@ -46,12 +46,12 @@ public class ModConfig implements ConfigData {
 
     public static class PlayerConfig {
         @ConfigEntry.Gui.Tooltip
-        @ConfigEntry.ColorPicker(allowAlpha = true)
-        public int penisShaftColor = 0xFFF5C6A5;
+        @ConfigEntry.ColorPicker
+        public int penisShaftColor = 0xF5C6A5;
 
         @ConfigEntry.Gui.Tooltip
-        @ConfigEntry.ColorPicker(allowAlpha = true)
-        public int penisHeadColor = 0xFFF5A7A9;
+        @ConfigEntry.ColorPicker
+        public int penisHeadColor = 0xF5A7A9;
     }
 
     @ConfigEntry.Category("freecam")

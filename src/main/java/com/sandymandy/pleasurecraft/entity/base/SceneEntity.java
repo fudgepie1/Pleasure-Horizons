@@ -353,9 +353,9 @@ public class SceneEntity extends AbstractGirlEntity{
         if(this.getWorld().isClient())messageHandler();
         handleSceneFootstepSounds();
 
-        this.overrideBoneColor(List.of("nut"), ModConfig.INSTANCE.player.penisHeadColor);
+        this.overrideBoneColor(List.of("nut"), Utils.withFullAlpha(ModConfig.INSTANCE.player.penisHeadColor));
 
-        this.overrideBoneColor(List.of("shaft", "ballL", "ballR"), ModConfig.INSTANCE.player.penisShaftColor);
+        this.overrideBoneColor(List.of("shaft", "ballL", "ballR"), Utils.withFullAlpha(ModConfig.INSTANCE.player.penisShaftColor));
 
         if(!this.getWorld().isClient()) {
 
