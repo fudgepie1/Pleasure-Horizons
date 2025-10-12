@@ -2,11 +2,9 @@ package com.sandymandy.pleasurecraft.client.models;
 
 import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.config.ModConfig;
-import com.sandymandy.pleasurecraft.entity.base.AbstractGirlEntity;
 import com.sandymandy.pleasurecraft.entity.base.SceneEntity;
-import com.sandymandy.pleasurecraft.entity.base.TameableGirlEntity;
-import com.sandymandy.pleasurecraft.util.renderer.GeoBoneExtension;
 import com.sandymandy.pleasurecraft.registries.PleasureCraftDataTicketRegistry;
+import com.sandymandy.pleasurecraft.util.renderer.GeoBoneExtension;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
