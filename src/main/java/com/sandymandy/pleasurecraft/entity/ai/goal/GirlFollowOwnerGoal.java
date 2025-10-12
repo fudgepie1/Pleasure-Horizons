@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.EnumSet;
 
-public class    GirlFollowOwnerGoal extends Goal {
+public class GirlFollowOwnerGoal extends Goal {
     private final TameableGirlEntity tameable;
     @Nullable
     private LivingEntity owner;

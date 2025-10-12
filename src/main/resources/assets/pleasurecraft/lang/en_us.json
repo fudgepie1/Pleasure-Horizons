@@ -133,6 +133,16 @@
 
   "text.autoconfig.pleasurecraft.option.girls.boobWindow.@Tooltip": "Makes the armor on the girls have a window to see their breast",
 
+  "text.autoconfig.pleasurecraft.option.player": "Player",
+
+  "text.autoconfig.pleasurecraft.option.player.penisShaftColor": "Penis Shaft Color",
+
+  "text.autoconfig.pleasurecraft.option.player.penisShaftColor.@Tooltip": "Sets the color of the shaft of penis on the player model",
+
+  "text.autoconfig.pleasurecraft.option.player.penisHeadColor": "Penis Head Color",
+
+  "text.autoconfig.pleasurecraft.option.player.penisHeadColor.@Tooltip": "Sets the color of the head of penis on the player model",
+
   "text.autoconfig.pleasurecraft.option.controls": "Key Bindings",
 
   "text.autoconfig.pleasurecraft.option.controls.@Tooltip": "Freecam key bindings.",

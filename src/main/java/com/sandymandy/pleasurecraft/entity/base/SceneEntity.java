@@ -2,6 +2,7 @@ package com.sandymandy.pleasurecraft.entity.base;
 
 import com.mojang.authlib.GameProfile;
 import com.sandymandy.pleasurecraft.PleasureCraft;
+import com.sandymandy.pleasurecraft.config.ModConfig;
 import com.sandymandy.pleasurecraft.entity.ai.goal.BedGoal;
 import com.sandymandy.pleasurecraft.entity.ai.goal.MoveToPlayerGoal;
 import com.sandymandy.pleasurecraft.entity.ai.goal.StopMovementGoal;
@@ -351,6 +352,10 @@ public class SceneEntity extends AbstractGirlEntity{
         soundHandler();
         if(this.getWorld().isClient())messageHandler();
         handleSceneFootstepSounds();
+
+        this.overrideBoneColor(List.of("nut"), ModConfig.INSTANCE.player.penisHeadColor);
+
+        this.overrideBoneColor(List.of("shaft", "ballL", "ballR"), ModConfig.INSTANCE.player.penisShaftColor);
 
         if(!this.getWorld().isClient()) {
 

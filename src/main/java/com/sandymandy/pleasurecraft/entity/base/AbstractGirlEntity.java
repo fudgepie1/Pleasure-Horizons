@@ -204,10 +204,11 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
         });
         this.goalSelector.add(4, new GirlAttackGoal(this, 1.5, false));
         this.goalSelector.add(5, new ConditionalGoal(new GirlFollowOwnerGoal(this, 1.0, 10.0F, 2.0F), this::isFollowing));
-        this.goalSelector.add(6, new TemptGoal(this, 1.25D, Ingredient.ofItems(getTameItem()), false));
-        this.goalSelector.add(7, new WanderAroundGoal(this, 1.0D));
-        this.goalSelector.add(8, new ConditionalGoal(new LookAtEntityGoal(this, PlayerEntity.class, 6.0F),() -> !isMovementLocked()));
-        this.goalSelector.add(9, new ConditionalGoal(new LookAroundGoal(this),() -> !isMovementLocked()));
+        this.goalSelector.add(6, new GirlStayNearBaseGoal(this, 1.0, 2.0F, 15.0F, 150));
+        this.goalSelector.add(7, new TemptGoal(this, 1.25D, Ingredient.ofItems(getTameItem()), false));
+        this.goalSelector.add(8, new WanderAroundGoal(this, 1.0D));
+        this.goalSelector.add(9, new ConditionalGoal(new LookAtEntityGoal(this, PlayerEntity.class, 6.0F),() -> !isMovementLocked()));
+        this.goalSelector.add(10, new ConditionalGoal(new LookAroundGoal(this),() -> !isMovementLocked()));
         this.targetSelector.add(1, new ConditionalGoal(new GirlTrackOwnerAttackerGoal(this), this::isFollowing));
         this.targetSelector.add(2, new ConditionalGoal(new GirlAttackWithOwnerGoal(this, AbstractGirlEntity.class), this::isFollowing));
         this.targetSelector.add(3, new RevengeGoal(this, PlayerEntity.class, AbstractGirlEntity.class));
@@ -383,7 +384,7 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity implements G
         }
     }
 
-    public void overrideBoneColor(List<String> bones, int hex) {
+    public void overrideBoneColor(List<String> bones, Integer hex) {
         if (this.boneColorOverrides == null) this.boneColorOverrides = new HashMap<>();
 
         for(String bone : bones) {

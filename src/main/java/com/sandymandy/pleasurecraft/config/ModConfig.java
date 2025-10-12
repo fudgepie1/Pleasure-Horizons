@@ -35,10 +35,23 @@ public class ModConfig implements ConfigData {
     @ConfigEntry.Gui.CollapsibleObject
     public GirlConfig girls = new GirlConfig();
 
+    @ConfigEntry.Gui.CollapsibleObject
+    public PlayerConfig player = new PlayerConfig();
+
 
     public static class GirlConfig {
         @ConfigEntry.Gui.Tooltip
         public boolean boobWindow = false;
+    }
+
+    public static class PlayerConfig {
+        @ConfigEntry.Gui.Tooltip
+        @ConfigEntry.ColorPicker(allowAlpha = true)
+        public int penisShaftColor = 0xFFF5C6A5;
+
+        @ConfigEntry.Gui.Tooltip
+        @ConfigEntry.ColorPicker(allowAlpha = true)
+        public int penisHeadColor = 0xFFF5A7A9;
     }
 
     @ConfigEntry.Category("freecam")
