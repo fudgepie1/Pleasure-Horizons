@@ -1,8 +1,5 @@
 package com.sandymandy.pleasurecraft.registries;
 
-import com.sandymandy.pleasurecraft.entity.base.AbstractGirlEntity;
-import com.sandymandy.pleasurecraft.entity.base.TameableGirlEntity;
-import com.sandymandy.pleasurecraft.util.PleasureCraftLangUtils;
 import net.minecraft.entity.EntityType;
 import net.minecraft.sound.SoundEvent;
 import software.bernie.geckolib.animatable.GeoAnimatable;
@@ -21,6 +18,8 @@ public class SceneKeyframeRegistry {
         lucyPaizuri();
         lucyShared();
         lucyBlowJob();
+        momoDoggy();
+        momoAnal();
     }
 
     private static void strip(){
@@ -116,6 +115,45 @@ public class SceneKeyframeRegistry {
         registerSound(GirlRegistry.LUCY,"doggyCumMSG3", PleasureCraftSoundEventRegistry.LUCY_HEAVYBREATHING);
         registerSound(GirlRegistry.LUCY,"doggyCumMSG4", PleasureCraftSoundEventRegistry.LUCY_HEAVYBREATHING);
         registerSound(GirlRegistry.LUCY,"doggyCumMSG5", PleasureCraftSoundEventRegistry.LUCY_HEAVYBREATHING);
+    }
+
+    private static void momoDoggy(){
+        //Laying on bed
+        registerSound(GirlRegistry.MOMO,"sitdownMSG1", PleasureCraftSoundEventRegistry.MOMO_BREATH);
+        registerMessage(GirlRegistry.MOMO, "sitdownMSG1", "sitDown");
+
+        //Sex
+        registerSound(GirlRegistry.MOMO, "slide", PleasureCraftSoundEventRegistry.SLIDE);
+        registerSound(GirlRegistry.MOMO, "pound", PleasureCraftSoundEventRegistry.POUNDING);
+        registerSound(GirlRegistry.MOMO, "doggyMoan", List.of(PleasureCraftSoundEventRegistry.MOMO_AHH, PleasureCraftSoundEventRegistry.MOMO_MMM));
+
+        //Cum
+        registerSound(GirlRegistry.MOMO, "cum", PleasureCraftSoundEventRegistry.INSERTS);
+        registerSound(GirlRegistry.MOMO, "orgasm1", PleasureCraftSoundEventRegistry.MOMO_MMM);
+        registerSound(GirlRegistry.MOMO, "orgasm2", PleasureCraftSoundEventRegistry.MOMO_MMM);
+
+    }
+
+    private static void momoAnal(){
+        //Laying on bed
+        registerSound(GirlRegistry.MOMO,"anal_prepareMSG1", PleasureCraftSoundEventRegistry.PLOB);
+        registerSound(GirlRegistry.MOMO,"anal_prepareMSG2", PleasureCraftSoundEventRegistry.BEDRUSTLE);
+
+        //Intro
+        registerSound(GirlRegistry.MOMO,"anal_startMSG1", PleasureCraftSoundEventRegistry.MOMO_AHH);
+        registerSound(GirlRegistry.MOMO,"anal_startMSG2", PleasureCraftSoundEventRegistry.POUNDING);
+        registerSound(GirlRegistry.MOMO,"anal_startMSG2", PleasureCraftSoundEventRegistry.MOMO_MMM);
+
+        //Slow
+        registerSound(GirlRegistry.MOMO,"anal_slowMSG1", PleasureCraftSoundEventRegistry.MOMO_AHH);
+        registerSound(GirlRegistry.MOMO,"anal_slowMSG1", PleasureCraftSoundEventRegistry.POUNDING);
+
+        //Fast
+        registerSound(GirlRegistry.MOMO,"anal_fastMSG1", PleasureCraftSoundEventRegistry.MOMO_AHH);
+        registerSound(GirlRegistry.MOMO,"anal_fastMSG1", PleasureCraftSoundEventRegistry.POUNDING);
+
+        //Cum
+        registerSound(GirlRegistry.MOMO,"anal_cumMSG2", PleasureCraftSoundEventRegistry.MOMO_AHH);
     }
 
     // --- Register a fixed sound ---
