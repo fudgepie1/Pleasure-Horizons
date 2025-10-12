@@ -8,7 +8,6 @@ import software.bernie.geckolib.cache.object.GeoBone;
 @Mixin(GeoBone.class)
 public abstract class GeoBoneMixin implements GeoBoneExtension {
 
-    @Shadow
     private boolean hidden;
 
     @Override

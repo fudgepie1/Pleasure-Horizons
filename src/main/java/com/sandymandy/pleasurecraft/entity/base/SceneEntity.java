@@ -8,6 +8,7 @@ import com.sandymandy.pleasurecraft.entity.ai.goal.MoveToPlayerGoal;
 import com.sandymandy.pleasurecraft.entity.ai.goal.StopMovementGoal;
 import com.sandymandy.pleasurecraft.entity.ai.goal.StripGoal;
 import com.sandymandy.pleasurecraft.networking.C2S.*;
+import com.sandymandy.pleasurecraft.networking.S2C.ClothingArmorVisibilityS2CPacket;
 import com.sandymandy.pleasurecraft.networking.S2C.PlayCumHudAnimationS2CPacket;
 import com.sandymandy.pleasurecraft.registries.PleasureCraftTrackedDataRegistry;
 import com.sandymandy.pleasurecraft.registries.SceneKeyframeRegistry;
@@ -19,17 +20,29 @@ import com.sandymandy.pleasurecraft.util.Utils;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.block.BlockState;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.texture.PlayerSkinProvider;
+import net.minecraft.client.util.SkinTextures;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.DyedColorComponent;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.sound.SoundEvent;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec2f;
 import net.minecraft.world.World;
+import software.bernie.geckolib.animatable.GeoEntity;
+import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.animatable.instance.SingletonAnimatableInstanceCache;
 import software.bernie.geckolib.animatable.manager.AnimatableManager;
 import software.bernie.geckolib.animatable.processing.AnimationController;
 import software.bernie.geckolib.animatable.processing.AnimationTest;
@@ -39,10 +52,9 @@ import software.bernie.geckolib.animation.RawAnimation;
 import software.bernie.geckolib.animation.keyframe.event.KeyFrameEvent;
 import software.bernie.geckolib.animation.keyframe.event.data.SoundKeyframeData;
 
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
-public class SceneEntity extends AbstractGirlEntity{
+public class SceneEntity extends AbstractGirlEntity implements GeoEntity {
     private static final TrackedData<SceneOptions> CURRENT_SCENE_OPTIONS = DataTracker.registerData(SceneEntity.class, PleasureCraftTrackedDataRegistry.SCENE_OPTION);
     private static final TrackedData<ScenePhase> CURRENT_SCENE_PHASE = DataTracker.registerData(SceneEntity.class, PleasureCraftTrackedDataRegistry.SCENE_PHASE);
     private static final TrackedData<String> ANIMATION_KEY_FRAME_EVENT = DataTracker.registerData(SceneEntity.class, TrackedDataHandlerRegistry.STRING);
@@ -51,6 +63,7 @@ public class SceneEntity extends AbstractGirlEntity{
     private static final TrackedData<Boolean> THRUSTING = DataTracker.registerData(SceneEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<Integer> INTRO_INDEX = DataTracker.registerData(SceneEntity.class, TrackedDataHandlerRegistry.INTEGER);
     private static final Random RANDOM = new Random();
+    private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
 
     private String lastSceneAnim = "";
     public String passengerBoneName = "boyCam";
@@ -60,6 +73,10 @@ public class SceneEntity extends AbstractGirlEntity{
     public PlayerEntity scenePlayer = (PlayerEntity) this.getOwner();
     private static final float PROGRESS_SPEED = 0.1f;
 
+    @Override
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return cache;
+    }
 
     protected SceneEntity(EntityType<? extends AbstractGirlEntity> entityType, World world) {
         super(entityType, world);
@@ -131,6 +148,53 @@ public class SceneEntity extends AbstractGirlEntity{
 
     public int getIntroIndex(){
         return this.dataTracker.get(INTRO_INDEX);
+    }
+
+    public void toggleModelBones(List<String> bones, boolean visible){
+        if(!getWorld().isClient){
+            return;
+        }
+
+        if (this.boneVisibility == null) {
+            this.boneVisibility = new HashMap<>();
+        }
+
+
+        for (String boneName : bones) {
+            this.boneVisibility.put(boneName, visible);
+        }
+    }
+
+    public void overrideBoneTexture(String boneName, Identifier texture) {
+        if (this.boneTextureOverrides == null) this.boneTextureOverrides = new HashMap<>();
+        this.boneTextureOverrides.put(boneName, texture);
+    }
+
+    public void overrideBoneTextureLayer2(String boneName, Identifier texture) {
+        if (this.boneTextureOverridesLayer2 == null) this.boneTextureOverridesLayer2 = new HashMap<>();
+        this.boneTextureOverridesLayer2.put(boneName, texture);
+    }
+
+    public void overrideBoneTextureLayer3(String boneName, Identifier texture) {
+        if (this.boneTextureOverridesLayer3 == null) this.boneTextureOverridesLayer3 = new HashMap<>();
+        this.boneTextureOverridesLayer3.put(boneName, texture);
+    }
+
+    public void overrideBoneUV(List<String> bones, float uOffset, float vOffset) {
+        if (this.boneUVOffsets == null) this.boneUVOffsets = new HashMap<>();
+
+        for (String boneName : bones) {
+            this.boneUVOffsets.put(boneName, new Vec2f(uOffset, vOffset));
+        }
+    }
+
+    public void overrideBoneColor(List<String> bones, Integer hex) {
+        if (this.boneColorOverrides == null) this.boneColorOverrides = new HashMap<>();
+
+        for(String bone : bones) {
+            this.boneColorOverrides.put(bone, Utils.withFullAlpha(hex));
+        }
+
     }
 
     public void startScene(SceneOptions option) {
@@ -346,19 +410,22 @@ public class SceneEntity extends AbstractGirlEntity{
 
     @Override
     public void tick() {
-        this.scenePlayer = (PlayerEntity) this.getOwner();
         super.tick();
+        this.scenePlayer = (PlayerEntity) this.getOwner();
+        //Rendering
+        this.overrideBoneColor(List.of("nut"), ModConfig.INSTANCE.player.penisHeadColor);
+        this.overrideBoneColor(List.of("shaft", "ballL", "ballR"), ModConfig.INSTANCE.player.penisShaftColor);
+        this.updateClothingAndArmor();
+        this.applySkinToBone(scenePlayer);
+        this.playerModelLogic();
+
+        //Scene
         keyFrameEventHandler();
-        soundHandler();
         if(this.getWorld().isClient())messageHandler();
-        handleSceneFootstepSounds();
-
-        this.overrideBoneColor(List.of("nut"), Utils.withFullAlpha(ModConfig.INSTANCE.player.penisHeadColor));
-
-        this.overrideBoneColor(List.of("shaft", "ballL", "ballR"), Utils.withFullAlpha(ModConfig.INSTANCE.player.penisShaftColor));
 
         if(!this.getWorld().isClient()) {
-
+            soundHandler();
+            handleSceneFootstepSounds();
             this.setSceneState(getCurrentScenePhase() != ScenePhase.NONE);
 
             boolean InSexPhases = switch (getCurrentScenePhase()) {
@@ -368,7 +435,6 @@ public class SceneEntity extends AbstractGirlEntity{
 
             this.setHavingSex(isSceneActive() && InSexPhases);
         }
-        playerModelLogic();
 
 
         // Handle scene exit
@@ -399,45 +465,40 @@ public class SceneEntity extends AbstractGirlEntity{
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllerRegistrar) {
         controllerRegistrar.add(new AnimationController<>("girl_animations", 4, this::handleAnimations).setSoundKeyframeHandler(new SoundKeyframeHandler(this)));
-
-
         // Attack controller, higher priority so it can override
-        //controllerRegistrar.add(new AnimationController<>("attack", 2, this::handleAttackAnimations));
-
-
+        /*controllerRegistrar.add(new AnimationController<>("attack", 2, this::handleAttackAnimations));*/
     }
+    /*private PlayState handleAttackAnimations(AnimationTest<SceneEntity> state) {
+        // Calculate horizontal velocity (not required, but kept from original)
+     double dx = this.getX() - this.prevX;
+       double dz = this.getZ() - this.prevZ;
 
-//    private PlayState handleAttackAnimations(AnimationTest<SceneEntity> state) {
-//        // Calculate horizontal velocity (not required, but kept from original)
-//     double dx = this.getX() - this.prevX;
-//       double dz = this.getZ() - this.prevZ;
-//
-//        // Detect swing (built-in swing progress > 0)
-//        if (this.getHandSwingProgress(state.getPartialTick()) > 0.0F && !this.swinging) {
-//            this.swinging = true;
-//            this.lastSwing = this.getWorld().getTime();
-//        }
-//
-//        // End swing after 7 ticks
-//        if (this.swinging && this.lastSwing + 7L <= this.getWorld().getTime()) {
-//            this.swinging = false;
-//        }
-//
-//        // If swinging and controller is idle, play correct animation
-//        if (this.swinging && state.controller().getAnimationState() == AnimationController.State.STOPPED) {
-//            state.resetCurrentAnimation();
-//
-//
-//            this.messageAsEntity("Swing");
-//            return state.setAndContinue(RawAnimation.begin().then(getAnimationPath("attack1"), Animation.LoopType.PLAY_ONCE));
-//        }
-//        else {
-//            this.messageAsEntity("Not Swing");
-//            return PlayState.CONTINUE;
-//        }
-//
-//
-//    }
+        // Detect swing (built-in swing progress > 0)
+        if (this.getHandSwingProgress(state.getPartialTick()) > 0.0F && !this.swinging) {
+            this.swinging = true;
+            this.lastSwing = this.getWorld().getTime();
+        }
+
+        // End swing after 7 ticks
+        if (this.swinging && this.lastSwing + 7L <= this.getWorld().getTime()) {
+            this.swinging = false;
+        }
+
+        // If swinging and controller is idle, play correct animation
+        if (this.swinging && state.controller().getAnimationState() == AnimationController.State.STOPPED) {
+            state.resetCurrentAnimation();
+
+
+            this.messageAsEntity("Swing");
+            return state.setAndContinue(RawAnimation.begin().then(getAnimationPath("attack1"), Animation.LoopType.PLAY_ONCE));
+        }
+        else {
+            this.messageAsEntity("Not Swing");
+            return PlayState.CONTINUE;
+        }
+
+
+    }*/
 
     private PlayState handleAnimations(AnimationTest<SceneEntity> state) {
         if (isSceneActive() && getOverrideAnim().isEmpty()) {
@@ -598,6 +659,113 @@ public class SceneEntity extends AbstractGirlEntity{
         return "animation." + this.getGirlID() + "." + animation;
     }
 
+    public void applySkinToBone(PlayerEntity player) {
+        if (!this.getWorld().isClient()) return;
+
+
+        Identifier texture;
+
+        // Set the base of the player model to Steve so if there isn't a player it has a fallback
+        this.overrideBoneTexture("steve", Identifier.ofVanilla("textures/entity/player/wide/steve.png"));
+
+        if (player != null) {
+            MinecraftClient client = MinecraftClient.getInstance();
+            PlayerSkinProvider skinProvider = client.getSkinProvider();
+
+            GameProfile profile = player.getGameProfile();
+
+            // Get the skin identifier
+            texture = skinProvider.getSkinTextures(profile).texture();
+            setIsPlayerModelSlim(skinProvider.getSkinTextures(profile).model() == SkinTextures.Model.SLIM);
+
+            // if isn't null set the player texture
+            if (texture != null) {
+                this.overrideBoneTexture("steve", texture);
+            }
+
+            this.overrideBoneTextureLayer2("steve", Identifier.of(PleasureCraft.MOD_ID,"textures/player/penis.png"));
+        }
+    }
+
+    private void updateClothingAndArmor() {
+        if (this.getWorld().isClient()) return;
+
+        boolean stripped = isStripped();
+
+        for (EquipmentSlot slot : EquipmentSlot.values()) {
+            boolean hasArmor = !this.inventory.getArmorStack(slot).isEmpty();
+            armorVisibility.put(slot, hasArmor &! stripped);
+        }
+
+
+        List<Boolean> armorList = Arrays.stream(EquipmentSlot.values())
+                .map(s -> armorVisibility.getOrDefault(s, false))
+                .toList();
+
+
+        ClothingArmorVisibilityS2CPacket packet =
+                new ClothingArmorVisibilityS2CPacket(this.getId(), armorList);
+
+        for (ServerPlayerEntity player : Objects.requireNonNull(this.getServer()).getPlayerManager().getPlayerList()) {
+            ServerPlayNetworking.send(player, packet);
+        }
+    }
+
+    public void applyClothingAndArmor() {
+        if (!this.getWorld().isClient()) return;
+
+        for (EquipmentSlot slot : EquipmentSlot.values()) {
+            List<String> armorBones = getArmorBones().get(slot);
+            if (armorBones != null) {
+                toggleModelBones(armorBones, armorVisibility.getOrDefault(slot, false));
+                // Special rule: hide vagina if armor is in legs slot
+                if (slot == EquipmentSlot.LEGS) {
+                    boolean legsCovered = armorVisibility.getOrDefault(slot, false);
+                    toggleModelBones(Collections.singletonList("vagina"), !legsCovered);
+                }
+            }
+            displayArmor(slot);
+        }
+    }
+
+    private void displayArmor(EquipmentSlot slot){
+        if (this.inventory.getArmorStack(slot).isEmpty()) {
+            return;
+        }
+
+        float u = 0;
+
+        ItemStack item = this.inventory.getArmorStack(slot);
+
+        String armorType = item.toString().toLowerCase();
+
+        if (armorType.contains("turtle")) u = 0.10546875f;
+        if (armorType.contains("leather")){
+            u = 0.0703125f;
+            this.overrideBoneColor(this.getArmorBones().get(slot), getDyedArmorColor(inventory.getArmorStack(slot)));
+        }
+        if (armorType.contains("iron")) u = 0.03515625f;
+        if (armorType.contains("chain")) u = 0.052734375f;
+        if (armorType.contains("gold")) u = 0.0176f;
+        if (armorType.contains("netherite")) u = 0.087890625f;
+
+        this.overrideBoneUV(this.getArmorBones().get(slot),u,0);
+
+    }
+
+    private int getDyedArmorColor(ItemStack stack) {
+        if (stack.isEmpty()) return 0xFFFFFF;
+
+        DyedColorComponent dyed = stack.get(DataComponentTypes.DYED_COLOR);
+        if (dyed != null) {
+            // Returns already-correct RGB integer
+            return dyed.rgb();
+        }
+
+        // Default base color for leather (same as EquipmentModel)
+        return 0xA06540;
+    }
+
     public float getBedOffset(){
         return this.getCurrentSceneOptions().bedAlignmentOffset();
     }
@@ -641,4 +809,5 @@ public class SceneEntity extends AbstractGirlEntity{
             ClientPlayNetworking.send(new SoundEventSyncC2SPacket(this.entity.getId(), key));
         }
     }
+
 }

@@ -2,8 +2,11 @@ package com.sandymandy.pleasurecraft.util;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.item.Item;
+import net.minecraft.registry.Registries;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.state.property.Properties;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
@@ -57,6 +60,30 @@ public class Utils {
         }
         // Add FF as the alpha (shift by 24 bits)
         return 0xFF000000 | color;
+    }
+
+    public static String getReadableTameItemName(Item tameItem) {
+        Identifier id = Registries.ITEM.getId(tameItem);
+
+        if (id != null) {
+            String path = id.getPath(); // e.g., "blue_allium"
+
+            // Capitalize each word split by underscores
+            String[] words = path.split("_");
+            StringBuilder formatted = new StringBuilder();
+
+            for (String word : words) {
+                if (!word.isEmpty()) {
+                    formatted.append(Character.toUpperCase(word.charAt(0)))
+                            .append(word.substring(1))
+                            .append(" ");
+                }
+            }
+
+            return formatted.toString().trim(); // "Blue Allium"
+        } else {
+            return "Unknown Item";
+        }
     }
 
     // simple record to hold info

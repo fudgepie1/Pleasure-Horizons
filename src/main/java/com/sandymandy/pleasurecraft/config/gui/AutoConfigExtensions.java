@@ -32,8 +32,6 @@ public class AutoConfigExtensions {
 
         ModBindingsConfigImpl.apply(registry);
         ValidateRegexImpl.apply(registry);
-        BoundedContinuousImpl.apply(registry);
-
         CollisionDependencies.apply(registry);
         CollisionWhitelistDependencies.apply(registry);
     }

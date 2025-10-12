@@ -19,6 +19,10 @@ public class InventoryButtonRegistry {
 
             new InventoryButtonAction(Text.literal("Go To Base"), 1,(girl, player) -> {
                 ClientPlayNetworking.send(new InventoryButtonC2SPacket(girl.getId(), "goToBase"));
+            }),
+
+            new InventoryButtonAction(Text.literal("Sound Test"), 1,(girl, player) -> {
+                ClientPlayNetworking.send(new InventoryButtonC2SPacket(girl.getId(), "testSound"));
             })
     );
 

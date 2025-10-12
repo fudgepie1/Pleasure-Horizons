@@ -7,6 +7,7 @@ import com.sandymandy.pleasurecraft.networking.C2S.*;
 import com.sandymandy.pleasurecraft.networking.S2C.ClothingArmorVisibilityS2CPacket;
 import com.sandymandy.pleasurecraft.networking.S2C.PlayCumHudAnimationS2CPacket;
 import com.sandymandy.pleasurecraft.networking.S2C.SceneOptionsS2CPacket;
+import com.sandymandy.pleasurecraft.registries.PleasureCraftSoundEventRegistry;
 import com.sandymandy.pleasurecraft.screen.client.GirlSceneScreen;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
@@ -58,6 +59,16 @@ public class PleasureCraftPackets {
                                     case "goToBase" -> girl.teleportToBase();
                                     case "sit" -> girl.setSitting(!girl.isSitting());
                                     case "follow" -> girl.setFollowing(!girl.isFollowing());
+                                    case "testSound" -> {
+                                        girl.playSound(PleasureCraftSoundEventRegistry.LUCY_MOAN, 2f, 1f);
+                                        girl.playSound(PleasureCraftSoundEventRegistry.TOUCH, 2f, 1f);
+                                        girl.playSound(PleasureCraftSoundEventRegistry.CLAP, 2f, 1f);
+                                        girl.playSound(PleasureCraftSoundEventRegistry.CUMINFLATION, 2f, 1f);
+                                        girl.playSound(PleasureCraftSoundEventRegistry.BELLJINGLE, 2f, 1f);
+                                        girl.playSound(PleasureCraftSoundEventRegistry.LUCY_HEAVYBREATHING, 2f, 1f);
+                                        girl.playSound(PleasureCraftSoundEventRegistry.LUCY_HUH, 2f, 1f);
+                                        girl.playSound(PleasureCraftSoundEventRegistry.LUCY_HMPH, 2f, 1f);
+                                    }
                                     default -> PleasureCraft.LOGGER.warn("Unknown Girl interaction: " + packet.actionId());
                                 }
                             }
