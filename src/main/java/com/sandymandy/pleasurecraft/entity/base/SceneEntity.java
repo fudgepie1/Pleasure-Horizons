@@ -356,7 +356,7 @@ public class SceneEntity extends AbstractGirlEntity implements GeoEntity {
         String key = getAnimationKeyFrameEvent();
 
         // Get all sounds for this key
-        List<SoundEvent> sounds = SceneKeyframeRegistry.getSound(this.getGirlID(), key);
+        List<SoundEvent> sounds = SceneKeyframeRegistry.getSound(this.getType(), key);
 
         // Play all sounds sequentially (or simultaneously)
         for (SoundEvent sound : sounds) {
@@ -366,18 +366,18 @@ public class SceneEntity extends AbstractGirlEntity implements GeoEntity {
 
     }
 
-    private void messageHandler(){
+    private void messageHandler() {
         String key = getAnimationKeyFrameEvent();
 
-        List<String> messagesGirl = SceneKeyframeRegistry.getMessage(this.getGirlID(), key);
-        List<String> messagesPlayer = SceneKeyframeRegistry.getMessage("player", key);
+        List<String> girlMsgs = SceneKeyframeRegistry.getMessage(this.getType(), key);
+        List<String> playerMsgs = SceneKeyframeRegistry.getPlayerMessage(key);
 
-        for (String messageGirl : messagesGirl) {
-            this.messageAsEntity(false, PleasureCraftLangUtils.getStringFromKey(messageGirl));
+        for (String msg : girlMsgs) {
+            this.messageAsEntity(false, PleasureCraftLangUtils.getStringFromKey(msg));
         }
 
-        for (String messagePlayer : messagesPlayer) {
-            this.messageAsOwner(PleasureCraftLangUtils.getStringFromKey(messagePlayer));
+        for (String msg : playerMsgs) {
+            this.messageAsOwner(PleasureCraftLangUtils.getStringFromKey(msg));
         }
     }
 

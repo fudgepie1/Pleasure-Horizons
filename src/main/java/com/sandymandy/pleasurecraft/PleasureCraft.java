@@ -25,7 +25,7 @@ public class PleasureCraft implements ModInitializer {
 		PleasureCraftPackets.registerC2SPackets();
 		PleasureCraftCriteria.registerAdvancementCriteria();
 		PleasureCraftTrackedDataRegistry.registerTrackedData();
-		PleasureCraftSoundEventRegistry.registerSounds();
+		PleasureCraftSoundEventRegistry.registerSoundEvents();
 		PleasureCraftScreenHandlerRegistry.register();
 	}
 }

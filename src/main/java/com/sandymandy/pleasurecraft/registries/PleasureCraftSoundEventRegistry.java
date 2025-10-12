@@ -8,7 +8,7 @@
 
     public class PleasureCraftSoundEventRegistry {
 
-//  MISC_________________________________________________________________________________________________________________
+//  MISC________________________________________________________________________________________________________________
         public static final SoundEvent BEDRUSTLE = registerSound("misc.bedrustle");
         public static final SoundEvent BELLJINGLE = registerSound("misc.belljingle");
         public static final SoundEvent CLAP = registerSound("misc.clap");
@@ -23,7 +23,7 @@
         public static final SoundEvent PLOB = registerSound("misc.plob");
 
 
-//  LUCY_________________________________________________________________________________________________________________
+//  LUCY________________________________________________________________________________________________________________
         public static final SoundEvent LUCY_AFTERSSESSIONMOAN = registerSound("lucy.aftersessionmoan");
         public static final SoundEvent LUCY_AHH = registerSound("lucy.ahh");
         public static final SoundEvent LUCY_BJMOAN = registerSound("lucy.bjmoan");
@@ -39,7 +39,35 @@
         public static final SoundEvent LUCY_SADOH = registerSound("lucy.sadoh");
         public static final SoundEvent LUCY_SIGH = registerSound("lucy.sigh");
 
-        public static void registerSounds() {
+//  MIKA________________________________________________________________________________________________________________
+        public static final SoundEvent MIKA_AFTERSSESSIONMOAN = registerSound("mika.aftersessionmoan");
+        public static final SoundEvent MIKA_AHH = registerSound("mika.ahh");
+        public static final SoundEvent MIKA_BJMOAN = registerSound("mika.bjmoan");
+        public static final SoundEvent MIKA_COMETOMOMMY = registerSound("mika.cometomommy");
+        public static final SoundEvent MIKA_GIGGLE = registerSound("mika.giggle");
+        public static final SoundEvent MIKA_GOODBOY = registerSound("mika.goodboy");
+        public static final SoundEvent MIKA_HAPPYOH = registerSound("mika.happyoh");
+        public static final SoundEvent MIKA_HEAVYBREATHING = registerSound("mika.heavybreathing");
+        public static final SoundEvent MIKA_HMPH = registerSound("mika.hmph");
+        public static final SoundEvent MIKA_HUH = registerSound("mika.huh");
+        public static final SoundEvent MIKA_LIGHTBREATHING = registerSound("mika.lightbreathing");
+        public static final SoundEvent MIKA_LIPSOUND = registerSound("mika.lipsound");
+        public static final SoundEvent MIKA_MMM = registerSound("mika.mmm");
+        public static final SoundEvent MIKA_MOAN = registerSound("mika.moan");
+        public static final SoundEvent MIKA_MOMMYSHORNNY = registerSound("mika.mommyhorny");
+        public static final SoundEvent MIKA_SADOH = registerSound("mika.sadoh");
+        public static final SoundEvent MIKA_SIGH = registerSound("mika.sigh");
+
+//  MOMO________________________________________________________________________________________________________________
+        public static final SoundEvent MOMO_AHH = registerSound("momo.ahh");
+        public static final SoundEvent MOMO_BJMOAN = registerSound("momo.bjmoan");
+        public static final SoundEvent MOMO_BREATH = registerSound("momo.breath");
+        public static final SoundEvent MOMO_GIGGLE = registerSound("momo.giggle");
+        public static final SoundEvent MOMO_HEY = registerSound("momo.hey");
+        public static final SoundEvent MOMO_HUH = registerSound("momo.huh");
+        public static final SoundEvent MOMO_MMM = registerSound("momo.mmm");
+
+        public static void registerSoundEvents() {
             PleasureCraft.LOGGER.info("Registering SoundEvents for PleasureCraft");
             SceneKeyframeRegistry.registerSoundEvents();
         }
