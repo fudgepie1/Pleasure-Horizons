@@ -1,15 +1,12 @@
 package com.sandymandy.pleasurecraft.entity.base;
 
-import com.sandymandy.pleasurecraft.entity.ai.goal.*;
 import com.sandymandy.pleasurecraft.util.variables.SceneOptions;
+import com.sandymandy.pleasurecraft.village.VillageData;
+import com.sandymandy.pleasurecraft.village.VillageMember;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.brain.Brain;
-import net.minecraft.entity.ai.goal.*;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.recipe.Ingredient;
-import net.minecraft.registry.tag.DamageTypeTags;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -36,8 +33,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 
-public abstract class GirlEntityAI extends TameableGirlEntity implements SmartBrainOwner<GirlEntityAI> {
-
+public abstract class GirlEntityAI extends TameableGirlEntity implements SmartBrainOwner<GirlEntityAI>, VillageMember {
+    private VillageData village;
     private LivingEntity attackTarget;
     private int ticksSinceLastHit;
     private static final int MAX_TICKS_NO_HIT = 20 * 20;
@@ -48,6 +45,14 @@ public abstract class GirlEntityAI extends TameableGirlEntity implements SmartBr
     private boolean requestMoveToPlayer;
     protected GirlEntityAI(EntityType<? extends TameableGirlEntity> entityType, World world) {
         super(entityType, world);
+    }
+
+    @Override
+    public @Nullable VillageData getVillage() { return village; }
+
+    @Override
+    public void setVillage(@Nullable VillageData village) {
+        this.village = village;
     }
 
     @Override
