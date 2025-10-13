@@ -1,11 +1,11 @@
 package com.sandymandy.pleasurecraft.screen.client;
 
 import com.sandymandy.pleasurecraft.PleasureCraft;
-import com.sandymandy.pleasurecraft.entity.base.AbstractGirlEntity;
+import com.sandymandy.pleasurecraft.entity.base.TameableGirlEntity;
 import com.sandymandy.pleasurecraft.networking.C2S.InInventoryC2SPacket;
+import com.sandymandy.pleasurecraft.registries.InventoryButtonRegistry;
 import com.sandymandy.pleasurecraft.screen.GirlInventoryScreenHandler;
 import com.sandymandy.pleasurecraft.screen.InventoryButtonAction;
-import com.sandymandy.pleasurecraft.registries.InventoryButtonRegistry;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -24,7 +24,7 @@ public class GirlInventoryScreen extends HandledScreen<GirlInventoryScreenHandle
     private float yMouse;
     private static final int GUI_WIDTH = 176;
     private static final int GUI_HEIGHT = 170;
-    private final AbstractGirlEntity girl;
+    private final TameableGirlEntity girl;
     private final PlayerEntity player;
 
 

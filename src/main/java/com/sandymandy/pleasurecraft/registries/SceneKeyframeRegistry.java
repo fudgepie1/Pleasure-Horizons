@@ -20,11 +20,15 @@ public class SceneKeyframeRegistry {
         lucyBlowJob();
         momoDoggy();
         momoAnal();
+        mikaFaceFuck();
+        mikaMissionary();
+        mikaCowgirl();
     }
 
     private static void strip(){
         registerSound(GirlRegistry.LUCY,"stripMSG1", PleasureCraftSoundEventRegistry.LUCY_GIGGLE);
         registerSound(GirlRegistry.MOMO,"stripMSG1", PleasureCraftSoundEventRegistry.MOMO_GIGGLE);
+        registerSound(GirlRegistry.MIKA,"stripMSG1", PleasureCraftSoundEventRegistry.MIKA_GIGGLE);
         registerMessage(List.of(GirlRegistry.LUCY,GirlRegistry.MIKA,GirlRegistry.MOMO),"stripMSG1", "strip");
     }
 
@@ -154,6 +158,61 @@ public class SceneKeyframeRegistry {
 
         //Cum
         registerSound(GirlRegistry.MOMO,"anal_cumMSG2", PleasureCraftSoundEventRegistry.MOMO_AHH);
+    }
+
+    private static void mikaFaceFuck(){
+        //Intro
+        registerSound(GirlRegistry.MIKA,"carry_introMSG1", PleasureCraftSoundEventRegistry.MIKA_HMPH);
+        registerMessage(GirlRegistry.MIKA,"carry_introMSG1", "faceFuck.msg1");
+        registerSound(GirlRegistry.MIKA,"carry_introMSG2", PleasureCraftSoundEventRegistry.MIKA_GIGGLE);
+        registerMessage(GirlRegistry.MIKA,"carry_introMSG2", "faceFuck.msg2");
+        registerSound(GirlRegistry.MIKA,"lipsound", PleasureCraftSoundEventRegistry.MIKA_LIPSOUND);
+        registerSound(GirlRegistry.MIKA, "suckFast", PleasureCraftSoundEventRegistry.POUNDING);
+
+        //Cum
+        registerSound(GirlRegistry.MIKA, "cum", PleasureCraftSoundEventRegistry.INSERTS);
+        registerSound(GirlRegistry.MIKA, "cum", PleasureCraftSoundEventRegistry.MIKA_LIPSOUND);
+    }
+
+    private static void mikaMissionary(){
+        //Laying on bed
+        registerSound(GirlRegistry.MIKA,"sitdownMSG1", PleasureCraftSoundEventRegistry.MIKA_COMETOMOMMY);
+        registerMessage(GirlRegistry.MIKA,"sitdownMSG1", "sitDown");
+
+        //Slow
+        registerSound(GirlRegistry.MIKA, "missionary_slowMSG1", PleasureCraftSoundEventRegistry.POUNDING);
+        registerSound(GirlRegistry.MIKA, "missionary_slowMSG1", PleasureCraftSoundEventRegistry.MIKA_AHH);
+
+        //Fast
+        registerSound(GirlRegistry.MIKA, "missionary_fastMSG1", PleasureCraftSoundEventRegistry.POUNDING);
+        registerSound(GirlRegistry.MIKA, "missionary_fastMSG1", List.of(PleasureCraftSoundEventRegistry.MIKA_AHH, PleasureCraftSoundEventRegistry.MIKA_MOAN));
+
+        //Cum
+        registerSound(GirlRegistry.MIKA, "bedRustle", PleasureCraftSoundEventRegistry.POUNDING);
+        registerSound(GirlRegistry.MIKA, "bedRustle", PleasureCraftSoundEventRegistry.BEDRUSTLE);
+        registerSound(GirlRegistry.MIKA, "missionary_cumMSG1", PleasureCraftSoundEventRegistry.MIKA_AHH);
+        registerSound(GirlRegistry.MIKA, "missionary_cumMSG2", PleasureCraftSoundEventRegistry.MIKA_GOODBOY);
+        registerMessage(GirlRegistry.MIKA,"missionary_cumMSG2", "goodBoy");
+    }
+
+    private static void mikaCowgirl(){
+        registerSound(GirlRegistry.MIKA,"cowgirlStartMSG0", PleasureCraftSoundEventRegistry.MIKA_GIGGLE);
+        registerMessage(GirlRegistry.MIKA,"cowgirlStartMSG1", "likeWhatYouSee");
+        registerSound(GirlRegistry.MIKA, "cowgirlStartMSG2", PleasureCraftSoundEventRegistry.POUNDING);
+        registerSound(GirlRegistry.MIKA, "cowgirlStartMSG2", List.of(PleasureCraftSoundEventRegistry.MIKA_AHH, PleasureCraftSoundEventRegistry.MIKA_MOAN));
+
+        //Fast
+        registerSound(GirlRegistry.MIKA, "cowgirlfastMSG1", PleasureCraftSoundEventRegistry.POUNDING);
+        registerSound(GirlRegistry.MIKA, "cowgirlfastMSG1", List.of(PleasureCraftSoundEventRegistry.MIKA_AHH, PleasureCraftSoundEventRegistry.MIKA_MOAN));
+
+        //Cum
+        registerSound(GirlRegistry.MIKA, "cowgirlcumMSG1", PleasureCraftSoundEventRegistry.POUNDING);
+        registerSound(GirlRegistry.MIKA, "cowgirlcumMSG1", PleasureCraftSoundEventRegistry.MIKA_AHH);
+        registerSound(GirlRegistry.MIKA, "cowgirlcumMSG2", PleasureCraftSoundEventRegistry.POUNDING);
+        registerSound(GirlRegistry.MIKA, "cowgirlcumMSG2", PleasureCraftSoundEventRegistry.MIKA_MOAN);
+        registerSound(GirlRegistry.MIKA, "cowgirlcumMSG3", PleasureCraftSoundEventRegistry.POUNDING);
+        registerSound(GirlRegistry.MIKA, "cowgirlcumMSG4", PleasureCraftSoundEventRegistry.MIKA_GOODBOY);
+        registerMessage(GirlRegistry.MIKA,"cowgirlcumMSG4", "goodBoy");
     }
 
     // --- Register a fixed sound ---

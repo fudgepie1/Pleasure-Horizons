@@ -1,19 +1,16 @@
 package com.sandymandy.pleasurecraft.entity.ai.goal;
 
-import com.sandymandy.pleasurecraft.entity.base.AbstractGirlEntity;
-import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.entity.mob.PathAwareEntity;
+import com.sandymandy.pleasurecraft.entity.base.TameableGirlEntity;
 import net.minecraft.entity.ai.control.MoveControl;
-import net.minecraft.util.math.Vec2f;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.entity.ai.goal.Goal;
 
 import java.util.EnumSet;
 
 public class StopMovementGoal extends Goal {
-    private final AbstractGirlEntity entity;
+    private final TameableGirlEntity entity;
     public float bodyYaw;
 
-    public StopMovementGoal(AbstractGirlEntity entity) {
+    public StopMovementGoal(TameableGirlEntity entity) {
         this.entity = entity;
         this.setControls(EnumSet.of(Goal.Control.MOVE, Goal.Control.JUMP));
     }

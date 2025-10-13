@@ -395,7 +395,7 @@ public class TameableGirlEntity extends PathAwareEntity implements Tameable {
                 }
                 else {
                     if (itemInHand.equals(getTameItem())) {
-                        player.sendMessage(Text.literal("She's Already In A Relationship With Someone"), true);
+                        player.sendMessage(Text.of(PleasureCraftLangUtils.getStringFromKey("msg.pleasurecraft.alreadyInRelationship")), true);
                         return ActionResult.FAIL;
                     }
                 }

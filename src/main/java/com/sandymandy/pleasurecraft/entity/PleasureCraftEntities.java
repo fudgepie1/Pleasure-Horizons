@@ -1,14 +1,12 @@
 package com.sandymandy.pleasurecraft.entity;
 
 import com.sandymandy.pleasurecraft.PleasureCraft;
-import com.sandymandy.pleasurecraft.entity.base.AbstractGirlEntity;
-import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
+import com.sandymandy.pleasurecraft.entity.base.SceneEntity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroups;
 import net.minecraft.item.SpawnEggItem;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
@@ -30,7 +28,7 @@ public class PleasureCraftEntities {
     /**
      * Registers a girl entity using the entity's own getGirlID() method for ID generation.
      */
-    public static <T extends AbstractGirlEntity> EntityType<T> registerGirl(
+    public static <T extends SceneEntity> EntityType<T> registerGirl(
             String id,
             BiFunction<EntityType<T>, net.minecraft.world.World, T> factory,
             float width,

@@ -15,7 +15,7 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 
-public abstract class AbstractGirlEntity extends TameableGirlEntity  {
+public abstract class GirlEntityAI extends TameableGirlEntity  {
 
     private LivingEntity attackTarget;
     private int ticksSinceLastHit;
@@ -25,7 +25,7 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity  {
     public SceneOptions stripOptions = SceneOptions.EMPTY;
     public BlockPos targetBedPos;
     private boolean requestMoveToPlayer;
-    protected AbstractGirlEntity(EntityType<? extends TameableGirlEntity> entityType, World world) {
+    protected GirlEntityAI(EntityType<? extends TameableGirlEntity> entityType, World world) {
         super(entityType, world);
     }
 
@@ -43,8 +43,8 @@ public abstract class AbstractGirlEntity extends TameableGirlEntity  {
         this.goalSelector.add(9, new ConditionalGoal(new LookAtEntityGoal(this, PlayerEntity.class, 6.0F),() -> !isMovementLocked()));
         this.goalSelector.add(10, new ConditionalGoal(new LookAroundGoal(this),() -> !isMovementLocked()));
         this.targetSelector.add(1, new ConditionalGoal(new GirlTrackOwnerAttackerGoal(this), this::isFollowing));
-        this.targetSelector.add(2, new ConditionalGoal(new GirlAttackWithOwnerGoal(this, AbstractGirlEntity.class), this::isFollowing));
-        this.targetSelector.add(3, new RevengeGoal(this, PlayerEntity.class, AbstractGirlEntity.class));
+        this.targetSelector.add(2, new ConditionalGoal(new GirlAttackWithOwnerGoal(this, GirlEntityAI.class), this::isFollowing));
+        this.targetSelector.add(3, new RevengeGoal(this, PlayerEntity.class, GirlEntityAI.class));
     }
 
     @Override

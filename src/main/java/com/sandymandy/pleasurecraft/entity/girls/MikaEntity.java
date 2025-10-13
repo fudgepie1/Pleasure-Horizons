@@ -1,7 +1,8 @@
 package com.sandymandy.pleasurecraft.entity.girls;
 
-import com.sandymandy.pleasurecraft.entity.base.AbstractGirlEntity;
+import com.sandymandy.pleasurecraft.entity.base.GirlEntityAI;
 import com.sandymandy.pleasurecraft.entity.base.SceneEntity;
+import com.sandymandy.pleasurecraft.entity.base.TameableGirlEntity;
 import com.sandymandy.pleasurecraft.util.variables.SceneOptions;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
@@ -15,7 +16,7 @@ import java.util.List;
 
 public class MikaEntity extends SceneEntity {
 
-    public MikaEntity(EntityType<? extends AbstractGirlEntity> entityType, World world) {
+    public MikaEntity(EntityType<? extends SceneEntity> entityType, World world) {
         super(entityType, world);
     }
 
@@ -50,7 +51,7 @@ public class MikaEntity extends SceneEntity {
                         List.of("missionary_slow"),
                         List.of("missionary_fast"),
                         "missionary_cum",
-                        6f,
+                        3f,
                         true,
                         false,
                         0.5f,
@@ -62,7 +63,7 @@ public class MikaEntity extends SceneEntity {
                         List.of("cowgirl_slow"),
                         List.of("cowgirl_fast"),
                         "cowgirl_cum",
-                        6f,
+                        3f,
                         true,
                         false,
                         0.5f,

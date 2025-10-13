@@ -1,7 +1,7 @@
 package com.sandymandy.pleasurecraft.screen;
 
 import com.sandymandy.pleasurecraft.PleasureCraftClient;
-import com.sandymandy.pleasurecraft.entity.base.AbstractGirlEntity;
+import com.sandymandy.pleasurecraft.entity.base.TameableGirlEntity;
 import com.sandymandy.pleasurecraft.util.inventory.GirlInventory;
 import com.sandymandy.pleasurecraft.util.inventory.slot.PublicArmorSlot;
 import net.minecraft.entity.Entity;
@@ -21,7 +21,7 @@ import static com.sandymandy.pleasurecraft.registries.PleasureCraftScreenHandler
 
 public class GirlInventoryScreenHandler extends ScreenHandler {
     private final Inventory inventory;
-    private final AbstractGirlEntity girl;
+    private final TameableGirlEntity girl;
     public static final Identifier EMPTY_HELMET_SLOT_TEXTURE = Identifier.ofVanilla( "container/slot/helmet");
     public static final Identifier EMPTY_CHESTPLATE_SLOT_TEXTURE = Identifier.ofVanilla( "container/slot/chestplate");
     public static final Identifier EMPTY_LEGGINGS_SLOT_TEXTURE = Identifier.ofVanilla( "container/slot/leggings");
@@ -53,7 +53,7 @@ public class GirlInventoryScreenHandler extends ScreenHandler {
         World world = player.getWorld();
 
         Entity entity = world.getEntityById(girlId);
-        if (!(entity instanceof AbstractGirlEntity girlEntity)) {
+        if (!(entity instanceof TameableGirlEntity girlEntity)) {
             throw new IllegalStateException("LucyEntity not found or mismatched entity ID");
         }
         this.girl = girlEntity;
@@ -122,7 +122,7 @@ public class GirlInventoryScreenHandler extends ScreenHandler {
     }
 
 
-    public AbstractGirlEntity getGirl(){
+    public TameableGirlEntity getGirl(){
         return this.girl;
     }
 

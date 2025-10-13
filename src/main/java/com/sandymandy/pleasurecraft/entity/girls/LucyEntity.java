@@ -1,6 +1,5 @@
 package com.sandymandy.pleasurecraft.entity.girls;
 
-import com.sandymandy.pleasurecraft.entity.base.AbstractGirlEntity;
 import com.sandymandy.pleasurecraft.entity.base.SceneEntity;
 import com.sandymandy.pleasurecraft.util.variables.SceneOptions;
 import net.minecraft.entity.EntityType;
@@ -9,14 +8,13 @@ import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
-import net.minecraft.text.Text;
 import net.minecraft.world.World;
 
 import java.util.List;
 
 public class LucyEntity extends SceneEntity {
 
-    public LucyEntity(EntityType<? extends AbstractGirlEntity> entityType, World world) {
+    public LucyEntity(EntityType<? extends SceneEntity> entityType, World world) {
         super(entityType, world);
     }
 

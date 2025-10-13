@@ -1,6 +1,6 @@
 package com.sandymandy.pleasurecraft.entity.ai.goal;
 
-import com.sandymandy.pleasurecraft.entity.base.AbstractGirlEntity;
+import com.sandymandy.pleasurecraft.entity.base.TameableGirlEntity;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.ai.pathing.EntityNavigation;
 import net.minecraft.entity.ai.pathing.Path;
@@ -10,7 +10,7 @@ import net.minecraft.util.math.BlockPos;
 import java.util.EnumSet;
 
 public class GirlStayNearBaseGoal extends Goal {
-    private final AbstractGirlEntity girl;
+    private final TameableGirlEntity girl;
     private final double speed;
     private final EntityNavigation navigation;
     private Path path;
@@ -23,7 +23,7 @@ public class GirlStayNearBaseGoal extends Goal {
 
     private float oldWaterPathPenalty;
 
-    public GirlStayNearBaseGoal(AbstractGirlEntity girl, double speed, float minDistance, float maxDistance, float breakOffPoint) {
+    public GirlStayNearBaseGoal(TameableGirlEntity girl, double speed, float minDistance, float maxDistance, float breakOffPoint) {
         this.girl = girl;
         this.speed = speed;
         this.navigation = girl.getNavigation();

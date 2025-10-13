@@ -1,13 +1,13 @@
 package com.sandymandy.pleasurecraft.entity.ai.goal;
 
-import com.sandymandy.pleasurecraft.entity.base.AbstractGirlEntity;
+import com.sandymandy.pleasurecraft.entity.base.GirlEntityAI;
 import net.minecraft.entity.ai.goal.MeleeAttackGoal;
 
 public class GirlAttackGoal extends MeleeAttackGoal {
-    private final AbstractGirlEntity girl;
+    private final GirlEntityAI girl;
     private int ticks;
 
-    public GirlAttackGoal(AbstractGirlEntity girl, double speed, boolean pauseWhenMobIdle) {
+    public GirlAttackGoal(GirlEntityAI girl, double speed, boolean pauseWhenMobIdle) {
         super(girl, speed, pauseWhenMobIdle);
         this.girl = girl;
     }

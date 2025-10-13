@@ -54,7 +54,7 @@ import software.bernie.geckolib.animation.keyframe.event.data.SoundKeyframeData;
 
 import java.util.*;
 
-public class SceneEntity extends AbstractGirlEntity implements GeoEntity {
+public class SceneEntity extends GirlEntityAI implements GeoEntity {
     private static final TrackedData<SceneOptions> CURRENT_SCENE_OPTIONS = DataTracker.registerData(SceneEntity.class, PleasureCraftTrackedDataRegistry.SCENE_OPTION);
     private static final TrackedData<ScenePhase> CURRENT_SCENE_PHASE = DataTracker.registerData(SceneEntity.class, PleasureCraftTrackedDataRegistry.SCENE_PHASE);
     private static final TrackedData<String> ANIMATION_KEY_FRAME_EVENT = DataTracker.registerData(SceneEntity.class, TrackedDataHandlerRegistry.STRING);
@@ -78,7 +78,7 @@ public class SceneEntity extends AbstractGirlEntity implements GeoEntity {
         return cache;
     }
 
-    protected SceneEntity(EntityType<? extends AbstractGirlEntity> entityType, World world) {
+    protected SceneEntity(EntityType<? extends GirlEntityAI> entityType, World world) {
         super(entityType, world);
     }
 
