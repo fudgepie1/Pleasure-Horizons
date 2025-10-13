@@ -12,10 +12,14 @@ import net.minecraft.registry.tag.DamageTypeTags;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.tslat.smartbrainlib.api.SmartBrainOwner;
+import net.tslat.smartbrainlib.api.core.sensor.ExtendedSensor;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 
-public abstract class GirlEntityAI extends TameableGirlEntity  {
+
+public class GirlEntityAI extends TameableGirlEntity implements SmartBrainOwner<GirlEntityAI> {
 
     private LivingEntity attackTarget;
     private int ticksSinceLastHit;
@@ -135,4 +139,8 @@ public abstract class GirlEntityAI extends TameableGirlEntity  {
         return false;
     }
 
+    @Override
+    public List<? extends ExtendedSensor<? extends GirlEntityAI>> getSensors() {
+        return List.of();
+    }
 }

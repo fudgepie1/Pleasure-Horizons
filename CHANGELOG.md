@@ -6,6 +6,7 @@
 - Fixed the Black Dick bug
 - Made it possible for people to change what the girls say with the lang file
 - Added the ability to change the color of the penis with the mod menu
+- Added Sounds for Momo and Mika
 
 ## 0.5.2
 - Fixed a bug where the girls wouldn't spawn in the villages.
