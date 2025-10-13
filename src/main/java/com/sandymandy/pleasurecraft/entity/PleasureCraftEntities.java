@@ -1,7 +1,7 @@
 package com.sandymandy.pleasurecraft.entity;
 
 import com.sandymandy.pleasurecraft.PleasureCraft;
-import com.sandymandy.pleasurecraft.entity.base.SceneEntity;
+import com.sandymandy.pleasurecraft.entity.base.GirlEntityVisuals;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
@@ -28,7 +28,7 @@ public class PleasureCraftEntities {
     /**
      * Registers a girl entity using the entity's own getGirlID() method for ID generation.
      */
-    public static <T extends SceneEntity> EntityType<T> registerGirl(
+    public static <T extends GirlEntityVisuals> EntityType<T> registerGirl(
             String id,
             BiFunction<EntityType<T>, net.minecraft.world.World, T> factory,
             float width,

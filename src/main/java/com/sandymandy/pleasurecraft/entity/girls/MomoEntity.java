@@ -1,6 +1,6 @@
 package com.sandymandy.pleasurecraft.entity.girls;
 
-import com.sandymandy.pleasurecraft.entity.base.SceneEntity;
+import com.sandymandy.pleasurecraft.entity.base.GirlEntityVisuals;
 import com.sandymandy.pleasurecraft.util.variables.SceneOptions;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
@@ -12,9 +12,9 @@ import net.minecraft.world.World;
 
 import java.util.List;
 
-public class MomoEntity extends SceneEntity {
+public class MomoEntity extends GirlEntityVisuals {
 
-    public MomoEntity(EntityType<? extends SceneEntity> entityType, World world) {
+    public MomoEntity(EntityType<? extends GirlEntityVisuals> entityType, World world) {
         super(entityType, world);
     }
 

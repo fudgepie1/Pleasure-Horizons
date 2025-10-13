@@ -1,6 +1,5 @@
 package com.sandymandy.pleasurecraft.screen;
 
-import com.sandymandy.pleasurecraft.entity.base.SceneEntity;
 import com.sandymandy.pleasurecraft.entity.base.TameableGirlEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Text;

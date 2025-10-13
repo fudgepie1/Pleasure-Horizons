@@ -1,17 +1,17 @@
 package com.sandymandy.pleasurecraft.entity.ai.goal;
 
-import com.sandymandy.pleasurecraft.entity.base.SceneEntity;
+import com.sandymandy.pleasurecraft.entity.base.GirlEntityVisuals;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.util.math.Vec3d;
 
 import java.util.EnumSet;
 
 public class MoveToPlayerGoal extends Goal {
-    private final SceneEntity girl;
+    private final GirlEntityVisuals girl;
     private boolean started = false;
     private final double speed;
 
-    public MoveToPlayerGoal(SceneEntity girl, double speed) {
+    public MoveToPlayerGoal(GirlEntityVisuals girl, double speed) {
         this.girl = girl;
         this.speed = speed;
         this.setControls(EnumSet.of(Control.MOVE, Control.LOOK, Control.JUMP));

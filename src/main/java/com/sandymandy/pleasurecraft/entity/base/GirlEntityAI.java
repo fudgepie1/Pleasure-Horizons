@@ -5,6 +5,7 @@ import com.sandymandy.pleasurecraft.util.variables.SceneOptions;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.ai.brain.Brain;
 import net.minecraft.entity.ai.goal.*;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.recipe.Ingredient;
@@ -13,13 +14,29 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.tslat.smartbrainlib.api.SmartBrainOwner;
+import net.tslat.smartbrainlib.api.core.BrainActivityGroup;
+import net.tslat.smartbrainlib.api.core.SmartBrainProvider;
+import net.tslat.smartbrainlib.api.core.behaviour.FirstApplicableBehaviour;
+import net.tslat.smartbrainlib.api.core.behaviour.OneRandomBehaviour;
+import net.tslat.smartbrainlib.api.core.behaviour.custom.attack.AnimatableMeleeAttack;
+import net.tslat.smartbrainlib.api.core.behaviour.custom.look.LookAtTarget;
+import net.tslat.smartbrainlib.api.core.behaviour.custom.misc.Idle;
+import net.tslat.smartbrainlib.api.core.behaviour.custom.move.MoveToWalkTarget;
+import net.tslat.smartbrainlib.api.core.behaviour.custom.path.SetRandomWalkTarget;
+import net.tslat.smartbrainlib.api.core.behaviour.custom.path.SetWalkTargetToAttackTarget;
+import net.tslat.smartbrainlib.api.core.behaviour.custom.target.InvalidateAttackTarget;
+import net.tslat.smartbrainlib.api.core.behaviour.custom.target.SetPlayerLookTarget;
+import net.tslat.smartbrainlib.api.core.behaviour.custom.target.SetRandomLookTarget;
+import net.tslat.smartbrainlib.api.core.behaviour.custom.target.TargetOrRetaliate;
 import net.tslat.smartbrainlib.api.core.sensor.ExtendedSensor;
+import net.tslat.smartbrainlib.api.core.sensor.vanilla.HurtBySensor;
+import net.tslat.smartbrainlib.api.core.sensor.vanilla.NearbyLivingEntitySensor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
 
-public class GirlEntityAI extends TameableGirlEntity implements SmartBrainOwner<GirlEntityAI> {
+public abstract class GirlEntityAI extends TameableGirlEntity implements SmartBrainOwner<GirlEntityAI> {
 
     private LivingEntity attackTarget;
     private int ticksSinceLastHit;
@@ -34,22 +51,50 @@ public class GirlEntityAI extends TameableGirlEntity implements SmartBrainOwner<
     }
 
     @Override
-    protected void initGoals() {
-        this.goalSelector.add(0, new GirlSitGoal(this));
-        this.goalSelector.add(1, new SwimGoal(this));
-        this.goalSelector.add(2, new LongDoorInteractGoal(this, true));
-        this.goalSelector.add(3, new TameableEscapeDangerGoal(1.5D, DamageTypeTags.PANIC_ENVIRONMENTAL_CAUSES));
-        this.goalSelector.add(4, new WanderAroundGoal(this, 1.0D));
-        this.goalSelector.add(5, new GirlAttackGoal(this, 1.5, false));
-        this.goalSelector.add(6, new ConditionalGoal(new GirlFollowOwnerGoal(this, 1.0, 10.0F, 2.0F), this::isFollowing));
-        this.goalSelector.add(7, new GirlStayNearBaseGoal(this, 1.0, 2.0F, 15.0F, 150));
-        this.goalSelector.add(8, new TemptGoal(this, 1.25D, Ingredient.ofItems(getTameItem()), false));
-        this.goalSelector.add(9, new ConditionalGoal(new LookAtEntityGoal(this, PlayerEntity.class, 6.0F),() -> !isMovementLocked()));
-        this.goalSelector.add(10, new ConditionalGoal(new LookAroundGoal(this),() -> !isMovementLocked()));
-        this.targetSelector.add(1, new ConditionalGoal(new GirlTrackOwnerAttackerGoal(this), this::isFollowing));
-        this.targetSelector.add(2, new ConditionalGoal(new GirlAttackWithOwnerGoal(this, GirlEntityAI.class), this::isFollowing));
-        this.targetSelector.add(3, new RevengeGoal(this, PlayerEntity.class, GirlEntityAI.class));
+    protected Brain.Profile<?> createBrainProfile() {
+        return new SmartBrainProvider<>(this);
     }
+
+    @Override
+    protected void mobTick(ServerWorld world) {
+        tickBrain(this);
+    }
+
+    @Override
+    public List<? extends ExtendedSensor<? extends GirlEntityAI>> getSensors() {
+        return List.of(
+                new NearbyLivingEntitySensor<>(), // This tracks nearby entities
+                new HurtBySensor<>()                // This tracks the last damage source and attacker
+        );
+    }
+
+    @Override
+    public BrainActivityGroup<? extends GirlEntityAI> getCoreTasks() { // These are the tasks that run all the time (usually)
+        return BrainActivityGroup.coreTasks(
+                new LookAtTarget<>(),                      // Have the entity turn to face and look at its current look target
+                new MoveToWalkTarget<>());                 // Walk towards the current walk target
+    }
+
+    @Override
+    public BrainActivityGroup<? extends GirlEntityAI> getIdleTasks() { // These are the tasks that run when the mob isn't doing anything else (usually)
+        return BrainActivityGroup.idleTasks(
+                new FirstApplicableBehaviour<GirlEntityAI>(      // Run only one of the below behaviours, trying each one in order. Include the generic type because JavaC is silly
+                        new TargetOrRetaliate<>(),            // Set the attack target and walk target based on nearby entities
+                        new SetPlayerLookTarget<>(),          // Set the look target for the nearest player
+                        new SetRandomLookTarget<>()),         // Set a random look target
+                new OneRandomBehaviour<>(                 // Run a random task from the below options
+                        new SetRandomWalkTarget<>(),          // Set a random walk target to a nearby position
+                        new Idle<>().runFor(entity -> entity.getRandom().nextBetween(30, 60)))); // Do nothing for 1.5->3 seconds
+    }
+
+    @Override
+    public BrainActivityGroup<? extends GirlEntityAI> getFightTasks() { // These are the tasks that handle fighting
+        return BrainActivityGroup.fightTasks(
+                new InvalidateAttackTarget<>(), // Cancel fighting if the target is no longer valid
+                new SetWalkTargetToAttackTarget<>(),      // Set the walk target to the attack target
+                new AnimatableMeleeAttack<>(0)); // Melee attack the target if close enough
+    }
+
 
     @Override
     public void tickMovement() {
@@ -137,10 +182,5 @@ public class GirlEntityAI extends TameableGirlEntity implements SmartBrainOwner<
             return true;
         }
         return false;
-    }
-
-    @Override
-    public List<? extends ExtendedSensor<? extends GirlEntityAI>> getSensors() {
-        return List.of();
     }
 }

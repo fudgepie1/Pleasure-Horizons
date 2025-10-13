@@ -56,7 +56,7 @@ import java.util.*;
 
 import static com.sandymandy.pleasurecraft.util.Utils.getReadableTameItemName;
 
-public class TameableGirlEntity extends PathAwareEntity implements Tameable {
+public abstract class TameableGirlEntity extends PathAwareEntity implements Tameable {
     private static final TrackedData<Boolean> WAITING_AT_BED = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<Boolean> LOCKED_STATE = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<Boolean> FROZEN_STATE = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);

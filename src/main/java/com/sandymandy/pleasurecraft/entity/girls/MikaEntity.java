@@ -1,8 +1,6 @@
 package com.sandymandy.pleasurecraft.entity.girls;
 
-import com.sandymandy.pleasurecraft.entity.base.GirlEntityAI;
-import com.sandymandy.pleasurecraft.entity.base.SceneEntity;
-import com.sandymandy.pleasurecraft.entity.base.TameableGirlEntity;
+import com.sandymandy.pleasurecraft.entity.base.GirlEntityVisuals;
 import com.sandymandy.pleasurecraft.util.variables.SceneOptions;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
@@ -14,9 +12,9 @@ import net.minecraft.world.World;
 
 import java.util.List;
 
-public class MikaEntity extends SceneEntity {
+public class MikaEntity extends GirlEntityVisuals {
 
-    public MikaEntity(EntityType<? extends SceneEntity> entityType, World world) {
+    public MikaEntity(EntityType<? extends GirlEntityVisuals> entityType, World world) {
         super(entityType, world);
     }
 

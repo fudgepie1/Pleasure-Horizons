@@ -2,7 +2,7 @@ package com.sandymandy.pleasurecraft.client.models;
 
 import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.config.ModConfig;
-import com.sandymandy.pleasurecraft.entity.base.SceneEntity;
+import com.sandymandy.pleasurecraft.entity.base.GirlEntityVisuals;
 import com.sandymandy.pleasurecraft.registries.PleasureCraftDataTicketRegistry;
 import com.sandymandy.pleasurecraft.util.renderer.GeoBoneExtension;
 import net.minecraft.client.MinecraftClient;
@@ -15,7 +15,7 @@ import software.bernie.geckolib.model.GeoModel;
 import software.bernie.geckolib.renderer.base.GeoRenderState;
 
 
-public abstract class AbstractGirlModel<T extends SceneEntity> extends GeoModel<T> {
+public abstract class AbstractGirlModel<T extends GirlEntityVisuals> extends GeoModel<T> {
 
     @Override
     public Identifier getModelResource(GeoRenderState renderState) {

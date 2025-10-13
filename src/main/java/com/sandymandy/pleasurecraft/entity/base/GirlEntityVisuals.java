@@ -14,9 +14,9 @@ import com.sandymandy.pleasurecraft.registries.PleasureCraftTrackedDataRegistry;
 import com.sandymandy.pleasurecraft.registries.SceneKeyframeRegistry;
 import com.sandymandy.pleasurecraft.util.PleasureCraftLangUtils;
 import com.sandymandy.pleasurecraft.util.PleasureCraftMessages;
+import com.sandymandy.pleasurecraft.util.Utils;
 import com.sandymandy.pleasurecraft.util.variables.SceneOptions;
 import com.sandymandy.pleasurecraft.util.variables.ScenePhase;
-import com.sandymandy.pleasurecraft.util.Utils;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.block.BlockState;
@@ -54,14 +54,14 @@ import software.bernie.geckolib.animation.keyframe.event.data.SoundKeyframeData;
 
 import java.util.*;
 
-public class SceneEntity extends GirlEntityAI implements GeoEntity {
-    private static final TrackedData<SceneOptions> CURRENT_SCENE_OPTIONS = DataTracker.registerData(SceneEntity.class, PleasureCraftTrackedDataRegistry.SCENE_OPTION);
-    private static final TrackedData<ScenePhase> CURRENT_SCENE_PHASE = DataTracker.registerData(SceneEntity.class, PleasureCraftTrackedDataRegistry.SCENE_PHASE);
-    private static final TrackedData<String> ANIMATION_KEY_FRAME_EVENT = DataTracker.registerData(SceneEntity.class, TrackedDataHandlerRegistry.STRING);
-    public static final TrackedData<Float> SCENE_PROGRESS = DataTracker.registerData(SceneEntity.class, TrackedDataHandlerRegistry.FLOAT);
-    public static final TrackedData<Float> CUM_THRESHOLD = DataTracker.registerData(SceneEntity.class, TrackedDataHandlerRegistry.FLOAT);
-    private static final TrackedData<Boolean> THRUSTING = DataTracker.registerData(SceneEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
-    private static final TrackedData<Integer> INTRO_INDEX = DataTracker.registerData(SceneEntity.class, TrackedDataHandlerRegistry.INTEGER);
+public class GirlEntityVisuals extends GirlEntityAI implements GeoEntity {
+    private static final TrackedData<SceneOptions> CURRENT_SCENE_OPTIONS = DataTracker.registerData(GirlEntityVisuals.class, PleasureCraftTrackedDataRegistry.SCENE_OPTION);
+    private static final TrackedData<ScenePhase> CURRENT_SCENE_PHASE = DataTracker.registerData(GirlEntityVisuals.class, PleasureCraftTrackedDataRegistry.SCENE_PHASE);
+    private static final TrackedData<String> ANIMATION_KEY_FRAME_EVENT = DataTracker.registerData(GirlEntityVisuals.class, TrackedDataHandlerRegistry.STRING);
+    public static final TrackedData<Float> SCENE_PROGRESS = DataTracker.registerData(GirlEntityVisuals.class, TrackedDataHandlerRegistry.FLOAT);
+    public static final TrackedData<Float> CUM_THRESHOLD = DataTracker.registerData(GirlEntityVisuals.class, TrackedDataHandlerRegistry.FLOAT);
+    private static final TrackedData<Boolean> THRUSTING = DataTracker.registerData(GirlEntityVisuals.class, TrackedDataHandlerRegistry.BOOLEAN);
+    private static final TrackedData<Integer> INTRO_INDEX = DataTracker.registerData(GirlEntityVisuals.class, TrackedDataHandlerRegistry.INTEGER);
     private static final Random RANDOM = new Random();
     private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
 
@@ -78,7 +78,7 @@ public class SceneEntity extends GirlEntityAI implements GeoEntity {
         return cache;
     }
 
-    protected SceneEntity(EntityType<? extends GirlEntityAI> entityType, World world) {
+    protected GirlEntityVisuals(EntityType<? extends GirlEntityAI> entityType, World world) {
         super(entityType, world);
     }
 
@@ -500,7 +500,7 @@ public class SceneEntity extends GirlEntityAI implements GeoEntity {
 
     }*/
 
-    private PlayState handleAnimations(AnimationTest<SceneEntity> state) {
+    private PlayState handleAnimations(AnimationTest<GirlEntityVisuals> state) {
         if (isSceneActive() && getOverrideAnim().isEmpty()) {
             final AnimationController<?> controller = state.controller();
             final SceneOptions options = this.getCurrentSceneOptions();
@@ -793,16 +793,16 @@ public class SceneEntity extends GirlEntityAI implements GeoEntity {
         new PleasureCraftMessages().PlayerSpecificMessage(scenePlayer, finalMessage);
     }
 
-    private static class SoundKeyframeHandler implements AnimationController.KeyframeEventHandler<SceneEntity, SoundKeyframeData> {
+    private static class SoundKeyframeHandler implements AnimationController.KeyframeEventHandler<GirlEntityVisuals, SoundKeyframeData> {
 
-        private final SceneEntity entity;
+        private final GirlEntityVisuals entity;
 
-        public SoundKeyframeHandler(SceneEntity entity) {
+        public SoundKeyframeHandler(GirlEntityVisuals entity) {
             this.entity = entity;
         }
 
         @Override
-        public void handle(KeyFrameEvent<SceneEntity, SoundKeyframeData> event) {
+        public void handle(KeyFrameEvent<GirlEntityVisuals, SoundKeyframeData> event) {
             if (!this.entity.getWorld().isClient()) return;
 
             String key = event.keyframeData().getSound();
