@@ -5,6 +5,10 @@
 
   "item.pleasurecraft.momo_spawn_egg": "Momo Spawn Egg",
 
+  "item.pleasurecraft.village_core": "Village Core",
+
+  "block.pleasurecraft.village_core" : "Village Core",
+
   "entity.pleasurecraft.lucy": "Lucy",
 
   "entity.pleasurecraft.mika": "Mika",
@@ -14,6 +18,8 @@
   "screen.pleasurecraft.girl_inventory": "Inventory",
 
   "itemgroup.pleasurecraft.pleasure_craft_items": "PleasureCraft Items",
+
+  "itemgroup.pleasurecraft.pleasure_craft_blocks": "PleasureCraft Blocks",
 
   "sceneMsg.lucy.strip": "Hihi~",
 

@@ -3,6 +3,7 @@ package com.sandymandy.pleasurecraft.entity.base;
 import com.sandymandy.pleasurecraft.util.variables.SceneOptions;
 import com.sandymandy.pleasurecraft.village.VillageData;
 import com.sandymandy.pleasurecraft.village.VillageMember;
+import net.minecraft.block.CryingObsidianBlock;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -31,7 +32,6 @@ import net.tslat.smartbrainlib.api.core.sensor.vanilla.NearbyLivingEntitySensor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-
 
 public abstract class GirlEntityAI extends TameableGirlEntity implements SmartBrainOwner<GirlEntityAI>, VillageMember {
     private VillageData village;

@@ -1,6 +1,8 @@
 package com.sandymandy.pleasurecraft;
 
 import com.sandymandy.pleasurecraft.advancement.criterion.PleasureCraftCriteria;
+import com.sandymandy.pleasurecraft.block.PleasureCraftBlocks;
+import com.sandymandy.pleasurecraft.block.entity.PleasureCraftBlockEntities;
 import com.sandymandy.pleasurecraft.item.PleasureCraftItemGroups;
 import com.sandymandy.pleasurecraft.item.PleasureCraftItems;
 import com.sandymandy.pleasurecraft.networking.PleasureCraftPackets;
@@ -11,8 +13,6 @@ import com.sandymandy.pleasurecraft.registries.PleasureCraftTrackedDataRegistry;
 import com.sandymandy.pleasurecraft.village.VillageManager;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-import net.minecraft.server.world.ServerWorld;
-import org.apache.logging.log4j.core.jmx.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,14 +28,16 @@ public class PleasureCraft implements ModInitializer {
 			}
 		});
 
-		GirlRegistry.register();
-		PleasureCraftItemGroups.registerItemGroups();
-		PleasureCraftItems.registerModItems();
 		PleasureCraftPackets.registerPackets();
 		PleasureCraftPackets.registerC2SPackets();
+		PleasureCraftItemGroups.registerItemGroups();
+		PleasureCraftItems.registerModItems();
+		PleasureCraftBlockEntities.registerBlockEntities();
+		PleasureCraftBlocks.registerBlocks();
 		PleasureCraftCriteria.registerAdvancementCriteria();
 		PleasureCraftTrackedDataRegistry.registerTrackedData();
 		PleasureCraftSoundEventRegistry.registerSoundEvents();
 		PleasureCraftScreenHandlerRegistry.register();
+		GirlRegistry.register();
 	}
 }
