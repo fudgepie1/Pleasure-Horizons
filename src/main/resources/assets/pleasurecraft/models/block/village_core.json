@@ -1,11 +1,8 @@
 {
-  "parent": "minecraft:block/cube",
+  "parent": "minecraft:block/cube_bottom_top",
   "textures": {
-    "up": "pleasurecraft:block/village_core_top",
-    "down": "pleasurecraft:block/village_core_bottom",
-    "north": "pleasurecraft:block/village_core_side",
-    "south": "pleasurecraft:block/village_core_side",
-    "west": "pleasurecraft:block/village_core_side",
-    "east": "pleasurecraft:block/village_core_side"
+    "top": "pleasurecraft:block/village_core_top",
+    "bottom": "pleasurecraft:block/village_core_bottom",
+    "side": "pleasurecraft:block/village_core_side"
   }
 }

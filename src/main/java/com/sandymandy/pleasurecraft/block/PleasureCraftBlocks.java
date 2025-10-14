@@ -17,7 +17,7 @@ import java.util.function.Function;
 
 public class PleasureCraftBlocks {
     public static Block VILLAGE_CORE = registerBlock("village_core",
-            properties -> new VillageCoreBlock(properties.strength(5.0F, 1200.0F).sounds(BlockSoundGroup.WOOD)));
+            properties -> new VillageCoreBlock(properties.strength(5.0F, 1200.0F).sounds(BlockSoundGroup.LODESTONE)));
 
     private static Block registerBlock(String name, Function<AbstractBlock.Settings, Block> function) {
         Block toRegister = function.apply(AbstractBlock.Settings.create().registryKey(RegistryKey.of(RegistryKeys.BLOCK, Identifier.of(PleasureCraft.MOD_ID, name))));

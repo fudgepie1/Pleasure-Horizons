@@ -68,16 +68,4 @@ public class VillageCoreBlock extends BlockWithEntity implements BlockEntityProv
         }
         return ActionResult.CONSUME;
     }
-
-    // Prevent being broken except via GUI
-    @Override
-    public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
-        return super.onBreak(world, pos, state, player);
-    }
-
-    @Override
-    public void afterBreak(World world, PlayerEntity player, BlockPos pos, BlockState state, BlockEntity blockEntity, ItemStack stack) {
-        // disable normal breaking
-    }
-
 }
