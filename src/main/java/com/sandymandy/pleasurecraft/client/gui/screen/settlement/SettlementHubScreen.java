@@ -1,33 +1,39 @@
 package com.sandymandy.pleasurecraft.client.gui.screen.settlement;
 
+import com.google.common.collect.Maps;
 import com.sandymandy.pleasurecraft.screen.SettlementHubScreenHandler;
 import com.sandymandy.pleasurecraft.settlement.Settlement;
-import com.sandymandy.pleasurecraft.settlement.SettlementResourceData;
+import com.sandymandy.pleasurecraft.settlement.SettlementDisplay;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Colors;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
+@Environment(EnvType.CLIENT)
 public class SettlementHubScreen extends HandledScreen<SettlementHubScreenHandler> {
     private static final Identifier WINDOW_TEXTURE = Identifier.ofVanilla("textures/gui/advancements/window.png");
-
-    private final Settlement data;
-    private final Map<String, SettlementTab> tabs = new LinkedHashMap<>();
-    private SettlementTab selectedTab;
-
     private static final int WINDOW_WIDTH = 252;
     private static final int WINDOW_HEIGHT = 140;
     private static final int PAGE_X = 9;
     private static final int PAGE_Y = 18;
+    private static final int PAGE_WIDTH = 234;
+    private static final int PAGE_HEIGHT = 113;
+    private static final int TITLE_X = 8;
+    private static final int TITLE_Y = 6;
 
-    private boolean dragging = false;
-    private double lastMouseX;
-    private double lastMouseY;
+    private final Settlement data;
+    private final Map<String, SettlementTab> tabs = Maps.newLinkedHashMap();
+    @Nullable
+    private SettlementTab selectedTab;
+    private boolean movingTab;
 
     public SettlementHubScreen(SettlementHubScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
@@ -37,104 +43,130 @@ public class SettlementHubScreen extends HandledScreen<SettlementHubScreenHandle
     @Override
     protected void init() {
         super.init();
-
         tabs.clear();
-        tabs.put("resources", new SettlementTab("Resources", data));
-        tabs.put("morale", new SettlementTab("Morale", data));
-        tabs.put("buildings", new SettlementTab("Buildings", data));
-        tabs.put("population", new SettlementTab("Population", data));
+        selectedTab = null;
 
-        selectedTab = tabs.get("resources");
+        // Create example tabs — later, you can load from settlement data
+        addTab("resources", SettlementDisplay.ofBasic(Text.literal("Resources"), Text.literal("Track and manage resources")));
+        addTab("morale", SettlementDisplay.ofBasic(Text.literal("Morale"), Text.literal("Citizen happiness and mood")));
+        addTab("buildings", SettlementDisplay.ofBasic(Text.literal("Buildings"), Text.literal("Construct and upgrade structures")));
+        addTab("population", SettlementDisplay.ofBasic(Text.literal("Population"), Text.literal("Track citizens and workers")));
+
+        // Default select first tab
+        if (!tabs.isEmpty()) selectedTab = tabs.values().iterator().next();
+    }
+
+    private void addTab(String id, SettlementDisplay display) {
+        SettlementTab tab = SettlementTab.create(client, this, tabs.size(), display);
+        if (tab != null) tabs.put(id, tab);
     }
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        int x = (width - WINDOW_WIDTH) / 2;
-        int y = (height - WINDOW_HEIGHT) / 2;
+        super.render(context, mouseX, mouseY, delta);
 
+        int x = (this.width - WINDOW_WIDTH) / 2;
+        int y = (this.height - WINDOW_HEIGHT) / 2;
+
+        // Draw the background texture + tab buttons
         drawWindow(context, x, y);
-        drawTabs(context, x, y, mouseX, mouseY);
 
-        if (selectedTab != null) {
-            selectedTab.render(context, x + PAGE_X, y + PAGE_Y, mouseX, mouseY, delta);
+        // Draw the current tab contents
+        drawTabPage(context, x, y, mouseX, mouseY);
+
+        // Draw tab tooltips if hovered
+        drawTabTooltips(context, x, y, mouseX, mouseY);
+
+    }
+
+    private void drawTabPage(DrawContext context, int x, int y, int mouseX, int mouseY) {
+        if (selectedTab == null) {
+            // No tabs = draw empty message
+            context.fill(x + PAGE_X, y + PAGE_Y, x + PAGE_X + PAGE_WIDTH, y + PAGE_Y + PAGE_HEIGHT, Colors.BLACK);
+            int centerX = x + PAGE_X + PAGE_WIDTH / 2;
+            context.drawCenteredTextWithShadow(textRenderer, Text.literal("No Settlement Data"), centerX, y + PAGE_Y + 40, Colors.WHITE);
+            return;
         }
 
-        super.render(context, mouseX, mouseY, delta);
+        // Draw tab content
+        selectedTab.render(context, x + PAGE_X, y + PAGE_Y);
     }
 
     private void drawWindow(DrawContext context, int x, int y) {
-        context.drawTexture(RenderLayer::getGuiTextured, WINDOW_TEXTURE, x, y, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 256, 256);
-        context.drawText(textRenderer, selectedTab != null ? Text.literal(selectedTab.getTitle()) : title, x + 8, y + 6, 0x404040, false);
+        context.drawTexture(RenderLayer::getGuiTextured, WINDOW_TEXTURE, x, y, 0.0F, 0.0F, WINDOW_WIDTH, WINDOW_HEIGHT, 256, 256);
+
+        if (tabs.size() > 1) {
+            for (SettlementTab tab : tabs.values()) {
+                tab.drawBackground(context, x, y, tab == selectedTab);
+            }
+
+            for (SettlementTab tab : tabs.values()) {
+                tab.drawIcon(context, x, y);
+            }
+        }
+
+        context.drawText(
+                textRenderer,
+                selectedTab != null ? selectedTab.getTitle() : title,
+                x + TITLE_X, y + TITLE_Y,
+                0x404040, false
+        );
     }
 
-    private void drawTabs(DrawContext context, int x, int y, int mouseX, int mouseY) {
-        int i = 0;
-        for (SettlementTab tab : tabs.values()) {
-            boolean selected = tab == selectedTab;
-            tab.drawTabButton(context, x + 10 + (i * 30), y - 24, selected, mouseX, mouseY);
-            i++;
+    private void drawTabTooltips(DrawContext context, int x, int y, int mouseX, int mouseY) {
+        if (tabs.size() > 1) {
+            for (SettlementTab tab : tabs.values()) {
+                if (tab.isClickOnTab(x, y, mouseX, mouseY)) {
+                    context.drawTooltip(textRenderer, tab.getTitle(), mouseX, mouseY);
+                }
+            }
         }
     }
 
+    // === Interaction ===
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        int x = (width - WINDOW_WIDTH) / 2;
-        int y = (height - WINDOW_HEIGHT) / 2;
+        if (button == 0) {
+            int x = (width - WINDOW_WIDTH) / 2;
+            int y = (height - WINDOW_HEIGHT) / 2;
 
-        int i = 0;
-        for (SettlementTab tab : tabs.values()) {
-            int tabX = x + 10 + (i * 30);
-            int tabY = y - 24;
-            if (tab.isClicked(mouseX, mouseY, tabX, tabY)) {
-                this.selectedTab = tab;
-                return true;
+            for (SettlementTab tab : tabs.values()) {
+                if (tab.isClickOnTab(x, y, mouseX, mouseY)) {
+                    this.selectedTab = tab;
+                    return true;
+                }
             }
-            i++;
         }
-
-        if (selectedTab != null && button == 0) {
-            this.dragging = true;
-            this.lastMouseX = mouseX;
-            this.lastMouseY = mouseY;
-            return true;
-        }
-
         return super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override
-    public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        if (button == 0) {
-            this.dragging = false;
-        }
-        return super.mouseReleased(mouseX, mouseY, button);
-    }
-
-    @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-        if (dragging && selectedTab != null) {
-            double dx = mouseX - lastMouseX;
-            double dy = mouseY - lastMouseY;
-            selectedTab.scroll(-dx, -dy);
-            lastMouseX = mouseX;
-            lastMouseY = mouseY;
+        if (button != 0) {
+            this.movingTab = false;
+            return false;
+        } else {
+            if (!this.movingTab) {
+                this.movingTab = true;
+            } else if (this.selectedTab != null) {
+                this.selectedTab.move(deltaX, deltaY);
+            }
             return true;
         }
-        return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
     }
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
         if (selectedTab != null) {
-            selectedTab.scroll(horizontalAmount * 16.0, verticalAmount * 16.0);
+            selectedTab.move(horizontalAmount * 16.0, verticalAmount * 16.0);
             return true;
         }
-        return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
+        return false;
     }
 
     @Override
     protected void drawBackground(DrawContext context, float deltaTicks, int mouseX, int mouseY) {
-
+        // background handled by window texture
     }
 
     @Override

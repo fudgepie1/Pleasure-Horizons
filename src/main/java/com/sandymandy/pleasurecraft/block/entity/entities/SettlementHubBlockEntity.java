@@ -48,17 +48,12 @@ public class SettlementHubBlockEntity extends BlockEntity {
     public void openGui(ServerWorld world, ServerPlayerEntity player) {
         if (settlement != null) {
             player.openHandledScreen(new SettlementHubScreenHandlerFactory(settlement));
-            PleasureCraft.LOGGER.info("Isn't null");
-        }
-        else {
-            PleasureCraft.LOGGER.info("Is null");
         }
     }
 
     /* === Tick === */
 
     public static void tick(World world, BlockPos pos, BlockState state, SettlementHubBlockEntity be) {
-        PleasureCraft.LOGGER.info("Is _________________________________________________________________");
 
         if (world.isClient()) return;
 
