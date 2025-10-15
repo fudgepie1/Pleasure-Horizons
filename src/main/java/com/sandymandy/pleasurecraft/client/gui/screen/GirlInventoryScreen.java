@@ -1,4 +1,4 @@
-package com.sandymandy.pleasurecraft.screen.client;
+package com.sandymandy.pleasurecraft.client.gui.screen;
 
 import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.entity.base.TameableGirlEntity;

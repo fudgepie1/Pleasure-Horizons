@@ -151,12 +151,12 @@ public class PleasureCraftPackets {
 
         ServerPlayNetworking.registerGlobalReceiver(SoundEventSyncC2SPacket.ID,
                 (packet, context) -> Objects.requireNonNull(context.player().getServer()).execute(() -> {
-                            var entity = context.player().getWorld().getEntityById(packet.entityId());
-                            if (entity instanceof GirlEntityVisuals girl) {
-                                girl.setAnimationKeyFrameEventState(packet.soundEvent());
-                            }
-                        }
-                ));
+                    var entity = context.player().getWorld().getEntityById(packet.entityId());
+                    if (entity instanceof GirlEntityVisuals girl) {
+                        girl.setAnimationKeyFrameEventState(packet.soundEvent());
+                    }
+                }));
+
     }
 
 

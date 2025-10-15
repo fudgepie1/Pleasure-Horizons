@@ -1,6 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "pleasurecraft:block/village_core"
+    "model": "pleasurecraft:block/settlement_hub"
   }
 }

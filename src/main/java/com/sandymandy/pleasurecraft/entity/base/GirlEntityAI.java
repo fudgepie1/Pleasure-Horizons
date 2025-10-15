@@ -1,9 +1,8 @@
 package com.sandymandy.pleasurecraft.entity.base;
 
+import com.sandymandy.pleasurecraft.settlement.Settlement;
 import com.sandymandy.pleasurecraft.util.variables.SceneOptions;
-import com.sandymandy.pleasurecraft.village.VillageData;
-import com.sandymandy.pleasurecraft.village.VillageMember;
-import net.minecraft.block.CryingObsidianBlock;
+import com.sandymandy.pleasurecraft.settlement.SettlementMember;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -33,8 +32,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public abstract class GirlEntityAI extends TameableGirlEntity implements SmartBrainOwner<GirlEntityAI>, VillageMember {
-    private VillageData village;
+public abstract class GirlEntityAI extends TameableGirlEntity implements SmartBrainOwner<GirlEntityAI>, SettlementMember {
+    private Settlement settlement;
     private LivingEntity attackTarget;
     private int ticksSinceLastHit;
     private static final int MAX_TICKS_NO_HIT = 20 * 20;
@@ -48,11 +47,13 @@ public abstract class GirlEntityAI extends TameableGirlEntity implements SmartBr
     }
 
     @Override
-    public @Nullable VillageData getVillage() { return village; }
+    public @Nullable Settlement getSettlement() {
+        return settlement;
+    }
 
     @Override
-    public void setVillage(@Nullable VillageData village) {
-        this.village = village;
+    public void setSettlement(@Nullable Settlement settlement) {
+        this.settlement = settlement;
     }
 
     @Override

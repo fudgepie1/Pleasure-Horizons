@@ -5,9 +5,9 @@
 
   "item.pleasurecraft.momo_spawn_egg": "Momo Spawn Egg",
 
-  "item.pleasurecraft.village_core": "Village Core",
+  "item.pleasurecraft.settlement_hub": "Settlement Hub",
 
-  "block.pleasurecraft.village_core" : "Village Core",
+  "block.pleasurecraft.settlement_hub" : "Settlement Hub",
 
   "entity.pleasurecraft.lucy": "Lucy",
 
@@ -16,6 +16,8 @@
   "entity.pleasurecraft.momo": "Momo",
 
   "screen.pleasurecraft.girl_inventory": "Inventory",
+
+  "screen.pleasurecraft.settlement_hub" : "Settlement Hub",
 
   "itemgroup.pleasurecraft.pleasure_craft_items": "PleasureCraft Items",
 

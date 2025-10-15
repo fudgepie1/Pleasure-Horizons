@@ -13,7 +13,7 @@ import com.sandymandy.pleasurecraft.networking.C2S.ThrustKeybindC2SPacket;
 import com.sandymandy.pleasurecraft.networking.PleasureCraftClientPackets;
 import com.sandymandy.pleasurecraft.registries.GirlRegistry;
 import com.sandymandy.pleasurecraft.registries.PleasureCraftHudRegistry;
-import com.sandymandy.pleasurecraft.screen.client.GirlInventoryScreen;
+import com.sandymandy.pleasurecraft.client.gui.screen.GirlInventoryScreen;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
@@ -23,8 +23,10 @@ import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
+import com.sandymandy.pleasurecraft.client.gui.screen.settlement.SettlementHubScreen;
 
 import static com.sandymandy.pleasurecraft.registries.PleasureCraftScreenHandlerRegistry.GIRL_INVENTORY_SCREEN_HANDLER;
+import static com.sandymandy.pleasurecraft.registries.PleasureCraftScreenHandlerRegistry.SETTLEMENT_HUB_SCREEN_HANDLER;
 
 
 public class PleasureCraftClient implements ClientModInitializer {
@@ -36,6 +38,7 @@ public class PleasureCraftClient implements ClientModInitializer {
         ClientTickEvents.START_CLIENT_TICK.register(Freecam::preTick);
         ClientTickEvents.END_CLIENT_TICK.register(Freecam::postTick);
         HandledScreens.register(GIRL_INVENTORY_SCREEN_HANDLER, GirlInventoryScreen::new);
+        HandledScreens.register(SETTLEMENT_HUB_SCREEN_HANDLER, SettlementHubScreen::new);
 
         EntityRendererRegistry.register(GirlRegistry.LUCY, LucyRenderer::new);
         EntityRendererRegistry.register(GirlRegistry.MIKA, MikaRenderer::new);

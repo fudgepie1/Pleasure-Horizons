@@ -1,7 +1,7 @@
 package com.sandymandy.pleasurecraft.block;
 
 import com.sandymandy.pleasurecraft.PleasureCraft;
-import com.sandymandy.pleasurecraft.block.blocks.VillageCoreBlock;
+import com.sandymandy.pleasurecraft.block.blocks.SettlementHubBlock;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.item.BlockItem;
@@ -16,8 +16,8 @@ import net.minecraft.util.Identifier;
 import java.util.function.Function;
 
 public class PleasureCraftBlocks {
-    public static Block VILLAGE_CORE = registerBlock("village_core",
-            properties -> new VillageCoreBlock(properties.strength(5.0F, 1200.0F).sounds(BlockSoundGroup.LODESTONE)));
+    public static Block SETTLEMENT_HUB = registerBlock("settlement_hub",
+            properties -> new SettlementHubBlock(properties.strength(1.0F, 1200.0F).sounds(BlockSoundGroup.LODESTONE).requiresTool()));
 
     private static Block registerBlock(String name, Function<AbstractBlock.Settings, Block> function) {
         Block toRegister = function.apply(AbstractBlock.Settings.create().registryKey(RegistryKey.of(RegistryKeys.BLOCK, Identifier.of(PleasureCraft.MOD_ID, name))));

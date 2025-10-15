@@ -1,8 +1,0 @@
-{
-  "parent": "minecraft:block/cube_bottom_top",
-  "textures": {
-    "top": "pleasurecraft:block/village_core_top",
-    "bottom": "pleasurecraft:block/village_core_bottom",
-    "side": "pleasurecraft:block/village_core_side"
-  }
-}

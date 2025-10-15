@@ -6,7 +6,7 @@ import com.sandymandy.pleasurecraft.hud.SceneProgressOverlay;
 import com.sandymandy.pleasurecraft.networking.S2C.ClothingArmorVisibilityS2CPacket;
 import com.sandymandy.pleasurecraft.networking.S2C.PlayCumHudAnimationS2CPacket;
 import com.sandymandy.pleasurecraft.networking.S2C.SceneOptionsS2CPacket;
-import com.sandymandy.pleasurecraft.screen.client.GirlSceneScreen;
+import com.sandymandy.pleasurecraft.client.gui.screen.GirlSceneScreen;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -49,5 +49,6 @@ public class PleasureCraftClientPackets {
                     context.client().execute(SceneProgressOverlay::triggerCumAnimation);
                 }
         );
+
     }
 }

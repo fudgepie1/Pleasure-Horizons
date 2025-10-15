@@ -22,10 +22,10 @@ public class PleasureCraftItemGroups {
 
     public static final ItemGroup PLEASURE_CRAFT_BLOCK_GROUP = Registry.register(Registries.ITEM_GROUP,
             Identifier.of(PleasureCraft.MOD_ID, "pleasurecraft_blocks"),
-            FabricItemGroup.builder().icon(() -> new ItemStack(PleasureCraftBlocks.VILLAGE_CORE))
+            FabricItemGroup.builder().icon(() -> new ItemStack(PleasureCraftBlocks.SETTLEMENT_HUB))
                     .displayName(Text.translatable("itemgroup.pleasurecraft.pleasure_craft_blocks"))
                     .entries((displayContext, entries) -> {
-                        entries.add(PleasureCraftBlocks.VILLAGE_CORE);
+                        entries.add(PleasureCraftBlocks.SETTLEMENT_HUB);
                     }).build());
 
 

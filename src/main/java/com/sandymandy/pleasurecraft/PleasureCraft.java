@@ -10,7 +10,7 @@ import com.sandymandy.pleasurecraft.registries.GirlRegistry;
 import com.sandymandy.pleasurecraft.registries.PleasureCraftScreenHandlerRegistry;
 import com.sandymandy.pleasurecraft.registries.PleasureCraftSoundEventRegistry;
 import com.sandymandy.pleasurecraft.registries.PleasureCraftTrackedDataRegistry;
-import com.sandymandy.pleasurecraft.village.VillageManager;
+import com.sandymandy.pleasurecraft.settlement.SettlementManager;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import org.slf4j.Logger;
@@ -24,7 +24,7 @@ public class PleasureCraft implements ModInitializer {
 	public void onInitialize() {
 		ServerTickEvents.END_WORLD_TICK.register(world -> {
 			if (!world.isClient()) {
-				VillageManager.get(world).tick(world);
+				SettlementManager.get(world).tick(world);
 			}
 		});
 
