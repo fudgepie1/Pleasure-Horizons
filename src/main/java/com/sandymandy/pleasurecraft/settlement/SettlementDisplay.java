@@ -23,7 +23,7 @@ public class SettlementDisplay {
                     ItemStack.VALIDATED_CODEC.fieldOf("icon").forGetter(SettlementDisplay::getIcon),
                     TextCodecs.CODEC.fieldOf("title").forGetter(SettlementDisplay::getTitle),
                     TextCodecs.CODEC.fieldOf("description").forGetter(SettlementDisplay::getDescription),
-                    AssetInfo.CODEC.fieldOf("background").forGetter(SettlementDisplay::getBackground)
+                    Identifier.CODEC.fieldOf("background").forGetter(SettlementDisplay::getBackground)
             ).apply(instance, SettlementDisplay::new
             )
     );
@@ -34,11 +34,11 @@ public class SettlementDisplay {
     private final ItemStack icon;
     private final Text title;
     private final Text description;
-    private final AssetInfo background;
+    private final Identifier background;
     private float x;
     private float y;
 
-    public SettlementDisplay(ItemStack icon, Text title, Text description, AssetInfo background) {
+    public SettlementDisplay(ItemStack icon, Text title, Text description, Identifier background) {
         this.icon = icon;
         this.title = title;
         this.description = description;
@@ -58,7 +58,7 @@ public class SettlementDisplay {
         return description;
     }
 
-    public AssetInfo getBackground() {
+    public Identifier getBackground() {
         return background;
     }
 
@@ -90,8 +90,17 @@ public class SettlementDisplay {
                 net.minecraft.item.Items.BOOK.getDefaultStack(),
                 title,
                 description,
-                new AssetInfo(Identifier.of(PleasureCraft.MOD_ID, title.getString().toLowerCase()), Identifier.ofVanilla("gui/advancements/adventure.png"))
+                Identifier.ofVanilla("textures/gui/advancements/backgrounds/end.png")
 
+        );
+    }
+
+    public static SettlementDisplay create(ItemStack icon, Text title, Text description, Identifier background){
+        return new SettlementDisplay(
+                icon,
+                title,
+                description,
+                background
         );
     }
 
@@ -99,7 +108,7 @@ public class SettlementDisplay {
         ItemStack icon = ItemStack.PACKET_CODEC.decode(buf);
         Text title = TextCodecs.UNLIMITED_REGISTRY_PACKET_CODEC.decode(buf);
         Text desc = TextCodecs.UNLIMITED_REGISTRY_PACKET_CODEC.decode(buf);
-        AssetInfo background = new AssetInfo(buf.readIdentifier());
+        Identifier background = buf.readIdentifier();
         return new SettlementDisplay(icon, title, desc, background);
     }
 }

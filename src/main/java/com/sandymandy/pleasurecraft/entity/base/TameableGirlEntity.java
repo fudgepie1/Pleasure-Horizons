@@ -481,35 +481,49 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
     @Override
     public void readCustomDataFromNbt(NbtCompound nbt) {
         super.readCustomDataFromNbt(nbt);
-        RegistryWrapper.WrapperLookup registryLookup = this.getWorld().getRegistryManager();
-        Inventories.readNbt(nbt, this.inventory.getItems(), registryLookup);
-        this.setSitting(nbt.getBoolean("SitSate").get());
-        this.setStripped(nbt.getBoolean("StripState").get());
-        this.setCurrentRelationshipLevel(nbt.getInt("RelationshipLevel").get());
+
+        var w = this.getWorld();
+        if (w != null) {
+            RegistryWrapper.WrapperLookup registryLookup = w.getRegistryManager();
+            Inventories.readNbt(nbt, this.inventory.getItems(), registryLookup);
+        }
+
+        boolean sitting = nbt.getBoolean("Sitting")
+                .or(() -> nbt.getBoolean("SitState"))
+                .or(() -> nbt.getBoolean("SitSate"))
+                .orElse(false);
+
+        this.setSitting(sitting);
+        this.setInSittingPose(sitting);
+
+        boolean stripped = nbt.getBoolean("StripState").orElse(false);
+        this.setStripped(stripped);
+
+        int relationship = nbt.getInt("RelationshipLevel").orElse(0);
+        this.setCurrentRelationshipLevel(relationship);
+
         if (nbt.contains("BaseX") && nbt.contains("BaseY") && nbt.contains("BaseZ")) {
-            int x = nbt.getInt("BaseX").get();
-            int y = nbt.getInt("BaseY").get();
-            int z = nbt.getInt("BaseZ").get();
+            int x = nbt.getInt("BaseX").orElse(0);
+            int y = nbt.getInt("BaseY").orElse(0);
+            int z = nbt.getInt("BaseZ").orElse(0);
             this.setBasePos(new BlockPos(x, y, z));
         }
 
-        LazyEntityReference<LivingEntity> lazyEntityReference = LazyEntityReference.fromNbtOrPlayerName(nbt, "Owner", this.getWorld());
+        LazyEntityReference<LivingEntity> lazyEntityReference =
+                LazyEntityReference.fromNbtOrPlayerName(nbt, "Owner", this.getWorld());
+
         if (lazyEntityReference != null) {
             try {
                 this.dataTracker.set(OWNER_UUID, Optional.of(lazyEntityReference));
                 this.setTamed(true, false);
-            } catch (Throwable var4) {
+            } catch (Throwable t) {
                 this.setTamed(false, true);
             }
         } else {
             this.dataTracker.set(OWNER_UUID, Optional.empty());
             this.setTamed(false, true);
         }
-
-        this.setSitting(nbt.getBoolean("Sitting").get());
-        this.setInSittingPose(this.isSitting());
     }
-
     @Override
     public boolean canBeLeashed() {
         return true;

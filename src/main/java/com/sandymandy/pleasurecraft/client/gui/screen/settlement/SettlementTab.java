@@ -7,15 +7,12 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.texture.TextureManager;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
-import net.minecraft.util.AssetInfo;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 
 import java.util.Map;
-import java.util.Optional;
 
 @Environment(EnvType.CLIENT)
 public class SettlementTab {
@@ -78,7 +75,7 @@ public class SettlementTab {
         context.getMatrices().push();
         context.getMatrices().translate((float)x, (float)y, 0.0F);
 
-        Identifier bgTex = display.getBackground().texturePath();
+        Identifier bgTex = display.getBackground();
 
         int i = MathHelper.floor(this.originX);
         int j = MathHelper.floor(this.originY);

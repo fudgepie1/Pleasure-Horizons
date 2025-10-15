@@ -99,22 +99,48 @@ public enum SettlementTabType {
         context.drawGuiTexture(RenderLayer::getGuiTextured, texture, x + getTabX(index), y + getTabY(index), width, height);
     }
 
-    public void drawIcon(DrawContext context, int x, int y, int index, ItemStack icon) {
-        int i = x + getTabX(index);
-        int j = y + getTabY(index);
+    public void drawIcon(DrawContext context, int x, int y, int index, ItemStack stack) {
+        int i = x + this.getTabX(index);
+        int j = y + this.getTabY(index);
         switch (this) {
-            case ABOVE -> { i += 6; j += 9; }
-            case BELOW -> { i += 6; j += 6; }
+            case ABOVE:
+                i += 6;
+                j += 9;
+                break;
+            case BELOW:
+                i += 6;
+                j += 6;
+                break;
+            case LEFT:
+                i += 10;
+                j += 5;
+                break;
+            case RIGHT:
+                i += 6;
+                j += 5;
         }
-        context.drawItemWithoutEntity(icon, i, j);
+
+        context.drawItemWithoutEntity(stack, i, j);
     }
 
     public int getTabX(int index) {
-        return (width + 4) * index;
+        return switch (this) {
+            case ABOVE -> (this.width + 4) * index;
+            case BELOW -> (this.width + 4) * index;
+            case LEFT -> -this.width + 4;
+            case RIGHT -> 248;
+            default -> throw new UnsupportedOperationException("Don't know what this tab type is!" + this);
+        };
     }
 
     public int getTabY(int index) {
-        return this == ABOVE ? -height + 4 : 136;
+        return switch (this) {
+            case ABOVE -> -this.height + 4;
+            case BELOW -> 136;
+            case LEFT -> this.height * index;
+            case RIGHT -> this.height * index;
+            default -> throw new UnsupportedOperationException("Don't know what this tab type is!" + this);
+        };
     }
 
     public boolean isClickOnTab(int baseX, int baseY, int index, double mouseX, double mouseY) {
