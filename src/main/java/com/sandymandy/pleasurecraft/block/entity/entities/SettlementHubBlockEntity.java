@@ -75,7 +75,7 @@ public class SettlementHubBlockEntity extends BlockEntity {
         SettlementManager manager = SettlementManager.get(world);
 
         if (settlement == null) {
-            this.settlement = manager.createSettlement(getPos(), "Settlement@" + getPos().toShortString());
+            this.settlement = manager.createSettlement(getPos(), "Settlement " + getPos().toShortString());
             markDirty();
         }
     }

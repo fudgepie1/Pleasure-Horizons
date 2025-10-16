@@ -2,7 +2,7 @@ package com.sandymandy.pleasurecraft.registries;
 
 import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.entity.base.GirlEntityVisuals;
-import com.sandymandy.pleasurecraft.hud.SceneProgressOverlay;
+import com.sandymandy.pleasurecraft.client.gui.screen.hud.SceneProgressOverlay;
 import net.fabricmc.fabric.api.client.rendering.v1.HudLayerRegistrationCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.IdentifiedLayer;
 import net.minecraft.client.MinecraftClient;

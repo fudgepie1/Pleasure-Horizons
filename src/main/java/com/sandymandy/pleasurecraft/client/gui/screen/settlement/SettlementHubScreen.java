@@ -1,6 +1,11 @@
 package com.sandymandy.pleasurecraft.client.gui.screen.settlement;
 
 import com.google.common.collect.Maps;
+import com.sandymandy.pleasurecraft.client.gui.screen.settlement.render.SettlementRenderable;
+import com.sandymandy.pleasurecraft.client.gui.screen.settlement.render.componets.IconButtonComponent;
+import com.sandymandy.pleasurecraft.client.gui.screen.settlement.render.componets.LabelComponent;
+import com.sandymandy.pleasurecraft.client.gui.screen.settlement.render.componets.ProgressBarComponent;
+import com.sandymandy.pleasurecraft.client.gui.screen.settlement.render.pages.ResourcePage;
 import com.sandymandy.pleasurecraft.screen.SettlementHubScreenHandler;
 import com.sandymandy.pleasurecraft.settlement.Settlement;
 import com.sandymandy.pleasurecraft.settlement.SettlementDisplay;
@@ -10,6 +15,8 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Colors;
@@ -46,19 +53,30 @@ public class SettlementHubScreen extends HandledScreen<SettlementHubScreenHandle
         tabs.clear();
         selectedTab = null;
 
-        // Create example tabs — later, you can load from settlement data
-        addTab("resources", SettlementDisplay.ofBasic(Text.literal("Resources"), Text.literal("Track and manage resources")));
-        addTab("morale", SettlementDisplay.ofBasic(Text.literal("Morale"), Text.literal("Citizen happiness and mood")));
-        addTab("buildings", SettlementDisplay.ofBasic(Text.literal("Buildings"), Text.literal("Construct and upgrade structures")));
-        addTab("population", SettlementDisplay.ofBasic(Text.literal("Population"), Text.literal("Track citizens and workers")));
+        // Automatically handles index
+        addTab("resources", SettlementDisplay.ofBasic(Text.literal("Resources"), Text.literal("Resource overview")))
+                .addRenderable( new ResourcePage());
 
-        // Default select first tab
+        addTab("storage", SettlementDisplay.ofBasic(Text.literal("Storage"), Text.literal("Stored resources")))
+                .addRenderable(new LabelComponent(10, 10, Text.literal("Resources")))
+                .addRenderable(new ProgressBarComponent(10, 25, 120, 8, 1,2))
+                .addRenderable(new IconButtonComponent(150, 20, new ItemStack(Items.CHEST),
+                        btn -> client.player.sendMessage(Text.literal("Opened storage!"), false)));
+
+        // Select first tab automatically
         if (!tabs.isEmpty()) selectedTab = tabs.values().iterator().next();
     }
 
-    private void addTab(String id, SettlementDisplay display) {
-        SettlementTab tab = SettlementTab.create(client, this, tabs.size(), display);
-        if (tab != null) tabs.put(id, tab);
+
+    private SettlementTab addTab(String id, SettlementDisplay display) {
+        int index = tabs.size(); // auto-index based on tab order
+        SettlementTab tab = SettlementTab.create(client, this, index, display);
+
+        if (tab != null) {
+            tabs.put(id, tab);
+        }
+
+        return tab; // return tab so you can chain .addRenderable()
     }
 
     @Override
@@ -126,10 +144,11 @@ public class SettlementHubScreen extends HandledScreen<SettlementHubScreenHandle
     // === Interaction ===
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (button == 0) {
-            int x = (width - WINDOW_WIDTH) / 2;
-            int y = (height - WINDOW_HEIGHT) / 2;
+        int x = (width - WINDOW_WIDTH) / 2;
+        int y = (height - WINDOW_HEIGHT) / 2;
 
+        // Handle tab switching first
+        if (button == 0) {
             for (SettlementTab tab : tabs.values()) {
                 if (tab.isClickOnTab(x, y, mouseX, mouseY)) {
                     this.selectedTab = tab;
@@ -137,8 +156,17 @@ public class SettlementHubScreen extends HandledScreen<SettlementHubScreenHandle
                 }
             }
         }
+
+        // Forward mouse clicks to the current tab, but adjust coordinates
+        if (selectedTab != null) {
+            double localMouseX = mouseX - (x + PAGE_X);
+            double localMouseY = mouseY - (y + PAGE_Y);
+            selectedTab.mouseClicked(localMouseX, localMouseY, button);
+        }
+
         return super.mouseClicked(mouseX, mouseY, button);
     }
+
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
@@ -170,7 +198,9 @@ public class SettlementHubScreen extends HandledScreen<SettlementHubScreenHandle
     }
 
     @Override
-    public boolean shouldPause() {
-        return true;
+    protected void handledScreenTick() {
+        if (selectedTab != null) {
+            selectedTab.tick();
+        }
     }
 }

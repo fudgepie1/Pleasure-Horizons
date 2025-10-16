@@ -1,4 +1,4 @@
-package com.sandymandy.pleasurecraft.hud;
+package com.sandymandy.pleasurecraft.client.gui.screen.hud;
 
 import com.sandymandy.pleasurecraft.PleasureCraft;
 import net.minecraft.client.gui.DrawContext;
