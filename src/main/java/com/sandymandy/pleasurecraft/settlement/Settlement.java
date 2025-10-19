@@ -7,6 +7,7 @@ import com.sandymandy.pleasurecraft.settlement.building.BuildingScanner;
 import com.sandymandy.pleasurecraft.settlement.building.BuildingType;
 import com.sandymandy.pleasurecraft.settlement.building.SettlementBuilding;
 import com.sandymandy.pleasurecraft.util.Utils;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.util.Uuids;
@@ -15,6 +16,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -26,7 +28,7 @@ public class Settlement {
     private SettlementResourceData data;
     private final BuildingScanner scanner = new BuildingScanner(this);
     private final List<UUID> members = new ArrayList<>();
-    private final List<SettlementBuilding> buildings = new ArrayList<>();
+    private final HashMap<UUID, SettlementBuilding> buildings = new HashMap<>();
     // === CODEC ===
     public static final Codec<Settlement> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Uuids.CODEC.fieldOf("id").forGetter(Settlement::getId),
@@ -122,43 +124,24 @@ public class Settlement {
         }
     }
 
-    public void registerBuilding(World world, UUID Id, BlockPos doorPos, Direction tagFacing, BlockPos tagPos, BuildingType type){
+    public void registerBuilding(World world, UUID Id, BlockPos doorPos, Direction tagFacing, BlockPos tagPos, BuildingType type, PlayerEntity player){
         BlockPos scanFrom = Utils.getBlockBehind(doorPos, tagFacing);
-        this.scanner.scanForBuilding(world, Id, scanFrom, doorPos, tagPos, type);
+        this.scanner.scanForBuilding(world, Id, scanFrom, doorPos, tagPos, type, player);
     }
 
-    public void removeBuilding(UUID id) {
-        // Attempt to find the building
-        SettlementBuilding toRemove = null;
-
-        for (SettlementBuilding b : buildings) {
-            if (b.getID().equals(id)) {
-                toRemove = b;
-                break;
-            }
-        }
-
-        if (toRemove != null) {
-            buildings.remove(toRemove);
-
-            // Optional: Log / debug
-            System.out.println("[Settlement] Removed building " + id + " (" + toRemove.getBuildingType() + ")");
-
-            // Optional: trigger persistence update if you have a manager system
-            // SettlementManager.get(world).markDirty();
-
-            // Optional: notify clients if synced via packet
-            // PacketHandler.sendBuildingRemoved(this, id);
-        } else {
-            System.err.println("[Settlement] Tried to remove non-existent building " + id);
-        }
+    public void removeBuilding(UUID ID) {
+        buildings.remove(ID);
     }
 
-    public List<SettlementBuilding> getBuildings() {
-        return List.copyOf(buildings);
+    public HashMap<UUID, SettlementBuilding> getAllBuildings() {
+        return buildings;
     }
 
-    public void addBuilding(SettlementBuilding building) {
-        buildings.add(building);
+    public SettlementBuilding getBuilding(UUID ID) {
+        return buildings.get(ID);
+    }
+
+    public void addBuilding(UUID ID, SettlementBuilding building) {
+        buildings.put(ID, building);
     }
 }

@@ -83,7 +83,7 @@ public class AbstractBuildingTagBlockEntity extends BlockEntity {
         }
 
         player.sendMessage(Text.of("§aRegistering to " + nearestSettlement.getName()), true);
-        nearestSettlement.registerBuilding(world, this.getBuildingId(), doorPos, facingDirection, pos, this.getBuildingType());
+        nearestSettlement.registerBuilding(world, this.getBuildingId(), doorPos, facingDirection, pos, this.getBuildingType(), player);
         this.settlement = nearestSettlement;
         return ActionResult.CONSUME;
     }

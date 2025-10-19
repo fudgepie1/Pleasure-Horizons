@@ -1,6 +1,7 @@
 package com.sandymandy.pleasurecraft.client.gui.screen.settlement;
 
 import com.google.common.collect.Maps;
+import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.client.gui.screen.settlement.render.componets.IconButtonComponent;
 import com.sandymandy.pleasurecraft.client.gui.screen.settlement.render.componets.LabelComponent;
 import com.sandymandy.pleasurecraft.client.gui.screen.settlement.render.componets.ProgressBarComponent;
@@ -64,7 +65,7 @@ public class SettlementHubScreen extends HandledScreen<SettlementHubScreenHandle
                         btn -> client.player.sendMessage(Text.literal("Opened storage!"), false)));
 
         addTab("buildings", SettlementDisplay.ofBasic(Text.literal("Buildings"), Text.literal("Resource overview")))
-                .addRenderable( new BuildingsPage(data));
+                /*.addRenderable( new BuildingsPage(data))*/;
 
         // Select first tab automatically
         if (!tabs.isEmpty()) selectedTab = tabs.values().iterator().next();
@@ -205,5 +206,7 @@ public class SettlementHubScreen extends HandledScreen<SettlementHubScreenHandle
         if (selectedTab != null) {
             selectedTab.tick();
         }
+
+        PleasureCraft.LOGGER.info(data.getAllBuildings() +"");
     }
 }
