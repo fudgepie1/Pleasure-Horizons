@@ -20,6 +20,7 @@ public class BuildingScanner {
     private static final int MAX_VERTICAL_SCAN = 15; // how high to check above each column
     private static final int MIN_CLEARANCE = 2;      // minimum air blocks for walkable interior
     private static final int MIN_VALID_QUADRANTS = 9; // min columns for valid building
+    private static final int MAX_GROUND_SEARCH = 20;  // how far down to check for ground
 
     public BuildingScanner(Settlement settlement) {
         this.settlement = settlement;
@@ -27,17 +28,25 @@ public class BuildingScanner {
 
     /**
      * Scans from a given position (the inside side of a door or tag).
+     * If the origin is floating, it automatically moves it down to floor level.
      */
     public void scanForBuilding(World world, UUID id, BlockPos origin, BlockPos doorPos, BlockPos tagPos, BuildingType type, PlayerEntity player) {
         if (world.isClient()) return;
 
-        PleasureCraft.LOGGER.info("[BuildingScanner] Starting scan at {}", origin);
+        // --- Align origin to ground level ---
+        BlockPos groundAligned = findGroundLevel(world, origin);
+        if (groundAligned == null) {
+            PleasureCraft.LOGGER.warn("[BuildingScanner] Could not find ground below {}", origin);
+            return;
+        }
+
+        PleasureCraft.LOGGER.info("[BuildingScanner] Starting scan at adjusted origin {}", groundAligned);
 
         Set<BlockPos> visited = new HashSet<>();
         Set<BlockPos> validQuadrants = new HashSet<>();
 
         Queue<BlockPos> toVisit = new ArrayDeque<>();
-        toVisit.add(origin);
+        toVisit.add(groundAligned);
 
         while (!toVisit.isEmpty()) {
             BlockPos pos = toVisit.poll();
@@ -51,9 +60,8 @@ public class BuildingScanner {
             if (isValidQuadrant(world, pos)) {
                 validQuadrants.add(pos);
 
-                for (BlockPos poss : validQuadrants) {
-                    world.setBlockState(poss, Blocks.GLOWSTONE.getDefaultState());
-                }
+                // Debug visualization (optional, remove in production)
+                world.setBlockState(pos, Blocks.GLOWSTONE.getDefaultState());
 
                 // Spread horizontally only inside roofed areas
                 for (Direction dir : Direction.Type.HORIZONTAL) {
@@ -65,6 +73,7 @@ public class BuildingScanner {
             }
         }
 
+        // --- Validation and registration ---
         if (validQuadrants.size() >= MIN_VALID_QUADRANTS) {
             registerBuilding(id, doorPos, tagPos, type, List.copyOf(validQuadrants));
         } else {
@@ -82,11 +91,28 @@ public class BuildingScanner {
     }
 
     /**
+     * Finds the ground level below a given origin position.
+     * Moves downward until a non-air block is found, or returns null if none within range.
+     */
+    private BlockPos findGroundLevel(World world, BlockPos origin) {
+        BlockPos.Mutable mutable = origin.mutableCopy();
+        for (int i = 0; i < MAX_GROUND_SEARCH; i++) {
+            BlockState below = world.getBlockState(mutable.down());
+            if (!below.isAir()) {
+                // Found ground, return the first air block above it
+                return mutable;
+            }
+            mutable.move(Direction.DOWN);
+        }
+        return null; // No ground found within limit
+    }
+
+    /**
      * Checks if there is a solid block (roof) within a given height range.
      * If air extends all the way up, returns false (open sky).
      */
     private boolean hasRoofWithin(World world, BlockPos pos) {
-        for (int i = 1; i <= BuildingScanner.MAX_VERTICAL_SCAN; i++) {
+        for (int i = 1; i <= MAX_VERTICAL_SCAN; i++) {
             BlockState above = world.getBlockState(pos.up(i));
             if (!above.isAir()) {
                 return true; // found roof
@@ -129,7 +155,7 @@ public class BuildingScanner {
                 validBlocks
         );
 
-        settlement.addBuilding(id,building);
+        settlement.addBuilding(id, building);
         PleasureCraft.LOGGER.info(
                 "[BuildingScanner] Registered valid building with {} interior quadrants.",
                 validBlocks.size()
