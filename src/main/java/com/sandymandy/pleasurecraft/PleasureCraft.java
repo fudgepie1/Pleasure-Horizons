@@ -31,7 +31,7 @@ public class PleasureCraft implements ModInitializer {
 		PleasureCraftPackets.registerPackets();
 		PleasureCraftPackets.registerC2SPackets();
 		PleasureCraftItemGroups.registerItemGroups();
-		PleasureCraftItems.registerModItems();
+		PleasureCraftItems.registerItems();
 		PleasureCraftBlockEntities.registerBlockEntities();
 		PleasureCraftBlocks.registerBlocks();
 		PleasureCraftCriteria.registerAdvancementCriteria();

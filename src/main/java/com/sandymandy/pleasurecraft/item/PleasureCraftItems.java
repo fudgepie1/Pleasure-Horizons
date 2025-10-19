@@ -21,7 +21,7 @@ public class PleasureCraftItems {
                 function.apply(new Item.Settings().registryKey(RegistryKey.of(RegistryKeys.ITEM, Identifier.of(PleasureCraft.MOD_ID, name)))));
     }
 
-    public static void registerModItems(){
+    public static void registerItems(){
         PleasureCraft.LOGGER.info("Registering Items for PleasureCraft");
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.SPAWN_EGGS).register(entries -> {
             PleasureCraftEntities.getAllSpawnEggs().forEach(entries::add);

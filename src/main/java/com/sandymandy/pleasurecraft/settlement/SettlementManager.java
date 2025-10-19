@@ -4,7 +4,6 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.datafixer.DataFixTypes;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.PersistentState;
 import net.minecraft.world.PersistentStateType;
@@ -40,8 +39,8 @@ public class SettlementManager extends PersistentState {
         return world.getPersistentStateManager().getOrCreate(TYPE);
     }
 
-    public Settlement createSettlement(BlockPos pos, String name) {
-        Settlement settlement = new Settlement(UUID.randomUUID(), name, pos);
+    public Settlement createSettlement(BlockPos pos, String name, UUID owner) {
+        Settlement settlement = new Settlement(UUID.randomUUID(), owner, name, pos);
         settlements.put(settlement.getId(), settlement);
         markDirty();
         return settlement;

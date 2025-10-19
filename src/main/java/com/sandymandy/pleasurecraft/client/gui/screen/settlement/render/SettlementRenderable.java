@@ -20,4 +20,7 @@ public interface SettlementRenderable {
     default boolean isMouseOver(double mouseX, double mouseY) {
         return false;
     }
+
+    default boolean mouseScrolled(double mouseX, double mouseY, double amount, double horizontalAmount){return false;}
+
 }

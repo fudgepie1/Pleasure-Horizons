@@ -1,6 +1,5 @@
 package com.sandymandy.pleasurecraft.block.entity.entities;
 
-import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.block.entity.PleasureCraftBlockEntities;
 import com.sandymandy.pleasurecraft.screen.SettlementHubScreenHandlerFactory;
 import com.sandymandy.pleasurecraft.settlement.Settlement;
@@ -8,6 +7,7 @@ import com.sandymandy.pleasurecraft.settlement.SettlementManager;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
@@ -15,6 +15,7 @@ import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.Text;
 import net.minecraft.util.Uuids;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -24,7 +25,6 @@ import java.util.UUID;
 
 public class SettlementHubBlockEntity extends BlockEntity {
     private Settlement settlement;
-    private boolean initialized = false;
 
     public SettlementHubBlockEntity(BlockPos pos, BlockState state) {
         super(PleasureCraftBlockEntities.SETTLEMENT_HUB_BLOCK_ENTITY, pos, state);
@@ -47,7 +47,13 @@ public class SettlementHubBlockEntity extends BlockEntity {
 
     public void openGui(ServerWorld world, ServerPlayerEntity player) {
         if (settlement != null) {
-            player.openHandledScreen(new SettlementHubScreenHandlerFactory(settlement));
+            PlayerEntity owner = world.getPlayerByUuid(settlement.getOwner());
+            if(player.equals(owner)) {
+                player.openHandledScreen(new SettlementHubScreenHandlerFactory(settlement));
+            }
+            else {
+                player.sendMessage(Text.of("§cThis is not owned by you"), true);
+            }
         }
     }
 
@@ -56,11 +62,6 @@ public class SettlementHubBlockEntity extends BlockEntity {
     public static void tick(World world, BlockPos pos, BlockState state, SettlementHubBlockEntity be) {
 
         if (world.isClient()) return;
-
-        if (!be.initialized) {
-            be.initialize((ServerWorld) world);
-            be.initialized = true;
-        }
 
         if (be.settlement != null) {
             be.settlement.tick(world);
@@ -71,11 +72,16 @@ public class SettlementHubBlockEntity extends BlockEntity {
 
     /* === Setup === */
 
-    private void initialize(ServerWorld world) {
+    public void initializeWithOwner(ServerWorld world, UUID ownerId) {
         SettlementManager manager = SettlementManager.get(world);
 
-        if (settlement == null) {
-            this.settlement = manager.createSettlement(getPos(), "Settlement " + getPos().toShortString());
+        if (this.settlement == null) {
+            PlayerEntity owner = world.getPlayerByUuid(ownerId);
+            String name = "Settlement@" + getPos().toShortString();
+
+            if(owner != null) name = owner.getName().getString().replace("literal{","").replace("}","") + "'s Settlement";
+
+            this.settlement = manager.createSettlement(getPos(), name, ownerId);
             markDirty();
         }
     }

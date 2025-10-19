@@ -7,7 +7,7 @@ import net.minecraft.world.World;
 import java.util.Objects;
 
 public class PleasureCraftMessages {
-    public void GlobleMessage(World world, String messageContent) {
+    public static void GlobleMessage(World world, String messageContent) {
         Text message = Text.literal(messageContent);
         if (world.isClient) return; // Don't run on client
 
@@ -17,7 +17,7 @@ public class PleasureCraftMessages {
                 .broadcast(message, false);
     }
 
-    public void PlayerSpecificMessage(PlayerEntity playerEntity, String messageContent){
+    public static void PlayerSpecificMessage(PlayerEntity playerEntity, String messageContent){
         Text message = Text.literal(messageContent);
         playerEntity.sendMessage(message,false);
     }

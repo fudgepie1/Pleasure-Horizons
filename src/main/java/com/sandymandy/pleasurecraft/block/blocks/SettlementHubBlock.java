@@ -26,6 +26,18 @@ import org.jetbrains.annotations.Nullable;
 public class SettlementHubBlock extends BlockWithEntity implements BlockEntityProvider {
     public static final MapCodec<SettlementHubBlock> CODEC = SettlementHubBlock.createCodec(SettlementHubBlock::new);
 
+    @Override
+    public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
+        super.onPlaced(world, pos, state, placer, itemStack);
+
+        if (world instanceof ServerWorld serverWorld && placer instanceof PlayerEntity player) {
+            BlockEntity be = world.getBlockEntity(pos);
+            if (be instanceof SettlementHubBlockEntity hub) {
+                hub.initializeWithOwner(serverWorld, player.getUuid());
+            }
+        }
+    }
+
     public SettlementHubBlock(Settings settings) {
         super(settings);
     }
@@ -83,5 +95,6 @@ public class SettlementHubBlock extends BlockWithEntity implements BlockEntityPr
 
         return ActionResult.CONSUME;
     }
+
 
 }

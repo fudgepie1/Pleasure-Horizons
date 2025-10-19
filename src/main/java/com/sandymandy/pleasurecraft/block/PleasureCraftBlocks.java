@@ -1,6 +1,7 @@
 package com.sandymandy.pleasurecraft.block;
 
 import com.sandymandy.pleasurecraft.PleasureCraft;
+import com.sandymandy.pleasurecraft.block.blocks.HouseBuildingTagBlock;
 import com.sandymandy.pleasurecraft.block.blocks.SettlementHubBlock;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
@@ -19,6 +20,9 @@ public class PleasureCraftBlocks {
     public static Block SETTLEMENT_HUB = registerBlock("settlement_hub",
             properties -> new SettlementHubBlock(properties.strength(1.0F, 1200.0F).sounds(BlockSoundGroup.LODESTONE).requiresTool()));
 
+    public static Block HOUSE_BUILDING_TAG_BLOCK = registerBlock("house_tag",
+            properties -> new HouseBuildingTagBlock(properties.strength(1.0F, 100.0F)));
+
     private static Block registerBlock(String name, Function<AbstractBlock.Settings, Block> function) {
         Block toRegister = function.apply(AbstractBlock.Settings.create().registryKey(RegistryKey.of(RegistryKeys.BLOCK, Identifier.of(PleasureCraft.MOD_ID, name))));
         registerBlockItem(name, toRegister);
@@ -35,7 +39,8 @@ public class PleasureCraftBlocks {
                 new BlockItem(block, new Item.Settings().useBlockPrefixedTranslationKey()
                         .registryKey(RegistryKey.of(RegistryKeys.ITEM, Identifier.of(PleasureCraft.MOD_ID, name)))));
     }
+
     public static void registerBlocks() {
-        PleasureCraft.LOGGER.info("Registering Block for " + PleasureCraft.MOD_ID);
+        PleasureCraft.LOGGER.info("Registering Block for PleasureCraft");
     }
 }

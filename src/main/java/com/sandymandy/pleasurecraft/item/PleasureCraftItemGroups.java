@@ -30,6 +30,6 @@ public class PleasureCraftItemGroups {
 
 
     public static void registerItemGroups(){
-        PleasureCraft.LOGGER.info("Registering Item Groups for " + PleasureCraft.MOD_ID);
+        PleasureCraft.LOGGER.info("Registering Item Groups for PleasureCraft");
     }
 }

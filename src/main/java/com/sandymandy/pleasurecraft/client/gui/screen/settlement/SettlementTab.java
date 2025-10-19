@@ -29,10 +29,10 @@ public class SettlementTab {
 
     private double originX;
     private double originY;
-    private int minPanX = Integer.MAX_VALUE;
-    private int minPanY = Integer.MAX_VALUE;
-    private int maxPanX = Integer.MIN_VALUE;
-    private int maxPanY = Integer.MIN_VALUE;
+    private final int minPanX = Integer.MAX_VALUE;
+    private final int minPanY = Integer.MAX_VALUE;
+    private final int maxPanX = Integer.MIN_VALUE;
+    private final int maxPanY = Integer.MIN_VALUE;
     private float alpha;
     private boolean initialized;
 
@@ -59,8 +59,8 @@ public class SettlementTab {
     // === Rendering ===
     public void render(DrawContext context, int x, int y) {
         if (!this.initialized) {
-            this.originX = 117 - (this.maxPanX + this.minPanX) / 2;
-            this.originY = 56 - (this.maxPanY + this.minPanY) / 2;
+            this.originX = 117 - (double) (this.maxPanX + this.minPanX) / 2;
+            this.originY = 56 - (double) (this.maxPanY + this.minPanY) / 2;
             this.initialized = true;
         }
 
@@ -107,6 +107,10 @@ public class SettlementTab {
             }
         }
     }
+
+//    public boolean mouseScrolled(double mouseX, double mouseY, double amount, double horizontalAmount) {
+//        return
+//    };
 
     // === Utility ===
     public void move(double dx, double dy) {

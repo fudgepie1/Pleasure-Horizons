@@ -14,9 +14,4 @@ public class ResourcePage extends SettlementPage {
                         .addComponent(new IconButtonComponent(120, 60, new ItemStack(Items.DIAMOND),
                                 btn -> client.player.sendMessage(Text.literal("Clicked diamond!"), false))));
     }
-
-    @Override
-    public void tick() {
-        super.tick();
-    }
 }

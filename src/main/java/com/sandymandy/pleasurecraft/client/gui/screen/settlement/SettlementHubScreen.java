@@ -1,10 +1,10 @@
 package com.sandymandy.pleasurecraft.client.gui.screen.settlement;
 
 import com.google.common.collect.Maps;
-import com.sandymandy.pleasurecraft.client.gui.screen.settlement.render.SettlementRenderable;
 import com.sandymandy.pleasurecraft.client.gui.screen.settlement.render.componets.IconButtonComponent;
 import com.sandymandy.pleasurecraft.client.gui.screen.settlement.render.componets.LabelComponent;
 import com.sandymandy.pleasurecraft.client.gui.screen.settlement.render.componets.ProgressBarComponent;
+import com.sandymandy.pleasurecraft.client.gui.screen.settlement.render.pages.BuildingsPage;
 import com.sandymandy.pleasurecraft.client.gui.screen.settlement.render.pages.ResourcePage;
 import com.sandymandy.pleasurecraft.screen.SettlementHubScreenHandler;
 import com.sandymandy.pleasurecraft.settlement.Settlement;
@@ -18,8 +18,8 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.Colors;
+import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
@@ -62,6 +62,9 @@ public class SettlementHubScreen extends HandledScreen<SettlementHubScreenHandle
                 .addRenderable(new ProgressBarComponent(10, 25, 120, 8, 1,2))
                 .addRenderable(new IconButtonComponent(150, 20, new ItemStack(Items.CHEST),
                         btn -> client.player.sendMessage(Text.literal("Opened storage!"), false)));
+
+        addTab("buildings", SettlementDisplay.ofBasic(Text.literal("Buildings"), Text.literal("Resource overview")))
+                .addRenderable( new BuildingsPage(data));
 
         // Select first tab automatically
         if (!tabs.isEmpty()) selectedTab = tabs.values().iterator().next();

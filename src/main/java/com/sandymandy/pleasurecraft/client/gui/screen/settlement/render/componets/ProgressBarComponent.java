@@ -23,6 +23,6 @@ public class ProgressBarComponent implements SettlementRenderable {
         int filled = (int) (width * progress);
 
         context.fill(offsetX + x, offsetY + y, offsetX + x + width, offsetY + y + height, 0xFF555555);
-        context.fill(offsetX + x, offsetY + y, offsetX + x + filled, offsetY + y + height, 0xFF00AA00);
+        context.fill(offsetX + x, offsetY + y, offsetX + x + filled, offsetY + y + height, 0xEFEFEFEF);
     }
 }
