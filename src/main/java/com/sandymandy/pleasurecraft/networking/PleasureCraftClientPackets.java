@@ -1,7 +1,7 @@
 package com.sandymandy.pleasurecraft.networking;
 
 import com.sandymandy.pleasurecraft.PleasureCraft;
-import com.sandymandy.pleasurecraft.entity.base.GirlEntityVisuals;
+import com.sandymandy.pleasurecraft.entity.base.GirlEntityScene;
 import com.sandymandy.pleasurecraft.client.gui.screen.hud.SceneProgressOverlay;
 import com.sandymandy.pleasurecraft.networking.S2C.ClothingArmorVisibilityS2CPacket;
 import com.sandymandy.pleasurecraft.networking.S2C.PlayCumHudAnimationS2CPacket;
@@ -26,7 +26,7 @@ public class PleasureCraftClientPackets {
                     if (world == null) return;
 
                     Entity entity = world.getEntityById(packet.entityId());
-                    if (entity instanceof GirlEntityVisuals girl) {
+                    if (entity instanceof GirlEntityScene girl) {
                         int i = 0;
                         for (EquipmentSlot slot : EquipmentSlot.values()) {
                             girl.armorVisibility.put(slot, packet.armor().get(i));

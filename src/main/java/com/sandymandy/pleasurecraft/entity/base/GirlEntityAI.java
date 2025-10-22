@@ -1,14 +1,20 @@
 package com.sandymandy.pleasurecraft.entity.base;
 
+import com.sandymandy.pleasurecraft.entity.ai.goal.GirlSitGoal;
+import com.sandymandy.pleasurecraft.entity.ai.goal.StopMovementGoal;
+import com.sandymandy.pleasurecraft.entity.ai.goal.StripGoal;
 import com.sandymandy.pleasurecraft.settlement.Settlement;
-import com.sandymandy.pleasurecraft.util.variables.SceneOptions;
 import com.sandymandy.pleasurecraft.settlement.SettlementMember;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.brain.Brain;
+import net.minecraft.entity.passive.IronGolemEntity;
+import net.minecraft.entity.passive.TurtleEntity;
+import net.minecraft.entity.passive.WolfEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.registry.Registries;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.tslat.smartbrainlib.api.SmartBrainOwner;
 import net.tslat.smartbrainlib.api.core.BrainActivityGroup;
@@ -32,19 +38,24 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public abstract class GirlEntityAI extends TameableGirlEntity implements SmartBrainOwner<GirlEntityAI>, SettlementMember {
+public abstract class GirlEntityAI extends GirlEntityScene implements SmartBrainOwner<GirlEntityAI>, SettlementMember {
     private Settlement settlement;
     private LivingEntity attackTarget;
     private int ticksSinceLastHit;
     private static final int MAX_TICKS_NO_HIT = 20 * 20;
-    private boolean requestStrip = false;
-    private boolean requestMoveToBed = false;
-    public SceneOptions stripOptions = SceneOptions.EMPTY;
-    public BlockPos targetBedPos;
-    private boolean requestMoveToPlayer;
-    protected GirlEntityAI(EntityType<? extends TameableGirlEntity> entityType, World world) {
+
+    protected GirlEntityAI(EntityType<? extends GirlEntityAI> entityType, World world) {
         super(entityType, world);
     }
+
+    @Override
+    protected void initGoals() {
+        super.initGoals();
+        this.goalSelector.add(-1, new StripGoal(this));
+        this.goalSelector.add(0, new StopMovementGoal(this));
+        this.goalSelector.add(1, new GirlSitGoal(this));
+    }
+
 
     @Override
     public @Nullable Settlement getSettlement() {
@@ -63,13 +74,18 @@ public abstract class GirlEntityAI extends TameableGirlEntity implements SmartBr
 
     @Override
     protected void mobTick(ServerWorld world) {
-        tickBrain(this);
+        if(!isMovementLocked() && !isSitting()) tickBrain(this);
     }
 
     @Override
     public List<? extends ExtendedSensor<? extends GirlEntityAI>> getSensors() {
         return List.of(
-                new NearbyLivingEntitySensor<>(), // This tracks nearby entities
+                new NearbyLivingEntitySensor<GirlEntityAI>()
+                        .setPredicate((target, entity) ->
+                                target instanceof PlayerEntity ||
+                                        target instanceof IronGolemEntity ||
+                                        target instanceof WolfEntity ||
+                                        (target instanceof TurtleEntity turtle && turtle.isBaby() && !turtle.isSwimming())),
                 new HurtBySensor<>()                // This tracks the last damage source and attacker
         );
     }
@@ -78,8 +94,9 @@ public abstract class GirlEntityAI extends TameableGirlEntity implements SmartBr
     public BrainActivityGroup<? extends GirlEntityAI> getCoreTasks() { // These are the tasks that run all the time (usually)
         return BrainActivityGroup.coreTasks(
                 new LookAtTarget<>(),                      // Have the entity turn to face and look at its current look target
-                new MoveToWalkTarget<>());                 // Walk towards the current walk target
+                new MoveToWalkTarget<>());          // Walk towards the current walk target
     }
+
 
     @Override
     public BrainActivityGroup<? extends GirlEntityAI> getIdleTasks() { // These are the tasks that run when the mob isn't doing anything else (usually)
@@ -101,6 +118,27 @@ public abstract class GirlEntityAI extends TameableGirlEntity implements SmartBr
                 new AnimatableMeleeAttack<>(0)); // Melee attack the target if close enough
     }
 
+//    @Override
+//    public List<Activity> getActivityPriorities() {
+//        return List.of(
+//                GirlActivities.SEX,
+//                GirlActivities.FOLLOW,
+//                Activity.IDLE
+//        );
+//    }
+
+//    @Override
+//    public Map<Activity, BrainActivityGroup<? extends GirlEntityAI>> getAdditionalTasks() {
+//        Map<Activity, BrainActivityGroup<? extends GirlEntityAI>> map = new HashMap<>();
+//
+//
+//        map.put(GirlActivities.FOLLOW, new BrainActivityGroup<>(GirlActivities.FOLLOW)
+//                .priority(15)
+//                .behaviours(new FollowOwnerTask())
+//        );
+//
+//        return map;
+//    }
 
     @Override
     public void tickMovement() {
@@ -146,47 +184,9 @@ public abstract class GirlEntityAI extends TameableGirlEntity implements SmartBr
         return success;
     }
 
-    public void requestMoveToBed() {
-        this.requestMoveToBed = true;
+    @Override
+    public void tick() {
+        super.tick();
     }
 
-    public boolean shouldMoveToBed() {
-        if (requestMoveToBed) {
-            requestMoveToBed = false;
-            return true;
-        }
-        return false;
-    }
-
-    public void requestMoveToPlayer() {
-        this.requestMoveToPlayer = true;
-    }
-
-    public boolean shouldMoveToPlayer() {
-        if (requestMoveToPlayer) {
-            requestMoveToPlayer = false;
-            return true;
-        }
-        return false;
-    }
-
-    public void requestStrip() {
-        this.requestStrip(null);
-    }
-
-    public void requestStrip(@Nullable SceneOptions options) {
-        this.requestStrip = true;
-
-        if(options != null){
-            this.stripOptions = options;
-        }
-    }
-
-    public boolean shouldStrip() {
-        if (requestStrip) {
-            requestStrip = false;
-            return true;
-        }
-        return false;
-    }
 }

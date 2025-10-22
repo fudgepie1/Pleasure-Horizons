@@ -3,10 +3,7 @@ package com.sandymandy.pleasurecraft.entity.base;
 import com.mojang.authlib.GameProfile;
 import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.config.ModConfig;
-import com.sandymandy.pleasurecraft.entity.ai.goal.BedGoal;
-import com.sandymandy.pleasurecraft.entity.ai.goal.MoveToPlayerGoal;
-import com.sandymandy.pleasurecraft.entity.ai.goal.StopMovementGoal;
-import com.sandymandy.pleasurecraft.entity.ai.goal.StripGoal;
+import com.sandymandy.pleasurecraft.entity.ai.goal.*;
 import com.sandymandy.pleasurecraft.networking.C2S.*;
 import com.sandymandy.pleasurecraft.networking.S2C.ClothingArmorVisibilityS2CPacket;
 import com.sandymandy.pleasurecraft.networking.S2C.PlayCumHudAnimationS2CPacket;
@@ -27,6 +24,7 @@ import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.DyedColorComponent;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.ai.goal.SitGoal;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
@@ -40,6 +38,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animatable.instance.SingletonAnimatableInstanceCache;
@@ -54,17 +53,21 @@ import software.bernie.geckolib.animation.keyframe.event.data.SoundKeyframeData;
 
 import java.util.*;
 
-public class GirlEntityVisuals extends GirlEntityAI implements GeoEntity {
-    private static final TrackedData<SceneOptions> CURRENT_SCENE_OPTIONS = DataTracker.registerData(GirlEntityVisuals.class, PleasureCraftTrackedDataRegistry.SCENE_OPTION);
-    private static final TrackedData<ScenePhase> CURRENT_SCENE_PHASE = DataTracker.registerData(GirlEntityVisuals.class, PleasureCraftTrackedDataRegistry.SCENE_PHASE);
-    private static final TrackedData<String> ANIMATION_KEY_FRAME_EVENT = DataTracker.registerData(GirlEntityVisuals.class, TrackedDataHandlerRegistry.STRING);
-    public static final TrackedData<Float> SCENE_PROGRESS = DataTracker.registerData(GirlEntityVisuals.class, TrackedDataHandlerRegistry.FLOAT);
-    public static final TrackedData<Float> CUM_THRESHOLD = DataTracker.registerData(GirlEntityVisuals.class, TrackedDataHandlerRegistry.FLOAT);
-    private static final TrackedData<Boolean> THRUSTING = DataTracker.registerData(GirlEntityVisuals.class, TrackedDataHandlerRegistry.BOOLEAN);
-    private static final TrackedData<Integer> INTRO_INDEX = DataTracker.registerData(GirlEntityVisuals.class, TrackedDataHandlerRegistry.INTEGER);
+public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
+    private static final TrackedData<SceneOptions> CURRENT_SCENE_OPTIONS = DataTracker.registerData(GirlEntityScene.class, PleasureCraftTrackedDataRegistry.SCENE_OPTION);
+    private static final TrackedData<ScenePhase> CURRENT_SCENE_PHASE = DataTracker.registerData(GirlEntityScene.class, PleasureCraftTrackedDataRegistry.SCENE_PHASE);
+    private static final TrackedData<String> ANIMATION_KEY_FRAME_EVENT = DataTracker.registerData(GirlEntityScene.class, TrackedDataHandlerRegistry.STRING);
+    public static final TrackedData<Float> SCENE_PROGRESS = DataTracker.registerData(GirlEntityScene.class, TrackedDataHandlerRegistry.FLOAT);
+    public static final TrackedData<Float> CUM_THRESHOLD = DataTracker.registerData(GirlEntityScene.class, TrackedDataHandlerRegistry.FLOAT);
+    private static final TrackedData<Boolean> THRUSTING = DataTracker.registerData(GirlEntityScene.class, TrackedDataHandlerRegistry.BOOLEAN);
+    private static final TrackedData<Integer> INTRO_INDEX = DataTracker.registerData(GirlEntityScene.class, TrackedDataHandlerRegistry.INTEGER);
     private static final Random RANDOM = new Random();
     private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
-
+    public BlockPos targetBedPos;
+    public SceneOptions stripOptions = SceneOptions.EMPTY;
+    private boolean requestStrip = false;
+    private boolean requestMoveToBed = false;
+    private boolean requestMoveToPlayer;
     private String lastSceneAnim = "";
     public String passengerBoneName = "boyCam";
     BlockPos bedPos;
@@ -78,7 +81,7 @@ public class GirlEntityVisuals extends GirlEntityAI implements GeoEntity {
         return cache;
     }
 
-    protected GirlEntityVisuals(EntityType<? extends GirlEntityAI> entityType, World world) {
+    protected GirlEntityScene(EntityType<? extends GirlEntityScene> entityType, World world) {
         super(entityType, world);
     }
 
@@ -453,14 +456,7 @@ public class GirlEntityVisuals extends GirlEntityAI implements GeoEntity {
         }
     }
 
-    @Override
-    protected void initGoals() {
-        this.goalSelector.add(-4, new MoveToPlayerGoal(this, 1.25D));
-        this.goalSelector.add(-3, new BedGoal(this, 1.25D));
-        this.goalSelector.add(-2, new StripGoal(this));
-        this.goalSelector.add(-1, new StopMovementGoal(this));
-        super.initGoals();
-    }
+
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllerRegistrar) {
@@ -500,7 +496,7 @@ public class GirlEntityVisuals extends GirlEntityAI implements GeoEntity {
 
     }*/
 
-    private PlayState handleAnimations(AnimationTest<GirlEntityVisuals> state) {
+    private PlayState handleAnimations(AnimationTest<GirlEntityScene> state) {
         if (isSceneActive() && getOverrideAnim().isEmpty()) {
             final AnimationController<?> controller = state.controller();
             final SceneOptions options = this.getCurrentSceneOptions();
@@ -793,16 +789,60 @@ public class GirlEntityVisuals extends GirlEntityAI implements GeoEntity {
         new PleasureCraftMessages().PlayerSpecificMessage(scenePlayer, finalMessage);
     }
 
-    private static class SoundKeyframeHandler implements AnimationController.KeyframeEventHandler<GirlEntityVisuals, SoundKeyframeData> {
+    public void requestMoveToBed() {
+        this.requestMoveToBed = true;
+    }
 
-        private final GirlEntityVisuals entity;
+    public boolean shouldMoveToBed() {
+        if (requestMoveToBed) {
+            requestMoveToBed = false;
+            return true;
+        }
+        return false;
+    }
 
-        public SoundKeyframeHandler(GirlEntityVisuals entity) {
+    public void requestMoveToPlayer() {
+        this.requestMoveToPlayer = true;
+    }
+
+    public boolean shouldMoveToPlayer() {
+        if (requestMoveToPlayer) {
+            requestMoveToPlayer = false;
+            return true;
+        }
+        return false;
+    }
+
+    public void requestStrip() {
+        this.requestStrip(null);
+    }
+
+    public void requestStrip(@Nullable SceneOptions options) {
+        this.requestStrip = true;
+
+        if(options != null){
+            this.stripOptions = options;
+        }
+    }
+
+    public boolean shouldStrip() {
+        if (requestStrip) {
+            requestStrip = false;
+            return true;
+        }
+        return false;
+    }
+
+    private static class SoundKeyframeHandler implements AnimationController.KeyframeEventHandler<GirlEntityScene, SoundKeyframeData> {
+
+        private final GirlEntityScene entity;
+
+        public SoundKeyframeHandler(GirlEntityScene entity) {
             this.entity = entity;
         }
 
         @Override
-        public void handle(KeyFrameEvent<GirlEntityVisuals, SoundKeyframeData> event) {
+        public void handle(KeyFrameEvent<GirlEntityScene, SoundKeyframeData> event) {
             if (!this.entity.getWorld().isClient()) return;
 
             String key = event.keyframeData().getSound();

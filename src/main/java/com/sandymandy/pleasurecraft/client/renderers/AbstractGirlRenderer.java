@@ -1,7 +1,7 @@
 package com.sandymandy.pleasurecraft.client.renderers;
 
 import com.mojang.datafixers.util.Either;
-import com.sandymandy.pleasurecraft.entity.base.GirlEntityVisuals;
+import com.sandymandy.pleasurecraft.entity.base.GirlEntityScene;
 import com.sandymandy.pleasurecraft.networking.C2S.BonePosSyncC2SPacket;
 import com.sandymandy.pleasurecraft.registries.PleasureCraftDataTicketRegistry;
 import com.sandymandy.pleasurecraft.util.renderer.OffsetVertexConsumer;
@@ -34,7 +34,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public abstract class AbstractGirlRenderer<T extends GirlEntityVisuals, R extends LivingEntityRenderState & GeoRenderState> extends GeoEntityRenderer<T, R> {
+public abstract class AbstractGirlRenderer<T extends GirlEntityScene, R extends LivingEntityRenderState & GeoRenderState> extends GeoEntityRenderer<T, R> {
 
 
     protected ItemStack mainHandItem;

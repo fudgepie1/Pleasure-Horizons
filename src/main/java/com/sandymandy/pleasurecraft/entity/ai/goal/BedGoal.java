@@ -1,6 +1,6 @@
 package com.sandymandy.pleasurecraft.entity.ai.goal;
 
-import com.sandymandy.pleasurecraft.entity.base.GirlEntityVisuals;
+import com.sandymandy.pleasurecraft.entity.base.GirlEntityScene;
 import com.sandymandy.pleasurecraft.util.variables.ScenePhase;
 import com.sandymandy.pleasurecraft.util.Utils;
 import net.minecraft.entity.ai.goal.Goal;
@@ -18,7 +18,7 @@ import java.util.EnumSet;
 
 
 public class BedGoal extends Goal {
-    private final GirlEntityVisuals entity;
+    private final GirlEntityScene entity;
     private final double speed;
     private final EntityNavigation navigation;
     private Direction bedFacing;
@@ -26,7 +26,7 @@ public class BedGoal extends Goal {
     private Vec3d scenePos;
     private Path pathToBed;
 
-    public BedGoal(GirlEntityVisuals entity, double speed) {
+    public BedGoal(GirlEntityScene entity, double speed) {
         this.entity = entity;
         this.speed = speed;
         this.navigation = entity.getNavigation();

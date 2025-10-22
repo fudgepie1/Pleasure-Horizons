@@ -3,6 +3,7 @@ package com.sandymandy.pleasurecraft;
 import com.sandymandy.pleasurecraft.advancement.criterion.PleasureCraftCriteria;
 import com.sandymandy.pleasurecraft.block.PleasureCraftBlocks;
 import com.sandymandy.pleasurecraft.block.entity.PleasureCraftBlockEntities;
+import com.sandymandy.pleasurecraft.entity.ai.brain.GirlMemoryTypes;
 import com.sandymandy.pleasurecraft.item.PleasureCraftItemGroups;
 import com.sandymandy.pleasurecraft.item.PleasureCraftItems;
 import com.sandymandy.pleasurecraft.networking.PleasureCraftPackets;
@@ -38,6 +39,7 @@ public class PleasureCraft implements ModInitializer {
 		PleasureCraftTrackedDataRegistry.registerTrackedData();
 		PleasureCraftSoundEventRegistry.registerSoundEvents();
 		PleasureCraftScreenHandlerRegistry.register();
+		GirlMemoryTypes.registerMemoryTypes();
 		GirlRegistry.register();
 	}
 }

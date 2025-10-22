@@ -7,13 +7,13 @@ import com.sandymandy.pleasurecraft.util.PleasureCraftLangUtils;
 import com.sandymandy.pleasurecraft.util.PleasureCraftMessages;
 import com.sandymandy.pleasurecraft.util.inventory.GirlInventory;
 import com.sandymandy.pleasurecraft.util.variables.SceneOptions;
-import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.LeavesBlock;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.FoodComponent;
 import net.minecraft.component.type.UseRemainderComponent;
 import net.minecraft.entity.*;
+import net.minecraft.entity.ai.control.MoveControl;
 import net.minecraft.entity.ai.goal.EscapeDangerGoal;
 import net.minecraft.entity.ai.pathing.LandPathNodeMaker;
 import net.minecraft.entity.ai.pathing.PathNodeType;
@@ -23,7 +23,6 @@ import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.mob.PathAwareEntity;
-import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.item.Item;
@@ -48,9 +47,6 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-import software.bernie.geckolib.animatable.GeoEntity;
-import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.animatable.instance.SingletonAnimatableInstanceCache;
 
 import java.util.*;
 
@@ -870,6 +866,19 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
     public void addVelocity(double dx, double dy, double dz) {
         if (!this.isMovementLocked()) {
             super.addVelocity(dx, dy, dz);
+        }
+    }
+
+    @Override
+    public void stopMovement() {
+        super.stopMovement();
+        this.setVelocity(0, this.getVelocity().y > 0 ? 0 : this.getVelocity().y, 0); // stops lateral motion
+        this.setJumping(false);
+        this.bodyYaw = this.getBodyYaw();
+
+        MoveControl control = this.getMoveControl();
+        if (control != null) {
+            control.moveTo(this.getX(), this.getY(), this.getZ(), 0); // keep position
         }
     }
 
