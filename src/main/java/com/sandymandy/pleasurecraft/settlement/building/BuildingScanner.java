@@ -141,7 +141,7 @@ public class BuildingScanner {
         }
 
         // Must have walkable clearance AND a roof within scan height
-        return airHeight >= MIN_CLEARANCE && hasRoof;
+        return airHeight >= MIN_CLEARANCE - 1 && hasRoof;
     }
 
     /**
