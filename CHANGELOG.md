@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.6
+- Fixed the animation bug where the bone would spin out of control
+
 ## 0.5.3
 - Added support for dyed armor
 - Added support for dedicated server

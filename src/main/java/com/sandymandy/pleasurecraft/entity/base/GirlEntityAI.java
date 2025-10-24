@@ -1,8 +1,6 @@
 package com.sandymandy.pleasurecraft.entity.base;
 
-import com.sandymandy.pleasurecraft.entity.ai.goal.GirlSitGoal;
-import com.sandymandy.pleasurecraft.entity.ai.goal.StopMovementGoal;
-import com.sandymandy.pleasurecraft.entity.ai.goal.StripGoal;
+import com.sandymandy.pleasurecraft.entity.ai.goal.*;
 import com.sandymandy.pleasurecraft.settlement.Settlement;
 import com.sandymandy.pleasurecraft.settlement.SettlementMember;
 import net.minecraft.entity.Entity;
@@ -51,6 +49,8 @@ public abstract class GirlEntityAI extends GirlEntityScene implements SmartBrain
     @Override
     protected void initGoals() {
         super.initGoals();
+        this.goalSelector.add(-3, new MoveToPlayerGoal(this, 1.25D));
+        this.goalSelector.add(-2, new BedGoal(this, 1.25D));
         this.goalSelector.add(-1, new StripGoal(this));
         this.goalSelector.add(0, new StopMovementGoal(this));
         this.goalSelector.add(1, new GirlSitGoal(this));

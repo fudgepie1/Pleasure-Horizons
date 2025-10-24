@@ -10,6 +10,7 @@ import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRendererFactory;
+import net.minecraft.client.render.entity.SlimeEntityRenderer;
 import net.minecraft.client.render.entity.state.LivingEntityRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemDisplayContext;
@@ -102,6 +103,14 @@ public abstract class AbstractGirlRenderer<T extends GirlEntityScene, R extends 
         });
 
 
+    }
+
+    @Override
+    public RenderLayer getRenderType(R renderState, @Nullable Identifier texture) {
+        if (texture != null) {
+            return RenderLayer.getEntityTranslucent(texture);
+        }
+        return super.getRenderType(renderState, texture);
     }
 
     @Override
