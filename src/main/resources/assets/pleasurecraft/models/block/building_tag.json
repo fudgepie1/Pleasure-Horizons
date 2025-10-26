@@ -1,5 +1,4 @@
 {
-	"format_version": "1.9.0",
 	"credit": "Made with Blockbench",
 	"elements": [
 		{
@@ -16,5 +15,6 @@
 				"down": {"uv": [0, 0, 16, 2], "texture": "#missing"}
 			}
 		}
-	]
+	],
+	"format_version": "1.9.0"
 }

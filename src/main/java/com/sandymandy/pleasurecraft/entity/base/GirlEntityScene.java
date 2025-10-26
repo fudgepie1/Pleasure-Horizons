@@ -3,7 +3,6 @@ package com.sandymandy.pleasurecraft.entity.base;
 import com.mojang.authlib.GameProfile;
 import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.config.ModConfig;
-import com.sandymandy.pleasurecraft.entity.ai.goal.*;
 import com.sandymandy.pleasurecraft.networking.C2S.*;
 import com.sandymandy.pleasurecraft.networking.S2C.ClothingArmorVisibilityS2CPacket;
 import com.sandymandy.pleasurecraft.networking.S2C.PlayCumHudAnimationS2CPacket;
@@ -24,7 +23,6 @@ import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.DyedColorComponent;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.ai.goal.SitGoal;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
@@ -37,6 +35,7 @@ import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec2f;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.animatable.GeoEntity;
@@ -153,7 +152,7 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
         return this.dataTracker.get(INTRO_INDEX);
     }
 
-    public void toggleModelBones(List<String> bones, boolean visible){
+    public void setBoneVisibility(List<String> bones, boolean visible){
         if(!getWorld().isClient){
             return;
         }
@@ -198,6 +197,29 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
             this.boneColorOverrides.put(bone, Utils.withFullAlpha(hex));
         }
 
+    }
+
+    public void setBoneSize(String bone, float x, float y, float z) {
+        if (this.boneSizeOverrides == null) this.boneSizeOverrides = new HashMap<>();
+
+        x = Math.clamp(x,0.25f,1.5f);
+        y = Math.clamp(y,0.25f,1.5f);
+        z = Math.clamp(z,0.25f,1.5f);
+
+        this.boneSizeOverrides.put(bone, new Vec3d(x,y,z));
+
+    }
+
+    public void setBoneSize(String bone, int size) {
+        float finalSize = (float) size / 100;
+        setBoneSize(bone, finalSize, finalSize, finalSize);
+    }
+
+    public void setBoneSize(String bone, int x, int y, int z) {
+        float finalX = (float) x / 100;
+        float finalY = (float) y / 100;
+        float finalZ = (float) z / 100;
+        setBoneSize(bone, finalX, finalY, finalZ);
     }
 
     public void startScene(SceneOptions option) {
@@ -329,15 +351,14 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
             default -> true; // Active NSFW phases
         };
 
-        this.toggleModelBones(List.of("RightLeg", "LeftLeg", "Torso2"), isActivePhase );
+        this.setBoneVisibility(List.of("RightLeg", "LeftLeg", "Torso2"), isActivePhase );
 
         List<String> Slim = List.of("rightArmAlex", "rightLowerArmAlex", "leftLowerArmAlex", "leftArmAlex");
         List<String> Wide = List.of("rightArmSteve", "rightLowerArmSteve", "leftLowerArmSteve", "leftArmSteve");
 
-        this.toggleModelBones(Slim , isPlayerModelSlim() && isActivePhase );
+        this.setBoneVisibility(Slim , isPlayerModelSlim() && isActivePhase );
 
-        this.toggleModelBones(Wide , !isPlayerModelSlim() && isActivePhase );
-
+        this.setBoneVisibility(Wide , !isPlayerModelSlim() && isActivePhase );
     }
     private String lastSoundKey = null;
 
@@ -713,11 +734,11 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
         for (EquipmentSlot slot : EquipmentSlot.values()) {
             List<String> armorBones = getArmorBones().get(slot);
             if (armorBones != null) {
-                toggleModelBones(armorBones, armorVisibility.getOrDefault(slot, false));
+                setBoneVisibility(armorBones, armorVisibility.getOrDefault(slot, false));
                 // Special rule: hide vagina if armor is in legs slot
                 if (slot == EquipmentSlot.LEGS) {
                     boolean legsCovered = armorVisibility.getOrDefault(slot, false);
-                    toggleModelBones(Collections.singletonList("vagina"), !legsCovered);
+                    setBoneVisibility(Collections.singletonList("vagina"), !legsCovered);
                 }
             }
             displayArmor(slot);

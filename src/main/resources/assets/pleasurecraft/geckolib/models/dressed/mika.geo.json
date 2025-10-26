@@ -52,13 +52,13 @@
 					]
 				},
 				{
-					"name": "bra",
+					"name": "boobs",
 					"parent": "torso",
 					"pivot": [-0.2525, 23.4252, 0.3875]
 				},
 				{
 					"name": "midsection4",
-					"parent": "bra",
+					"parent": "boobs",
 					"pivot": [0.37337, 2.06699, 0.84432],
 					"cubes": [
 						{
@@ -169,7 +169,7 @@
 				},
 				{
 					"name": "braLside3",
-					"parent": "bra",
+					"parent": "boobs",
 					"pivot": [-3.34717, 25.00269, 1.17599],
 					"rotation": [2.5, 4.5, 10],
 					"cubes": [
@@ -627,7 +627,7 @@
 				},
 				{
 					"name": "braRside3",
-					"parent": "bra",
+					"parent": "boobs",
 					"pivot": [2.79721, 25.00269, 1.17599],
 					"rotation": [2.5, -4.5, -10],
 					"cubes": [
@@ -1077,7 +1077,7 @@
 				},
 				{
 					"name": "armorBoobs",
-					"parent": "bra",
+					"parent": "boobs",
 					"pivot": [0, 29.18875, 0.835]
 				},
 				{
@@ -2524,7 +2524,7 @@
 				},
 				{
 					"name": "boobR2",
-					"parent": "bra",
+					"parent": "boobs",
 					"pivot": [1.42365, 26.27891, -0.05968],
 					"rotation": [8.25, -22, -1]
 				},
@@ -3967,7 +3967,7 @@
 				},
 				{
 					"name": "boobR3",
-					"parent": "bra",
+					"parent": "boobs",
 					"pivot": [1.42365, 26.27891, -0.05968],
 					"rotation": [8.25, -22, -1]
 				},
@@ -5410,7 +5410,7 @@
 				},
 				{
 					"name": "boobR",
-					"parent": "bra",
+					"parent": "boobs",
 					"pivot": [-1.42365, 26.27891, -0.05968],
 					"rotation": [8.25, 22, 1]
 				},

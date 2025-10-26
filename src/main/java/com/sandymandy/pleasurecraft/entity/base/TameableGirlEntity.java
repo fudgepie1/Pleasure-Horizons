@@ -79,6 +79,7 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
     public Map<String, Identifier> boneTextureOverrides = new HashMap<>();
     public Map<String, Identifier> boneTextureOverridesLayer2 = new HashMap<>();
     public Map<String, Identifier> boneTextureOverridesLayer3 = new HashMap<>();
+    public Map<String, Vec3d> boneSizeOverrides = new HashMap<>();
     public Map<String, Vec2f> boneUVOffsets = new HashMap<>();
     public final Map<EquipmentSlot, Boolean> armorVisibility = new EnumMap<>(EquipmentSlot.class);
     public Vec3d previousVelocity = Vec3d.ZERO;
