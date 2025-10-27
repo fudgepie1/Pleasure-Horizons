@@ -1,10 +1,12 @@
 package com.sandymandy.pleasurecraft.mixins;
 
 import com.sandymandy.pleasurecraft.util.renderer.GeoBoneExtension;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import software.bernie.geckolib.cache.object.GeoBone;
 
+@Environment(EnvType.CLIENT)
 @Mixin(GeoBone.class)
 public abstract class GeoBoneMixin implements GeoBoneExtension {
 

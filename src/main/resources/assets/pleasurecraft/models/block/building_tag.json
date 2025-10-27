@@ -1,18 +1,21 @@
 {
 	"credit": "Made with Blockbench",
+	"textures": {
+		"0": "pleasurecraft:block/building_tag_house",
+		"particle": "pleasurecraft:block/building_tag_house"
+	},
 	"elements": [
 		{
 			"from": [0, 3, 14],
 			"to": [16, 13, 16],
 			"rotation": {"angle": 0, "axis": "y", "origin": [0, 0, 13.5]},
-			"color": 5,
 			"faces": {
-				"north": {"uv": [0, 0, 16, 10], "texture": "#missing"},
-				"east": {"uv": [0, 0, 2, 10], "texture": "#missing"},
-				"south": {"uv": [0, 0, 16, 10], "texture": "#missing"},
-				"west": {"uv": [0, 0, 2, 10], "texture": "#missing"},
-				"up": {"uv": [0, 0, 16, 2], "texture": "#missing"},
-				"down": {"uv": [0, 0, 16, 2], "texture": "#missing"}
+				"north": {"uv": [0, 0, 8, 5], "texture": "#0"},
+				"east": {"uv": [8, 2, 9, 12], "texture": "#0"},
+				"south": {"uv": [0, 5, 8, 10], "texture": "#0"},
+				"west": {"uv": [8, 2, 9, 12], "texture": "#0"},
+				"up": {"uv": [8, 0, 16, 2], "texture": "#0"},
+				"down": {"uv": [8, 0, 16, 2], "texture": "#0"}
 			}
 		}
 	],

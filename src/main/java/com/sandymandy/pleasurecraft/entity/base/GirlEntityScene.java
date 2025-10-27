@@ -168,18 +168,26 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
     }
 
     public void overrideBoneTexture(String boneName, Identifier texture) {
+        this.overrideBoneTexture(List.of(boneName), texture);
+    }
+
+    public void overrideBoneTexture(List<String> bones, Identifier texture) {
         if (this.boneTextureOverrides == null) this.boneTextureOverrides = new HashMap<>();
-        this.boneTextureOverrides.put(boneName, texture);
+
+        for (String boneName : bones) {
+            this.boneTextureOverrides.put(boneName, texture);
+        }
     }
 
-    public void overrideBoneTextureLayer2(String boneName, Identifier texture) {
+    public void overrideBoneTextureLayer2(String bones, Identifier texture) {
         if (this.boneTextureOverridesLayer2 == null) this.boneTextureOverridesLayer2 = new HashMap<>();
-        this.boneTextureOverridesLayer2.put(boneName, texture);
+
+        this.boneTextureOverridesLayer2.put(bones, texture);
     }
 
-    public void overrideBoneTextureLayer3(String boneName, Identifier texture) {
+    public void overrideBoneTextureLayer3(String bones, Identifier texture) {
         if (this.boneTextureOverridesLayer3 == null) this.boneTextureOverridesLayer3 = new HashMap<>();
-        this.boneTextureOverridesLayer3.put(boneName, texture);
+        this.boneTextureOverridesLayer3.put(bones, texture);
     }
 
     public void overrideBoneUV(List<String> bones, float uOffset, float vOffset) {
@@ -752,19 +760,22 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
 
         float u = 0;
 
+        float offset = 0.017578125f;
+
         ItemStack item = this.inventory.getArmorStack(slot);
 
         String armorType = item.toString().toLowerCase();
 
-        if (armorType.contains("turtle")) u = 0.10546875f;
+        if (armorType.contains("diamond")) u = offset;
+        if (armorType.contains("gold")) u = offset * 2;
+        if (armorType.contains("iron")) u = offset * 3;
+        if (armorType.contains("copper")) u = offset * 4;
+        if (armorType.contains("chain")) u = offset * 5;
         if (armorType.contains("leather")){
-            u = 0.0703125f;
+            u = offset * 6;
             this.overrideBoneColor(this.getArmorBones().get(slot), getDyedArmorColor(inventory.getArmorStack(slot)));
         }
-        if (armorType.contains("iron")) u = 0.03515625f;
-        if (armorType.contains("chain")) u = 0.052734375f;
-        if (armorType.contains("gold")) u = 0.0176f;
-        if (armorType.contains("netherite")) u = 0.087890625f;
+        if (armorType.contains("turtle")) u = offset * 7;
 
         this.overrideBoneUV(this.getArmorBones().get(slot),u,0);
 

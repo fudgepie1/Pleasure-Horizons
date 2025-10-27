@@ -1,6 +1,10 @@
 # Changelog
 
 ## 0.6
+- Added a new slime girl
+- Updated the Armor textures on the girls to use the ones after 1.14
+
+## 0.5.4
 - Fixed the animation bug where the bone would spin out of control
 
 ## 0.5.3

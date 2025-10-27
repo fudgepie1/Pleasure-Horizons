@@ -5,6 +5,7 @@ import com.sandymandy.pleasurecraft.entity.PleasureCraftEntities;
 import com.sandymandy.pleasurecraft.entity.girls.MikaEntity;
 import com.sandymandy.pleasurecraft.entity.girls.LucyEntity;
 import com.sandymandy.pleasurecraft.entity.girls.MomoEntity;
+import com.sandymandy.pleasurecraft.entity.girls.SlimeEntity;
 import net.minecraft.entity.EntityType;
 
 public class GirlRegistry {
@@ -13,6 +14,8 @@ public class GirlRegistry {
     public static final EntityType<MikaEntity> MIKA = PleasureCraftEntities.registerGirl("mika", MikaEntity::new, 0.5f, 1.95f, MikaEntity::createAttributes);
 
     public static final EntityType<MomoEntity> MOMO = PleasureCraftEntities.registerGirl("momo", MomoEntity::new, 0.5f, 1.65f, MomoEntity::createAttributes);
+
+    public static final EntityType<SlimeEntity> SLIME = PleasureCraftEntities.registerGirl("slime", SlimeEntity::new, 0.5f, 1.65f, SlimeEntity::createAttributes);
 
     public static void register() {
         PleasureCraft.LOGGER.info("Registering Girls for PleasureCraft");

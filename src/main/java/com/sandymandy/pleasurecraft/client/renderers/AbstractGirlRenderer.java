@@ -107,10 +107,19 @@ public abstract class AbstractGirlRenderer<T extends GirlEntityScene, R extends 
 
     @Override
     public RenderLayer getRenderType(R renderState, @Nullable Identifier texture) {
-        if (texture != null) {
-            return RenderLayer.getEntityTranslucent(texture);
+        if (shouldUseTranslucentRendering(renderState)) {
+            if (texture != null) {
+                return RenderLayer.getEntityTranslucent(texture);
+            }
         }
         return super.getRenderType(renderState, texture);
+    }
+
+    /**
+     * Override this method if the entity should use translucent rendering
+     */
+    protected boolean shouldUseTranslucentRendering(R renderState) {
+        return false; // Default to false
     }
 
     @Override

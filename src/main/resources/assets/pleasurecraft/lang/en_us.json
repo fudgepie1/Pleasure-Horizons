@@ -5,6 +5,8 @@
 
   "item.pleasurecraft.momo_spawn_egg": "Momo Spawn Egg",
 
+  "item.pleasurecraft.slime_spawn_egg": "Slime Spawn Egg",
+
   "item.pleasurecraft.settlement_hub": "Settlement Hub",
 
   "block.pleasurecraft.settlement_hub" : "Settlement Hub",
@@ -14,6 +16,8 @@
   "entity.pleasurecraft.mika": "Mika",
 
   "entity.pleasurecraft.momo": "Momo",
+
+  "entity.pleasurecraft.slime": "Slime",
 
   "screen.pleasurecraft.girl_inventory": "Inventory",
 
