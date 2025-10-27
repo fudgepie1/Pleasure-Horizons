@@ -1,28 +1,28 @@
 # Changelog
 
 ## 0.6
-- Added a new slime girl
-- Updated the Armor textures on the girls to use the ones after 1.14
+- Added a new slime girl.
+- Updated the Armor textures on the girls to use the ones after 1.14.
 
 ## 0.5.4
-- Fixed the animation bug where the bone would spin out of control
+- Fixed the animation bug where the bone would spin out of control.
 
 ## 0.5.3
-- Added support for dyed armor
-- Added support for dedicated server
-- Fixed the Black Dick bug
-- Made it possible for people to change what the girls say with the lang file
-- Added the ability to change the color of the penis with the mod menu
-- Added Sounds for Momo and Mika
+- Added support for dyed armor.
+- Added support for dedicated server.
+- Fixed the Black Dick bug.
+- Made it possible for people to change what the girls say with the lang file.
+- Added the ability to change the color of the penis with the mod menu.
+- Added Sounds for Momo and Mika.
 
 ## 0.5.2
 - Fixed a bug where the girls wouldn't spawn in the villages.
 - Added Mika and replaced Bia with Momo from the village entity pool.
-- Added a progress bar when in a scene
-- Added 3 new scenes to Mika: Face Fuck, Missionary and CowGirl
+- Added a progress bar when in a scene.
+- Added 3 new scenes to Mika: Face Fuck, Missionary and CowGirl.
 - Integrated FreeCam (By **NotNightSky**)
-- Added an option to have a boob window in the armor
-- Implemented Mod Menu
+- Added an option to have a boob window in the armor.
+- Implemented Mod Menu.
 
 ## 0.5.1
 - Fixed a bug where you would do a 360 when switching from the intro animation.
@@ -31,12 +31,12 @@
 ## 0.5
 - Fixed a bug where you would still be invisible when exiting a scene.
 - Made the girls not attack other girls when if the owner attacked them.
-- Replaced Bia with a new girl called Momo
-- Add a new girl called Mika (based on ellie)
-- Made the girls render the item in their hands
+- Replaced Bia with a new girl called Momo.
+- Add a new girl called Mika (based on ellie).
+- Made the girls render the item in their hands.
 - Improved Lucy's outfit.
-- Updated to 1.21.5
-- Improved the thrust system when in the doggy scene with Momo
+- Updated to 1.21.5.
+- Improved the thrust system when in the doggy scene with Momo.
 
 ## 0.4
 - Fixed the relationship level not saving.
