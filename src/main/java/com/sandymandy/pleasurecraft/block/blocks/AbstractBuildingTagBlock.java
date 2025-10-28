@@ -20,7 +20,7 @@ import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
 
 public abstract class AbstractBuildingTagBlock extends BlockWithEntity implements BlockEntityProvider {
-    public static final EnumProperty<Direction> FACING = Properties.HORIZONTAL_FACING;
+    public static final EnumProperty<Direction> FACING = HorizontalFacingBlock.FACING;
     public static final VoxelShape NORTH_SHAPE = VoxelShapes.cuboid(0.0, 3.0/16.0, 14.0/16.0, 1.0, 13.0/16.0, 1.0);
     public static final VoxelShape SOUTH_SHAPE = VoxelShapes.cuboid(0.0, 3.0/16.0, 0.0,       1.0, 13.0/16.0, 2.0/16.0);
     public static final VoxelShape EAST_SHAPE  = VoxelShapes.cuboid(0.0, 3.0/16.0, 0.0,       2.0/16.0, 13.0/16.0, 1.0);
@@ -28,6 +28,7 @@ public abstract class AbstractBuildingTagBlock extends BlockWithEntity implement
 
     public AbstractBuildingTagBlock(Settings settings) {
         super(settings);
+        this.setDefaultState(this.stateManager.getDefaultState().with(FACING, Direction.NORTH));
     }
 
     @Override
@@ -41,12 +42,11 @@ public abstract class AbstractBuildingTagBlock extends BlockWithEntity implement
     }
 
     // --- Directional placement ---
-    @Nullable
     @Override
     public BlockState getPlacementState(ItemPlacementContext ctx) {
-        // face opposite of player direction (like furnaces)
         return this.getDefaultState().with(FACING, ctx.getHorizontalPlayerFacing().getOpposite());
     }
+
 
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {

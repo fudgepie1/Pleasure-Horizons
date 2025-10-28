@@ -1,10 +1,14 @@
 package com.sandymandy.pleasurecraft.block;
 
 import com.sandymandy.pleasurecraft.PleasureCraft;
+import com.sandymandy.pleasurecraft.block.blocks.CarvedGirlPumpkinBlock;
 import com.sandymandy.pleasurecraft.block.blocks.HouseBuildingTagBlock;
 import com.sandymandy.pleasurecraft.block.blocks.SettlementHubBlock;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.MapColor;
+import net.minecraft.block.piston.PistonBehavior;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
@@ -18,10 +22,18 @@ import java.util.function.Function;
 
 public class PleasureCraftBlocks {
     public static Block SETTLEMENT_HUB = registerBlock("settlement_hub",
-            properties -> new SettlementHubBlock(properties.strength(1.0F, 1200.0F).sounds(BlockSoundGroup.LODESTONE).requiresTool()));
+            properties -> new SettlementHubBlock(properties.strength(3.5f, 1200.0F).sounds(BlockSoundGroup.LODESTONE).requiresTool()));
 
-    public static Block HOUSE_BUILDING_TAG_BLOCK = registerBlock("house_tag",
+    public static Block HOUSE_BUILDING_TAG = registerBlock("house_tag",
             properties -> new HouseBuildingTagBlock(properties.strength(1.0F, 100.0F)));
+
+    public static Block CARVED_GIRL_PUMPKIN = registerBlock("carved_girl_pumpkin",
+            properties -> new CarvedGirlPumpkinBlock(properties
+                    .mapColor(MapColor.ORANGE)
+                    .strength(1.0F)
+                    .sounds(BlockSoundGroup.WOOD)
+                    .allowsSpawning(Blocks::always)
+                    .pistonBehavior(PistonBehavior.DESTROY)));
 
     private static Block registerBlock(String name, Function<AbstractBlock.Settings, Block> function) {
         Block toRegister = function.apply(AbstractBlock.Settings.create().registryKey(RegistryKey.of(RegistryKeys.BLOCK, Identifier.of(PleasureCraft.MOD_ID, name))));

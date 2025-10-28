@@ -26,6 +26,8 @@ public class PleasureCraftItemGroups {
                     .displayName(Text.translatable("itemgroup.pleasurecraft.pleasure_craft_blocks"))
                     .entries((displayContext, entries) -> {
                         entries.add(PleasureCraftBlocks.SETTLEMENT_HUB);
+                        entries.add(PleasureCraftBlocks.HOUSE_BUILDING_TAG);
+                        entries.add(PleasureCraftBlocks.CARVED_GIRL_PUMPKIN);
                     }).build());
 
 

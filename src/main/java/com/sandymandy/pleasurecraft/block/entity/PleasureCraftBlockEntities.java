@@ -22,7 +22,7 @@ public class PleasureCraftBlockEntities {
                     Identifier.of(PleasureCraft.MOD_ID, "building_tag"),
                     FabricBlockEntityTypeBuilder.create(
                             (pos, state) -> new AbstractBuildingTagBlockEntity(pos, state, null),
-                            PleasureCraftBlocks.HOUSE_BUILDING_TAG_BLOCK
+                            PleasureCraftBlocks.HOUSE_BUILDING_TAG
                     ).build()
             );
 

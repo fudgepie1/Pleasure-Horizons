@@ -11,6 +11,10 @@
 
   "block.pleasurecraft.settlement_hub" : "Settlement Hub",
 
+  "block.pleasurecraft.house_tag" : "House Building Tag",
+
+  "block.pleasurecraft.carved_girl_pumpkin" : "Carved Girl Pumpkin",
+
   "entity.pleasurecraft.lucy": "Lucy",
 
   "entity.pleasurecraft.mika": "Mika",

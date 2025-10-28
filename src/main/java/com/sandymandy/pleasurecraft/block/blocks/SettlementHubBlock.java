@@ -4,16 +4,14 @@ import com.mojang.serialization.MapCodec;
 import com.sandymandy.pleasurecraft.block.entity.PleasureCraftBlockEntities;
 import com.sandymandy.pleasurecraft.block.entity.entities.SettlementHubBlockEntity;
 import com.sandymandy.pleasurecraft.settlement.SettlementManager;
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.BlockRenderType;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.BlockWithEntity;
+import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.loot.context.LootWorldContext;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.ActionResult;
@@ -22,6 +20,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class SettlementHubBlock extends BlockWithEntity implements BlockEntityProvider {
     public static final MapCodec<SettlementHubBlock> CODEC = SettlementHubBlock.createCodec(SettlementHubBlock::new);
@@ -82,7 +82,14 @@ public class SettlementHubBlock extends BlockWithEntity implements BlockEntityPr
                     .ifPresent(s -> manager.removeSettlement(s.getId()));
         }
         super.onBroken(world, pos, state);
+
     }
+
+    @Override
+    protected List<ItemStack> getDroppedStacks(BlockState state, LootWorldContext.Builder builder) {
+        return super.getDroppedStacks(state, builder);
+    }
+
 
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
