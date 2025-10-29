@@ -245,18 +245,18 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
 
         if (isBedScene()) {
             //  Check for a bed before starting
-            Utils.BlockInfo bedInfo = Utils.findNearbyBlock(
+            Utils.BlockInfo bedInfo = Utils.findNearbyBed(
                     this.getWorld(),
                     this.getBlockPos(),
-                    15,// radius
-                    null,
-                    BlockTags.BEDS
+                    15// radius
             );
 
             if (bedInfo == null) {
                 this.messageAsEntity(false, PleasureCraftLangUtils.getStringFromKey("msg.pleasurecraft.noBedFound"));
                 return;
             }
+
+            PleasureCraft.usedBeds.put(this.getUuid(), bedInfo.pos());
 
             //  Store target bed pos in entity so the BedGoal can use it
             this.targetBedPos = bedInfo.pos();
@@ -292,6 +292,9 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
             ClientPlayNetworking.send(new StopSceneOnServerC2SPacket(this.getId()));
             return;
         }
+
+        PleasureCraft.usedBeds.remove(this.getUuid());
+        PleasureCraft.activeScenes.remove(this.scenePlayer.getUuid());
         setIntroIndex(0);
         this.setSceneProgress(0f);
         onSceneStop();

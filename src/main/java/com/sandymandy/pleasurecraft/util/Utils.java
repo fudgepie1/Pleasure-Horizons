@@ -1,9 +1,11 @@
 package com.sandymandy.pleasurecraft.util;
 
+import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.settlement.Settlement;
 import com.sandymandy.pleasurecraft.settlement.SettlementManager;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.enums.BedPart;
 import net.minecraft.block.enums.DoubleBlockHalf;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
@@ -19,7 +21,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Comparator;
+import java.util.*;
 
 public class Utils {
 
@@ -93,24 +95,44 @@ public class Utils {
 
     }
 
-    public static BlockInfo findNearbyBlock(World world, BlockPos center, int radius, @Nullable Block block, @Nullable TagKey<Block> blockTag) {
-        for (BlockPos pos : BlockPos.iterate(
-                center.add(-radius, -radius, -radius),
-                center.add(radius, radius, radius))) {
+    public static BlockInfo findNearbyBed(World world, BlockPos center, int radius) {
+        if (radius <= 0) return null;
 
+        Set<BlockPos> visited = new HashSet<>();
+        Queue<BlockPos> queue = new ArrayDeque<>();
+        queue.add(center);
+        visited.add(center);
+
+        while (!queue.isEmpty()) {
+            BlockPos pos = queue.poll();
+
+            // --- Check this block ---
             BlockState state = world.getBlockState(pos);
+            if (state.isIn(BlockTags.BEDS)
+                    && state.get(Properties.BED_PART) == BedPart.FOOT
+                    && !PleasureCraft.usedBeds.containsValue(pos)) {
 
-            if (isBlockOrTag(state, block, blockTag)) {
-                // Found a matching block, collect info
                 Direction facing = state.contains(Properties.HORIZONTAL_FACING)
                         ? state.get(Properties.HORIZONTAL_FACING)
-                        : Direction.NORTH; // fallback
+                        : Direction.NORTH;
 
                 return new BlockInfo(pos.toImmutable(), state, facing);
             }
+
+            // --- Expand neighbours ---
+            for (Direction dir : Direction.values()) {
+                BlockPos next = pos.offset(dir);
+                if (!visited.contains(next)
+                        && center.getManhattanDistance(next) <= radius) {
+                    visited.add(next);
+                    queue.add(next);
+                }
+            }
         }
-        return null; // none found
+
+        return null;
     }
+
 
     public static boolean checkForBlockAt(World world, BlockPos blockPos, @Nullable Block block, @Nullable TagKey<Block> blockTag){
         BlockState state = world.getBlockState(blockPos);

@@ -137,7 +137,7 @@ public class CarvedGirlPumpkinBlock extends HorizontalFacingBlock {
             this.snowGolemPattern = BlockPatternBuilder.start()
                     .aisle("^", "#", "#")
                     .where('^', CachedBlockPosition.matchesBlockState(IS_GOLEM_HEAD_PREDICATE))
-                    .where('#', CachedBlockPosition.matchesBlockState(BlockStatePredicate.forBlock(Blocks.SNOW_BLOCK)))
+                    .where('#', CachedBlockPosition.matchesBlockState(BlockStatePredicate.forBlock(Blocks.COPPER_BLOCK)))
                     .build();
         }
 

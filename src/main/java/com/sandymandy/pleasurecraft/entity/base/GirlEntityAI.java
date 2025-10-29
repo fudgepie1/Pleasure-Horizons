@@ -74,7 +74,7 @@ public abstract class GirlEntityAI extends GirlEntityScene implements SmartBrain
 
     @Override
     protected void mobTick(ServerWorld world) {
-        if(!isMovementLocked() && !isSitting()) tickBrain(this);
+        if(!isMovementLocked() && !isSitting() && this.targetBedPos == null) tickBrain(this);
     }
 
     @Override

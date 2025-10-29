@@ -1,5 +1,6 @@
 package com.sandymandy.pleasurecraft.entity.ai.goal;
 
+import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.entity.base.GirlEntityScene;
 import com.sandymandy.pleasurecraft.util.variables.ScenePhase;
 import com.sandymandy.pleasurecraft.util.Utils;
@@ -15,6 +16,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 
 import java.util.EnumSet;
+import java.util.UUID;
 
 
 public class BedGoal extends Goal {
@@ -48,6 +50,7 @@ public class BedGoal extends Goal {
 
     @Override
     public void start() {
+        PleasureCraft.usedBeds.put(this.entity.getUuid(),this.entity.targetBedPos);
         var state = this.entity.getWorld().getBlockState(this.entity.targetBedPos);
         if (state.contains(Properties.HORIZONTAL_FACING)) {
             this.bedFacing = state.get(Properties.HORIZONTAL_FACING);
@@ -57,7 +60,6 @@ public class BedGoal extends Goal {
         }
 
         if (bedFacing == Direction.NORTH){
-            this.entity.targetBedPos = new BlockPos(this.entity.targetBedPos.getX(), this.entity.targetBedPos.getY(), this.entity.targetBedPos.getZ() + 1);
             this.snapPos = new Vec3d(this.entity.targetBedPos.getX() + 0.5, this.entity.targetBedPos.getY(), this.entity.targetBedPos.getZ() + 1.5);
             this.scenePos = new Vec3d(this.snapPos.getX(), this.snapPos.getY(), this.snapPos.getZ() - entity.getBedOffset());
         }
@@ -70,7 +72,6 @@ public class BedGoal extends Goal {
             this.scenePos = new Vec3d(this.snapPos.getX(), this.snapPos.getY(), this.snapPos.getZ() + entity.getBedOffset());
         }
         else if (bedFacing == Direction.WEST){
-            this.entity.targetBedPos = new BlockPos(this.entity.targetBedPos.getX() + 1, this.entity.targetBedPos.getY(), this.entity.targetBedPos.getZ());
             this.snapPos = new Vec3d(this.entity.targetBedPos.getX() + 1.5, this.entity.targetBedPos.getY(), this.entity.targetBedPos.getZ() + 0.5);
             this.scenePos = new Vec3d(this.snapPos.getX() - entity.getBedOffset(), this.snapPos.getY(), this.snapPos.getZ());
         }
@@ -124,9 +125,18 @@ public class BedGoal extends Goal {
             this.navigation.startMovingAlong(this.pathToBed, this.speed);
         }
     }
-    private void startOnContact(){
-        if(!entity.isWaitingAtBed()) return;
-        if(this.entity.squaredDistanceTo(this.entity.scenePlayer) <= 1.5 && entity.getCurrentScenePhase().equals(ScenePhase.BED_IDLE)){
+    private void startOnContact() {
+        if (!entity.isWaitingAtBed()) return;
+
+        UUID playerId = entity.scenePlayer.getUuid();
+
+        // Someone else already has this player in a scene
+        if (PleasureCraft.activeScenes.containsKey(playerId)) return;
+
+        if (this.entity.squaredDistanceTo(this.entity.scenePlayer) <= 1.5 &&
+                entity.getCurrentScenePhase().equals(ScenePhase.BED_IDLE)) {
+
+            PleasureCraft.activeScenes.put(playerId, entity.getUuid()); // reserve player
             this.entity.setPosition(scenePos);
             this.entity.onSceneStart();
         }

@@ -14,12 +14,19 @@ import com.sandymandy.pleasurecraft.registries.PleasureCraftTrackedDataRegistry;
 import com.sandymandy.pleasurecraft.settlement.SettlementManager;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.minecraft.util.math.BlockPos;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class PleasureCraft implements ModInitializer {
 	public static final String MOD_ID = "pleasurecraft";
 	public static final Logger LOGGER = LoggerFactory.getLogger("PleasureCraft");
+	public static Map<UUID, BlockPos> usedBeds = new HashMap<>();
+	public static Map<UUID, UUID> activeScenes = new HashMap<>();
 
 	@Override
 	public void onInitialize() {
