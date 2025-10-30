@@ -102,7 +102,7 @@ public class BedGoal extends Goal {
                 // Server-authoritative snap: position + yaw together
                 if (!this.entity.getWorld().isClient()) {
                     this.entity.refreshPositionAndAngles(
-                            this.snapPos.x, this.snapPos.y, this.snapPos.z,
+                            this.snapPos,
                             targetYaw, this.entity.getPitch()
                     );
                 }

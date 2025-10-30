@@ -17,7 +17,7 @@ public class GirlRegistry {
 
     public static final EntityType<SlimeEntity> SLIME = PleasureCraftEntities.registerGirl("slime", SlimeEntity::new, 0.5f, 1.65f, SlimeEntity::createAttributes);
 
-    public static void register() {
+    public static void registerGirls() {
         PleasureCraft.LOGGER.info("Registering Girls for PleasureCraft");
         // Trigger attribute registration
         PleasureCraftEntities.registerAttributes();

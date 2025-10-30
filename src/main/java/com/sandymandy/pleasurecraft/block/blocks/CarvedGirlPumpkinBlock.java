@@ -2,6 +2,8 @@ package com.sandymandy.pleasurecraft.block.blocks;
 
 import com.mojang.serialization.MapCodec;
 import com.sandymandy.pleasurecraft.block.PleasureCraftBlocks;
+import com.sandymandy.pleasurecraft.entity.girls.SlimeEntity;
+import com.sandymandy.pleasurecraft.registries.GirlRegistry;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.*;
 import net.minecraft.block.pattern.BlockPattern;
@@ -11,7 +13,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.passive.IronGolemEntity;
-import net.minecraft.entity.passive.SnowGolemEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.predicate.block.BlockStatePredicate;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -27,7 +28,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.Predicate;
 
 public class CarvedGirlPumpkinBlock extends HorizontalFacingBlock {
-    public static final MapCodec<CarvedPumpkinBlock> CODEC = createCodec(CarvedPumpkinBlock::new);
+    public static final MapCodec<CarvedGirlPumpkinBlock> CODEC = createCodec(CarvedGirlPumpkinBlock::new);
     public static final EnumProperty<Direction> FACING = HorizontalFacingBlock.FACING;
     @Nullable
     private BlockPattern snowGolemDispenserPattern;
@@ -41,7 +42,7 @@ public class CarvedGirlPumpkinBlock extends HorizontalFacingBlock {
             && state.isOf(PleasureCraftBlocks.CARVED_GIRL_PUMPKIN);
 
     @Override
-    public MapCodec<? extends CarvedPumpkinBlock> getCodec() {
+    public MapCodec<? extends CarvedGirlPumpkinBlock> getCodec() {
         return CODEC;
     }
 
@@ -64,9 +65,9 @@ public class CarvedGirlPumpkinBlock extends HorizontalFacingBlock {
     private void trySpawnEntity(World world, BlockPos pos) {
         BlockPattern.Result result = this.getSnowGolemPattern().searchAround(world, pos);
         if (result != null) {
-            SnowGolemEntity snowGolemEntity = EntityType.SNOW_GOLEM.create(world, SpawnReason.TRIGGERED);
-            if (snowGolemEntity != null) {
-                spawnEntity(world, result, snowGolemEntity, result.translate(0, 2, 0).getBlockPos());
+            SlimeEntity girl = GirlRegistry.SLIME.create(world, SpawnReason.TRIGGERED);
+            if (girl != null) {
+                spawnEntity(world, result, girl, result.translate(0, 1, 0).getBlockPos());
             }
         } else {
             BlockPattern.Result result2 = this.getIronGolemPattern().searchAround(world, pos);
@@ -124,8 +125,8 @@ public class CarvedGirlPumpkinBlock extends HorizontalFacingBlock {
     private BlockPattern getSnowGolemDispenserPattern() {
         if (this.snowGolemDispenserPattern == null) {
             this.snowGolemDispenserPattern = BlockPatternBuilder.start()
-                    .aisle(" ", "#", "#")
-                    .where('#', CachedBlockPosition.matchesBlockState(BlockStatePredicate.forBlock(Blocks.SNOW_BLOCK)))
+                    .aisle(" ", "#")
+                    .where('#', CachedBlockPosition.matchesBlockState(BlockStatePredicate.forBlock(Blocks.COPPER_BLOCK)))
                     .build();
         }
 
@@ -135,7 +136,7 @@ public class CarvedGirlPumpkinBlock extends HorizontalFacingBlock {
     private BlockPattern getSnowGolemPattern() {
         if (this.snowGolemPattern == null) {
             this.snowGolemPattern = BlockPatternBuilder.start()
-                    .aisle("^", "#", "#")
+                    .aisle("^", "#")
                     .where('^', CachedBlockPosition.matchesBlockState(IS_GOLEM_HEAD_PREDICATE))
                     .where('#', CachedBlockPosition.matchesBlockState(BlockStatePredicate.forBlock(Blocks.COPPER_BLOCK)))
                     .build();

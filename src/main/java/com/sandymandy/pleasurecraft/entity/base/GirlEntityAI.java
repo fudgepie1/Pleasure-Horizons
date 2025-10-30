@@ -7,11 +7,14 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.brain.Brain;
+import net.minecraft.entity.ai.goal.*;
 import net.minecraft.entity.passive.IronGolemEntity;
 import net.minecraft.entity.passive.TurtleEntity;
 import net.minecraft.entity.passive.WolfEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.recipe.Ingredient;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.tag.DamageTypeTags;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.World;
 import net.tslat.smartbrainlib.api.SmartBrainOwner;
@@ -54,6 +57,25 @@ public abstract class GirlEntityAI extends GirlEntityScene implements SmartBrain
         this.goalSelector.add(-1, new StripGoal(this));
         this.goalSelector.add(0, new StopMovementGoal(this));
         this.goalSelector.add(1, new GirlSitGoal(this));
+
+        if(!this.hasSettlement()) {
+            this.goalSelector.add(0, new GirlSitGoal(this));
+            this.goalSelector.add(1, new SwimGoal(this));
+            this.goalSelector.add(2, new LongDoorInteractGoal(this, true));
+            this.goalSelector.add(3, new TameableEscapeDangerGoal(1.5D, DamageTypeTags.PANIC_ENVIRONMENTAL_CAUSES));
+            this.goalSelector.add(4, new WanderAroundGoal(this, 1.0D));
+            this.goalSelector.add(5, new GirlAttackGoal(this, 1.5, false));
+            this.goalSelector.add(6, new ConditionalGoal(new GirlFollowOwnerGoal(this, 1.0, 10.0F, 2.0F), this::isFollowing));
+            this.goalSelector.add(7, new GirlStayNearBaseGoal(this, 1.0, 2.0F, 15.0F, 150));
+            this.goalSelector.add(8, new TemptGoal(this, 1.25D, Ingredient.ofItems(getTameItem()), false));
+            this.goalSelector.add(9, new ConditionalGoal(new LookAtEntityGoal(this, PlayerEntity.class, 6.0F), () -> !isMovementLocked()));
+            this.goalSelector.add(10, new ConditionalGoal(new LookAroundGoal(this), () -> !isMovementLocked()));
+            this.targetSelector.add(1, new ConditionalGoal(new GirlTrackOwnerAttackerGoal(this), this::isFollowing));
+            this.targetSelector.add(2, new ConditionalGoal(new GirlAttackWithOwnerGoal(this, GirlEntityAI.class), this::isFollowing));
+            this.targetSelector.add(3, new RevengeGoal(this, PlayerEntity.class, GirlEntityAI.class));
+            this.targetSelector.add(2, new ConditionalGoal(new GirlAttackWithOwnerGoal(this, GirlEntityAI.class), this::isFollowing));
+            this.targetSelector.add(3, new RevengeGoal(this, PlayerEntity.class, GirlEntityAI.class));
+        }
     }
 
 
@@ -74,7 +96,7 @@ public abstract class GirlEntityAI extends GirlEntityScene implements SmartBrain
 
     @Override
     protected void mobTick(ServerWorld world) {
-        if(!isMovementLocked() && !isSitting() && this.targetBedPos == null) tickBrain(this);
+        if(!isMovementLocked() && !isSitting() && this.targetBedPos == null && this.hasSettlement()) tickBrain(this);
     }
 
     @Override

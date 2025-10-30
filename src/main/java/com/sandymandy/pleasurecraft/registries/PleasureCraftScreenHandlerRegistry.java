@@ -25,7 +25,7 @@ public class PleasureCraftScreenHandlerRegistry {
                     new ExtendedScreenHandlerType<>(SettlementHubScreenHandler::new, Settlement.PACKET_CODEC));
 
 
-    public static void register(){
+    public static void registerScreenHandlers(){
         PleasureCraft.LOGGER.info("Registering Screen Handlers for PleasureCraft");
     }
 }

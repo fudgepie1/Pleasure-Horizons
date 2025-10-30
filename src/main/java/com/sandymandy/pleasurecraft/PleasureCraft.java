@@ -7,10 +7,7 @@ import com.sandymandy.pleasurecraft.entity.ai.brain.GirlMemoryTypes;
 import com.sandymandy.pleasurecraft.item.PleasureCraftItemGroups;
 import com.sandymandy.pleasurecraft.item.PleasureCraftItems;
 import com.sandymandy.pleasurecraft.networking.PleasureCraftPackets;
-import com.sandymandy.pleasurecraft.registries.GirlRegistry;
-import com.sandymandy.pleasurecraft.registries.PleasureCraftScreenHandlerRegistry;
-import com.sandymandy.pleasurecraft.registries.PleasureCraftSoundEventRegistry;
-import com.sandymandy.pleasurecraft.registries.PleasureCraftTrackedDataRegistry;
+import com.sandymandy.pleasurecraft.registries.*;
 import com.sandymandy.pleasurecraft.settlement.SettlementManager;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -45,8 +42,9 @@ public class PleasureCraft implements ModInitializer {
 		PleasureCraftCriteria.registerAdvancementCriteria();
 		PleasureCraftTrackedDataRegistry.registerTrackedData();
 		PleasureCraftSoundEventRegistry.registerSoundEvents();
-		PleasureCraftScreenHandlerRegistry.register();
+		PleasureCraftScreenHandlerRegistry.registerScreenHandlers();
+		PleasureCraftDispenserBehavior.registerDispenserBehavior();
 		GirlMemoryTypes.registerMemoryTypes();
-		GirlRegistry.register();
+		GirlRegistry.registerGirls();
 	}
 }
