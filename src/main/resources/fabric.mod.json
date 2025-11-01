@@ -37,7 +37,8 @@
 		"java": ">=21",
 		"fabric-api": "*",
 		"geckolib" : ">=5.1.0",
-		"cloth-config": ">=18.0.0"
+		"cloth-config": ">=18.0.0",
+		"smartbrainlib": ">=1.16.7"
 	},
 	"suggests": {
 		"another-mod": "*"

@@ -357,10 +357,14 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
     }
 
     private void playerModelLogic(){
+        if(!this.getWorld().isClient()) return;
         boolean isActivePhase = switch (getCurrentScenePhase()) {
             case NONE, BED_IDLE, LAYING_DOWN -> false; // Inactive/resting
             default -> true; // Active NSFW phases
         };
+
+        this.overrideBoneColor(List.of("nut"), ModConfig.INSTANCE.player.penisHeadColor);
+        this.overrideBoneColor(List.of("shaft", "ballL", "ballR"), ModConfig.INSTANCE.player.penisShaftColor);
 
         this.setBoneVisibility(List.of("RightLeg", "LeftLeg", "Torso2"), isActivePhase );
 
@@ -448,8 +452,6 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
         super.tick();
         this.scenePlayer = (PlayerEntity) this.getOwner();
         //Rendering
-        this.overrideBoneColor(List.of("nut"), ModConfig.INSTANCE.player.penisHeadColor);
-        this.overrideBoneColor(List.of("shaft", "ballL", "ballR"), ModConfig.INSTANCE.player.penisShaftColor);
         this.updateClothingAndArmor();
         this.applySkinToBone(scenePlayer);
         this.playerModelLogic();

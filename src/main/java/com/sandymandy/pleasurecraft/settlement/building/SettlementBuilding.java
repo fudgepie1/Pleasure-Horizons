@@ -8,12 +8,7 @@ import net.minecraft.util.math.BlockPos;
 import java.util.List;
 import java.util.UUID;
 
-public class SettlementBuilding {
-//    private final UUID buildingID;
-    private final BlockPos doorPos;
-    private final BlockPos tagPos;
-    private final BuildingType buildingType; // e.g. pleasurecraft:house
-    private final List<BlockPos> structureBlocks; // all connected blocks
+public record SettlementBuilding(BlockPos doorPos, BlockPos tagPos, BuildingType buildingType, List<BlockPos> structureBlocks) {
 
     public static final Codec<SettlementBuilding> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 //            Uuids.CODEC.fieldOf("doorPos").forGetter(SettlementBuilding::getID),

@@ -3,11 +3,15 @@ package com.sandymandy.pleasurecraft.entity.base;
 import com.sandymandy.pleasurecraft.entity.ai.goal.*;
 import com.sandymandy.pleasurecraft.settlement.Settlement;
 import com.sandymandy.pleasurecraft.settlement.SettlementMember;
+import com.sandymandy.pleasurecraft.util.variables.SceneOptions;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.brain.Brain;
 import net.minecraft.entity.ai.goal.*;
+import net.minecraft.entity.data.DataTracker;
+import net.minecraft.entity.data.TrackedData;
+import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.passive.IronGolemEntity;
 import net.minecraft.entity.passive.TurtleEntity;
 import net.minecraft.entity.passive.WolfEntity;
@@ -44,9 +48,15 @@ public abstract class GirlEntityAI extends GirlEntityScene implements SmartBrain
     private LivingEntity attackTarget;
     private int ticksSinceLastHit;
     private static final int MAX_TICKS_NO_HIT = 20 * 20;
-
+    private static final TrackedData<Boolean> SHOULD_TICK_BRAIN = DataTracker.registerData(GirlEntityAI.class, TrackedDataHandlerRegistry.BOOLEAN);
     protected GirlEntityAI(EntityType<? extends GirlEntityAI> entityType, World world) {
         super(entityType, world);
+    }
+
+    @Override
+    protected void initDataTracker(DataTracker.Builder builder) {
+        super.initDataTracker(builder);
+        builder.add(SHOULD_TICK_BRAIN, false);
     }
 
     @Override
@@ -58,7 +68,7 @@ public abstract class GirlEntityAI extends GirlEntityScene implements SmartBrain
         this.goalSelector.add(0, new StopMovementGoal(this));
         this.goalSelector.add(1, new GirlSitGoal(this));
 
-        if(!this.hasSettlement()) {
+        if(!this.dataTracker.get(SHOULD_TICK_BRAIN)) {
             this.goalSelector.add(0, new GirlSitGoal(this));
             this.goalSelector.add(1, new SwimGoal(this));
             this.goalSelector.add(2, new LongDoorInteractGoal(this, true));
@@ -96,7 +106,7 @@ public abstract class GirlEntityAI extends GirlEntityScene implements SmartBrain
 
     @Override
     protected void mobTick(ServerWorld world) {
-        if(!isMovementLocked() && !isSitting() && this.targetBedPos == null && this.hasSettlement()) tickBrain(this);
+        if(this.dataTracker.get(SHOULD_TICK_BRAIN)) tickBrain(this);
     }
 
     @Override
@@ -209,6 +219,7 @@ public abstract class GirlEntityAI extends GirlEntityScene implements SmartBrain
     @Override
     public void tick() {
         super.tick();
+        this.dataTracker.set(SHOULD_TICK_BRAIN, !(isMovementLocked() && isSitting() && this.targetBedPos != null && this.isFollowing()) && this.hasSettlement());
     }
 
 }

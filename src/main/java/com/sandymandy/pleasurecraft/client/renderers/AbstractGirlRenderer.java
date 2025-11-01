@@ -4,13 +4,12 @@ import com.mojang.datafixers.util.Either;
 import com.sandymandy.pleasurecraft.entity.base.GirlEntityScene;
 import com.sandymandy.pleasurecraft.networking.C2S.BonePosSyncC2SPacket;
 import com.sandymandy.pleasurecraft.registries.PleasureCraftDataTicketRegistry;
-import com.sandymandy.pleasurecraft.util.renderer.OffsetVertexConsumer;
+import com.sandymandy.pleasurecraft.util.rendering.OffsetVertexConsumer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRendererFactory;
-import net.minecraft.client.render.entity.SlimeEntityRenderer;
 import net.minecraft.client.render.entity.state.LivingEntityRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemDisplayContext;
@@ -138,6 +137,9 @@ public abstract class AbstractGirlRenderer<T extends GirlEntityScene, R extends 
         renderState.addGeckolibData(PleasureCraftDataTicketRegistry.GIRL_BONE_COLOR_OVERRIDES, new HashMap<>(animatable.boneColorOverrides));
         renderState.addGeckolibData(PleasureCraftDataTicketRegistry.GIRL_BONE_SIZE_OVERRIDES, new HashMap<>(animatable.boneSizeOverrides));
         renderState.addGeckolibData(PleasureCraftDataTicketRegistry.PASSENGER_BONE_NAME, animatable.passengerBoneName);
+        renderState.addGeckolibData(PleasureCraftDataTicketRegistry.YAW, animatable.getYaw());
+        renderState.addGeckolibData(PleasureCraftDataTicketRegistry.PREVIOUS_YAW, animatable.previousYaw);
+        renderState.addGeckolibData(PleasureCraftDataTicketRegistry.PREVIOUS_VELOCITY, animatable.previousVelocity);
     }
 
     @Override

@@ -4,18 +4,32 @@ import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.config.ModConfig;
 import com.sandymandy.pleasurecraft.entity.base.GirlEntityScene;
 import com.sandymandy.pleasurecraft.registries.PleasureCraftDataTicketRegistry;
-import com.sandymandy.pleasurecraft.util.renderer.GeoBoneExtension;
+import com.sandymandy.pleasurecraft.util.rendering.GeoBoneExtension;
+import com.sandymandy.pleasurecraft.util.rendering.JigglePhysics;
+import com.sandymandy.pleasurecraft.util.variables.JiggleBoneConfig;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import software.bernie.geckolib.animatable.processing.AnimationState;
 import software.bernie.geckolib.cache.object.GeoBone;
 import software.bernie.geckolib.constant.DataTickets;
 import software.bernie.geckolib.model.GeoModel;
 import software.bernie.geckolib.renderer.base.GeoRenderState;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 
 public abstract class AbstractGirlModel<T extends GirlEntityScene> extends GeoModel<T> {
+    private final Map<Long, Map<String, JigglePhysics>> jiggleMapByEntity = new HashMap<>();
+    private final Map<Long, Map<String, Vec3d>> defaultRotationsByEntity = new HashMap<>();
+    private final Map<Long, Long> lastUpdateTimeByEntity = new HashMap<>();
+    private static final double FIXED_TIMESTEP = 1.0 / 25.0;// 25Hz
+    private final Map<Long, Double> timeAccumulator = new HashMap<>();
+
 
     @Override
     public Identifier getModelResource(GeoRenderState renderState) {
@@ -53,7 +67,9 @@ public abstract class AbstractGirlModel<T extends GirlEntityScene> extends GeoMo
     public void setCustomAnimations(AnimationState<T> animationState) {
 
         GeoBone head = getAnimationProcessor().getBone("head");
-        boolean isSceneActive = animationState.renderState().getGeckolibData(PleasureCraftDataTicketRegistry.IS_IN_SCENE);
+        boolean isSceneActive = animationState.getData(PleasureCraftDataTicketRegistry.IS_IN_SCENE);
+
+        this.calculateJigglePhysics(animationState);
 
         if (head != null && !isSceneActive) {
             float pitch = animationState.getData(DataTickets.ENTITY_PITCH);
@@ -79,4 +95,89 @@ public abstract class AbstractGirlModel<T extends GirlEntityScene> extends GeoMo
         }
 
     }
+
+    private void calculateJigglePhysics(AnimationState<T> animationState){
+        long instanceId = animationState.getData(DataTickets.ANIMATABLE_INSTANCE_ID);
+        float currentYaw = animationState.getData(PleasureCraftDataTicketRegistry.YAW);
+        float yawDelta = currentYaw - animationState.getData(PleasureCraftDataTicketRegistry.PREVIOUS_YAW);
+        if (yawDelta > 180) yawDelta -= 360;
+        if (yawDelta < -180) yawDelta += 360;
+
+        Vec3d velocity = animationState.getData(DataTickets.VELOCITY);
+        Vec3d deltaVelocity = velocity.subtract(animationState.getData(PleasureCraftDataTicketRegistry.PREVIOUS_VELOCITY));
+
+        double yawInfluenceX = Math.sin(Math.toRadians(currentYaw)) * yawDelta * 0.05;
+        double yawInfluenceZ = Math.cos(Math.toRadians(currentYaw)) * yawDelta * 0.05;
+
+        Vec3d inertiaForce = deltaVelocity.multiply(1.2).add(new Vec3d(yawInfluenceX, 0, yawInfluenceZ));
+
+        jiggleMapByEntity.putIfAbsent(instanceId, new HashMap<>());
+        defaultRotationsByEntity.putIfAbsent(instanceId, new HashMap<>());
+        timeAccumulator.putIfAbsent(instanceId, 0.0);
+
+        Map<String, JigglePhysics> jiggleMap = jiggleMapByEntity.get(instanceId);
+        Map<String, Vec3d> defaultRotations = defaultRotationsByEntity.get(instanceId);
+
+        long now = System.nanoTime();
+        long lastUpdate = lastUpdateTimeByEntity.getOrDefault(instanceId, now);
+        double deltaSec = (now - lastUpdate) / 1_000_000_000.0;
+        lastUpdateTimeByEntity.put(instanceId, now);
+
+        // Accumulate unprocessed time
+        double accumulator = timeAccumulator.get(instanceId) + deltaSec;
+
+        // Step physics in fixed intervals (can run multiple small steps if lagged)
+        while (accumulator >= FIXED_TIMESTEP) {
+            for (JiggleBoneConfig config : JIGGLE_BONES(animationState)) {
+                GeoBone bone = getAnimationProcessor().getBone(config.boneName());
+                if (bone == null) continue;
+
+                defaultRotations.putIfAbsent(config.boneName(),
+                        new Vec3d(bone.getRotX(), bone.getRotY(), bone.getRotZ()));
+                jiggleMap.putIfAbsent(config.boneName(),
+                        new JigglePhysics(config.stiffness(), config.damping()));
+
+                jiggleMap.get(config.boneName()).update(inertiaForce);
+            }
+            accumulator -= FIXED_TIMESTEP;
+        }
+
+        timeAccumulator.put(instanceId, accumulator);
+
+        // Interpolate between last and current displacement for smoothness
+        double alpha = accumulator / FIXED_TIMESTEP;
+        for (JiggleBoneConfig config : JIGGLE_BONES(animationState)) {
+            GeoBone bone = getAnimationProcessor().getBone(config.boneName());
+            if (bone == null) continue;
+
+            Vec3d defaultRot = defaultRotations.get(config.boneName());
+            JigglePhysics jiggle = jiggleMap.get(config.boneName());
+            if (defaultRot == null || jiggle == null) continue;
+
+            Vec3d offset = jiggle.getInterpolatedDisplacement(alpha);
+
+            bone.setRotX((float) (defaultRot.x + offset.x));
+            bone.setRotY((float) (defaultRot.y + offset.y));
+            bone.setRotZ((float) (defaultRot.z + offset.z));
+        }
+    }
+
+    protected List<JiggleBoneConfig> JIGGLE_BONES(AnimationState<T> animationState){
+        List<JiggleBoneConfig> bones = new ArrayList<>();
+
+        bones.add(new JiggleBoneConfig("cheekL", 0.2, 0.2));
+        bones.add(new JiggleBoneConfig("cheekR", 0.2, 0.2));
+
+        if(!animationState.getDataOrDefault(PleasureCraftDataTicketRegistry.IS_STRIPPED,false)) {
+            bones.add(new JiggleBoneConfig("boobs", 0.2, 0.4));
+        }
+        else {
+            bones.add(new JiggleBoneConfig("boobL", 0.2, 0.3));
+            bones.add(new JiggleBoneConfig("boobR", 0.2, 0.3));
+        }
+
+        return bones;
+    }
+
+
 }

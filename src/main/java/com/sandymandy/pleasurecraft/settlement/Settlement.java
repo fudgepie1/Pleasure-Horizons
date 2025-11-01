@@ -2,6 +2,7 @@ package com.sandymandy.pleasurecraft.settlement;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.entity.base.GirlEntityAI;
 import com.sandymandy.pleasurecraft.settlement.building.BuildingScanner;
 import com.sandymandy.pleasurecraft.settlement.building.BuildingType;
@@ -122,6 +123,7 @@ public class Settlement {
             float newMorale = Math.max(0, data.morale() - 0.01f);
             data = data.withMorale(newMorale);
         }
+
     }
 
     public void registerBuilding(World world, UUID Id, BlockPos doorPos, Direction tagFacing, BlockPos tagPos, BuildingType type, PlayerEntity player){
@@ -130,18 +132,18 @@ public class Settlement {
     }
 
     public void removeBuilding(UUID ID) {
-        buildings.remove(ID);
+        this.buildings.remove(ID);
     }
 
     public HashMap<UUID, SettlementBuilding> getAllBuildings() {
-        return buildings;
+        return this.buildings;
     }
 
     public SettlementBuilding getBuilding(UUID ID) {
-        return buildings.get(ID);
+        return this.buildings.get(ID);
     }
 
     public void addBuilding(UUID ID, SettlementBuilding building) {
-        buildings.put(ID, building);
+        this.buildings.put(ID, building);
     }
 }

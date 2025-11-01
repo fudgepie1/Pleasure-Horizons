@@ -1,6 +1,6 @@
 package com.sandymandy.pleasurecraft.mixins;
 
-import com.sandymandy.pleasurecraft.util.renderer.GeoBoneExtension;
+import com.sandymandy.pleasurecraft.util.rendering.GeoBoneExtension;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import org.spongepowered.asm.mixin.Mixin;

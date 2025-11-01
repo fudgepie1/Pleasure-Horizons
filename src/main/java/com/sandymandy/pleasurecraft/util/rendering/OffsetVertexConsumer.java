@@ -1,4 +1,4 @@
-package com.sandymandy.pleasurecraft.util.renderer;
+package com.sandymandy.pleasurecraft.util.rendering;
 
 import net.minecraft.client.render.VertexConsumer;
 

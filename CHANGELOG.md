@@ -6,6 +6,8 @@
 - Fixed a bug where 2 girls would go to the same bed
 - Fixed a bug where having two girls in separate beds caused both to activate when interacting with just one.
 - Started implementing the settlement system.
+- Fixed a bug that crashed servers when spawning a girl.
+- Reimplemented Jiggle Physics.
 
 ## 0.5.4
 - Fixed the animation bug where the bone would spin out of control.

@@ -24,4 +24,8 @@ public class PleasureCraftDataTicketRegistry {
     public static final DataTicket<Map<String, Integer>> GIRL_BONE_COLOR_OVERRIDES = (DataTicket<Map<String, Integer>>) (Object) DataTicket.create("girl_bone_color_overrides", Map.class);
     public static final DataTicket<Map<String, Vec3d>> GIRL_BONE_SIZE_OVERRIDES = (DataTicket<Map<String, Vec3d>>) (Object) DataTicket.create("girl_bone_size_overrides", Map.class);
     public static final DataTicket<String> PASSENGER_BONE_NAME = DataTicket.create("passenger_bone_name", String.class);
+    public static final DataTicket<Float> YAW = DataTicket.create("yaw", Float.class);
+    public static final DataTicket<Float> PREVIOUS_YAW = DataTicket.create("previous_yaw", Float.class);
+    public static final DataTicket<Vec3d> PREVIOUS_VELOCITY = DataTicket.create("previous_velocity", Vec3d.class);
+
 }
