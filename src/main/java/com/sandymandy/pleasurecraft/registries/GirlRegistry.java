@@ -3,7 +3,6 @@ package com.sandymandy.pleasurecraft.registries;
 import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.entity.PleasureCraftEntities;
 import com.sandymandy.pleasurecraft.entity.girls.*;
-import com.sandymandy.pleasurecraft.util.ProfileFactory;
 import net.minecraft.entity.EntityType;
 
 public class GirlRegistry {
@@ -15,17 +14,14 @@ public class GirlRegistry {
 
     public static final EntityType<SlimeEntity> SLIME = PleasureCraftEntities.registerGirl("slime", SlimeEntity::new, 0.5f, 1.65f, SlimeEntity::createAttributes);
 
+
     public static final EntityType<JsonGirlEntity> JSON_GIRL  = PleasureCraftEntities.registerGirl(
             "json_girl",
-            (type, world) -> new JsonGirlEntity(type, world), // fallback
-            0.5f, 1.8f,
+            JsonGirlEntity::new,
+            0.5f, 1.8f, // base, overridden by profile
             false,
             JsonGirlEntity::createMobAttributes
     );
-
-
-    public static final ProfileFactory<JsonGirlEntity> JSON_GIRL_FACTORY = JsonGirlEntity::new;
-
 
     public static void registerGirls() {
         PleasureCraft.LOGGER.info("Registering Girls for PleasureCraft");

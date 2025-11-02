@@ -61,14 +61,14 @@ public class JsonGirlSpawnCommand {
 //        SlimeEntity girl = GirlRegistry.SLIME.create(world, SpawnReason.COMMAND);
 
         // Create entity
-        JsonGirlEntity girl = GirlRegistry.JSON_GIRL_FACTORY.create(GirlRegistry.JSON_GIRL, world, profile);
+        JsonGirlEntity girl = GirlRegistry.JSON_GIRL.create(world, SpawnReason.COMMAND);
         if (girl == null) {
             source.sendError(Text.literal("Failed to create girl entity."));
             return 0;
         }
 //
 //        // Apply profile and attributes
-
+        girl.setProfile(profile);
 //        girl.getAttributeInstance(net.minecraft.entity.attribute.EntityAttributes.MAX_HEALTH).setBaseValue(profile.maxHealth());
 //        girl.getAttributeInstance(net.minecraft.entity.attribute.EntityAttributes.MOVEMENT_SPEED).setBaseValue(profile.movementSpeed());
 //        girl.getAttributeInstance(net.minecraft.entity.attribute.EntityAttributes.ATTACK_DAMAGE).setBaseValue(profile.attackDamage());
