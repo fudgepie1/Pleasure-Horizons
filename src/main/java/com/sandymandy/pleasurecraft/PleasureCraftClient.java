@@ -2,10 +2,10 @@ package com.sandymandy.pleasurecraft;
 
 
 import com.sandymandy.pleasurecraft.client.PleasureCraftKeybinds;
-import com.sandymandy.pleasurecraft.client.renderers.LucyRenderer;
-import com.sandymandy.pleasurecraft.client.renderers.MikaRenderer;
-import com.sandymandy.pleasurecraft.client.renderers.MomoRenderer;
-import com.sandymandy.pleasurecraft.client.renderers.SlimeRenderer;
+import com.sandymandy.pleasurecraft.client.rendering.renderers.LucyRenderer;
+import com.sandymandy.pleasurecraft.client.rendering.renderers.MikaRenderer;
+import com.sandymandy.pleasurecraft.client.rendering.renderers.MomoRenderer;
+import com.sandymandy.pleasurecraft.client.rendering.renderers.SlimeRenderer;
 import com.sandymandy.pleasurecraft.config.ModBindings;
 import com.sandymandy.pleasurecraft.config.ModConfig;
 import com.sandymandy.pleasurecraft.freecam.Freecam;

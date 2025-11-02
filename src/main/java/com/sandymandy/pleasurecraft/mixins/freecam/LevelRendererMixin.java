@@ -1,4 +1,4 @@
-package com.sandymandy.pleasurecraft.mixins;
+package com.sandymandy.pleasurecraft.mixins.freecam;
 
 import net.minecraft.client.render.BufferBuilderStorage;
 import net.minecraft.client.render.Camera;

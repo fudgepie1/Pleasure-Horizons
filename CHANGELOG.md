@@ -2,6 +2,9 @@
 
 ## v0.6.0
 - Added a new slime girl.
+- Added a new block called "Carved Girl Pumpkin" To summon Golem Girls in the future
+- Added a new block called "Settlement Hub" to create and manage settlements
+- Added a new type of blocks called building tags which allows you to register buildings to a nearby settlement you own
 - Updated the Armor textures on the girls to use the ones after 1.14.
 - Fixed a bug where 2 girls would go to the same bed
 - Fixed a bug where having two girls in separate beds caused both to activate when interacting with just one.

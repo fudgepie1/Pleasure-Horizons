@@ -1,4 +1,4 @@
-package com.sandymandy.pleasurecraft.mixins;
+package com.sandymandy.pleasurecraft.mixins.geckolib;
 
 import com.sandymandy.pleasurecraft.util.rendering.GeoBoneExtension;
 import net.fabricmc.api.EnvType;

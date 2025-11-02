@@ -1,4 +1,4 @@
-package com.sandymandy.pleasurecraft.mixins;
+package com.sandymandy.pleasurecraft.mixins.freecam;
 
 import net.minecraft.client.render.Frustum;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;

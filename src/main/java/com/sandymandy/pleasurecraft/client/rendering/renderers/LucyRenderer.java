@@ -1,4 +1,4 @@
-package com.sandymandy.pleasurecraft.client.renderers;
+package com.sandymandy.pleasurecraft.client.rendering.renderers;
 
 import com.sandymandy.pleasurecraft.client.models.LucyModel;
 import com.sandymandy.pleasurecraft.entity.girls.LucyEntity;

@@ -1,4 +1,4 @@
-package com.sandymandy.pleasurecraft.client.renderers;
+package com.sandymandy.pleasurecraft.client.rendering.renderers;
 
 import com.mojang.datafixers.util.Either;
 import com.sandymandy.pleasurecraft.entity.base.GirlEntityScene;

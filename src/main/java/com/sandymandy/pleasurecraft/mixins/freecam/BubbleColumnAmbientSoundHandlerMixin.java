@@ -1,4 +1,4 @@
-package com.sandymandy.pleasurecraft.mixins;
+package com.sandymandy.pleasurecraft.mixins.freecam;
 
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.sound.BubbleColumnSoundPlayer;

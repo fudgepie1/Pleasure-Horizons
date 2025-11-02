@@ -1,4 +1,4 @@
-package com.sandymandy.pleasurecraft.mixins;
+package com.sandymandy.pleasurecraft.mixins.freecam;
 
 import net.minecraft.client.option.GameOptions;
 import com.sandymandy.pleasurecraft.freecam.Freecam;

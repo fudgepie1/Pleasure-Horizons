@@ -1,4 +1,4 @@
-package com.sandymandy.pleasurecraft.mixins;
+package com.sandymandy.pleasurecraft.mixins.freecam;
 
 import com.sandymandy.pleasurecraft.freecam.Freecam;
 import org.spongepowered.asm.mixin.Mixin;
