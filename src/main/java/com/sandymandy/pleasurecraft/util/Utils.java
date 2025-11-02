@@ -120,7 +120,7 @@ public class Utils {
             }
 
             // --- Expand neighbours ---
-            for (Direction dir : Direction.values()) {
+            for (Direction dir : Direction.Type.HORIZONTAL) {
                 BlockPos next = pos.offset(dir);
                 if (!visited.contains(next)
                         && center.getManhattanDistance(next) <= radius) {

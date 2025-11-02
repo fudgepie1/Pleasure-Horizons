@@ -96,21 +96,28 @@ public abstract class AbstractGirlModel<T extends GirlEntityScene> extends GeoMo
 
     }
 
-    private void calculateJigglePhysics(AnimationState<T> animationState){
+    private void calculateJigglePhysics(AnimationState<T> animationState) {
         long instanceId = animationState.getData(DataTickets.ANIMATABLE_INSTANCE_ID);
-        float currentYaw = animationState.getData(PleasureCraftDataTicketRegistry.YAW);
-        float yawDelta = currentYaw - animationState.getData(PleasureCraftDataTicketRegistry.PREVIOUS_YAW);
+
+        // Read motion data
+        Vec3d velocity = animationState.getDataOrDefault(DataTickets.VELOCITY, Vec3d.ZERO);
+        Vec3d prevVelocity = animationState.getDataOrDefault(PleasureCraftDataTicketRegistry.PREVIOUS_VELOCITY, Vec3d.ZERO);
+        float currentYaw = animationState.getDataOrDefault(PleasureCraftDataTicketRegistry.YAW, 0f);
+        float prevYaw = animationState.getDataOrDefault(PleasureCraftDataTicketRegistry.PREVIOUS_YAW, currentYaw);
+
+        // Compute change in yaw
+        float yawDelta = currentYaw - prevYaw;
         if (yawDelta > 180) yawDelta -= 360;
         if (yawDelta < -180) yawDelta += 360;
 
-        Vec3d velocity = animationState.getData(DataTickets.VELOCITY);
-        Vec3d deltaVelocity = velocity.subtract(animationState.getData(PleasureCraftDataTicketRegistry.PREVIOUS_VELOCITY));
-
+        // Compute motion-based force
+        Vec3d deltaVelocity = velocity.subtract(prevVelocity);
+        Vec3d inertiaForce = deltaVelocity.multiply(1.2);
         double yawInfluenceX = Math.sin(Math.toRadians(currentYaw)) * yawDelta * 0.05;
         double yawInfluenceZ = Math.cos(Math.toRadians(currentYaw)) * yawDelta * 0.05;
+        inertiaForce = inertiaForce.add(yawInfluenceX, 0, yawInfluenceZ);
 
-        Vec3d inertiaForce = deltaVelocity.multiply(1.2).add(new Vec3d(yawInfluenceX, 0, yawInfluenceZ));
-
+        // Initialize maps
         jiggleMapByEntity.putIfAbsent(instanceId, new HashMap<>());
         defaultRotationsByEntity.putIfAbsent(instanceId, new HashMap<>());
         timeAccumulator.putIfAbsent(instanceId, 0.0);
@@ -118,15 +125,17 @@ public abstract class AbstractGirlModel<T extends GirlEntityScene> extends GeoMo
         Map<String, JigglePhysics> jiggleMap = jiggleMapByEntity.get(instanceId);
         Map<String, Vec3d> defaultRotations = defaultRotationsByEntity.get(instanceId);
 
+        // Time tracking
         long now = System.nanoTime();
         long lastUpdate = lastUpdateTimeByEntity.getOrDefault(instanceId, now);
         double deltaSec = (now - lastUpdate) / 1_000_000_000.0;
         lastUpdateTimeByEntity.put(instanceId, now);
 
-        // Accumulate unprocessed time
+        // Accumulate and clamp
         double accumulator = timeAccumulator.get(instanceId) + deltaSec;
+        accumulator = Math.min(accumulator, FIXED_TIMESTEP * 5); // clamp to avoid runaway
 
-        // Step physics in fixed intervals (can run multiple small steps if lagged)
+        // Fixed-step updates
         while (accumulator >= FIXED_TIMESTEP) {
             for (JiggleBoneConfig config : JIGGLE_BONES(animationState)) {
                 GeoBone bone = getAnimationProcessor().getBone(config.boneName());
@@ -134,18 +143,21 @@ public abstract class AbstractGirlModel<T extends GirlEntityScene> extends GeoMo
 
                 defaultRotations.putIfAbsent(config.boneName(),
                         new Vec3d(bone.getRotX(), bone.getRotY(), bone.getRotZ()));
+
                 jiggleMap.putIfAbsent(config.boneName(),
                         new JigglePhysics(config.stiffness(), config.damping()));
 
                 jiggleMap.get(config.boneName()).update(inertiaForce);
             }
             accumulator -= FIXED_TIMESTEP;
+            if (Double.isNaN(accumulator) || accumulator > 1.0) accumulator = 0.0;
         }
 
+        // Save accumulator for interpolation
         timeAccumulator.put(instanceId, accumulator);
-
-        // Interpolate between last and current displacement for smoothness
         double alpha = accumulator / FIXED_TIMESTEP;
+
+        // Apply interpolated displacements
         for (JiggleBoneConfig config : JIGGLE_BONES(animationState)) {
             GeoBone bone = getAnimationProcessor().getBone(config.boneName());
             if (bone == null) continue;
@@ -162,13 +174,13 @@ public abstract class AbstractGirlModel<T extends GirlEntityScene> extends GeoMo
         }
     }
 
-    protected List<JiggleBoneConfig> JIGGLE_BONES(AnimationState<T> animationState){
+    protected List<JiggleBoneConfig> JIGGLE_BONES(AnimationState<T> animationState) {
         List<JiggleBoneConfig> bones = new ArrayList<>();
 
         bones.add(new JiggleBoneConfig("cheekL", 0.2, 0.2));
         bones.add(new JiggleBoneConfig("cheekR", 0.2, 0.2));
 
-        if(!animationState.getDataOrDefault(PleasureCraftDataTicketRegistry.IS_STRIPPED,false)) {
+        if (!animationState.getDataOrDefault(PleasureCraftDataTicketRegistry.IS_STRIPPED, false)) {
             bones.add(new JiggleBoneConfig("boobs", 0.2, 0.4));
         }
         else {
@@ -178,6 +190,4 @@ public abstract class AbstractGirlModel<T extends GirlEntityScene> extends GeoMo
 
         return bones;
     }
-
-
 }

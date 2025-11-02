@@ -55,4 +55,9 @@ public class JigglePhysics {
         displacement = Vec3d.ZERO;
         prevDisplacement = Vec3d.ZERO;
     }
+
+    public void dampen(double factor) {
+        velocity = velocity.multiply(factor);
+        displacement = displacement.multiply(factor);
+    }
 }

@@ -5,6 +5,7 @@ import com.sandymandy.pleasurecraft.settlement.Settlement;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
@@ -36,11 +37,13 @@ public class BuildingScanner {
         // --- Align origin to ground level ---
         BlockPos groundAligned = findGroundLevel(world, origin);
         if (groundAligned == null) {
-            PleasureCraft.LOGGER.warn("[BuildingScanner] Could not find ground below {}", origin);
+            PleasureCraft.LOGGER.warn("[BuildingScanner] Could not find ground below {}, {}, {}", origin.getX(), origin.getY(), origin.getZ());
+            player.sendMessage(Text.literal("[BuildingScanner] Could not find ground below " + origin.getX() + ", " + origin.getY() + ", " + origin.getZ()), false);
             return;
         }
 
-        PleasureCraft.LOGGER.info("[BuildingScanner] Starting scan at adjusted origin {}", groundAligned);
+        PleasureCraft.LOGGER.info("[BuildingScanner] Starting scan at adjusted origin {}, {}, {}", groundAligned.getX(), groundAligned.getY(), groundAligned.getZ());
+        player.sendMessage(Text.literal("[BuildingScanner] Starting scan at adjusted origin " + groundAligned.getX() + ", " + groundAligned.getY() + ", " + groundAligned.getZ()), false);
 
         Set<BlockPos> visited = new HashSet<>();
         Set<BlockPos> validQuadrants = new HashSet<>();
@@ -75,12 +78,13 @@ public class BuildingScanner {
 
         // --- Validation and registration ---
         if (validQuadrants.size() >= MIN_VALID_QUADRANTS) {
-            registerBuilding(id, doorPos, tagPos, type, List.copyOf(validQuadrants));
+            registerBuilding(id, doorPos, tagPos, type, List.copyOf(validQuadrants), player);
         } else {
             PleasureCraft.LOGGER.warn(
                     "[BuildingScanner] Invalid building ({} valid quadrants).",
                     validQuadrants.size()
             );
+            player.sendMessage(Text.literal("[BuildingScanner] Invalid building, only " + validQuadrants.size() + " valid quadrants found, minimum required is 9."), false);
         }
     }
 
@@ -147,7 +151,7 @@ public class BuildingScanner {
     /**
      * Registers a successfully scanned building to the settlement.
      */
-    private void registerBuilding(UUID id, BlockPos doorPos, BlockPos tagPos, BuildingType type, List<BlockPos> validBlocks) {
+    private void registerBuilding(UUID id, BlockPos doorPos, BlockPos tagPos, BuildingType type, List<BlockPos> validBlocks, PlayerEntity player) {
         SettlementBuilding building = new SettlementBuilding(
                 doorPos,
                 tagPos,
@@ -160,5 +164,7 @@ public class BuildingScanner {
                 "[BuildingScanner] Registered valid building with {} interior quadrants.",
                 validBlocks.size()
         );
+        player.sendMessage(Text.literal("[BuildingScanner] Registered valid building with " + validBlocks.size() + " interior quadrants."), false);
+
     }
 }
