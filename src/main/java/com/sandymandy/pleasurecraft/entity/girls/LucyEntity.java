@@ -69,12 +69,4 @@ public class LucyEntity extends GirlEntityAI {
                         List.of("doggy_lay_on_bed", "doggy_bed_idle"))
                 );
     }
-
-    public static DefaultAttributeContainer.Builder createAttributes() {
-        return MobEntity.createMobAttributes()
-                .add(EntityAttributes.MAX_HEALTH, 20)
-                .add(EntityAttributes.MOVEMENT_SPEED, .20)
-                .add(EntityAttributes.TEMPT_RANGE, 15)
-                .add(EntityAttributes.ATTACK_DAMAGE, 2);
-    }
 }

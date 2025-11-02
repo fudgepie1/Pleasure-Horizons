@@ -1,4 +1,4 @@
-package com.sandymandy.pleasurecraft.util;
+package com.sandymandy.pleasurecraft.util.json;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -6,7 +6,6 @@ import com.google.gson.JsonObject;
 import com.sandymandy.pleasurecraft.util.variables.JsonGirlProfile;
 import com.sandymandy.pleasurecraft.util.variables.SceneOptions;
 import net.minecraft.item.Item;
-import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import java.util.ArrayList;
@@ -16,6 +15,7 @@ public class JsonGirlParser {
 
     public static JsonGirlProfile parse(JsonObject json) {
         String id = json.get("id").getAsString();
+        String name = json.get("name").getAsString();
         int guiSize = json.has("gui_size") ? json.get("gui_size").getAsInt() : 30;
         float guiYOffset = json.has("gui_y_offset") ? json.get("gui_y_offset").getAsFloat() : 0.05f;
 
@@ -51,7 +51,7 @@ public class JsonGirlParser {
             }
         }
 
-        return new JsonGirlProfile(id, guiSize, guiYOffset, tameItem, health, speed, damage, scenes);
+        return new JsonGirlProfile(id, name, guiSize, guiYOffset, tameItem, health, speed, damage, scenes);
     }
 
     private static List<String> jsonArrayToList(JsonArray array) {

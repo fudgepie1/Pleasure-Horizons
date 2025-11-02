@@ -186,10 +186,12 @@ public abstract class AbstractGirlRenderer<T extends GirlEntityScene, R extends 
     public void renderFinal(R renderState, MatrixStack poseStack, BakedGeoModel model, VertexConsumerProvider bufferSource, @Nullable VertexConsumer buffer, int packedLight, int packedOverlay, int renderColor) {
         String passengerBoneName = renderState.getGeckolibData(PleasureCraftDataTicketRegistry.PASSENGER_BONE_NAME);
 
-        GeoBone bone = getGeoModel().getBone(passengerBoneName).get();
-        Vector3d bonePos = bone.getWorldPosition();
-        Vec3d passengerBonePos = new Vec3d(bonePos.x, bonePos.y, bonePos.z);
-        ClientPlayNetworking.send(new BonePosSyncC2SPacket(renderState.getGeckolibData(PleasureCraftDataTicketRegistry.ENTITY_ID), passengerBonePos));
+        if(getGeoModel().getBone(passengerBoneName).isPresent()){
+            GeoBone bone = getGeoModel().getBone(passengerBoneName).get();
+            Vector3d bonePos = bone.getWorldPosition();
+            Vec3d passengerBonePos = new Vec3d(bonePos.x, bonePos.y, bonePos.z);
+            ClientPlayNetworking.send(new BonePosSyncC2SPacket(renderState.getGeckolibData(PleasureCraftDataTicketRegistry.ENTITY_ID), passengerBonePos));
+        }
         super.renderFinal(renderState, poseStack, model, bufferSource, buffer, packedLight, packedOverlay, renderColor);
     }
 

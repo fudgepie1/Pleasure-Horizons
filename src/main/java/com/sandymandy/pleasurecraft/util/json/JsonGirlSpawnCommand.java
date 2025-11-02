@@ -1,9 +1,8 @@
-package com.sandymandy.pleasurecraft.util;
+package com.sandymandy.pleasurecraft.util.json;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.sandymandy.pleasurecraft.entity.girls.JsonGirlEntity;
-import com.sandymandy.pleasurecraft.entity.girls.SlimeEntity;
 import com.sandymandy.pleasurecraft.registries.GirlRegistry;
 import com.sandymandy.pleasurecraft.util.variables.JsonGirlProfile;
 import net.minecraft.command.CommandRegistryAccess;

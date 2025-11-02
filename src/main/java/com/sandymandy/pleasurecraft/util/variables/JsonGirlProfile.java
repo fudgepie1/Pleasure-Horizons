@@ -6,6 +6,7 @@ import java.util.List;
 
 public record JsonGirlProfile(
         String id,
+        String name,
         int guiSize,
         float guiYOffset,
         Item tameItem,

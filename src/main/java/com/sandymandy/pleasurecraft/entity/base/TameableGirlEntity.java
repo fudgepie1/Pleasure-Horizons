@@ -17,11 +17,14 @@ import net.minecraft.entity.ai.control.MoveControl;
 import net.minecraft.entity.ai.goal.EscapeDangerGoal;
 import net.minecraft.entity.ai.pathing.LandPathNodeMaker;
 import net.minecraft.entity.ai.pathing.PathNodeType;
+import net.minecraft.entity.attribute.DefaultAttributeContainer;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.damage.DamageType;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
+import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventories;
@@ -881,6 +884,14 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
         if (control != null) {
             control.moveTo(this.getX(), this.getY(), this.getZ(), 0); // keep position
         }
+    }
+
+    public static DefaultAttributeContainer.Builder createDefaultAttributes() {
+        return MobEntity.createMobAttributes()
+                .add(EntityAttributes.MAX_HEALTH, 20)
+                .add(EntityAttributes.MOVEMENT_SPEED, .20)
+                .add(EntityAttributes.TEMPT_RANGE, 15)
+                .add(EntityAttributes.ATTACK_DAMAGE, 2);
     }
 
     public class TameableEscapeDangerGoal extends EscapeDangerGoal {

@@ -4,9 +4,10 @@ import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.entity.PleasureCraftEntities;
 import com.sandymandy.pleasurecraft.entity.girls.*;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.mob.MobEntity;
 
 public class GirlRegistry {
-    public static final EntityType<LucyEntity> LUCY = PleasureCraftEntities.registerGirl("lucy", LucyEntity::new, 0.5f, 1.95f, LucyEntity::createAttributes);
+    public static final EntityType<LucyEntity> LUCY = PleasureCraftEntities.registerGirl("lucy", LucyEntity::new, 0.5f, 1.95f, LucyEntity::createDefaultAttributes);
 
     public static final EntityType<MikaEntity> MIKA = PleasureCraftEntities.registerGirl("mika", MikaEntity::new, 0.5f, 1.95f, MikaEntity::createAttributes);
 
@@ -15,12 +16,11 @@ public class GirlRegistry {
     public static final EntityType<SlimeEntity> SLIME = PleasureCraftEntities.registerGirl("slime", SlimeEntity::new, 0.5f, 1.65f, SlimeEntity::createAttributes);
 
 
-    public static final EntityType<JsonGirlEntity> JSON_GIRL  = PleasureCraftEntities.registerGirl(
+    public static final EntityType<JsonGirlEntity> JSON_GIRL = PleasureCraftEntities.registerGirl(
             "json_girl",
             JsonGirlEntity::new,
-            0.5f, 1.8f, // base, overridden by profile
-            false,
-            JsonGirlEntity::createMobAttributes
+            0.5f, 1.8f,false,
+            JsonGirlEntity::createDefaultAttributes
     );
 
     public static void registerGirls() {
