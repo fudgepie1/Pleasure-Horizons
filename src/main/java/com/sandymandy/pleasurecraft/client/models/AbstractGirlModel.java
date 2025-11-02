@@ -98,12 +98,14 @@ public abstract class AbstractGirlModel<T extends GirlEntityScene> extends GeoMo
 
     private void calculateJigglePhysics(AnimationState<T> animationState) {
         long instanceId = animationState.getData(DataTickets.ANIMATABLE_INSTANCE_ID);
+        boolean inGui = MinecraftClient.getInstance().currentScreen != null;
 
         // Read motion data
-        Vec3d velocity = animationState.getDataOrDefault(DataTickets.VELOCITY, Vec3d.ZERO);
-        Vec3d prevVelocity = animationState.getDataOrDefault(PleasureCraftDataTicketRegistry.PREVIOUS_VELOCITY, Vec3d.ZERO);
-        float currentYaw = animationState.getDataOrDefault(PleasureCraftDataTicketRegistry.YAW, 0f);
-        float prevYaw = animationState.getDataOrDefault(PleasureCraftDataTicketRegistry.PREVIOUS_YAW, currentYaw);
+        Vec3d velocity = inGui ? Vec3d.ZERO : animationState.getDataOrDefault(DataTickets.VELOCITY, Vec3d.ZERO);
+        Vec3d prevVelocity = inGui ? Vec3d.ZERO : animationState.getDataOrDefault(PleasureCraftDataTicketRegistry.PREVIOUS_VELOCITY, Vec3d.ZERO);
+        float currentYaw = inGui ? 0 : animationState.getDataOrDefault(PleasureCraftDataTicketRegistry.YAW, 0f);
+        float prevYaw = inGui ? 0 : animationState.getDataOrDefault(PleasureCraftDataTicketRegistry.PREVIOUS_YAW, currentYaw);
+
 
         // Compute change in yaw
         float yawDelta = currentYaw - prevYaw;
