@@ -1,0 +1,26 @@
+{
+  "id": "daisy",
+  "gui_size": 30,
+  "gui_y_offset": 0.05,
+
+  "attributes": {
+    "health": 20,
+    "speed": 0.20,
+    "damage": 2
+  },
+
+  "tame_item": "minecraft:cookie",
+
+  "scenes": [
+    {
+      "name": "Paizuri",
+      "required_level": 6,
+      "intro": ["paizuri_intro"],
+      "slow": ["paizuri_slow"],
+      "fast": ["paizuri_fast"],
+      "cum": "paizuri_cum",
+      "cum_threshold": 4.0,
+      "needs_to_strip": true
+    }
+  ]
+}

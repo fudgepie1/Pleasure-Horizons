@@ -35,6 +35,18 @@ public class PleasureCraftEntities {
             float height,
             Supplier<DefaultAttributeContainer.Builder> attributes
     ) {
+        return registerGirl(id,factory, width, height, true, attributes);
+    }
+
+    public static <T extends GirlEntityScene> EntityType<T> registerGirl(
+            String id,
+            BiFunction<EntityType<T>, net.minecraft.world.World, T> factory,
+            float width,
+            float height,
+            boolean createSpawnEgg,
+            Supplier<DefaultAttributeContainer.Builder> attributes
+    ) {
+
         try {
             // Create a temporary instance to get the girl ID
 
@@ -53,11 +65,13 @@ public class PleasureCraftEntities {
                     net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry.register(type, attributes.get())
             );
 
-            // Auto spawn egg
-            Identifier eggId = Identifier.of(PleasureCraft.MOD_ID, id + "_spawn_egg");
-            Item egg = Registry.register(Registries.ITEM, eggId,
-                    new SpawnEggItem(type, new Item.Settings().registryKey(RegistryKey.of(RegistryKeys.ITEM, eggId))));
-            AUTO_SPAWN_EGGS.add(egg);
+            if(createSpawnEgg) {
+                // Auto spawn egg
+                Identifier eggId = Identifier.of(PleasureCraft.MOD_ID, id + "_spawn_egg");
+                Item egg = Registry.register(Registries.ITEM, eggId,
+                        new SpawnEggItem(type, new Item.Settings().registryKey(RegistryKey.of(RegistryKeys.ITEM, eggId))));
+                AUTO_SPAWN_EGGS.add(egg);
+            }
 
             GIRLS.add(type);
             return type;

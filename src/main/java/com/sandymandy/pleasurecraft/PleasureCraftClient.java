@@ -2,10 +2,7 @@ package com.sandymandy.pleasurecraft;
 
 
 import com.sandymandy.pleasurecraft.client.PleasureCraftKeybinds;
-import com.sandymandy.pleasurecraft.client.rendering.renderers.LucyRenderer;
-import com.sandymandy.pleasurecraft.client.rendering.renderers.MikaRenderer;
-import com.sandymandy.pleasurecraft.client.rendering.renderers.MomoRenderer;
-import com.sandymandy.pleasurecraft.client.rendering.renderers.SlimeRenderer;
+import com.sandymandy.pleasurecraft.client.rendering.renderers.*;
 import com.sandymandy.pleasurecraft.config.ModBindings;
 import com.sandymandy.pleasurecraft.config.ModConfig;
 import com.sandymandy.pleasurecraft.freecam.Freecam;
@@ -45,6 +42,7 @@ public class PleasureCraftClient implements ClientModInitializer {
         EntityRendererRegistry.register(GirlRegistry.MIKA, MikaRenderer::new);
         EntityRendererRegistry.register(GirlRegistry.MOMO, MomoRenderer::new);
         EntityRendererRegistry.register(GirlRegistry.SLIME, SlimeRenderer::new);
+        EntityRendererRegistry.register(GirlRegistry.JSON_GIRL, JsonGirlRenderer::new);
         PleasureCraftKeybinds.register();
         PleasureCraftClientPackets.registerS2CPackets();
         PleasureCraftHudRegistry.register();
