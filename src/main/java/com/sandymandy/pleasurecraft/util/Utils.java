@@ -7,10 +7,14 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.enums.BedPart;
 import net.minecraft.block.enums.DoubleBlockHalf;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.registry.tag.TagKey;
+import net.minecraft.resource.Resource;
+import net.minecraft.resource.ResourceManager;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.Identifier;
@@ -93,6 +97,16 @@ public class Utils {
 
         return new BlockPos(origin.getX(), origin.getY(), origin.getZ() + 1);
 
+    }
+
+    public static boolean assetExistsClient(Identifier path) {
+        MinecraftClient client = MinecraftClient.getInstance();
+        if (client == null || client.getResourceManager() == null)
+            return false;
+
+        ResourceManager manager = client.getResourceManager();
+        Optional<Resource> resource = manager.getResource(path);
+        return resource.isPresent();
     }
 
     public static BlockInfo findNearbyBed(World world, BlockPos center, int radius) {

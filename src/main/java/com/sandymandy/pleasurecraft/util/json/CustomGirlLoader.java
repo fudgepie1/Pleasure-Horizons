@@ -3,7 +3,7 @@ package com.sandymandy.pleasurecraft.util.json;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.sandymandy.pleasurecraft.PleasureCraft;
-import com.sandymandy.pleasurecraft.util.variables.JsonGirlProfile;
+import com.sandymandy.pleasurecraft.util.variables.CustomGirlProfile;
 import net.fabricmc.loader.api.FabricLoader;
 
 import java.nio.file.Files;
@@ -11,9 +11,9 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
-public class JsonGirlLoader {
+public class CustomGirlLoader {
 
-    public static final Map<String, JsonGirlProfile> PROFILES = new HashMap<>();
+    public static final Map<String, CustomGirlProfile> PROFILES = new HashMap<>();
 
     public static void register() {
         Path dir = FabricLoader.getInstance()
@@ -24,7 +24,7 @@ public class JsonGirlLoader {
 
         try (var files = Files.list(dir)) {
             files.filter(f -> f.toString().endsWith(".json"))
-                    .forEach(JsonGirlLoader::loadFile);
+                    .forEach(CustomGirlLoader::loadFile);
         } catch (Exception e) {
             PleasureCraft.LOGGER.error("Failed loading girl profiles", e);
         }
@@ -35,7 +35,7 @@ public class JsonGirlLoader {
             JsonObject json = JsonParser.parseString(Files.readString(file))
                     .getAsJsonObject();
 
-            JsonGirlProfile profile = JsonGirlParser.parse(json);
+            CustomGirlProfile profile = CustomGirlParser.parse(json);
             PROFILES.put(profile.id(), profile);
 
             PleasureCraft.LOGGER.info("Loaded custom girl: {}", profile.id());

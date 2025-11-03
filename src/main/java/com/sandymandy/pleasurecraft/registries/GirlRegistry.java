@@ -4,7 +4,6 @@ import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.entity.PleasureCraftEntities;
 import com.sandymandy.pleasurecraft.entity.girls.*;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.mob.MobEntity;
 
 public class GirlRegistry {
     public static final EntityType<LucyEntity> LUCY = PleasureCraftEntities.registerGirl("lucy", LucyEntity::new, 0.5f, 1.95f, LucyEntity::createDefaultAttributes);
@@ -16,11 +15,11 @@ public class GirlRegistry {
     public static final EntityType<SlimeEntity> SLIME = PleasureCraftEntities.registerGirl("slime", SlimeEntity::new, 0.5f, 1.65f, SlimeEntity::createAttributes);
 
 
-    public static final EntityType<JsonGirlEntity> JSON_GIRL = PleasureCraftEntities.registerGirl(
+    public static final EntityType<CustomGirlEntity> JSON_GIRL = PleasureCraftEntities.registerGirl(
             "json_girl",
-            JsonGirlEntity::new,
+            CustomGirlEntity::new,
             0.5f, 1.8f,false,
-            JsonGirlEntity::createDefaultAttributes
+            CustomGirlEntity::createDefaultAttributes
     );
 
     public static void registerGirls() {

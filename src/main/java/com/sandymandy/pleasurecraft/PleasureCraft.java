@@ -9,8 +9,8 @@ import com.sandymandy.pleasurecraft.item.PleasureCraftItems;
 import com.sandymandy.pleasurecraft.networking.PleasureCraftPackets;
 import com.sandymandy.pleasurecraft.registries.*;
 import com.sandymandy.pleasurecraft.settlement.SettlementManager;
-import com.sandymandy.pleasurecraft.util.json.JsonGirlLoader;
-import com.sandymandy.pleasurecraft.util.json.JsonGirlSpawnCommand;
+import com.sandymandy.pleasurecraft.util.json.CustomGirlLoader;
+import com.sandymandy.pleasurecraft.command.CustomGirlSpawnCommand;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -49,9 +49,9 @@ public class PleasureCraft implements ModInitializer {
 		PleasureCraftDispenserBehavior.registerDispenserBehavior();
 		GirlMemoryTypes.registerMemoryTypes();
 		GirlRegistry.registerGirls();
-		JsonGirlLoader.register();
+		CustomGirlLoader.register();
 
 
-		CommandRegistrationCallback.EVENT.register(JsonGirlSpawnCommand::register);
+		CommandRegistrationCallback.EVENT.register(CustomGirlSpawnCommand::register);
 	}
 }

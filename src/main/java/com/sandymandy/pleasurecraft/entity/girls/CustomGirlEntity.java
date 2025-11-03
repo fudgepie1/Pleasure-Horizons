@@ -1,9 +1,10 @@
 package com.sandymandy.pleasurecraft.entity.girls;
 
-import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.entity.base.GirlEntityAI;
-import com.sandymandy.pleasurecraft.util.variables.JsonGirlProfile;
+import com.sandymandy.pleasurecraft.util.variables.CustomGirlProfile;
 import com.sandymandy.pleasurecraft.util.variables.SceneOptions;
+import net.minecraft.entity.EntityDimensions;
+import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
@@ -14,11 +15,13 @@ import net.minecraft.world.World;
 
 import java.util.List;
 
-public class JsonGirlEntity extends GirlEntityAI {
+public class CustomGirlEntity extends GirlEntityAI {
 
-    private JsonGirlProfile profile = JsonGirlProfile.DEFAULT;
-    private static final TrackedData<String> GIRL_ID = DataTracker.registerData(JsonGirlEntity.class, TrackedDataHandlerRegistry.STRING);
-    private static final TrackedData<String> GIRL_NAME = DataTracker.registerData(JsonGirlEntity.class, TrackedDataHandlerRegistry.STRING);
+    private CustomGirlProfile profile = CustomGirlProfile.DEFAULT;
+    private float lastHitboxHeight = CustomGirlProfile.DEFAULT.hitboxHeight(); // Track last known height
+
+    private static final TrackedData<String> GIRL_ID = DataTracker.registerData(CustomGirlEntity.class, TrackedDataHandlerRegistry.STRING);
+    private static final TrackedData<String> GIRL_NAME = DataTracker.registerData(CustomGirlEntity.class, TrackedDataHandlerRegistry.STRING);
 
     @Override
     protected void initDataTracker(DataTracker.Builder builder) {
@@ -27,17 +30,17 @@ public class JsonGirlEntity extends GirlEntityAI {
         builder.add(GIRL_NAME, "Default Girl");
     }
 
-    public JsonGirlEntity(EntityType<? extends GirlEntityAI> type, World world) {
+    public CustomGirlEntity(EntityType<? extends GirlEntityAI> type, World world) {
         super(type, world);
     }
 
-    public void setProfile(JsonGirlProfile profile) {
-        if (profile == null) profile = JsonGirlProfile.DEFAULT;
+    public void setProfile(CustomGirlProfile profile) {
+        if (profile == null) profile = CustomGirlProfile.DEFAULT;
         this.profile = profile;
     }
 
-    public JsonGirlProfile getProfile() {
-        return (profile != null ? profile : JsonGirlProfile.DEFAULT);
+    public CustomGirlProfile getProfile() {
+        return (profile != null ? profile : CustomGirlProfile.DEFAULT);
     }
 
     @Override
@@ -70,12 +73,15 @@ public class JsonGirlEntity extends GirlEntityAI {
         return getProfile().guiYOffset();
     }
 
+    @Override
+    protected EntityDimensions getBaseDimensions(EntityPose pose) {
+        return EntityDimensions.fixed(0.5f, getProfile().hitboxHeight());}
 
     // Save profile ID
     @Override
     public void writeCustomDataToNbt(NbtCompound nbt) {
         super.writeCustomDataToNbt(nbt);
-        nbt.put("GirlProfileID", JsonGirlProfile.CODEC, profile);
+        nbt.put("GirlProfileID", CustomGirlProfile.CODEC, profile);
     }
 
     // Load profile ID OR fallback to default
@@ -83,7 +89,7 @@ public class JsonGirlEntity extends GirlEntityAI {
     public void readCustomDataFromNbt(NbtCompound nbt) {
         super.readCustomDataFromNbt(nbt);
         if (nbt.contains("GirlProfileID")) {
-            this.profile = nbt.get("GirlProfileID", JsonGirlProfile.CODEC).orElse(JsonGirlProfile.DEFAULT);
+            this.profile = nbt.get("GirlProfileID", CustomGirlProfile.CODEC).orElse(CustomGirlProfile.DEFAULT);
         }
     }
 
@@ -92,5 +98,11 @@ public class JsonGirlEntity extends GirlEntityAI {
         super.tick();
         if(!this.getWorld().isClient()) this.dataTracker.set(GIRL_ID, getProfile().id());
         if(!this.getWorld().isClient()) this.dataTracker.set(GIRL_NAME, getProfile().name());
+
+        float currentHeight = getProfile().hitboxHeight();
+        if (currentHeight != lastHitboxHeight) {
+            this.lastHitboxHeight = currentHeight;
+            this.calculateDimensions();
+        }
     }
 }

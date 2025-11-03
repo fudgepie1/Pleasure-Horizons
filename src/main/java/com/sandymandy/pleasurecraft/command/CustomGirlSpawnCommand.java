@@ -1,11 +1,12 @@
-package com.sandymandy.pleasurecraft.util.json;
+package com.sandymandy.pleasurecraft.command;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
-import com.sandymandy.pleasurecraft.entity.girls.JsonGirlEntity;
+import com.sandymandy.pleasurecraft.entity.girls.CustomGirlEntity;
 import com.sandymandy.pleasurecraft.registries.GirlRegistry;
-import com.sandymandy.pleasurecraft.util.variables.JsonGirlProfile;
+import com.sandymandy.pleasurecraft.util.json.CustomGirlLoader;
+import com.sandymandy.pleasurecraft.util.variables.CustomGirlProfile;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.argument.BlockPosArgumentType;
 import net.minecraft.server.command.CommandManager;
@@ -20,11 +21,11 @@ import java.util.concurrent.CompletableFuture;
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
-public class JsonGirlSpawnCommand {
+public class CustomGirlSpawnCommand {
 
     // Suggestion provider for auto-complete
     private static final SuggestionProvider<ServerCommandSource> PROFILE_SUGGESTIONS = (context, builder) -> {
-        JsonGirlLoader.PROFILES.keySet().forEach(builder::suggest);
+        CustomGirlLoader.PROFILES.keySet().forEach(builder::suggest);
         return CompletableFuture.completedFuture(builder.build());
     };
 
@@ -62,7 +63,7 @@ public class JsonGirlSpawnCommand {
         ServerWorld world = source.getWorld();
 
         // Validate profile
-        JsonGirlProfile profile = JsonGirlLoader.PROFILES.get(id);
+        CustomGirlProfile profile = CustomGirlLoader.PROFILES.get(id);
         if (profile == null) {
             source.sendError(Text.literal("Girl profile not found: " + id));
             return 0;
@@ -76,7 +77,7 @@ public class JsonGirlSpawnCommand {
         }
 
         // Create entity
-        JsonGirlEntity girl = GirlRegistry.JSON_GIRL.create(world, net.minecraft.entity.SpawnReason.COMMAND);
+        CustomGirlEntity girl = GirlRegistry.JSON_GIRL.create(world, net.minecraft.entity.SpawnReason.COMMAND);
         if (girl == null) {
             source.sendError(Text.literal("Failed to create girl entity."));
             return 0;
