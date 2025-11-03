@@ -2,7 +2,6 @@ package com.sandymandy.pleasurecraft.entity.girls;
 
 import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.entity.base.GirlEntityAI;
-import com.sandymandy.pleasurecraft.entity.base.TameableGirlEntity;
 import com.sandymandy.pleasurecraft.util.variables.JsonGirlProfile;
 import com.sandymandy.pleasurecraft.util.variables.SceneOptions;
 import net.minecraft.entity.EntityType;
@@ -93,6 +92,5 @@ public class JsonGirlEntity extends GirlEntityAI {
         super.tick();
         if(!this.getWorld().isClient()) this.dataTracker.set(GIRL_ID, getProfile().id());
         if(!this.getWorld().isClient()) this.dataTracker.set(GIRL_NAME, getProfile().name());
-        PleasureCraft.LOGGER.info(getGirlID());
     }
 }

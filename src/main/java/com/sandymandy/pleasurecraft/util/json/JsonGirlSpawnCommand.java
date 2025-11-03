@@ -2,11 +2,12 @@ package com.sandymandy.pleasurecraft.util.json;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.sandymandy.pleasurecraft.entity.girls.JsonGirlEntity;
 import com.sandymandy.pleasurecraft.registries.GirlRegistry;
 import com.sandymandy.pleasurecraft.util.variables.JsonGirlProfile;
 import net.minecraft.command.CommandRegistryAccess;
-import net.minecraft.entity.SpawnReason;
+import net.minecraft.command.argument.BlockPosArgumentType;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.world.ServerWorld;
@@ -14,26 +15,42 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
+import java.util.concurrent.CompletableFuture;
+
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
 public class JsonGirlSpawnCommand {
 
-    public static void register(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess registryAccess, CommandManager.RegistrationEnvironment environment) {
+    // Suggestion provider for auto-complete
+    private static final SuggestionProvider<ServerCommandSource> PROFILE_SUGGESTIONS = (context, builder) -> {
+        JsonGirlLoader.PROFILES.keySet().forEach(builder::suggest);
+        return CompletableFuture.completedFuture(builder.build());
+    };
+
+    public static void register(CommandDispatcher<ServerCommandSource> dispatcher,
+                                CommandRegistryAccess registryAccess,
+                                CommandManager.RegistrationEnvironment environment) {
+
         dispatcher.register(
                 literal("girl")
                         .requires(src -> src.hasPermissionLevel(2))
                         .then(literal("spawn")
+                                // /girl spawn <id>
                                 .then(argument("id", StringArgumentType.string())
+                                        .suggests(PROFILE_SUGGESTIONS)
                                         .executes(ctx -> {
-                                            return spawnGirl(ctx.getSource(), StringArgumentType.getString(ctx, "id"), ctx.getSource().getPosition());
+                                            Vec3d pos = ctx.getSource().getPosition();
+                                            String id = StringArgumentType.getString(ctx, "id");
+                                            return spawnGirl(ctx.getSource(), id, pos);
                                         })
-                                )
-                                .then(argument("pos", net.minecraft.command.argument.Vec3ArgumentType.vec3())
-                                        .then(argument("id", StringArgumentType.string())
+                                        // /girl spawn <id> <pos>
+                                        .then(argument("pos", BlockPosArgumentType.blockPos())
                                                 .executes(ctx -> {
-                                                    Vec3d pos = net.minecraft.command.argument.Vec3ArgumentType.getVec3(ctx, "pos");
-                                                    return spawnGirl(ctx.getSource(), StringArgumentType.getString(ctx, "id"), pos);
+                                                    String id = StringArgumentType.getString(ctx, "id");
+                                                    BlockPos blockPos = BlockPosArgumentType.getBlockPos(ctx, "pos");
+                                                    Vec3d pos = new Vec3d(blockPos.getX() + 0.5, blockPos.getY(), blockPos.getZ() + 0.5);
+                                                    return spawnGirl(ctx.getSource(), id, pos);
                                                 })
                                         )
                                 )
@@ -47,7 +64,7 @@ public class JsonGirlSpawnCommand {
         // Validate profile
         JsonGirlProfile profile = JsonGirlLoader.PROFILES.get(id);
         if (profile == null) {
-            source.sendError(Text.literal("Girl not found: " + id));
+            source.sendError(Text.literal("Girl profile not found: " + id));
             return 0;
         }
 
@@ -57,21 +74,23 @@ public class JsonGirlSpawnCommand {
             source.sendError(Text.literal("Invalid spawn position."));
             return 0;
         }
-//        SlimeEntity girl = GirlRegistry.SLIME.create(world, SpawnReason.COMMAND);
 
         // Create entity
-        JsonGirlEntity girl = GirlRegistry.JSON_GIRL.create(world, SpawnReason.COMMAND);
+        JsonGirlEntity girl = GirlRegistry.JSON_GIRL.create(world, net.minecraft.entity.SpawnReason.COMMAND);
         if (girl == null) {
             source.sendError(Text.literal("Failed to create girl entity."));
             return 0;
         }
-//
-//        // Apply profile and attributes
+
+        // Apply profile and attributes
         girl.setProfile(profile);
-//        girl.getAttributeInstance(net.minecraft.entity.attribute.EntityAttributes.MAX_HEALTH).setBaseValue(profile.maxHealth());
-//        girl.getAttributeInstance(net.minecraft.entity.attribute.EntityAttributes.MOVEMENT_SPEED).setBaseValue(profile.movementSpeed());
-//        girl.getAttributeInstance(net.minecraft.entity.attribute.EntityAttributes.ATTACK_DAMAGE).setBaseValue(profile.attackDamage());
-//        girl.setHealth((float) profile.maxHealth());
+        girl.getAttributeInstance(net.minecraft.entity.attribute.EntityAttributes.MAX_HEALTH)
+                .setBaseValue(profile.maxHealth());
+        girl.getAttributeInstance(net.minecraft.entity.attribute.EntityAttributes.MOVEMENT_SPEED)
+                .setBaseValue(profile.movementSpeed());
+        girl.getAttributeInstance(net.minecraft.entity.attribute.EntityAttributes.ATTACK_DAMAGE)
+                .setBaseValue(profile.attackDamage());
+        girl.setHealth((float) profile.maxHealth());
 
         // Position & rotation
         girl.refreshPositionAndAngles(pos.x, pos.y, pos.z, source.getRotation().y, 0);
