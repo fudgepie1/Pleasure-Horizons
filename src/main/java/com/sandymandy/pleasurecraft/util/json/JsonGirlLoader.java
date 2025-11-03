@@ -15,7 +15,7 @@ public class JsonGirlLoader {
 
     public static final Map<String, JsonGirlProfile> PROFILES = new HashMap<>();
 
-    public static void load() {
+    public static void register() {
         Path dir = FabricLoader.getInstance()
                 .getConfigDir()
                 .resolve("pleasurecraft/girls");

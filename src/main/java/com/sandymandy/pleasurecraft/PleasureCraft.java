@@ -49,7 +49,7 @@ public class PleasureCraft implements ModInitializer {
 		PleasureCraftDispenserBehavior.registerDispenserBehavior();
 		GirlMemoryTypes.registerMemoryTypes();
 		GirlRegistry.registerGirls();
-		JsonGirlLoader.load();
+		JsonGirlLoader.register();
 
 
 		CommandRegistrationCallback.EVENT.register(JsonGirlSpawnCommand::register);

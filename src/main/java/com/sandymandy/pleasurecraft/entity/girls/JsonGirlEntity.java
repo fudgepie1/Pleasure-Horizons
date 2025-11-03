@@ -1,14 +1,14 @@
 package com.sandymandy.pleasurecraft.entity.girls;
 
+import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.entity.base.GirlEntityAI;
-import com.sandymandy.pleasurecraft.util.json.JsonGirlLoader;
-import com.sandymandy.pleasurecraft.util.json.JsonGirlProfiles;
+import com.sandymandy.pleasurecraft.entity.base.TameableGirlEntity;
 import com.sandymandy.pleasurecraft.util.variables.JsonGirlProfile;
 import com.sandymandy.pleasurecraft.util.variables.SceneOptions;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.attribute.DefaultAttributeContainer;
-import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.entity.data.DataTracker;
+import net.minecraft.entity.data.TrackedData;
+import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.item.Item;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.world.World;
@@ -17,29 +17,38 @@ import java.util.List;
 
 public class JsonGirlEntity extends GirlEntityAI {
 
-    private JsonGirlProfile profile = JsonGirlProfiles.DEFAULT;
+    private JsonGirlProfile profile = JsonGirlProfile.DEFAULT;
+    private static final TrackedData<String> GIRL_ID = DataTracker.registerData(JsonGirlEntity.class, TrackedDataHandlerRegistry.STRING);
+    private static final TrackedData<String> GIRL_NAME = DataTracker.registerData(JsonGirlEntity.class, TrackedDataHandlerRegistry.STRING);
+
+    @Override
+    protected void initDataTracker(DataTracker.Builder builder) {
+        super.initDataTracker(builder);
+        builder.add(GIRL_ID, "default");
+        builder.add(GIRL_NAME, "Default Girl");
+    }
 
     public JsonGirlEntity(EntityType<? extends GirlEntityAI> type, World world) {
         super(type, world);
     }
 
     public void setProfile(JsonGirlProfile profile) {
-        if (profile == null) profile = JsonGirlProfiles.DEFAULT;
+        if (profile == null) profile = JsonGirlProfile.DEFAULT;
         this.profile = profile;
     }
 
     public JsonGirlProfile getProfile() {
-        return (profile != null ? profile : JsonGirlProfiles.DEFAULT);
+        return (profile != null ? profile : JsonGirlProfile.DEFAULT);
     }
 
     @Override
     public String getGirlID() {
-        return getProfile().id();
+        return this.dataTracker.get(GIRL_ID);
     }
 
     @Override
     public String getGirlDisplayName() {
-        return getProfile().name();
+        return this.dataTracker.get(GIRL_NAME);
     }
 
     @Override
@@ -67,7 +76,7 @@ public class JsonGirlEntity extends GirlEntityAI {
     @Override
     public void writeCustomDataToNbt(NbtCompound nbt) {
         super.writeCustomDataToNbt(nbt);
-        nbt.putString("GirlProfileID", profile.id());
+        nbt.put("GirlProfileID", JsonGirlProfile.CODEC, profile);
     }
 
     // Load profile ID OR fallback to default
@@ -75,9 +84,15 @@ public class JsonGirlEntity extends GirlEntityAI {
     public void readCustomDataFromNbt(NbtCompound nbt) {
         super.readCustomDataFromNbt(nbt);
         if (nbt.contains("GirlProfileID")) {
-            String id = nbt.getString("GirlProfileID").orElse("default_girl");
-            JsonGirlProfile p = JsonGirlLoader.PROFILES.get(id);
-            this.profile = (p != null ? p : JsonGirlProfiles.DEFAULT);
+            this.profile = nbt.get("GirlProfileID", JsonGirlProfile.CODEC).orElse(JsonGirlProfile.DEFAULT);
         }
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        if(!this.getWorld().isClient()) this.dataTracker.set(GIRL_ID, getProfile().id());
+        if(!this.getWorld().isClient()) this.dataTracker.set(GIRL_NAME, getProfile().name());
+        PleasureCraft.LOGGER.info(getGirlID());
     }
 }

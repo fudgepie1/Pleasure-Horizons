@@ -1,5 +1,7 @@
 package com.sandymandy.pleasurecraft.util.variables;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.sandymandy.pleasurecraft.networking.codec.PacketCodecExtra;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
@@ -40,6 +42,21 @@ public class SceneOptions{
             PacketCodecs.collection(ArrayList::new, PacketCodecs.STRING), SceneOptions::bedIdle,
             SceneOptions::new
     );
+
+    public static final Codec<SceneOptions> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+            Codec.STRING.fieldOf("displayName").forGetter(SceneOptions::displayName),
+            Codec.INT.fieldOf("requiredRelationshipLevel").forGetter(SceneOptions::requiredRelationshipLevel),
+            Codec.STRING.listOf().fieldOf("introAnim").forGetter(SceneOptions::introAnim),
+            Codec.STRING.listOf().fieldOf("slowAnim").forGetter(SceneOptions::slowAnim),
+            Codec.STRING.listOf().fieldOf("fastAnim").forGetter(SceneOptions::fastAnim),
+            Codec.STRING.fieldOf("cumAnim").forGetter(SceneOptions::cumAnim),
+            Codec.FLOAT.fieldOf("cumThreshold").forGetter(SceneOptions::cumThreshold),
+            Codec.BOOL.fieldOf("needsToStrip").forGetter(SceneOptions::needsToStrip),
+            Codec.BOOL.fieldOf("isBedScene").forGetter(SceneOptions::isBedScene),
+            Codec.BOOL.fieldOf("useKeyFrameEvents").forGetter(SceneOptions::useKeyFrameEvents),
+            Codec.FLOAT.fieldOf("bedAlignmentOffset").forGetter(SceneOptions::bedAlignmentOffset),
+            Codec.STRING.listOf().fieldOf("bedIdle").forGetter(SceneOptions::bedIdle)
+    ).apply(instance, SceneOptions::new));
 
     private SceneOptions(String displayName, int requiredRelationshipLevel, List<String> introAnim, List<String> slowAnim, List<String> fastAnim, String cumAnim, float cumThreshold, boolean needsToStrip, boolean isBedScene, boolean useKeyFrameEvents, float bedAlignmentOffset, List<String> bedIdle){
         this.displayName = displayName;
@@ -98,5 +115,21 @@ public class SceneOptions{
         return new SceneOptions(name, requiredRelationshipLevel, introAnim, slowAnim, fastAnim, cumAnim, cumThreshold, needsToStrip, false, false, 0f, new ArrayList<>());
     }
 
+    public static SceneOptions create(
+            String name,
+            int requiredRelationshipLevel,
+            List<String> introAnim,
+            List<String> slowAnim,
+            List<String> fastAnim,
+            String cumAnim,
+            float cumThreshold,
+            boolean needsToStrip,
+            boolean isBedScene,
+            boolean useKeyFrameEvents,
+            float bedOffset,
+            List<String> bedIdle
+    ){
+        return new SceneOptions(name, requiredRelationshipLevel, introAnim, slowAnim, fastAnim, cumAnim, cumThreshold, needsToStrip, isBedScene, useKeyFrameEvents, bedOffset, bedIdle);
+    }
 
 }

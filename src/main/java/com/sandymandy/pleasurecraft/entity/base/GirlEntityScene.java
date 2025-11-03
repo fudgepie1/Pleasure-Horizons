@@ -32,6 +32,7 @@ import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.sound.SoundEvent;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec2f;
@@ -273,7 +274,7 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
 
     public void onSceneStart() {
         scenePlayer.setInvisible(true);
-
+        scenePlayer.sendMessage(Text.of("msg.pleasurecraft.canGoInToFreeCam"), true);
         this.setSceneProgress(0f);
         this.setCumThreshold(getCurrentSceneOptions().cumThreshold());
         setThrusting(false);
