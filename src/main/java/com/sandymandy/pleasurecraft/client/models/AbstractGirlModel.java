@@ -39,10 +39,10 @@ public abstract class AbstractGirlModel<T extends GirlEntityScene> extends GeoMo
 
 
         // Pick the folder based on stripped/dressed state
-        String folder = stripped ? "nude" : "dressed";
+        String folder = stripped ? "nude/" : "dressed/";
 
         // Use the model file provided by your getModelFile() method
-        String filePath = folder + "/" + girlID;
+        String filePath = folder + girlID;
 
         return Identifier.of(PleasureCraft.MOD_ID, filePath);
     }

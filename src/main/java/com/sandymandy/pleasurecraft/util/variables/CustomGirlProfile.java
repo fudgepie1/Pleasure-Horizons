@@ -35,7 +35,7 @@ public record CustomGirlProfile(
 
     public static final CustomGirlProfile DEFAULT = new CustomGirlProfile(
             "default",
-            "Default Json Girl",
+            "Default Custom Girl",
             1.65f,
             30,                   // gui size
             0.05f,                // gui offset

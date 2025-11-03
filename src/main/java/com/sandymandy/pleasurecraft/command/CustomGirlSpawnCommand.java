@@ -77,7 +77,7 @@ public class CustomGirlSpawnCommand {
         }
 
         // Create entity
-        CustomGirlEntity girl = GirlRegistry.JSON_GIRL.create(world, net.minecraft.entity.SpawnReason.COMMAND);
+        CustomGirlEntity girl = GirlRegistry.CUSTOM_GIRL.create(world, net.minecraft.entity.SpawnReason.COMMAND);
         if (girl == null) {
             source.sendError(Text.literal("Failed to create girl entity."));
             return 0;

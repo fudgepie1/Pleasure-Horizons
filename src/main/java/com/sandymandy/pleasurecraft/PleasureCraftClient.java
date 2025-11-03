@@ -42,7 +42,7 @@ public class PleasureCraftClient implements ClientModInitializer {
         EntityRendererRegistry.register(GirlRegistry.MIKA, MikaRenderer::new);
         EntityRendererRegistry.register(GirlRegistry.MOMO, MomoRenderer::new);
         EntityRendererRegistry.register(GirlRegistry.SLIME, SlimeRenderer::new);
-        EntityRendererRegistry.register(GirlRegistry.JSON_GIRL, CustomGirlRenderer::new);
+        EntityRendererRegistry.register(GirlRegistry.CUSTOM_GIRL, CustomGirlRenderer::new);
         PleasureCraftKeybinds.register();
         PleasureCraftClientPackets.registerS2CPackets();
         PleasureCraftHudRegistry.register();
