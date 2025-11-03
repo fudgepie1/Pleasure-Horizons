@@ -25,7 +25,7 @@ public class CustomGirlModel extends AbstractGirlModel<CustomGirlEntity>{
             return super.getModelResource(renderState);
         }
         else {
-            return Identifier.of(PleasureCraft.MOD_ID, folder + "/default");
+            return Identifier.of(PleasureCraft.MOD_ID, folder + "default");
         }
     }
 
