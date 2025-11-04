@@ -45,7 +45,8 @@ public class MomoEntity extends GirlEntityAI {
                         true,
                         false,
                         0f,
-                        List.of("anal_lay_on_bed", "anal_bed_idle")),
+                        "anal_lay_on_bed",
+                        "anal_bed_idle"),
 
                 SceneOptions.create("Doggy",
                         8,
@@ -57,7 +58,8 @@ public class MomoEntity extends GirlEntityAI {
                         true,
                         true,
                         1f,
-                        List.of("sit_down", "sit_down_idle"))
+                        "sit_down",
+                        "sit_down_idle")
         );
     }
 

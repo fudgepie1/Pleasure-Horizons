@@ -54,7 +54,8 @@ public class MikaEntity extends GirlEntityAI {
                         true,
                         false,
                         0.5f,
-                        List.of("sit_down", "sit_down_idle")),
+                        "sit_down",
+                        "sit_down_idle"),
 
                 SceneOptions.create("Cowgirl",
                         10,
@@ -66,7 +67,8 @@ public class MikaEntity extends GirlEntityAI {
                         true,
                         false,
                         0.5f,
-                        List.of("sit_down", "sit_down_idle"))
+                        "sit_down",
+                        "sit_down_idle")
         );
     }
 

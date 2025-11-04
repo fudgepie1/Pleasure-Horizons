@@ -66,7 +66,8 @@ public class LucyEntity extends GirlEntityAI {
                         true,
                         false,
                         0f,
-                        List.of("doggy_lay_on_bed", "doggy_bed_idle"))
+                        "doggy_lay_on_bed",
+                        "doggy_bed_idle")
                 );
     }
 }

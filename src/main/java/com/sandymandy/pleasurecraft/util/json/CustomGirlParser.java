@@ -39,16 +39,17 @@ public class CustomGirlParser {
                 scenes.add(SceneOptions.create(
                         s.get("name").getAsString(),
                         s.get("required_level").getAsInt(),
-                        jsonArrayToList(s.getAsJsonArray("intro")),
-                        jsonArrayToList(s.getAsJsonArray("slow")),
-                        jsonArrayToList(s.getAsJsonArray("fast")),
-                        s.get("cum").getAsString(),
+                        jsonArrayToList(s.getAsJsonArray("intro_anim")),
+                        jsonArrayToList(s.getAsJsonArray("slow_anim")),
+                        jsonArrayToList(s.getAsJsonArray("fast_anim")),
+                        s.get("cum_anim").getAsString(),
                         s.get("cum_threshold").getAsFloat(),
                         s.has("needs_to_strip") && s.get("needs_to_strip").getAsBoolean(),
                         s.has("is_bed_scene") && s.get("is_bed_scene").getAsBoolean(),
                         s.has("use_keyframe") && s.get("use_keyframe").getAsBoolean(),
                         s.has("bed_offset") ? s.get("bed_offset").getAsFloat() : 0f,
-                        s.has("bed_idle") ? jsonArrayToList(s.getAsJsonArray("bed_idle")) : new ArrayList<>()
+                        s.has("lay_on_bed_anim") ? s.get("lay_on_bed_anim").getAsString() : "",
+                        s.has("bed_idle_anim") ? s.get("bed_idle_anim").getAsString() : ""
                 ));
             }
         }

@@ -544,11 +544,11 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
 
             switch (getCurrentScenePhase()) {
                 case LAYING_DOWN -> {
-                    String laying = options.bedIdle().isEmpty() ? "null" : options.bedIdle().getFirst();
+                    String laying = options.bedIdle().isEmpty() ? "null" : options.layOnBed();
                     return setSceneAnimIfChanged(state, laying, Animation.LoopType.HOLD_ON_LAST_FRAME);
                 }
                 case BED_IDLE -> {
-                    String bedIdle = options.bedIdle().isEmpty() ? "null" : options.bedIdle().getLast();
+                    String bedIdle = options.bedIdle().isEmpty() ? "null" : options.bedIdle();
                     return setSceneAnimIfChanged(state, bedIdle, Animation.LoopType.LOOP);
                 }
                 case INTRO -> {

@@ -23,9 +23,10 @@ public class SceneOptions{
     private final boolean isBedScene;
     private final boolean useKeyFrameEvents;
     private final float bedAlignmentOffset;
-    private final List<String> bedIdle;
+    private final String layOnBed;
+    private final String bedIdle;
 
-    public static final SceneOptions EMPTY = new SceneOptions("", 0,new ArrayList<>(),new ArrayList<>(),new ArrayList<>(),"", 0f,false, false, false, 0f, new ArrayList<>());
+    public static final SceneOptions EMPTY = new SceneOptions("", 0,new ArrayList<>(),new ArrayList<>(),new ArrayList<>(),"", 0f,false, false, false, 0f, "", "");
 
     public static final PacketCodec<RegistryByteBuf, SceneOptions> PACKET_CODEC = PacketCodecExtra.tuple(
             PacketCodecs.STRING, SceneOptions::displayName,
@@ -39,7 +40,8 @@ public class SceneOptions{
             PacketCodecs.BOOLEAN, SceneOptions::isBedScene,
             PacketCodecs.BOOLEAN, SceneOptions::useKeyFrameEvents,
             PacketCodecs.FLOAT, SceneOptions::bedAlignmentOffset,
-            PacketCodecs.collection(ArrayList::new, PacketCodecs.STRING), SceneOptions::bedIdle,
+            PacketCodecs.STRING, SceneOptions::layOnBed,
+            PacketCodecs.STRING, SceneOptions::bedIdle,
             SceneOptions::new
     );
 
@@ -55,10 +57,11 @@ public class SceneOptions{
             Codec.BOOL.fieldOf("isBedScene").forGetter(SceneOptions::isBedScene),
             Codec.BOOL.fieldOf("useKeyFrameEvents").forGetter(SceneOptions::useKeyFrameEvents),
             Codec.FLOAT.fieldOf("bedAlignmentOffset").forGetter(SceneOptions::bedAlignmentOffset),
-            Codec.STRING.listOf().fieldOf("bedIdle").forGetter(SceneOptions::bedIdle)
+            Codec.STRING.fieldOf("layOnBed").forGetter(SceneOptions::layOnBed),
+            Codec.STRING.fieldOf("bedIdle").forGetter(SceneOptions::bedIdle)
     ).apply(instance, SceneOptions::new));
 
-    private SceneOptions(String displayName, int requiredRelationshipLevel, List<String> introAnim, List<String> slowAnim, List<String> fastAnim, String cumAnim, float cumThreshold, boolean needsToStrip, boolean isBedScene, boolean useKeyFrameEvents, float bedAlignmentOffset, List<String> bedIdle){
+    private SceneOptions(String displayName, int requiredRelationshipLevel, List<String> introAnim, List<String> slowAnim, List<String> fastAnim, String cumAnim, float cumThreshold, boolean needsToStrip, boolean isBedScene, boolean useKeyFrameEvents, float bedAlignmentOffset, String layOnBed, String bedIdle){
         this.displayName = displayName;
         this.requiredRelationshipLevel = requiredRelationshipLevel;
         this.introAnim = introAnim;
@@ -70,6 +73,7 @@ public class SceneOptions{
         this.isBedScene = isBedScene;
         this.useKeyFrameEvents = useKeyFrameEvents;
         this.bedAlignmentOffset = bedAlignmentOffset;
+        this.layOnBed = layOnBed;
         this.bedIdle = bedIdle;
     }
 
@@ -84,7 +88,9 @@ public class SceneOptions{
     public final boolean isBedScene() {return this.isBedScene;}
     public final boolean useKeyFrameEvents() {return this.useKeyFrameEvents;}
     public final float bedAlignmentOffset() {return this.bedAlignmentOffset;}
-    public final List<String> bedIdle() {return this.bedIdle;}
+    public final String layOnBed() {return this.layOnBed;}
+    public final String bedIdle() {return this.bedIdle;}
+
 
     public static SceneOptions create(
             String name,
@@ -97,9 +103,10 @@ public class SceneOptions{
             boolean needsToStrip,
             boolean useKeyFrameEvents,
             float bedOffset,
-            List<String> bedIdle
+            String layOnBed,
+            String bedIdle
     ){
-        return new SceneOptions(name, requiredRelationshipLevel, introAnim, slowAnim, fastAnim, cumAnim, cumThreshold, needsToStrip, true, useKeyFrameEvents,bedOffset, bedIdle);
+        return new SceneOptions(name, requiredRelationshipLevel, introAnim, slowAnim, fastAnim, cumAnim, cumThreshold, needsToStrip, true, useKeyFrameEvents, bedOffset, layOnBed, bedIdle);
     }
 
     public static SceneOptions create(
@@ -112,7 +119,7 @@ public class SceneOptions{
             float cumThreshold,
             boolean needsToStrip
     ){
-        return new SceneOptions(name, requiredRelationshipLevel, introAnim, slowAnim, fastAnim, cumAnim, cumThreshold, needsToStrip, false, false, 0f, new ArrayList<>());
+        return new SceneOptions(name, requiredRelationshipLevel, introAnim, slowAnim, fastAnim, cumAnim, cumThreshold, needsToStrip, false, false, 0f, "", "");
     }
 
     public static SceneOptions create(
@@ -127,9 +134,10 @@ public class SceneOptions{
             boolean isBedScene,
             boolean useKeyFrameEvents,
             float bedOffset,
-            List<String> bedIdle
+            String layOnBed,
+            String bedIdle
     ){
-        return new SceneOptions(name, requiredRelationshipLevel, introAnim, slowAnim, fastAnim, cumAnim, cumThreshold, needsToStrip, isBedScene, useKeyFrameEvents, bedOffset, bedIdle);
+        return new SceneOptions(name, requiredRelationshipLevel, introAnim, slowAnim, fastAnim, cumAnim, cumThreshold, needsToStrip, isBedScene, useKeyFrameEvents, bedOffset, layOnBed, bedIdle);
     }
 
 }
