@@ -428,7 +428,7 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
         BlockSoundGroup soundGroup = state.getSoundGroup();
         SoundEvent stepSound = soundGroup.getStepSound();
 
-        if(getAnimationKeyFrameEvent().equals("paizuri_startStep")){
+        if(getAnimationKeyFrameEvent().equals("paizuri_startStep".toLowerCase())){
             this.playSound(stepSound, 1.0f, 1.0f);
         }
 
@@ -439,9 +439,9 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
             return;
         }
 
-        String key = getAnimationKeyFrameEvent();
+        String key = getAnimationKeyFrameEvent().toLowerCase();
 
-        if (key.contains("Switch") || key.contains("Reset") || key.contains("thrust")) {
+        if (key.contains("switch") || key.contains("reset") || key.contains("thrust")) {
             this.setSceneProgress(this.getSceneProgress() + PROGRESS_SPEED);
         }
 
@@ -567,15 +567,15 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
                         String key = getAnimationKeyFrameEvent();
                         String anim = getRandomFromList(options.slowAnim());
 
-                        if (key.contains("Switch") && thrustKeyDown) {
+                        if (key.contains("switch") && thrustKeyDown) {
                             anim = getRandomFromList(options.fastAnim());
                         }
 
-                        if (key.contains("Reset") && thrustKeyDown) {
+                        if (key.contains("reset") && thrustKeyDown) {
                             return setSceneAnimIfChanged(state, getRandomFromList(options.fastAnim()), Animation.LoopType.LOOP);
                         }
 
-                        if (key.contains("Reset") && !thrustKeyDown) {
+                        if (key.contains("reset") && !thrustKeyDown) {
                             anim = getRandomFromList(options.slowAnim());
                         }
 
@@ -883,7 +883,7 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
         public void handle(KeyFrameEvent<GirlEntityScene, SoundKeyframeData> event) {
             if (!this.entity.getWorld().isClient()) return;
 
-            String key = event.keyframeData().getSound();
+            String key = event.keyframeData().getSound().toLowerCase();
             ClientPlayNetworking.send(new SoundEventSyncC2SPacket(this.entity.getId(), key));
         }
     }

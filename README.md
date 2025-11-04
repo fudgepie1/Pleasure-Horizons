@@ -85,3 +85,124 @@ This mod contains **adult content** and is intended for **mature audiences only*
 Use responsibly and respect Minecraft’s community guidelines, platform policies, and age requirements.
 
 > PleasureCraft is **heavily inspired** by SexCraft+ (by VyP3X) and FapCraft (by Schnurri_tv), but is an **independent project** with original implementation and goals.
+
+
+
+
+
+
+[//]: # (## 4. Girl Property Reference)
+
+[//]: # ()
+[//]: # (### id)
+
+[//]: # (Unique internal name. Must match the filenames of your model, animations and texture.)
+
+[//]: # ()
+[//]: # (### name)
+
+[//]: # (Display name shown in-game.)
+
+[//]: # ()
+[//]: # (### gui_size)
+
+[//]: # (Size of the girl in the GUI window)
+
+[//]: # ()
+[//]: # (### gui_y_offset)
+
+[//]: # (Vertical offset in the GUI for centering.)
+
+[//]: # ()
+[//]: # (### tame_item)
+
+[//]: # (Minecraft item ID used to tame the girl.)
+
+[//]: # ()
+[//]: # (### Attributes)
+
+[//]: # ()
+[//]: # (- health – Maximum HP.)
+
+[//]: # ()
+[//]: # (- speed – Movement speed.)
+
+[//]: # ()
+[//]: # (- damage – Base melee damage dealt.)
+
+[//]: # ()
+[//]: # (## 5. Scene Field Reference)
+
+[//]: # (Each entry in "scenes" describes a possible scene or interaction.)
+
+[//]: # ()
+[//]: # (### name)
+
+[//]: # ()
+[//]: # (The name of the scene. This is displayed on the GUI.)
+
+[//]: # ()
+[//]: # (### required_level)
+
+[//]: # ()
+[//]: # (The minimum relationship level required to unlock this scene.)
+
+[//]: # ()
+[//]: # (### intro_anim)
+
+[//]: # ()
+[//]: # (List of animations played at the start of the scene.)
+
+[//]: # ()
+[//]: # (### slow_anim)
+
+[//]: # ()
+[//]: # (List of looping animations for the slow phase.)
+
+[//]: # ()
+[//]: # (### fast_anim)
+
+[//]: # ()
+[//]: # (List of looping animations for the fast phase.)
+
+[//]: # ()
+[//]: # (### cum_anim)
+
+[//]: # ()
+[//]: # (The final animation that plays when the cum threshold is reached.)
+
+[//]: # ()
+[//]: # (### cum_threshold)
+
+[//]: # ()
+[//]: # (A numeric value determining how much progress is required before the cum animation triggers.)
+
+[//]: # ()
+[//]: # (### needs_to_strip)
+
+[//]: # ()
+[//]: # (Whether the girl must be naked before this scene can start.)
+
+[//]: # ()
+[//]: # (### is_bed_scene)
+
+[//]: # ()
+[//]: # (Marks the scene as one that happens on a bed. Adjusts positioning and animation accordingly.)
+
+[//]: # ()
+[//]: # (### bed_offset )
+
+[//]: # ()
+[//]: # (Vertical offset used to correctly align the girl model on the bed. &#40;Only if is_bed_scene is true&#41;)
+
+[//]: # ()
+[//]: # (### lay_on_bed_anim)
+
+[//]: # ()
+[//]: # (The animation that plays when the girl first lies on the bed. &#40;Only if is_bed_scene is true&#41;)
+
+[//]: # ()
+[//]: # (### bed_idle_anim)
+
+[//]: # ()
+[//]: # (The looping animation that plays while the girl is idle on the bed. &#40;Only if is_bed_scene is true&#41;)

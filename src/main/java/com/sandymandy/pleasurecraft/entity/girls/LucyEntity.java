@@ -64,7 +64,7 @@ public class LucyEntity extends GirlEntityAI {
                         "doggy_cum",
                         6f,
                         true,
-                        false,
+                        true,
                         0f,
                         "doggy_lay_on_bed",
                         "doggy_bed_idle")

@@ -9807,8 +9807,8 @@
                 "44.24": {
                     "effect": "bjiMSG11"
                 },
-                "49.24": {
-                    "effect": "bjiDone"
+                "49.12": {
+                    "effect": "sexUiOn"
                 }
             }
         },
@@ -12937,9 +12937,6 @@
                 },
                 "0.4": {
                     "effect": "thrust"
-                },
-                "0.6": {
-                    "effect": "sexUiOn"
                 },
                 "1.24": {
                     "effect": "bjtReady"
@@ -19807,19 +19804,19 @@
             },
             "sound_effects": {
                 "0.6": {
-                    "effect": "doggyGoOnBedMSG1"
+                    "effect": "doggyLayOnBedMSG1"
                 },
                 "2.52": {
-                    "effect": "doggyGoOnBedMSG2"
+                    "effect": "doggyLayOnBedMSG2"
                 },
                 "4.16": {
-                    "effect": "doggyGoOnBedMSG3"
+                    "effect": "doggyLayOnBedMSG3"
                 },
                 "5.32": {
-                    "effect": "doggyGoOnBedMSG4"
+                    "effect": "doggyLayOnBedMSG4"
                 },
                 "6.48": {
-                    "effect": "doggyGoOnBedDone"
+                    "effect": "doggyLayOnBedDone"
                 }
             }
         },
@@ -24650,22 +24647,22 @@
             },
             "sound_effects": {
                 "0.32": {
-                    "effect": "doggystartMSG1"
+                    "effect": "doggyintroMSG1"
                 },
                 "0.6": {
-                    "effect": "doggystartMSG2"
+                    "effect": "doggyintroMSG2"
                 },
                 "2.16": {
-                    "effect": "doggystartMSG3"
+                    "effect": "doggyintroMSG3"
                 },
                 "6.64": {
-                    "effect": "doggystartMSG4"
+                    "effect": "doggyintroMSG4"
                 },
                 "8.0": {
-                    "effect": "doggystartMSG5"
+                    "effect": "doggyintroMSG5"
                 },
                 "9.76": {
-                    "effect": "doggystartDone"
+                    "effect": "sexUI"
                 }
             }
         },
@@ -26121,7 +26118,7 @@
                     "effect": "thrust"
                 },
                 "1.08": {
-                    "effect": "sexUiOn"
+                    "effect": "reset"
                 },
                 "1.64": {
                     "effect": "doggyslowMSG2"
@@ -27679,14 +27676,8 @@
                 }
             },
             "sound_effects": {
-                "0.08": {
-                    "effect": "sexUiOn"
-                },
                 "0.16": {
-                    "effect": "thrust"
-                },
-                "0.2": {
-                    "effect": "doggyfastMSG1"
+                    "effect": "doggyfastMSG1 thrust"
                 },
                 "0.52": {
                     "effect": "doggyfastReady"
@@ -29271,14 +29262,8 @@
                 }
             },
             "sound_effects": {
-                "0.08": {
-                    "effect": "sexUiOn"
-                },
                 "0.16": {
-                    "effect": "thrust"
-                },
-                "0.2": {
-                    "effect": "doggyfastMSG1"
+                    "effect": "doggyfastMSG1 thrust"
                 },
                 "0.52": {
                     "effect": "doggyfastReady"
@@ -36262,7 +36247,7 @@
                         },
                         "0.2": {
                             "vector": [
-                                11.0,
+                                11,
                                 0,
                                 0
                             ],
@@ -36270,7 +36255,7 @@
                         },
                         "0.4": {
                             "vector": [
-                                14.0,
+                                14,
                                 0,
                                 0
                             ],
@@ -36567,7 +36552,7 @@
                         },
                         "0.4": {
                             "vector": [
-                                -109.0,
+                                -109,
                                 0,
                                 0
                             ],
@@ -37385,10 +37370,7 @@
             },
             "sound_effects": {
                 "0.1": {
-                    "effect": "paizuriFastMSG1"
-                },
-                "0.2": {
-                    "effect": "thrust"
+                    "effect": "paizuriFastMSG1 thrust"
                 },
                 "0.8": {
                     "effect": "paizuriReady"
@@ -41989,7 +41971,7 @@
                     "effect": "paizuriStartMSG1"
                 },
                 "8.625": {
-                    "effect": "paizuri_startDone"
+                    "effect": "sexUI"
                 }
             }
         },
@@ -42182,7 +42164,7 @@
                             "vector": [
                                 16,
                                 0,
-                                6.0
+                                6
                             ],
                             "easing": "easeInOutSine"
                         },
@@ -42190,7 +42172,7 @@
                             "vector": [
                                 14.5,
                                 0,
-                                6.0
+                                6
                             ],
                             "easing": "easeInSine"
                         },
@@ -42214,7 +42196,7 @@
                             "vector": [
                                 -2.5,
                                 0,
-                                -4.0
+                                -4
                             ],
                             "easing": "easeInSine"
                         },

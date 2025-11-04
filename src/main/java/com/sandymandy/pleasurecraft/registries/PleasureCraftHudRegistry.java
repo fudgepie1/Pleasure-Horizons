@@ -20,7 +20,7 @@ public class PleasureCraftHudRegistry {
                     PlayerEntity localPlayer = client.player;
 
                     if (localPlayer != null && localPlayer.getVehicle() instanceof GirlEntityScene scene) {
-                        if(scene.getAnimationKeyFrameEvent().equals("sexUI")) SceneProgressOverlay.setActive(true);
+                        if(scene.getAnimationKeyFrameEvent().contains("sexui")) SceneProgressOverlay.setActive(true);
                         SceneProgressOverlay.render(context, scene.getSceneProgress(), scene.getCumThreshold());
                     } else {
                         SceneProgressOverlay.setActive(false);

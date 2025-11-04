@@ -217,31 +217,46 @@ public class SceneKeyframeRegistry {
 
     // --- Register a fixed sound ---
     public static void registerSound(EntityType<? extends GeoAnimatable> girl, String frameKey, SoundEvent event) {
+        frameKey = frameKey.toLowerCase();
         SceneKey key = new SceneKey(girl, frameKey);
         SOUND_EVENTS.computeIfAbsent(key, k -> new ArrayList<>()).add(event);
     }
 
     // --- Register a randomizable sound list ---
     public static void registerSound(EntityType<? extends GeoAnimatable> girl, String frameKey, List<SoundEvent> events) {
+        frameKey = frameKey.toLowerCase();
         SceneKey key = new SceneKey(girl, frameKey);
         RANDOM_SOUNDS.computeIfAbsent(key, k -> new ArrayList<>()).addAll(events);
     }
 
     // --- Get sounds: returns all fixed sounds, plus one random from the random list if present ---
     public static List<SoundEvent> getSound(EntityType<?> girl, String key) {
-        SceneKey sceneKey = new SceneKey(girl, key);
+        key = key.toLowerCase();
         List<SoundEvent> result = new ArrayList<>();
 
-        List<SoundEvent> fixed = SOUND_EVENTS.get(sceneKey);
-        if (fixed != null) result.addAll(fixed);
+        // Go through all registered keys and find ones that "contain" or "start with" the key
+        for (Map.Entry<SceneKey, List<SoundEvent>> entry : SOUND_EVENTS.entrySet()) {
+            SceneKey sceneKey = entry.getKey();
+            if (sceneKey.girl().equals(girl) && key.contains(sceneKey.key())) {
+                result.addAll(entry.getValue());
+            }
+        }
 
-        List<SoundEvent> randomPool = RANDOM_SOUNDS.get(sceneKey);
-        if (randomPool != null && !randomPool.isEmpty()) {
-            result.add(randomPool.get(RANDOM.nextInt(randomPool.size())));
+        // Add random sounds if partial key matches
+        for (Map.Entry<SceneKey, List<SoundEvent>> entry : RANDOM_SOUNDS.entrySet()) {
+            SceneKey sceneKey = entry.getKey();
+            if (sceneKey.girl().equals(girl) && key.contains(sceneKey.key())) {
+                List<SoundEvent> pool = entry.getValue();
+                if (!pool.isEmpty()) {
+                    result.add(pool.get(RANDOM.nextInt(pool.size())));
+                }
+            }
         }
 
         return result;
     }
+
+
 
   /**
    * The way that this gets the messages are through the lang files like the en_us.json for US english
@@ -253,6 +268,7 @@ public class SceneKeyframeRegistry {
    */
   // --- Register message(s) ---
     public static void registerMessage(EntityType<?> girl, String frameKey, String langKey) {
+      frameKey = frameKey.toLowerCase();
       String girlName = EntityType.getId(girl).getPath();
       SceneKey key = new SceneKey(girl, frameKey);
       String msgKey = "sceneMsg." + girlName + "." + langKey;
@@ -260,6 +276,7 @@ public class SceneKeyframeRegistry {
     }
 
     public static void registerMessage(List<EntityType<?>> girls, String frameKey, String langKey) {
+        frameKey = frameKey.toLowerCase();
         for (EntityType<?> girl : girls) {
             registerMessage(girl, frameKey, langKey);
         }
@@ -267,17 +284,33 @@ public class SceneKeyframeRegistry {
 
     // --- Register Player message ---
     public static void registerPlayerMessage(String frameKey, String langKey) {
+        frameKey = frameKey.toLowerCase();
         String msgKey = "sceneMsg.player." + langKey;
         PLAYER_MESSAGES.computeIfAbsent(frameKey, k -> new ArrayList<>()).add(msgKey);
     }
 
     public static List<String> getPlayerMessage(String key) {
+        key = key.toLowerCase();
         return PLAYER_MESSAGES.getOrDefault(key, Collections.emptyList());
     }
 
     public static List<String> getMessage(EntityType<?> girl, String key) {
-        return CHAT_MESSAGES.getOrDefault(new SceneKey(girl, key), Collections.emptyList());
+        key = key.toLowerCase();
+        List<String> result = new ArrayList<>();
+
+        for (Map.Entry<SceneKey, List<String>> entry : CHAT_MESSAGES.entrySet()) {
+            SceneKey sceneKey = entry.getKey();
+            if (sceneKey.girl().equals(girl) && key.contains(sceneKey.key())) {
+                result.addAll(entry.getValue());
+            }
+        }
+
+        return result;
     }
 
-    public record SceneKey(EntityType<?> girl, String key) {}
+    public record SceneKey(EntityType<?> girl, String key) {
+        public SceneKey {
+            key = key.toLowerCase(Locale.ROOT); // normalize record field
+        }
+    }
 }

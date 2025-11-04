@@ -40,7 +40,7 @@ public class StripGoal extends Goal {
     public void tick() {
         if(started) {
             if (!girl.isFrozenInPlace()) girl.setFreeze(true);
-            if (girl.getAnimationKeyFrameEvent().equals("becomeNude") && !stripTrigged) {
+            if (girl.getAnimationKeyFrameEvent().equals("becomeNude".toLowerCase()) && !stripTrigged) {
                 girl.setStripped(!girl.isStripped()); // toggle stripped state
                 stripTrigged = true;
             }
