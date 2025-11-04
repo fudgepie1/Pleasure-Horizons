@@ -1,6 +1,7 @@
 package com.sandymandy.pleasurecraft.entity.girls;
 
 import com.sandymandy.pleasurecraft.entity.base.GirlEntityAI;
+import com.sandymandy.pleasurecraft.util.json.CustomGirlLoader;
 import com.sandymandy.pleasurecraft.util.variables.CustomGirlProfile;
 import com.sandymandy.pleasurecraft.util.variables.SceneOptions;
 import net.minecraft.entity.EntityDimensions;
@@ -81,7 +82,7 @@ public class CustomGirlEntity extends GirlEntityAI {
     @Override
     public void writeCustomDataToNbt(NbtCompound nbt) {
         super.writeCustomDataToNbt(nbt);
-        nbt.put("GirlProfileID", CustomGirlProfile.CODEC, profile);
+        nbt.putString("GirlProfileID", profile.id());
     }
 
     // Load profile ID OR fallback to default
@@ -89,7 +90,9 @@ public class CustomGirlEntity extends GirlEntityAI {
     public void readCustomDataFromNbt(NbtCompound nbt) {
         super.readCustomDataFromNbt(nbt);
         if (nbt.contains("GirlProfileID")) {
-            this.profile = nbt.get("GirlProfileID", CustomGirlProfile.CODEC).orElse(CustomGirlProfile.DEFAULT);
+            String id = nbt.getString("GirlProfileID").orElse("default_girl");
+            CustomGirlProfile p = CustomGirlLoader.PROFILES.get(id);
+            this.profile = (p != null ? p : CustomGirlProfile.DEFAULT);
         }
     }
 
