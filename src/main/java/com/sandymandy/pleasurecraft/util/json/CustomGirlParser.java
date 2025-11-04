@@ -45,8 +45,8 @@ public class CustomGirlParser {
                         s.get("cum").getAsString(),
                         s.get("cum_threshold").getAsFloat(),
                         s.has("needs_to_strip") && s.get("needs_to_strip").getAsBoolean(),
-                        s.has("use_keyframe") && s.get("use_keyframe").getAsBoolean(),
                         s.has("is_bed_scene") && s.get("is_bed_scene").getAsBoolean(),
+                        s.has("use_keyframe") && s.get("use_keyframe").getAsBoolean(),
                         s.has("bed_offset") ? s.get("bed_offset").getAsFloat() : 0f,
                         s.has("bed_idle") ? jsonArrayToList(s.getAsJsonArray("bed_idle")) : new ArrayList<>()
                 ));
