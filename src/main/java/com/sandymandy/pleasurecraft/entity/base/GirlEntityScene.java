@@ -435,7 +435,7 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
     }
 
     private void handleSceneSpeed() {
-        if(!this.getCurrentScenePhase().equals(ScenePhase.HAVING_SEX)){
+        if (!this.getCurrentScenePhase().equals(ScenePhase.HAVING_SEX)) {
             return;
         }
 
