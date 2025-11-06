@@ -1,5 +1,6 @@
 package com.sandymandy.pleasurecraft.registries;
 
+import com.sandymandy.pleasurecraft.util.json.SceneKeyframeLoader;
 import net.minecraft.entity.EntityType;
 import net.minecraft.sound.SoundEvent;
 import software.bernie.geckolib.animatable.GeoAnimatable;
@@ -10,6 +11,9 @@ public class SceneKeyframeRegistry {
     private static final Map<SceneKey, List<SoundEvent>> RANDOM_SOUNDS = new HashMap<>();
     private static final Map<SceneKey, List<String>> CHAT_MESSAGES = new HashMap<>();
     private static final Map<String, List<String>> PLAYER_MESSAGES = new HashMap<>();
+    private static final Map<CustomGirlSceneKey, List<SoundEvent>> CUSTOM_GIRL_SOUND_EVENTS = new HashMap<>();
+    private static final Map<CustomGirlSceneKey, List<SoundEvent>> CUSTOM_GIRL_RANDOM_SOUNDS = new HashMap<>();
+    private static final Map<CustomGirlSceneKey, List<String>> CUSTOM_GIRL_CHAT_MESSAGES = new HashMap<>();
     private static final Random RANDOM = new Random();
 
     public static void registerSoundEvents() {
@@ -23,6 +27,7 @@ public class SceneKeyframeRegistry {
         mikaFaceFuck();
         mikaMissionary();
         mikaCowgirl();
+        SceneKeyframeLoader.loadFromAssets();
     }
 
     private static void strip(){
@@ -229,6 +234,18 @@ public class SceneKeyframeRegistry {
         RANDOM_SOUNDS.computeIfAbsent(key, k -> new ArrayList<>()).addAll(events);
     }
 
+    public static void registerCustomGirlSound(String girlID, String frameKey, SoundEvent event) {
+        frameKey = frameKey.toLowerCase();
+        CustomGirlSceneKey key = new CustomGirlSceneKey(girlID, frameKey);
+        CUSTOM_GIRL_SOUND_EVENTS.computeIfAbsent(key, k -> new ArrayList<>()).add(event);
+    }
+
+    public static void registerCustomGirlSound(String girlID, String frameKey, List<SoundEvent> events) {
+        frameKey = frameKey.toLowerCase();
+        CustomGirlSceneKey key = new CustomGirlSceneKey(girlID, frameKey);
+        CUSTOM_GIRL_RANDOM_SOUNDS.computeIfAbsent(key, k -> new ArrayList<>()).addAll(events);
+    }
+
     // --- Get sounds: returns all fixed sounds, plus one random from the random list if present ---
     public static List<SoundEvent> getSound(EntityType<?> girl, String key) {
         key = key.toLowerCase();
@@ -256,6 +273,31 @@ public class SceneKeyframeRegistry {
         return result;
     }
 
+    public static List<SoundEvent> getCustomGirlSound(String girlID, String key) {
+        key = key.toLowerCase();
+        List<SoundEvent> result = new ArrayList<>();
+
+        // Go through all registered keys and find ones that "contain" or "start with" the key
+        for (Map.Entry<CustomGirlSceneKey, List<SoundEvent>> entry : CUSTOM_GIRL_SOUND_EVENTS.entrySet()) {
+            CustomGirlSceneKey sceneKey = entry.getKey();
+            if (sceneKey.girlID().equals(girlID) && key.contains(sceneKey.key())) {
+                result.addAll(entry.getValue());
+            }
+        }
+
+        // Add random sounds if partial key matches
+        for (Map.Entry<CustomGirlSceneKey, List<SoundEvent>> entry : CUSTOM_GIRL_RANDOM_SOUNDS.entrySet()) {
+            CustomGirlSceneKey sceneKey = entry.getKey();
+            if (sceneKey.girlID().equals(girlID) && key.contains(sceneKey.key())) {
+                List<SoundEvent> pool = entry.getValue();
+                if (!pool.isEmpty()) {
+                    result.add(pool.get(RANDOM.nextInt(pool.size())));
+                }
+            }
+        }
+
+        return result;
+    }
 
 
   /**
@@ -280,6 +322,13 @@ public class SceneKeyframeRegistry {
         for (EntityType<?> girl : girls) {
             registerMessage(girl, frameKey, langKey);
         }
+    }
+
+
+    public static void registerCustomGirlMessage(String girlID, String frameKey, String message) {
+        frameKey = frameKey.toLowerCase();
+        CustomGirlSceneKey key = new CustomGirlSceneKey(girlID, frameKey);
+        CUSTOM_GIRL_CHAT_MESSAGES.computeIfAbsent(key, k -> new ArrayList<>()).add(message);
     }
 
     // --- Register Player message ---
@@ -308,8 +357,28 @@ public class SceneKeyframeRegistry {
         return result;
     }
 
+    public static List<String> getCustomGirlMessage(String girlID, String key) {
+        key = key.toLowerCase();
+        List<String> result = new ArrayList<>();
+
+        for (Map.Entry<CustomGirlSceneKey, List<String>> entry : CUSTOM_GIRL_CHAT_MESSAGES.entrySet()) {
+            CustomGirlSceneKey sceneKey = entry.getKey();
+            if (sceneKey.girlID().equals(girlID) && key.contains(sceneKey.key())) {
+                result.addAll(entry.getValue());
+            }
+        }
+
+        return result;
+    }
+
     public record SceneKey(EntityType<?> girl, String key) {
         public SceneKey {
+            key = key.toLowerCase(Locale.ROOT); // normalize record field
+        }
+    }
+
+    public record CustomGirlSceneKey(String girlID, String key) {
+        public CustomGirlSceneKey {
             key = key.toLowerCase(Locale.ROOT); // normalize record field
         }
     }

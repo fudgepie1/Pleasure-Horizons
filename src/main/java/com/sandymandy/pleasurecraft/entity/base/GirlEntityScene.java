@@ -392,7 +392,7 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
 
     }
 
-    private void soundHandler() {
+    protected void soundHandler() {
         String key = getAnimationKeyFrameEvent();
 
         // Get all sounds for this key
@@ -406,7 +406,7 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
 
     }
 
-    private void messageHandler() {
+    protected void messageHandler() {
         String key = getAnimationKeyFrameEvent();
 
         List<String> girlMsgs = SceneKeyframeRegistry.getMessage(this.getType(), key);
@@ -441,7 +441,7 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
 
         String key = getAnimationKeyFrameEvent().toLowerCase();
 
-        if (key.contains("switch") || key.contains("reset") || key.contains("thrust")) {
+        if (key.contains("thrust")) {
             this.setSceneProgress(this.getSceneProgress() + PROGRESS_SPEED);
         }
 

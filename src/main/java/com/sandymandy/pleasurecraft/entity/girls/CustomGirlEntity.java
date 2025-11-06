@@ -1,6 +1,7 @@
 package com.sandymandy.pleasurecraft.entity.girls;
 
 import com.sandymandy.pleasurecraft.entity.base.GirlEntityAI;
+import com.sandymandy.pleasurecraft.registries.SceneKeyframeRegistry;
 import com.sandymandy.pleasurecraft.util.json.CustomGirlLoader;
 import com.sandymandy.pleasurecraft.util.variables.CustomGirlProfile;
 import com.sandymandy.pleasurecraft.util.variables.SceneOptions;
@@ -12,6 +13,7 @@ import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.item.Item;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.sound.SoundEvent;
 import net.minecraft.world.World;
 
 import java.util.List;
@@ -106,6 +108,30 @@ public class CustomGirlEntity extends GirlEntityAI {
         if (currentHeight != lastHitboxHeight) {
             this.lastHitboxHeight = currentHeight;
             this.calculateDimensions();
+        }
+    }
+
+    @Override
+    protected void messageHandler() {
+        String key = getAnimationKeyFrameEvent();
+
+        List<String> girlMsgs = SceneKeyframeRegistry.getCustomGirlMessage(this.getGirlID(), key);
+
+        for (String msg : girlMsgs) {
+            this.messageAsEntity(false, msg);
+        }
+    }
+
+    @Override
+    protected void soundHandler() {
+        String key = getAnimationKeyFrameEvent();
+
+        // Get all sounds for this key
+        List<SoundEvent> sounds = SceneKeyframeRegistry.getCustomGirlSound(this.getGirlID(), key);
+
+        // Play all sounds sequentially (or simultaneously)
+        for (SoundEvent sound : sounds) {
+            this.playSound(sound, 1.0f, 1.0f);
         }
     }
 }

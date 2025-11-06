@@ -3,9 +3,6 @@ package com.sandymandy.pleasurecraft.entity.girls;
 import com.sandymandy.pleasurecraft.entity.base.GirlEntityAI;
 import com.sandymandy.pleasurecraft.util.variables.SceneOptions;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.attribute.DefaultAttributeContainer;
-import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.world.World;
@@ -60,7 +57,7 @@ public class LucyEntity extends GirlEntityAI {
                         10,
                         List.of("doggy_intro"),
                         List.of("doggy_slow"),
-                        List.of("doggy_fast1"),
+                        List.of("doggy_fast1", "doggy_fast2"),
                         "doggy_cum",
                         6f,
                         true,

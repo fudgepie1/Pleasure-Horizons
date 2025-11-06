@@ -26118,7 +26118,7 @@
                     "effect": "thrust"
                 },
                 "1.08": {
-                    "effect": "reset"
+                    "effect": "switch"
                 },
                 "1.64": {
                     "effect": "doggyslowMSG2"
@@ -27680,7 +27680,7 @@
                     "effect": "doggyfastMSG1 thrust"
                 },
                 "0.52": {
-                    "effect": "doggyfastReady"
+                    "effect": "reset"
                 },
                 "1.04": {
                     "effect": "doggyfastDone"
@@ -29266,7 +29266,7 @@
                     "effect": "doggyfastMSG1 thrust"
                 },
                 "0.52": {
-                    "effect": "doggyfastReady"
+                    "effect": "reset"
                 },
                 "1.04": {
                     "effect": "doggyfastDone"
