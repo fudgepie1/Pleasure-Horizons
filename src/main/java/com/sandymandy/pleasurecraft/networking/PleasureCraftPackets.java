@@ -7,6 +7,7 @@ import com.sandymandy.pleasurecraft.networking.S2C.ClothingArmorVisibilityS2CPac
 import com.sandymandy.pleasurecraft.networking.S2C.PlayCumHudAnimationS2CPacket;
 import com.sandymandy.pleasurecraft.networking.S2C.SceneOptionsS2CPacket;
 import com.sandymandy.pleasurecraft.registries.PleasureCraftSoundEventRegistry;
+import com.sandymandy.pleasurecraft.registries.SceneKeyframeRegistry;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 
@@ -28,6 +29,10 @@ public class PleasureCraftPackets {
         PayloadTypeRegistry.playC2S().register(ScenePhaseSyncC2SPacket.ID, ScenePhaseSyncC2SPacket.CODEC);
         PayloadTypeRegistry.playC2S().register(StopSceneOnServerC2SPacket.ID, StopSceneOnServerC2SPacket.CODEC);
         PayloadTypeRegistry.playC2S().register(SoundEventSyncC2SPacket.ID, SoundEventSyncC2SPacket.CODEC);
+        PayloadTypeRegistry.playC2S().register(RegisterCustomGirlMessageC2SPacket.ID, RegisterCustomGirlMessageC2SPacket.CODEC);
+        PayloadTypeRegistry.playC2S().register(RegisterCustomGirlSoundC2SPacket.ID, RegisterCustomGirlSoundC2SPacket.CODEC);
+        PayloadTypeRegistry.playC2S().register(RegisterCustomGirlRandomSoundC2SPacket.ID, RegisterCustomGirlRandomSoundC2SPacket.CODEC);
+
 
 
         // --- S2C (server → client) ---
@@ -155,6 +160,21 @@ public class PleasureCraftPackets {
                     if (entity instanceof GirlEntityScene girl) {
                         girl.setAnimationKeyFrameEventState(packet.soundEvent());
                     }
+                }));
+
+        ServerPlayNetworking.registerGlobalReceiver(RegisterCustomGirlMessageC2SPacket.ID,
+                (packet, context) -> Objects.requireNonNull(context.player().getServer()).execute(() -> {
+                    SceneKeyframeRegistry.registerCustomGirlMessage(packet.girlID(), packet.key(), packet.message());
+                }));
+
+        ServerPlayNetworking.registerGlobalReceiver(RegisterCustomGirlSoundC2SPacket.ID,
+                (packet, context) -> Objects.requireNonNull(context.player().getServer()).execute(() -> {
+                    SceneKeyframeRegistry.registerCustomGirlSound(packet.girlID(), packet.key(), packet.sound());
+                }));
+
+        ServerPlayNetworking.registerGlobalReceiver(RegisterCustomGirlRandomSoundC2SPacket.ID,
+                (packet, context) -> Objects.requireNonNull(context.player().getServer()).execute(() -> {
+                    SceneKeyframeRegistry.registerCustomGirlSound(packet.girlID(), packet.key(), packet.sounds());
                 }));
 
     }

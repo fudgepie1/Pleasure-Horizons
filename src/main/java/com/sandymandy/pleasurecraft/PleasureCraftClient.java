@@ -2,6 +2,8 @@ package com.sandymandy.pleasurecraft;
 
 
 import com.sandymandy.pleasurecraft.client.PleasureCraftKeybinds;
+import com.sandymandy.pleasurecraft.client.gui.screen.GirlInventoryScreen;
+import com.sandymandy.pleasurecraft.client.gui.screen.settlement.SettlementHubScreen;
 import com.sandymandy.pleasurecraft.client.rendering.renderers.*;
 import com.sandymandy.pleasurecraft.config.ModBindings;
 import com.sandymandy.pleasurecraft.config.ModConfig;
@@ -11,7 +13,7 @@ import com.sandymandy.pleasurecraft.networking.C2S.ThrustKeybindC2SPacket;
 import com.sandymandy.pleasurecraft.networking.PleasureCraftClientPackets;
 import com.sandymandy.pleasurecraft.registries.GirlRegistry;
 import com.sandymandy.pleasurecraft.registries.PleasureCraftHudRegistry;
-import com.sandymandy.pleasurecraft.client.gui.screen.GirlInventoryScreen;
+import com.sandymandy.pleasurecraft.util.SceneKeyframeRegistryReloader;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
@@ -21,7 +23,6 @@ import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
-import com.sandymandy.pleasurecraft.client.gui.screen.settlement.SettlementHubScreen;
 
 import static com.sandymandy.pleasurecraft.registries.PleasureCraftScreenHandlerRegistry.GIRL_INVENTORY_SCREEN_HANDLER;
 import static com.sandymandy.pleasurecraft.registries.PleasureCraftScreenHandlerRegistry.SETTLEMENT_HUB_SCREEN_HANDLER;
@@ -47,6 +48,7 @@ public class PleasureCraftClient implements ClientModInitializer {
         PleasureCraftClientPackets.registerS2CPackets();
         PleasureCraftHudRegistry.register();
         handleKeybinds();
+        SceneKeyframeRegistryReloader.registerReloader();
     }
 
     private static void handleKeybinds() {

@@ -1,12 +1,14 @@
 package com.sandymandy.pleasurecraft.util.json;
 
-import com.google.gson.*;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.registries.SceneKeyframeRegistry;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.resource.ResourceManager;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.Util;
 
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
@@ -15,11 +17,10 @@ import java.util.List;
 
 public class SceneKeyframeLoader {
 
-    public static void loadFromAssets() {
-        var resourceManager = MinecraftClient.getInstance().getResourceManager();
+    public static void loadFromAssets(ResourceManager resourceManager) {
 
-        resourceManager.findResources("scenes", path -> path.getPath().endsWith(".json")).forEach((id, resource) -> {
-            try (var reader = new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8)) {
+        resourceManager.findResources("keyframe_events", path -> path.getPath().endsWith(".json")).forEach((id, resource) -> {
+            try (InputStreamReader reader = new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8)) {
                 JsonObject json = JsonParser.parseReader(reader).getAsJsonObject();
 
                 String girlID = json.get("girl_id").getAsString();

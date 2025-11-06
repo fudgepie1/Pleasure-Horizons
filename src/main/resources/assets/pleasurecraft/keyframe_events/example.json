@@ -1,0 +1,30 @@
+{
+  "girl_id": "daisy",
+  "scenes": [
+    {
+      "key": "doggySlowMSG1",
+      "sounds": [
+        "pleasurecraft:momo.bjmoan",
+        "pleasurecraft:misc.pounding"
+      ],
+      "random_sounds": [
+        "pleasurecraft:momo.giggle",
+        "pleasurecraft:momo.breath"
+      ],
+      "messages": [
+        "Mmh"
+      ]
+    },
+    {
+      "key": "doggyCumMSG1",
+      "sounds": [
+        "pleasurecraft:misc.cuminflation",
+        "pleasurecraft:momo.ahh"
+      ],
+      "random_sounds": [],
+      "messages": [
+        "OooOh~"
+      ]
+    }
+  ]
+}

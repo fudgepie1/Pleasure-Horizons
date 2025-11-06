@@ -1,5 +1,6 @@
 package com.sandymandy.pleasurecraft.registries;
 
+import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.util.json.SceneKeyframeLoader;
 import net.minecraft.entity.EntityType;
 import net.minecraft.sound.SoundEvent;
@@ -27,7 +28,6 @@ public class SceneKeyframeRegistry {
         mikaFaceFuck();
         mikaMissionary();
         mikaCowgirl();
-        SceneKeyframeLoader.loadFromAssets();
     }
 
     private static void strip(){
