@@ -125,6 +125,7 @@ public abstract class AbstractGirlRenderer<T extends GirlEntityScene, R extends 
     public void addRenderData(T animatable, Void relatedObject, R renderState) {
         renderState.addGeckolibData(PleasureCraftDataTicketRegistry.IS_STRIPPED, animatable.isStripped());
         renderState.addGeckolibData(PleasureCraftDataTicketRegistry.IS_IN_SCENE, animatable.isSceneActive());
+        renderState.addGeckolibData(PleasureCraftDataTicketRegistry.HAS_VEHICLE, animatable.hasVehicle());
         renderState.addGeckolibData(PleasureCraftDataTicketRegistry.GIRL_ID, animatable.getGirlID());
         renderState.addGeckolibData(PleasureCraftDataTicketRegistry.ENTITY_ID, animatable.getId());
         renderState.addGeckolibData(PleasureCraftDataTicketRegistry.GIRL_FIRST_PASSENGER, animatable.getFirstPassenger());

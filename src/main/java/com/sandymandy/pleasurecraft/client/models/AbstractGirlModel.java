@@ -68,8 +68,9 @@ public abstract class AbstractGirlModel<T extends GirlEntityScene> extends GeoMo
 
         GeoBone head = getAnimationProcessor().getBone("head");
         boolean isSceneActive = animationState.getData(PleasureCraftDataTicketRegistry.IS_IN_SCENE);
+        boolean hasVehicle = animationState.getData(PleasureCraftDataTicketRegistry.HAS_VEHICLE);
 
-        if (!isSceneActive) {
+        if (!isSceneActive && !hasVehicle) {
             this.calculateJigglePhysics(animationState);
         }
         if (head != null && !isSceneActive) {

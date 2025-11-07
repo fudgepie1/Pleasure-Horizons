@@ -12,6 +12,7 @@ import java.util.Map;
 public class PleasureCraftDataTicketRegistry {
     public static final DataTicket<Boolean> IS_STRIPPED = DataTicket.create("is_stripped", Boolean.class);
     public static final DataTicket<Boolean> IS_IN_SCENE = DataTicket.create("is_in_scene", Boolean.class);
+    public static final DataTicket<Boolean> HAS_VEHICLE = DataTicket.create("has_vehicle", Boolean.class);
     public static final DataTicket<String> GIRL_ID = DataTicket.create("girl_id", String.class);
     public static final DataTicket<Integer> ENTITY_ID = DataTicket.create("entity_id", Integer.class);
     public static final DataTicket<Entity> GIRL_FIRST_PASSENGER = DataTicket.create("girl_first_passenger", Entity.class);

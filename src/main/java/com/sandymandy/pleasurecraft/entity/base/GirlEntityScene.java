@@ -23,9 +23,11 @@ import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.DyedColorComponent;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
+import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.tag.BlockTags;
@@ -402,8 +404,6 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
         for (SoundEvent sound : sounds) {
             this.playSound(sound, 1.0f, 1.0f);
         }
-
-
     }
 
     protected void messageHandler() {
@@ -664,9 +664,10 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
 
 
     private String getDefaultAnimation(AnimationTest<?> state) {
-        if (!this.isOnGround() && !isSitting()) return "fly";
+        if (!this.isOnGround() && !isSitting() && !this.hasVehicle()) return "fly";
         if (state.isMoving() && !isSitting()) return "walk";
         if (isSitting()) return "sit";
+        if (this.hasVehicle()) return "ride";
         return "idle";
     }
 
@@ -811,20 +812,21 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
     public void messageAsEntity(boolean sendFromServer, String message){
         String finalMessage = "<"+getGirlDisplayName()+"> " + message;
 
-        if(sendFromServer && !this.getWorld().isClient()){
-            new PleasureCraftMessages().GlobleMessage(this.getWorld(), finalMessage);
+        if((sendFromServer && !this.getWorld().isClient()) || scenePlayer == null){
+            PleasureCraftMessages.GlobleMessage(this.getWorld(), finalMessage);
         }
-        else {
-            new PleasureCraftMessages().PlayerSpecificMessage(scenePlayer,finalMessage);
+        else{
+            PleasureCraftMessages.PlayerSpecificMessage(scenePlayer,finalMessage);
         }
 
     }
 
     public void messageAsOwner(String message) {
+        if(scenePlayer == null) return;
 
         GameProfile profile = scenePlayer.getGameProfile();
         String finalMessage = "<" + profile.getName() + "> " + message;
-        new PleasureCraftMessages().PlayerSpecificMessage(scenePlayer, finalMessage);
+        PleasureCraftMessages.PlayerSpecificMessage(scenePlayer, finalMessage);
     }
 
     public void requestMoveToBed() {
