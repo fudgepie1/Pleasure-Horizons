@@ -13,7 +13,7 @@
 - Reimplemented Jiggle Physics.
 - Made the bed scanner only scan horizontally
 - Added a new system that allows players to add their own girls
-- Fixed the scene progress overlay not showing in some cases
+- Fixed the scene progress overlay not showing in some cases 
 
 ___
 

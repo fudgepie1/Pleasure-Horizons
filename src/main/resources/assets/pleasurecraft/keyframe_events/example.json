@@ -1,18 +1,15 @@
 {
   "girl_id": "daisy",
-  "scenes": [
+  "events": [
     {
-      "key": "wananana",
-      "sounds": [
-        "pleasurecraft:momo.bjmoan",
-        "pleasurecraft:misc.pounding"
-      ],
+      "key": "angry",
+      "sounds": [],
       "random_sounds": [
-        "pleasurecraft:momo.giggle",
-        "pleasurecraft:momo.breath"
+        "pleasurecraft:momo.breath",
+        "minecraft:block.metal.break"
       ],
       "messages": [
-        "Mmh"
+        "*Sigh*"
       ]
     },
     {

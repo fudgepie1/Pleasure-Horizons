@@ -24,7 +24,7 @@ public class SceneKeyframeLoader {
                 JsonObject json = JsonParser.parseReader(reader).getAsJsonObject();
 
                 String girlID = json.get("girl_id").getAsString();
-                JsonArray scenes = json.getAsJsonArray("scenes");
+                JsonArray scenes = json.getAsJsonArray("events");
 
                 for (JsonElement elem : scenes) {
                     JsonObject scene = elem.getAsJsonObject();

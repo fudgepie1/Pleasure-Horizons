@@ -71,6 +71,7 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
     private static final TrackedData<String> OVERRIDE_ANIM = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.STRING);
     private static final TrackedData<String> SCENE_ANIM = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.STRING);
     private static final TrackedData<Integer> RELATIONSHIP_LEVEL = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.INTEGER);
+    private static final TrackedData<Integer> MAX_RELATIONSHIP_LEVEL = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.INTEGER);
     private static final TrackedData<BlockPos> BASE_POS = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.BLOCK_POS);
     private static final TrackedData<Vec3d> PASSENGER_BONE_POSITION = DataTracker.registerData(TameableGirlEntity.class, PleasureCraftTrackedDataRegistry.VEC3D);
     protected static final TrackedData<Byte> TAMEABLE_FLAGS = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.BYTE);
@@ -114,6 +115,7 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
         builder.add(IS_PLAYER_MODEL_SLIM, false);
         builder.add(HAVING_SEX, false);
         builder.add(RELATIONSHIP_LEVEL,0);
+        builder.add(MAX_RELATIONSHIP_LEVEL,0);
         builder.add(PASSENGER_BONE_POSITION, Vec3d.ZERO);
         builder.add(BASE_POS, this.getBlockPos());
         builder.add(OVERRIDE_ANIM,"");
@@ -266,18 +268,22 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
 
             // If null or empty, return default
             if (options == null || options.isEmpty()) {
-                return 4;
+                this.dataTracker.set(MAX_RELATIONSHIP_LEVEL, 4);
+                return this.dataTracker.get(MAX_RELATIONSHIP_LEVEL);
             }
 
-            // Find max requiredRelationshipLevel
-            return options.stream()
+            int value = options.stream()
                     .map(SceneOptions::requiredRelationshipLevel)
                     .max(Integer::compareTo)
-                    .orElse(4); // fallback if stream is empty
+                    .orElse(4);
+
+            this.dataTracker.set(MAX_RELATIONSHIP_LEVEL, value);
+
+            return this.dataTracker.get(MAX_RELATIONSHIP_LEVEL);
         } catch (Exception e) {
             // In case something unexpected happens
-            return 4;
-        }
+            this.dataTracker.set(MAX_RELATIONSHIP_LEVEL, 4);
+            return this.dataTracker.get(MAX_RELATIONSHIP_LEVEL);        }
     }
 
     protected Map<EquipmentSlot, List<String>> getArmorBones() {
@@ -359,7 +365,7 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
                     FoodComponent foodComponent = itemStack.get(DataComponentTypes.FOOD);
                     float f = foodComponent != null ? foodComponent.nutrition() : 1.0F;
                     this.heal(2.0F * f);
-                    player.getWorld().sendEntityStatus(this, EntityStatuses.CONSUME_ITEM);
+                    this.getWorld().sendEntityStatus(this, EntityStatuses.CONSUME_ITEM);
                     return ActionResult.CONSUME;
                 }
 
@@ -370,7 +376,7 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
                             itemStack.decrementUnlessCreative(1, player);
                             player.sendMessage(Text.literal("She Liked The Gift"), true);
                             setCurrentRelationshipLevel(getCurrentRelationshipLevel() + 1);
-                            player.getWorld().sendEntityStatus(this, EntityStatuses.ADD_BREEDING_PARTICLES);
+                            this.getWorld().sendEntityStatus(this, EntityStatuses.ADD_BREEDING_PARTICLES);
                             return ActionResult.CONSUME;
                         }
                         else {
@@ -410,7 +416,7 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
                     return ActionResult.SUCCESS;
                 }
 
-                if (!this.getWorld().isClient) {
+                if (!this.getWorld().isClient()) {
                     if (itemInHand.equals(getTameItem()) && !player.isSneaking()) {
                         itemStack.decrementUnlessCreative(1, player);
                         this.tryTame(player);
