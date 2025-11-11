@@ -2,6 +2,7 @@ package com.sandymandy.pleasurecraft.client.gui.screen.settlement;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.item.ItemStack;
@@ -96,7 +97,7 @@ public enum SettlementTabType {
         else if (index == tabCount - 1) texture = tex.last();
         else texture = tex.middle();
 
-        context.drawGuiTexture(RenderLayer::getGuiTextured, texture, x + getTabX(index), y + getTabY(index), width, height);
+        context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, texture, x + getTabX(index), y + getTabY(index), width, height);
     }
 
     public void drawIcon(DrawContext context, int x, int y, int index, ItemStack stack) {

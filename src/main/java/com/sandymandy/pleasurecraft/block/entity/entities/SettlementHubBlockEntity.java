@@ -15,6 +15,8 @@ import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.text.Text;
 import net.minecraft.util.Uuids;
 import net.minecraft.util.math.BlockPos;
@@ -89,23 +91,24 @@ public class SettlementHubBlockEntity extends BlockEntity {
     /* === Persistence === */
 
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.writeNbt(nbt, registryLookup);
+    protected void writeData(WriteView view) {
+        super.writeData(view);
         if (settlement != null) {
-            nbt.put("SettlementId", Uuids.CODEC, settlement.getId());
+            view.put("SettlementId", Uuids.CODEC, settlement.getId());
         }
     }
 
     @Override
-    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.readNbt(nbt, registryLookup);
-        if (nbt.contains("SettlementId")) {
-            UUID id = nbt.get("SettlementId", Uuids.CODEC).get();
-            if (world instanceof ServerWorld serverWorld) {
+    public void readData(ReadView view) {
+        super.readData(view);
+
+        // Try to read the UUID using the codec
+        view.read("SettlementId", Uuids.CODEC).ifPresent(id -> {
+            if (this.world instanceof ServerWorld serverWorld) {
                 SettlementManager manager = SettlementManager.get(serverWorld);
                 this.settlement = manager.getSettlement(id);
             }
-        }
+        });
     }
 
     /* === Sync Utility === */

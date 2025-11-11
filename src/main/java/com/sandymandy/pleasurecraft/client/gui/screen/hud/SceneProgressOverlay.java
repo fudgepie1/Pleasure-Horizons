@@ -1,6 +1,7 @@
 package com.sandymandy.pleasurecraft.client.gui.screen.hud;
 
 import com.sandymandy.pleasurecraft.PleasureCraft;
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.util.Identifier;
@@ -44,7 +45,7 @@ public class SceneProgressOverlay {
         int y = 10;
 
         // --- Background ---
-        context.drawTexture(RenderLayer::getGuiTextured, SCENE_PROGRESS_BAR_TEXTURE,
+        context.drawTexture(RenderPipelines.GUI_TEXTURED, SCENE_PROGRESS_BAR_TEXTURE,
                 x, y,
                 0, 0,
                 scaledWidth, scaledHeight,
@@ -67,7 +68,7 @@ public class SceneProgressOverlay {
         }
 
         if(!animatingCum)
-            context.drawTexture(RenderLayer::getGuiTextured, READY_TO_CUM_TEXTURE,
+            context.drawTexture(RenderPipelines.GUI_TEXTURED, READY_TO_CUM_TEXTURE,
                     cumXPadding, y + cumYPadding,
                     cumU, cumV,
                     cropWidth, cropHeight,

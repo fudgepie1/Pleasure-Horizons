@@ -7,14 +7,18 @@ import com.sandymandy.pleasurecraft.util.variables.SceneOptions;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.item.Item;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.world.World;
 
 import java.util.List;
+import java.util.Objects;
 
 public class CustomGirlEntity extends GirlEntityAI {
 
@@ -38,6 +42,14 @@ public class CustomGirlEntity extends GirlEntityAI {
     public void setProfile(CustomGirlProfile profile) {
         if (profile == null) profile = CustomGirlProfile.DEFAULT;
         this.profile = profile;
+
+        Objects.requireNonNull(this.getAttributeInstance(EntityAttributes.MAX_HEALTH))
+                .setBaseValue(profile.maxHealth());
+        Objects.requireNonNull(this.getAttributeInstance(EntityAttributes.MOVEMENT_SPEED))
+                .setBaseValue(profile.movementSpeed());
+        Objects.requireNonNull(this.getAttributeInstance(EntityAttributes.ATTACK_DAMAGE))
+                .setBaseValue(profile.attackDamage());
+        this.setHealth((float) profile.maxHealth());
     }
 
     public CustomGirlProfile getProfile() {
@@ -80,20 +92,18 @@ public class CustomGirlEntity extends GirlEntityAI {
 
     // Save profile ID
     @Override
-    public void writeCustomDataToNbt(NbtCompound nbt) {
-        super.writeCustomDataToNbt(nbt);
-        nbt.putString("GirlProfileID", profile.id());
+    public void writeCustomData(WriteView view) {
+        super.writeCustomData(view);
+        view.putString("GirlProfileID", profile.id());
     }
 
     // Load profile ID OR fallback to default
     @Override
-    public void readCustomDataFromNbt(NbtCompound nbt) {
-        super.readCustomDataFromNbt(nbt);
-        if (nbt.contains("GirlProfileID")) {
-            String id = nbt.getString("GirlProfileID").orElse("default_girl");
-            CustomGirlProfile p = CustomGirlLoader.PROFILES.get(id);
-            this.profile = (p != null ? p : CustomGirlProfile.DEFAULT);
-        }
+    public void readCustomData(ReadView view) {
+        super.readCustomData(view);
+        String id = view.getString("GirlProfileID", "default_girl");
+        CustomGirlProfile p = CustomGirlLoader.PROFILES.get(id);
+        this.profile = (p != null ? p : CustomGirlProfile.DEFAULT);
     }
 
     @Override

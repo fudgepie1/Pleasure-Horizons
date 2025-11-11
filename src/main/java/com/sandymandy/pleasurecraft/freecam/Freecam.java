@@ -55,8 +55,6 @@ public class Freecam {
                 );
                 mc.player.input = input;
             }
-
-            mc.gameRenderer.setRenderHand(ModConfig.INSTANCE.visual.showHand);
         }
     }
 
@@ -222,7 +220,6 @@ public class Freecam {
 
     private static void onEnable() {
         MC.chunkCullingEnabled = false;
-        MC.gameRenderer.setRenderHand(ModConfig.INSTANCE.visual.showHand);
 
         rememberedF5 = MC.options.getPerspective();
         if (MC.gameRenderer.getCamera().isThirdPerson()) {
@@ -232,7 +229,6 @@ public class Freecam {
 
     private static void onDisable() {
         MC.chunkCullingEnabled = true;
-        MC.gameRenderer.setRenderHand(true);
         MC.setCameraEntity(MC.player);
         playerControlEnabled = false;
         freeCamera.despawn();

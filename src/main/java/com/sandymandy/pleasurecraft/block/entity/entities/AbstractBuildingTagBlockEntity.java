@@ -9,6 +9,8 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.state.property.Properties;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Uuids;
@@ -42,19 +44,28 @@ public class AbstractBuildingTagBlockEntity extends BlockEntity {
 
     // --- Saving / Loading ---
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registries) {
-        super.writeNbt(nbt, registries);
-        nbt.put("BuildingType", BuildingType.CODEC, buildingType);
-        nbt.put("BuildingId", Uuids.CODEC, buildingId);
-        if(settlement != null) nbt.put("Settlement", Settlement.CODEC, settlement);
+    protected void writeData(WriteView view) {
+        super.writeData(view);
+        view.put("BuildingType", BuildingType.CODEC, buildingType);
+        view.put("BuildingId", Uuids.CODEC, buildingId);
+        if(settlement != null) view.put("Settlement", Settlement.CODEC, settlement);
     }
 
     @Override
-    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registries) {
-        super.readNbt(nbt, registries);
-        if (nbt.contains("BuildingType")) this.buildingType = nbt.get("BuildingType", BuildingType.CODEC).get();
-        if (nbt.contains("BuildingId")) this.buildingId = nbt.get("BuildingId", Uuids.CODEC).get();
-        if (nbt.contains("Settlement")) this.settlement = nbt.get("Settlement", Settlement.CODEC).get();
+    public void readData(ReadView view) {
+        super.readData(view);
+
+        // BuildingType
+        view.read("BuildingType", BuildingType.CODEC)
+                .ifPresent(value -> this.buildingType = value);
+
+        // Building ID (UUID)
+        view.read("BuildingId", Uuids.CODEC)
+                .ifPresent(value -> this.buildingId = value);
+
+        // Settlement
+        view.read("Settlement", Settlement.CODEC)
+                .ifPresent(value -> this.settlement = value);
     }
 
     // Optional tick method

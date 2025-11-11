@@ -6,12 +6,15 @@ import com.sandymandy.pleasurecraft.settlement.SettlementDisplay;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.screen.advancement.AdvancementTab;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
+import org.joml.Matrix3x2f;
 
 import java.util.List;
 
@@ -65,8 +68,8 @@ public class SettlementTab {
         }
 
         context.enableScissor(x, y, x + 234, y + 113);
-        context.getMatrices().push();
-        context.getMatrices().translate((float)x, (float)y, 0.0F);
+        context.getMatrices().pushMatrix();
+        context.getMatrices().translate((float)x, (float)y);
 
         Identifier bgTex = display.getBackground();
 
@@ -78,7 +81,7 @@ public class SettlementTab {
         // Draw tiled background
         for (int m = -1; m <= 15; m++) {
             for (int n = -1; n <= 8; n++) {
-                context.drawTexture(RenderLayer::getGuiTextured, bgTex,
+                context.drawTexture(RenderPipelines.GUI_TEXTURED, bgTex,
                         offsetX + 16 * m, offsetY + 16 * n,
                         0, 0, 16, 16, 16, 16);
             }
@@ -89,7 +92,7 @@ public class SettlementTab {
             renderable.render(context, 0, 0);
         }
 
-        context.getMatrices().pop();
+        context.getMatrices().popMatrix();
         context.disableScissor();
     }
 

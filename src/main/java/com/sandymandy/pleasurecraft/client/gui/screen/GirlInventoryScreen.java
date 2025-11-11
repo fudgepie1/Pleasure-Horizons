@@ -1,5 +1,6 @@
 package com.sandymandy.pleasurecraft.client.gui.screen;
 
+import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.entity.base.TameableGirlEntity;
 import com.sandymandy.pleasurecraft.networking.C2S.InInventoryC2SPacket;
@@ -7,6 +8,7 @@ import com.sandymandy.pleasurecraft.registries.InventoryButtonRegistry;
 import com.sandymandy.pleasurecraft.screen.GirlInventoryScreenHandler;
 import com.sandymandy.pleasurecraft.screen.InventoryButtonAction;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
@@ -38,7 +40,7 @@ public class GirlInventoryScreen extends HandledScreen<GirlInventoryScreenHandle
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         int alpha = 120; // adjust blur opacity
-        context.fillGradient(alpha, 0, 0, this.height, this.width, 0xAA000000, 0xAA000000);
+//        context.fillGradient(alpha, 0, 0, this.height, this.width, 0xAA000000, 0xAA000000);
         super.render(context, mouseX, mouseY, delta);
 //        drawMouseoverTooltip(context,mouseX,mouseY);
 
@@ -55,7 +57,7 @@ public class GirlInventoryScreen extends HandledScreen<GirlInventoryScreenHandle
         int centerY = (height - GUI_HEIGHT) / 2;
         int i = this.x;
         int j = this.y;
-        context.drawTexture(RenderLayer::getGuiTextured,TEXTURE, centerX, centerY, 0, 0, GUI_WIDTH, GUI_HEIGHT, GUI_WIDTH, GUI_HEIGHT);
+        context.drawTexture(RenderPipelines.GUI_TEXTURED, TEXTURE, centerX, centerY, 0, 0, GUI_WIDTH, GUI_HEIGHT, GUI_WIDTH, GUI_HEIGHT);
         InventoryScreen.drawEntity(context, i + 26, j + 8, i + 75, j + 78, this.girl.getSizeGUI(), this.girl.getYAxisGUI(), mouseX, mouseY, this.girl);
 
         int relLevel = girl.getCurrentRelationshipLevel();
@@ -68,7 +70,7 @@ public class GirlInventoryScreen extends HandledScreen<GirlInventoryScreenHandle
         int iconY = centerY - 20;
 
         // draw the effect texture (assumes 18x18 size like vanilla)
-        context.drawTexture(RenderLayer::getGuiTextured, HEALTH_BOOST_ICON,
+        context.drawTexture(RenderPipelines.GUI_TEXTURED, HEALTH_BOOST_ICON,
                 iconX, iconY, 0, 0, 18, 18, 18, 18);
 
         // draw the number next to it
@@ -76,6 +78,7 @@ public class GirlInventoryScreen extends HandledScreen<GirlInventoryScreenHandle
                 iconX + 20, iconY + 5, 0xFFFFFF, true);
 
     }
+
 
     @Override
     public void close() {

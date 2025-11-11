@@ -31,7 +31,6 @@ import net.minecraft.inventory.Inventories;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.RegistryWrapper;
@@ -40,6 +39,8 @@ import net.minecraft.registry.tag.TagKey;
 import net.minecraft.scoreboard.Team;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
@@ -463,60 +464,55 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
     }
 
     @Override
-    public void writeCustomDataToNbt(NbtCompound nbt) {
-        super.writeCustomDataToNbt(nbt);
+    public void writeCustomData(WriteView view) {
+        super.writeCustomData(view);
         RegistryWrapper.WrapperLookup registryLookup = this.getWorld().getRegistryManager();
-        Inventories.writeNbt(nbt, this.inventory.getItems(), registryLookup);
-        nbt.putBoolean("SitSate", this.isSitting());
-        nbt.putBoolean("StripState", this.isStripped());
-        nbt.putBoolean("SceneState", this.isSceneActive());
-        nbt.putInt("RelationshipLevel", this.getCurrentRelationshipLevel());
+        Inventories.writeData(view, this.inventory.getItems());
+        view.putBoolean("SitSate", this.isSitting());
+        view.putBoolean("StripState", this.isStripped());
+        view.putBoolean("SceneState", this.isSceneActive());
+        view.putInt("RelationshipLevel", this.getCurrentRelationshipLevel());
 
-        nbt.putInt("BaseX", this.getBasePos().getX());
-        nbt.putInt("BaseY", this.getBasePos().getY());
-        nbt.putInt("BaseZ", this.getBasePos().getZ());
+        view.putInt("BaseX", this.getBasePos().getX());
+        view.putInt("BaseY", this.getBasePos().getY());
+        view.putInt("BaseZ", this.getBasePos().getZ());
 
         LazyEntityReference<LivingEntity> lazyEntityReference = this.getOwnerReference();
         if (lazyEntityReference != null) {
-            lazyEntityReference.writeNbt(nbt, "Owner");
+            lazyEntityReference.writeData(view, "Owner");
         }
 
-        nbt.putBoolean("Sitting", this.isSitting());
+        view.putBoolean("Sitting", this.isSitting());
     }
 
     @Override
-    public void readCustomDataFromNbt(NbtCompound nbt) {
-        super.readCustomDataFromNbt(nbt);
+    public void readCustomData(ReadView view) {
+        super.readCustomData(view);
 
         var w = this.getWorld();
         if (w != null) {
-            RegistryWrapper.WrapperLookup registryLookup = w.getRegistryManager();
-            Inventories.readNbt(nbt, this.inventory.getItems(), registryLookup);
+            Inventories.readData(view, this.inventory.getItems());
         }
 
-        boolean sitting = nbt.getBoolean("Sitting")
-                .or(() -> nbt.getBoolean("SitState"))
-                .or(() -> nbt.getBoolean("SitSate"))
-                .orElse(false);
+        boolean sitting = view.getBoolean("Sitting", false);
 
         this.setSitting(sitting);
         this.setInSittingPose(sitting);
 
-        boolean stripped = nbt.getBoolean("StripState").orElse(false);
+        boolean stripped = view.getBoolean("StripState", false);
         this.setStripped(stripped);
 
-        int relationship = nbt.getInt("RelationshipLevel").orElse(0);
+        int relationship = view.getInt("RelationshipLevel", 0);
         this.setCurrentRelationshipLevel(relationship);
 
-        if (nbt.contains("BaseX") && nbt.contains("BaseY") && nbt.contains("BaseZ")) {
-            int x = nbt.getInt("BaseX").orElse(0);
-            int y = nbt.getInt("BaseY").orElse(0);
-            int z = nbt.getInt("BaseZ").orElse(0);
-            this.setBasePos(new BlockPos(x, y, z));
-        }
+        int x = view.getInt("BaseX",0);
+        int y = view.getInt("BaseY", 0);
+        int z = view.getInt("BaseZ", 0);
+        this.setBasePos(new BlockPos(x, y, z));
+
 
         LazyEntityReference<LivingEntity> lazyEntityReference =
-                LazyEntityReference.fromNbtOrPlayerName(nbt, "Owner", this.getWorld());
+                LazyEntityReference.fromDataOrPlayerName(view, "Owner", this.getWorld());
 
         if (lazyEntityReference != null) {
             try {
@@ -535,31 +531,19 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
         return true;
     }
 
-    @Override
-    public boolean beforeLeashTick(Entity leashHolder, float distance) {
-        if (this.isInSittingPose()) {
-            if (distance > 10.0F) {
-                this.detachLeash();
-            }
-
-            return false;
-        } else {
-            return super.beforeLeashTick(leashHolder, distance);
-        }
-    }
-
     protected void showEmoteParticle(boolean positive) {
         ParticleEffect particleEffect = ParticleTypes.HEART;
         if (!positive) {
             particleEffect = ParticleTypes.SMOKE;
         }
 
-        for (int i = 0; i < 7; i++) {
+        for(int i = 0; i < 7; ++i) {
             double d = this.random.nextGaussian() * 0.02;
             double e = this.random.nextGaussian() * 0.02;
             double f = this.random.nextGaussian() * 0.02;
-            this.getWorld().addParticleClient(particleEffect, this.getParticleX(1.0), this.getRandomBodyY() + 0.5, this.getParticleZ(1.0), d, e, f);
+            this.getWorld().addParticleClient(particleEffect, this.getParticleX((double)1.0F), this.getRandomBodyY() + (double)0.5F, this.getParticleZ((double)1.0F), d, e, f);
         }
+
     }
 
     @Override
@@ -574,7 +558,7 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
     }
 
     public boolean isTamed() {
-        return (this.dataTracker.get(TAMEABLE_FLAGS) & 4) != 0;
+        return ((Byte)this.dataTracker.get(TAMEABLE_FLAGS) & 4) != 0;
     }
 
     public void setTamed(boolean tamed, boolean updateAttributes) {
@@ -609,7 +593,7 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
     @Nullable
     @Override
     public LazyEntityReference<LivingEntity> getOwnerReference() {
-        return (LazyEntityReference<LivingEntity>)this.dataTracker.get(OWNER_UUID).orElse(null);
+        return (LazyEntityReference)((Optional)this.dataTracker.get(OWNER_UUID)).orElse((Object)null);
     }
 
     public void setOwner(@Nullable LivingEntity owner) {
@@ -662,7 +646,7 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
     @Override
     protected boolean isInSameTeam(Entity other) {
         if (this.isTamed()) {
-            LivingEntity livingEntity = this.getOwner();
+            LivingEntity livingEntity = this.getTopLevelOwner();
             if (other == livingEntity) {
                 return true;
             }

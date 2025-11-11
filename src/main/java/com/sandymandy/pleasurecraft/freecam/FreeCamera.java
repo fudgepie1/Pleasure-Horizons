@@ -16,6 +16,7 @@ import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.resource.featuretoggle.FeatureSet;
 import net.minecraft.server.ServerLinks;
+import net.minecraft.util.PlayerInput;
 import net.minecraft.util.math.BlockPos;
 import com.sandymandy.pleasurecraft.config.ModConfig;
 import org.jetbrains.annotations.ApiStatus;
@@ -61,7 +62,7 @@ public class FreeCamera extends ClientPlayerEntity {
     };
 
     public FreeCamera(int id) {
-        super(MC, MC.world, NETWORK_HANDLER, MC.player.getStatHandler(), MC.player.getRecipeBook(), false, false);
+        super(MC, MC.world, NETWORK_HANDLER, MC.player.getStatHandler(), MC.player.getRecipeBook(), PlayerInput.DEFAULT, false);
 
         setId(id);
         setPose(EntityPose.SWIMMING);

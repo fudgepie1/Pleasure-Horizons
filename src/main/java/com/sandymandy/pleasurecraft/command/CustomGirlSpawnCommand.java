@@ -85,13 +85,7 @@ public class CustomGirlSpawnCommand {
 
         // Apply profile and attributes
         girl.setProfile(profile);
-        girl.getAttributeInstance(net.minecraft.entity.attribute.EntityAttributes.MAX_HEALTH)
-                .setBaseValue(profile.maxHealth());
-        girl.getAttributeInstance(net.minecraft.entity.attribute.EntityAttributes.MOVEMENT_SPEED)
-                .setBaseValue(profile.movementSpeed());
-        girl.getAttributeInstance(net.minecraft.entity.attribute.EntityAttributes.ATTACK_DAMAGE)
-                .setBaseValue(profile.attackDamage());
-        girl.setHealth((float) profile.maxHealth());
+
 
         // Position & rotation
         girl.refreshPositionAndAngles(pos.x, pos.y, pos.z, source.getRotation().y, 0);

@@ -5,6 +5,7 @@ import com.sandymandy.pleasurecraft.networking.C2S.StartSceneC2SPacket;
 import com.sandymandy.pleasurecraft.util.variables.SceneOptions;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tooltip.Tooltip;
@@ -55,7 +56,7 @@ public class GirlSceneScreen extends Screen {
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         int alpha = 120; // adjust blur opacity
-        context.fillGradient(alpha, 0, 0, this.height, this.width, 0xAA000000, 0xAA000000);
+//        context.fillGradient(alpha, 0, 0, this.height, this.width, 0xAA000000, 0xAA000000);
         super.render(context, mouseX, mouseY, delta);
 
         // draw relationship icon + number
@@ -64,7 +65,7 @@ public class GirlSceneScreen extends Screen {
         int iconX = this.width / 2 - 10; // position from top-left corner
         int iconY = this.height / 4 - 30;
 
-        context.drawTexture(RenderLayer::getGuiTextured, RELATIONSHIP_ICON, iconX, iconY, 0, 0, 18, 18, 18, 18);
+        context.drawTexture(RenderPipelines.GUI_TEXTURED, RELATIONSHIP_ICON, iconX, iconY, 0, 0, 18, 18, 18, 18);
 
         // draw the number next to it
         context.drawText(MinecraftClient.getInstance().textRenderer,
