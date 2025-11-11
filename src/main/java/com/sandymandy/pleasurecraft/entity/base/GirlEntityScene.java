@@ -411,11 +411,11 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
         List<String> playerMsgs = SceneKeyframeEventRegistry.getPlayerMessage(key);
 
         for (String msg : girlMsgs) {
-            this.messageAsEntity(false, PleasureCraftLangUtils.getStringFromKey(msg));
+            this.messageAsEntity(false, msg);
         }
 
         for (String msg : playerMsgs) {
-            this.messageAsOwner(PleasureCraftLangUtils.getStringFromKey(msg));
+            this.messageAsOwner(msg);
         }
     }
 

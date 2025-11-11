@@ -56,16 +56,16 @@ public class SceneKeyframeEventLoader {
 
                     // --- Messages ---
                     if (scene.has("player_messages")) {
-                        for (String message : jsonArrayToList(scene.getAsJsonArray("messages"))) {
+                        for (String message : jsonArrayToList(scene.getAsJsonArray("player_messages"))) {
                             SceneKeyframeEventRegistry.registerPlayerMessage(key, message);
                         }
                     }
                 }
 
-                PleasureCraft.LOGGER.info("[SceneKeyframeLoader] Loaded scene keyframe events for {}", girlID);
+                PleasureCraft.LOGGER.info("[SceneKeyframeEventLoader] Loaded scene keyframe events for {}", girlID);
 
             } catch (Exception e) {
-                PleasureCraft.LOGGER.error("[SceneKeyframeLoader] Failed to load scene keyframe events " + id, e);
+                PleasureCraft.LOGGER.error("[SceneKeyframeEventLoader] Failed to load scene keyframe events " + id, e);
             }
         });
     }

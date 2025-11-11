@@ -18,7 +18,7 @@ public class SceneKeyframeEventReloader {
 
             @Override
             public void reload(net.minecraft.resource.ResourceManager manager) {
-                PleasureCraft.LOGGER.info("[SceneKeyframeRegistryReloader] Reloading Scene Keyframes...");
+                PleasureCraft.LOGGER.info("[SceneKeyframeEventReloader] Reloading Scene Keyframes...");
                 SceneKeyframeEventLoader.loadFromAssets(manager);
             }
         });

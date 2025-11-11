@@ -61,10 +61,9 @@ public class SceneKeyframeEventRegistry {
     }
 
     // --- Register Player message ---
-    public static void registerPlayerMessage(String frameKey, String langKey) {
+    public static void registerPlayerMessage(String frameKey, String message) {
         frameKey = frameKey.toLowerCase();
-        String msgKey = "sceneMsg.player." + langKey;
-        PLAYER_MESSAGES.computeIfAbsent(frameKey, k -> new ArrayList<>()).add(msgKey);
+        PLAYER_MESSAGES.computeIfAbsent(frameKey, k -> new ArrayList<>()).add(message);
     }
 
     public static List<String> getPlayerMessage(String key) {
