@@ -10,7 +10,8 @@
       ],
       "messages": [
         "*Sigh*"
-      ]
+      ],
+      "player_messages": []
     },
     {
       "key": "doggyCumMSG1",
@@ -21,7 +22,8 @@
       "random_sounds": [],
       "messages": [
         "OooOh~"
-      ]
+      ],
+      "player_messages": []
     }
   ]
 }

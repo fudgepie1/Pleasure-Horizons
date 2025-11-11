@@ -1,7 +1,6 @@
 package com.sandymandy.pleasurecraft.entity.girls;
 
 import com.sandymandy.pleasurecraft.entity.base.GirlEntityAI;
-import com.sandymandy.pleasurecraft.registries.SceneKeyframeRegistry;
 import com.sandymandy.pleasurecraft.util.json.CustomGirlLoader;
 import com.sandymandy.pleasurecraft.util.variables.CustomGirlProfile;
 import com.sandymandy.pleasurecraft.util.variables.SceneOptions;
@@ -13,7 +12,6 @@ import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.item.Item;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.sound.SoundEvent;
 import net.minecraft.world.World;
 
 import java.util.List;
@@ -111,11 +109,12 @@ public class CustomGirlEntity extends GirlEntityAI {
         }
     }
 
+    /*
     @Override
     protected void messageHandler() {
         String key = getAnimationKeyFrameEvent();
 
-        List<String> girlMsgs = SceneKeyframeRegistry.getCustomGirlMessage(this.getGirlID(), key);
+        List<String> girlMsgs = SceneKeyframeRegistry.getMessage(this.getGirlID(), key);
 
         for (String msg : girlMsgs) {
             this.messageAsEntity(false, msg);
@@ -134,4 +133,5 @@ public class CustomGirlEntity extends GirlEntityAI {
             this.playSound(sound, 1.0f, 1.0f);
         }
     }
+     */
 }

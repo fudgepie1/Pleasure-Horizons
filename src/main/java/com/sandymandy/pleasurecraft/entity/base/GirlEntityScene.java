@@ -7,7 +7,7 @@ import com.sandymandy.pleasurecraft.networking.C2S.*;
 import com.sandymandy.pleasurecraft.networking.S2C.ClothingArmorVisibilityS2CPacket;
 import com.sandymandy.pleasurecraft.networking.S2C.PlayCumHudAnimationS2CPacket;
 import com.sandymandy.pleasurecraft.registries.PleasureCraftTrackedDataRegistry;
-import com.sandymandy.pleasurecraft.registries.SceneKeyframeRegistry;
+import com.sandymandy.pleasurecraft.registries.SceneKeyframeEventRegistry;
 import com.sandymandy.pleasurecraft.util.PleasureCraftLangUtils;
 import com.sandymandy.pleasurecraft.util.PleasureCraftMessages;
 import com.sandymandy.pleasurecraft.util.Utils;
@@ -23,11 +23,9 @@ import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.DyedColorComponent;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
-import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.tag.BlockTags;
@@ -398,7 +396,7 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
         String key = getAnimationKeyFrameEvent();
 
         // Get all sounds for this key
-        List<SoundEvent> sounds = SceneKeyframeRegistry.getSound(this.getType(), key);
+        List<SoundEvent> sounds = SceneKeyframeEventRegistry.getSound(this.getGirlID(), key);
 
         // Play all sounds sequentially (or simultaneously)
         for (SoundEvent sound : sounds) {
@@ -409,8 +407,8 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
     protected void messageHandler() {
         String key = getAnimationKeyFrameEvent();
 
-        List<String> girlMsgs = SceneKeyframeRegistry.getMessage(this.getType(), key);
-        List<String> playerMsgs = SceneKeyframeRegistry.getPlayerMessage(key);
+        List<String> girlMsgs = SceneKeyframeEventRegistry.getMessage(this.getGirlID(), key);
+        List<String> playerMsgs = SceneKeyframeEventRegistry.getPlayerMessage(key);
 
         for (String msg : girlMsgs) {
             this.messageAsEntity(false, PleasureCraftLangUtils.getStringFromKey(msg));

@@ -5,7 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.sandymandy.pleasurecraft.PleasureCraft;
-import com.sandymandy.pleasurecraft.registries.SceneKeyframeRegistry;
+import com.sandymandy.pleasurecraft.registries.SceneKeyframeEventRegistry;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Identifier;
@@ -15,7 +15,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SceneKeyframeLoader {
+public class SceneKeyframeEventLoader {
 
     public static void loadFromAssets(ResourceManager resourceManager) {
 
@@ -34,7 +34,7 @@ public class SceneKeyframeLoader {
                     if (scene.has("sounds")) {
                         for (String soundId : jsonArrayToList(scene.getAsJsonArray("sounds"))) {
                             SoundEvent sound = SoundEvent.of(Identifier.of(soundId));
-                            SceneKeyframeRegistry.registerCustomGirlSound(girlID, key, sound);
+                            SceneKeyframeEventRegistry.registerSound(girlID, key, sound);
                         }
                     }
 
@@ -44,21 +44,28 @@ public class SceneKeyframeLoader {
                         List<SoundEvent> soundEvents = randomIds.stream()
                                 .map(idStr -> SoundEvent.of(Identifier.of(idStr)))
                                 .toList();
-                        SceneKeyframeRegistry.registerCustomGirlSound(girlID, key, soundEvents);
+                        SceneKeyframeEventRegistry.registerSound(girlID, key, soundEvents);
                     }
 
                     // --- Messages ---
                     if (scene.has("messages")) {
                         for (String message : jsonArrayToList(scene.getAsJsonArray("messages"))) {
-                            SceneKeyframeRegistry.registerCustomGirlMessage(girlID, key, message);
+                            SceneKeyframeEventRegistry.registerMessage(girlID, key, message);
+                        }
+                    }
+
+                    // --- Messages ---
+                    if (scene.has("player_messages")) {
+                        for (String message : jsonArrayToList(scene.getAsJsonArray("messages"))) {
+                            SceneKeyframeEventRegistry.registerPlayerMessage(key, message);
                         }
                     }
                 }
 
-                PleasureCraft.LOGGER.info("[SceneKeyframeLoader] Loaded custom scene JSON for {}", girlID);
+                PleasureCraft.LOGGER.info("[SceneKeyframeLoader] Loaded scene keyframe events for {}", girlID);
 
             } catch (Exception e) {
-                PleasureCraft.LOGGER.error("[SceneKeyframeLoader] Failed to load scene JSON " + id, e);
+                PleasureCraft.LOGGER.error("[SceneKeyframeLoader] Failed to load scene keyframe events " + id, e);
             }
         });
     }

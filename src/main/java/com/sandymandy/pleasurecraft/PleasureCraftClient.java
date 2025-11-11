@@ -13,7 +13,7 @@ import com.sandymandy.pleasurecraft.networking.C2S.ThrustKeybindC2SPacket;
 import com.sandymandy.pleasurecraft.networking.PleasureCraftClientPackets;
 import com.sandymandy.pleasurecraft.registries.GirlRegistry;
 import com.sandymandy.pleasurecraft.registries.PleasureCraftHudRegistry;
-import com.sandymandy.pleasurecraft.util.SceneKeyframeRegistryReloader;
+import com.sandymandy.pleasurecraft.util.SceneKeyframeEventReloader;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
@@ -48,7 +48,7 @@ public class PleasureCraftClient implements ClientModInitializer {
         PleasureCraftClientPackets.registerS2CPackets();
         PleasureCraftHudRegistry.register();
         handleKeybinds();
-        SceneKeyframeRegistryReloader.registerReloader();
+        SceneKeyframeEventReloader.registerReloader();
     }
 
     private static void handleKeybinds() {

@@ -69,7 +69,7 @@
 
         public static void registerSoundEvents() {
             PleasureCraft.LOGGER.info("Registering SoundEvents for PleasureCraft");
-            SceneKeyframeRegistry.registerSoundEvents();
+            SceneKeyframeEventRegistry.registerSoundEvents();
         }
 
         private static SoundEvent registerSound(String soundPath) {
