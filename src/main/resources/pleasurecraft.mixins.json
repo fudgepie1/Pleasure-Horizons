@@ -6,26 +6,7 @@
   "mixins": [
   ],
   "client": [
-    "freecam.BlockStateBaseMixin",
-    "freecam.BubbleColumnAmbientSoundHandlerMixin",
-    "freecam.CameraMixin",
-    "freecam.ClientPacketListenerMixin",
-    "freecam.EntityMixin",
-    "freecam.EntityRenderDispatcherAccessor",
-    "freecam.EntityRenderDispatcherMixin",
-    "freecam.EntityRendererMixin",
-    "freecam.GameRendererMixin",
-    "freecam.GuiMixin",
-    "freecam.ItemInHandRendererMixin",
-    "freecam.LevelRendererMixin",
-    "freecam.LightTextureMixin",
-    "freecam.LivingEntityMixin",
-    "freecam.LocalPlayerMixin",
-    "freecam.MinecraftMixin",
-    "freecam.MultiPlayerGameModeMixin",
-    "freecam.OptionsMixin",
-    "freecam.ScreenHandlerMixin",
-    "geckolib.GeoBoneMixin",
+    "geckolib.GeoBoneMixin"
   ],
   "injectors": {
     "defaultRequire": 1

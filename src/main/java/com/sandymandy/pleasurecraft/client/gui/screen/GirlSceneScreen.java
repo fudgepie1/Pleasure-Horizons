@@ -12,6 +12,7 @@ import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.text.Text;
+import net.minecraft.util.Colors;
 import net.minecraft.util.Identifier;
 
 import java.util.List;
@@ -56,7 +57,6 @@ public class GirlSceneScreen extends Screen {
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         int alpha = 120; // adjust blur opacity
-//        context.fillGradient(alpha, 0, 0, this.height, this.width, 0xAA000000, 0xAA000000);
         super.render(context, mouseX, mouseY, delta);
 
         // draw relationship icon + number
@@ -70,7 +70,7 @@ public class GirlSceneScreen extends Screen {
         // draw the number next to it
         context.drawText(MinecraftClient.getInstance().textRenderer,
                 String.valueOf(currentRelationshipLevel),
-                iconX + 20, iconY + 4, 0xFFFFFF, true);
+                iconX + 20, iconY + 4, Colors.WHITE, true);
 
 
     }

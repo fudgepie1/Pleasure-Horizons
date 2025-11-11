@@ -18,6 +18,7 @@ import net.minecraft.client.render.RenderLayer;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.text.Text;
+import net.minecraft.util.Colors;
 import net.minecraft.util.Identifier;
 
 public class GirlInventoryScreen extends HandledScreen<GirlInventoryScreenHandler> {
@@ -40,7 +41,6 @@ public class GirlInventoryScreen extends HandledScreen<GirlInventoryScreenHandle
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         int alpha = 120; // adjust blur opacity
-//        context.fillGradient(alpha, 0, 0, this.height, this.width, 0xAA000000, 0xAA000000);
         super.render(context, mouseX, mouseY, delta);
 //        drawMouseoverTooltip(context,mouseX,mouseY);
 
@@ -74,8 +74,8 @@ public class GirlInventoryScreen extends HandledScreen<GirlInventoryScreenHandle
                 iconX, iconY, 0, 0, 18, 18, 18, 18);
 
         // draw the number next to it
-        context.drawText(this.textRenderer, String.valueOf(relLevel),
-                iconX + 20, iconY + 5, 0xFFFFFF, true);
+        context.drawText(this.textRenderer, Text.literal(String.valueOf(relLevel)),
+                iconX + 20, iconY + 5, Colors.WHITE, true);
 
     }
 
