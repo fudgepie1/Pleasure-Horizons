@@ -22,7 +22,7 @@ public class GirlFollowOwnerGoal extends Goal {
     private final float minDistance;
     private float oldWaterPathfindingPenalty;
 
-    public GirlFollowOwnerGoal(TameableGirlEntity tameable, double speed, float minDistance, float maxDistance) {
+    public GirlFollowOwnerGoal(TameableGirlEntity tameable, double speed, double runSpeed, float minDistance, float maxDistance) {
         this.tameable = tameable;
         this.speed = speed;
         this.navigation = tameable.getNavigation();

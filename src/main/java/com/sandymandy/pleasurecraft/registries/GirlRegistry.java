@@ -12,13 +12,13 @@ public class GirlRegistry {
 
     public static final EntityType<MomoEntity> MOMO = PleasureCraftEntities.registerGirl("momo", MomoEntity::new, 0.5f, 1.65f, MomoEntity::createAttributes);
 
-    public static final EntityType<SlimeEntity> SLIME = PleasureCraftEntities.registerGirl("slime", SlimeEntity::new, 0.5f, 1.65f, SlimeEntity::createAttributes);
+    public static final EntityType<SlimeEntity> SLIME = PleasureCraftEntities.registerGirl("slime", SlimeEntity::new, 0.5f, 1.95f, SlimeEntity::createAttributes);
 
 
     public static final EntityType<CustomGirlEntity> CUSTOM_GIRL = PleasureCraftEntities.registerGirl(
             "custom_girl",
             CustomGirlEntity::new,
-            0.5f, 1.8f,false,
+            0.5f, 1.95f,false,
             CustomGirlEntity::createDefaultAttributes
     );
 

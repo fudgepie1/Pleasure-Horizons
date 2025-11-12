@@ -66,9 +66,10 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
     private static final TrackedData<Boolean> OVERRIDE_LOOP = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<Boolean> OVERRIDE_HOLD = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<Boolean> OVERRIDE_ANIM_PLAYING = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
-    private static final TrackedData<Boolean> IS_PLAYER_MODEL_SLIM = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+    private static final TrackedData<Boolean> PLAYER_MODEL_SLIM = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<Boolean> HAVING_SEX = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<Boolean> SITTING = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+    private static final TrackedData<Boolean> RUNNING = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<String> OVERRIDE_ANIM = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.STRING);
     private static final TrackedData<String> SCENE_ANIM = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.STRING);
     private static final TrackedData<Integer> RELATIONSHIP_LEVEL = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.INTEGER);
@@ -113,8 +114,10 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
         builder.add(OVERRIDE_LOOP, false);
         builder.add(OVERRIDE_HOLD, false);
         builder.add(OVERRIDE_ANIM_PLAYING, false);
-        builder.add(IS_PLAYER_MODEL_SLIM, false);
+        builder.add(PLAYER_MODEL_SLIM, false);
         builder.add(HAVING_SEX, false);
+        builder.add(SITTING, false);
+        builder.add(RUNNING, false);
         builder.add(RELATIONSHIP_LEVEL,0);
         builder.add(MAX_RELATIONSHIP_LEVEL,0);
         builder.add(PASSENGER_BONE_POSITION, Vec3d.ZERO);
@@ -123,7 +126,6 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
         builder.add(SCENE_ANIM,"");
         builder.add(TAMEABLE_FLAGS, (byte)0);
         builder.add(OWNER_UUID, Optional.empty());
-        builder.add(SITTING, false);
     }
 
     public void setFollowing(boolean follow) {
@@ -207,11 +209,11 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
     }
 
     public void setIsPlayerModelSlim(boolean isSlim){
-        this.dataTracker.set(IS_PLAYER_MODEL_SLIM, isSlim);
+        this.dataTracker.set(PLAYER_MODEL_SLIM, isSlim);
     }
 
     public boolean isPlayerModelSlim(){
-        return this.dataTracker.get(IS_PLAYER_MODEL_SLIM);
+        return this.dataTracker.get(PLAYER_MODEL_SLIM);
     }
 
     public void setHavingSex(boolean state) {
@@ -220,6 +222,14 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
 
     public boolean isHavingSex() {
         return this.dataTracker.get(HAVING_SEX);
+    }
+
+    public void setRunning(boolean state) {
+        this.dataTracker.set(RUNNING, state);
+    }
+
+    public boolean isRunning() {
+        return this.dataTracker.get(RUNNING);
     }
 
     public int getCurrentRelationshipLevel() { return this.dataTracker.get(RELATIONSHIP_LEVEL);}
@@ -454,6 +464,7 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
             this.setOwner((LivingEntity) null); // Remove the owner UUID
             this.setSitting(false); // Ensure the entity is not sitting
             this.setStripped(false);
+            this.dropInventory((ServerWorld) this.getWorld());
             this.setCurrentRelationshipLevel(0);
             if(!isTamed() && !isOwner(player)){
                 player.sendMessage(Text.literal("§cYou Broke Up With " + getGirlDisplayName()), true);
