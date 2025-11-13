@@ -4,6 +4,7 @@
   "package": "com.sandymandy.pleasurecraft.mixins",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "bugfix.ScreenHandlerMixin"
   ],
   "client": [
     "geckolib.GeoBoneMixin"
