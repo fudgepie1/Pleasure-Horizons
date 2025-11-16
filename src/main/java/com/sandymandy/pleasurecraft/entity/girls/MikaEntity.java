@@ -75,7 +75,7 @@ public class MikaEntity extends GirlEntityAI {
     public static DefaultAttributeContainer.Builder createAttributes() {
         return MobEntity.createMobAttributes()
                 .add(EntityAttributes.MAX_HEALTH, 30)
-                .add(EntityAttributes.MOVEMENT_SPEED, .15)
+                .add(EntityAttributes.MOVEMENT_SPEED, .18)
                 .add(EntityAttributes.TEMPT_RANGE, 15)
                 .add(EntityAttributes.ATTACK_DAMAGE, 5);
 

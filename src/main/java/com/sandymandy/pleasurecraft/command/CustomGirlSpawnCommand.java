@@ -34,7 +34,7 @@ public class CustomGirlSpawnCommand {
                                 CommandManager.RegistrationEnvironment environment) {
 
         dispatcher.register(
-                literal("girl")
+                literal("girls")
                         .requires(src -> src.hasPermissionLevel(2))
                         .then(literal("spawn")
                                 // /girl spawn <id>

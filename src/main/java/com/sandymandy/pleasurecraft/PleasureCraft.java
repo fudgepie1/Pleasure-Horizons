@@ -3,16 +3,16 @@ package com.sandymandy.pleasurecraft;
 import com.sandymandy.pleasurecraft.advancement.criterion.PleasureCraftCriteria;
 import com.sandymandy.pleasurecraft.block.PleasureCraftBlocks;
 import com.sandymandy.pleasurecraft.block.entity.PleasureCraftBlockEntities;
+import com.sandymandy.pleasurecraft.command.Commands;
 import com.sandymandy.pleasurecraft.entity.ai.brain.GirlMemoryTypes;
 import com.sandymandy.pleasurecraft.item.PleasureCraftItemGroups;
 import com.sandymandy.pleasurecraft.item.PleasureCraftItems;
 import com.sandymandy.pleasurecraft.networking.PleasureCraftPackets;
 import com.sandymandy.pleasurecraft.registries.*;
-import com.sandymandy.pleasurecraft.settlement.SettlementManager;
+import com.sandymandy.pleasurecraft.util.managers.SettlementManager;
 import com.sandymandy.pleasurecraft.util.json.CustomGirlLoader;
-import com.sandymandy.pleasurecraft.command.CustomGirlSpawnCommand;
+import com.sandymandy.pleasurecraft.util.managers.TamedGirlManager;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.util.math.BlockPos;
 import org.slf4j.Logger;
@@ -33,6 +33,7 @@ public class PleasureCraft implements ModInitializer {
 		ServerTickEvents.END_WORLD_TICK.register(world -> {
 			if (!world.isClient()) {
 				SettlementManager.get(world).tick(world);
+				TamedGirlManager.get(world).cleanupDeadGirls(world);
 			}
 		});
 
@@ -50,8 +51,6 @@ public class PleasureCraft implements ModInitializer {
 		GirlMemoryTypes.registerMemoryTypes();
 		GirlRegistry.registerGirls();
 		CustomGirlLoader.register();
-
-
-		CommandRegistrationCallback.EVENT.register(CustomGirlSpawnCommand::register);
+		Commands.register();
 	}
 }

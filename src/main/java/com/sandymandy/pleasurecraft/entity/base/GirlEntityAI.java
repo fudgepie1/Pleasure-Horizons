@@ -73,11 +73,11 @@ public abstract class GirlEntityAI extends GirlEntityScene implements SmartBrain
             this.goalSelector.add(1, new SwimGoal(this));
             this.goalSelector.add(2, new LongDoorInteractGoal(this, true));
             this.goalSelector.add(3, new TameableEscapeDangerGoal(1.5D, DamageTypeTags.PANIC_ENVIRONMENTAL_CAUSES));
-            this.goalSelector.add(4, new WanderAroundGoal(this, 1.0D));
-            this.goalSelector.add(5, new GirlAttackGoal(this, 1.5, false));
-            this.goalSelector.add(6, new ConditionalGoal(new GirlFollowOwnerGoal(this, 1.0, 2.0, 10.0F, 2.0F), this::isFollowing));
+            this.goalSelector.add(4, new GirlAttackGoal(this, 1.5, false));
+            this.goalSelector.add(5, new ConditionalGoal(new GirlFollowOwnerGoal(this, 1.65, 5.0F, 2.0F), this::isFollowing));
+            this.goalSelector.add(6, new TemptGoal(this, 1.25D, Ingredient.ofItems(getTameItem()), false));
             this.goalSelector.add(7, new GirlStayNearBaseGoal(this, 1.0, 2.0F, 15.0F, 150));
-            this.goalSelector.add(8, new TemptGoal(this, 1.25D, Ingredient.ofItems(getTameItem()), false));
+            this.goalSelector.add(8, new WanderAroundGoal(this, 1.0D));
             this.goalSelector.add(9, new ConditionalGoal(new LookAtEntityGoal(this, PlayerEntity.class, 6.0F), () -> !isMovementLocked()));
             this.goalSelector.add(10, new ConditionalGoal(new LookAroundGoal(this), () -> !isMovementLocked()));
             this.targetSelector.add(1, new ConditionalGoal(new GirlTrackOwnerAttackerGoal(this), this::isFollowing));

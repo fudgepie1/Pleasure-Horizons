@@ -3,7 +3,7 @@ package com.sandymandy.pleasurecraft.block.blocks;
 import com.mojang.serialization.MapCodec;
 import com.sandymandy.pleasurecraft.block.entity.PleasureCraftBlockEntities;
 import com.sandymandy.pleasurecraft.block.entity.entities.SettlementHubBlockEntity;
-import com.sandymandy.pleasurecraft.settlement.SettlementManager;
+import com.sandymandy.pleasurecraft.util.managers.SettlementManager;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;

@@ -2,7 +2,7 @@ package com.sandymandy.pleasurecraft.util;
 
 import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.settlement.Settlement;
-import com.sandymandy.pleasurecraft.settlement.SettlementManager;
+import com.sandymandy.pleasurecraft.util.managers.SettlementManager;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.enums.BedPart;
@@ -14,7 +14,6 @@ import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.Identifier;

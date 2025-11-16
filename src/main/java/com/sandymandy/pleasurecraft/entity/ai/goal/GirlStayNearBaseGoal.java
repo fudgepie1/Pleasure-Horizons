@@ -35,6 +35,7 @@ public class GirlStayNearBaseGoal extends Goal {
 
     @Override
     public boolean canStart() {
+        if(!girl.isTamed()) return false    ;
         BlockPos basePos = girl.getBasePos();
         if (basePos == null || girl.isFollowing()) {
             return false;

@@ -1,7 +1,8 @@
-package com.sandymandy.pleasurecraft.settlement;
+package com.sandymandy.pleasurecraft.util.managers;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.sandymandy.pleasurecraft.settlement.Settlement;
 import net.minecraft.datafixer.DataFixTypes;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;

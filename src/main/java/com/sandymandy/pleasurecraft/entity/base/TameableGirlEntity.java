@@ -6,6 +6,7 @@ import com.sandymandy.pleasurecraft.screen.GirlInventoryScreenHandlerFactory;
 import com.sandymandy.pleasurecraft.util.PleasureCraftLangUtils;
 import com.sandymandy.pleasurecraft.util.PleasureCraftMessages;
 import com.sandymandy.pleasurecraft.util.inventory.GirlInventory;
+import com.sandymandy.pleasurecraft.util.managers.TamedGirlManager;
 import com.sandymandy.pleasurecraft.util.variables.SceneOptions;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.LeavesBlock;
@@ -109,7 +110,7 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
         builder.add(LOCKED_STATE, false);
         builder.add(FROZEN_STATE, false);
         builder.add(STRIPPED, false);
-        builder.add(FOLLOWING, true);
+        builder.add(FOLLOWING, false);
         builder.add(IN_SCENE, false);
         builder.add(OVERRIDE_LOOP, false);
         builder.add(OVERRIDE_HOLD, false);
@@ -448,6 +449,7 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
     private void tryTame(PlayerEntity player) {
         if (this.random.nextInt(3) == 0) {
             this.setTamedBy(player);
+            TamedGirlManager.get((ServerWorld) this.getWorld()).registerGirl(this);
             this.navigation.stop();
             setTarget(null);
             this.getWorld().sendEntityStatus(this, EntityStatuses.ADD_POSITIVE_PLAYER_REACTION_PARTICLES);
@@ -462,6 +464,7 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
         if(!player.getWorld().isClient){
             this.setTamed(false,true); // Mark the entity as untamed
             this.setOwner((LivingEntity) null); // Remove the owner UUID
+            TamedGirlManager.get((ServerWorld) this.getWorld()).removeGirl(this.getUuid());
             this.setSitting(false); // Ensure the entity is not sitting
             this.setStripped(false);
             this.dropInventory((ServerWorld) this.getWorld());
@@ -482,6 +485,7 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
         view.putBoolean("SitSate", this.isSitting());
         view.putBoolean("StripState", this.isStripped());
         view.putBoolean("SceneState", this.isSceneActive());
+        view.putBoolean("FollowState", this.isFollowing());
         view.putInt("RelationshipLevel", this.getCurrentRelationshipLevel());
 
         view.putInt("BaseX", this.getBasePos().getX());
@@ -509,6 +513,9 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
 
         this.setSitting(sitting);
         this.setInSittingPose(sitting);
+
+        boolean following = view.getBoolean("FollowState", false);
+        this.setFollowing(following);
 
         boolean stripped = view.getBoolean("StripState", false);
         this.setStripped(stripped);
@@ -751,6 +758,17 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
     @Override
     public void tick() {
         super.tick();
+        if (!this.getWorld().isClient()) {
+            ServerWorld world = (ServerWorld) this.getWorld();
+
+            if (this.isTamed()) {
+                TamedGirlManager.get(world).updateGirl(this);
+            }
+            else {
+                // not tamed anymore → remove
+                TamedGirlManager.get(world).removeGirl(this.getUuid());
+            }
+        }
         previousYaw = getYaw();
         previousVelocity = getVelocity();
         this.setMovementLockedState(this.isFrozenInPlace() || this.isWaitingAtBed() || this.isSceneActive());

@@ -8,6 +8,7 @@ import net.minecraft.util.math.Vec3d;
 import software.bernie.geckolib.constant.dataticket.DataTicket;
 
 import java.util.Map;
+import java.util.UUID;
 
 public class PleasureCraftDataTicketRegistry {
     public static final DataTicket<Boolean> IS_STRIPPED = DataTicket.create("is_stripped", Boolean.class);
@@ -28,5 +29,6 @@ public class PleasureCraftDataTicketRegistry {
     public static final DataTicket<Float> YAW = DataTicket.create("yaw", Float.class);
     public static final DataTicket<Float> PREVIOUS_YAW = DataTicket.create("previous_yaw", Float.class);
     public static final DataTicket<Vec3d> PREVIOUS_VELOCITY = DataTicket.create("previous_velocity", Vec3d.class);
+
 
 }

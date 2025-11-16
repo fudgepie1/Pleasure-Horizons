@@ -11,6 +11,7 @@ import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 
 import java.util.Objects;
+import java.util.UUID;
 
 public class PleasureCraftPackets {
 
@@ -74,14 +75,28 @@ public class PleasureCraftPackets {
                 ));
 
         ServerPlayNetworking.registerGlobalReceiver(BonePosSyncC2SPacket.ID,
-                (packet, context) -> Objects.requireNonNull(context.player().getServer()).execute(() -> {
-                            var entity = context.player().getWorld().getEntityById(packet.entityId());
-                            if (entity instanceof GirlEntityScene girl) {
-                                girl.setPassengerBonePosition(packet.position());
-                            }
+                (packet, context) -> {
+                    var server = context.player().getServer();
+                    if (server == null) return;
 
+                    server.execute(() -> {
+                        var world = context.player().getWorld();
+                        var entity = world.getEntityById(packet.entityId());
+
+                        if (!(entity instanceof GirlEntityScene girl))
+                            return;
+
+                        if (!girl.isOwner(context.player())) {
+                            // Not the owner — ignore
+                            return;
                         }
-                ));
+
+                        // 3. Safe → update the bone pos
+                        girl.setPassengerBonePosition(packet.position());
+                    });
+                }
+        );
+
 
         ServerPlayNetworking.registerGlobalReceiver(AnimationSyncC2SPacket.ID,
                 (packet, context) -> Objects.requireNonNull(context.player().getServer()).execute(() -> {

@@ -22,7 +22,7 @@ public class GirlFollowOwnerGoal extends Goal {
     private final float minDistance;
     private float oldWaterPathfindingPenalty;
 
-    public GirlFollowOwnerGoal(TameableGirlEntity tameable, double speed, double runSpeed, float minDistance, float maxDistance) {
+    public GirlFollowOwnerGoal(TameableGirlEntity tameable, double speed, float minDistance, float maxDistance) {
         this.tameable = tameable;
         this.speed = speed;
         this.navigation = tameable.getNavigation();
@@ -67,6 +67,7 @@ public class GirlFollowOwnerGoal extends Goal {
 
     @Override
     public void stop() {
+        this.tameable.setRunning(false);
         this.owner = null;
         this.navigation.stop();
         this.tameable.setPathfindingPenalty(PathNodeType.WATER, this.oldWaterPathfindingPenalty);
@@ -82,8 +83,10 @@ public class GirlFollowOwnerGoal extends Goal {
         if (--this.updateCountdownTicks <= 0) {
             this.updateCountdownTicks = this.getTickCount(10);
             if (bl) {
+                this.tameable.setRunning(false);
                 this.tameable.tryTeleportToOwner();
             } else {
+                this.tameable.setRunning(true);
                 this.navigation.startMovingTo(this.owner, this.speed);
             }
         }
