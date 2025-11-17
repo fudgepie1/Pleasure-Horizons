@@ -1,5 +1,6 @@
 package com.sandymandy.pleasurecraft.util.variables;
 
+import com.mojang.serialization.Codec;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
@@ -12,7 +13,9 @@ public enum ScenePhase {
     INTRO,
     MOVING,
     HAVING_SEX,
-    CUM;
+    CUM,
+    STATIONARY_INTRO,
+    STATIONARY;
 
     /**
      * A PacketCodec for encoding/decoding ScenePhase values over the network.
@@ -22,4 +25,10 @@ public enum ScenePhase {
             i -> ScenePhase.values()[i],  // Decode: int ordinal -> enum
             ScenePhase::ordinal           // Encode: enum -> int ordinal
     );
+
+    public static final Codec<ScenePhase> CODEC =
+            Codec.INT.xmap(
+                    i -> ScenePhase.values()[i],   // decode
+                    ScenePhase::ordinal            // encode
+            );
 }

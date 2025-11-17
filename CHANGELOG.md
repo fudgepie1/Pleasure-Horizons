@@ -1,6 +1,7 @@
 # Changelog
 
 ## v0.6.0
+- Updated to 1.21.8
 - Added a new slime girl.
 - Added a new block called "Carved Girl Pumpkin" To summon Golem Girls in the future
 - Added a new block called "Settlement Hub" to create and manage settlements
@@ -13,7 +14,8 @@
 - Reimplemented Jiggle Physics.
 - Made the bed scanner only scan horizontally
 - Added a new system that allows players to add their own girls
-- Fixed the scene progress overlay not showing in some cases 
+- Fixed the scene progress overlay not showing in some cases
+- Added a new command called /girls which is used to spawn a custom girl, locate all your tamed girls and more
 
 ___
 

@@ -34,7 +34,7 @@ public class LucyEntity extends GirlEntityAI {
     @Override
     public List<SceneOptions> getSceneOptions() {
         return List.of(
-                SceneOptions.create("Paizuri",
+                SceneOptions.onPlayer("Paizuri",
                         6,
                         List.of("paizuri_intro"),
                         List.of("paizuri_slow"),
@@ -44,7 +44,7 @@ public class LucyEntity extends GirlEntityAI {
                         true),
 
 
-                SceneOptions.create("Blow Job",
+                SceneOptions.onPlayer("Blow Job",
                         8,
                         List.of("blowjob_intro"),
                         List.of("blowjob_slow"),
@@ -53,7 +53,7 @@ public class LucyEntity extends GirlEntityAI {
                         4,
                         false),
 
-                SceneOptions.create("Doggy",
+                SceneOptions.onBed("Doggy",
                         10,
                         List.of("doggy_intro"),
                         List.of("doggy_slow"),

@@ -35,7 +35,7 @@ public class MomoEntity extends GirlEntityAI {
     @Override
     public List<SceneOptions> getSceneOptions() {
         return List.of(
-                SceneOptions.create("Anal",
+                SceneOptions.onBed("Anal",
                         6,
                         List.of("anal_intro"),
                         List.of("anal_slow"),
@@ -48,7 +48,7 @@ public class MomoEntity extends GirlEntityAI {
                         "anal_lay_on_bed",
                         "anal_bed_idle"),
 
-                SceneOptions.create("Doggy",
+                SceneOptions.onBed("Doggy",
                         8,
                         List.of("prone_doggy_intro", "prone_doggy_insert"),
                         List.of("prone_doggy_slow"),

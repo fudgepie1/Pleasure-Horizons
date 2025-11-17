@@ -48,7 +48,7 @@ public class MoveToPlayerGoal extends Goal {
         if(this.girl.squaredDistanceTo(this.girl.scenePlayer) <= 2.5){
             this.girl.setVelocity(Vec3d.ZERO);
             this.girl.getNavigation().stop();
-            this.girl.onSceneStart();
+            this.girl.startRidingScene();
             this.started = true;
         }
     }

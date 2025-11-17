@@ -1,7 +1,6 @@
 package com.sandymandy.pleasurecraft.entity.girls;
 
 import com.sandymandy.pleasurecraft.entity.base.GirlEntityAI;
-import com.sandymandy.pleasurecraft.entity.base.GirlEntityScene;
 import com.sandymandy.pleasurecraft.util.variables.SceneOptions;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
@@ -35,7 +34,7 @@ public class MikaEntity extends GirlEntityAI {
     @Override
     public List<SceneOptions> getSceneOptions() {
         return List.of(
-                SceneOptions.create("Face fuck",
+                SceneOptions.onPlayer("Face fuck",
                         6,
                         List.of("carry_intro"),
                         List.of("carry_slow1"),
@@ -44,7 +43,7 @@ public class MikaEntity extends GirlEntityAI {
                         2.5f,
                         false),
 
-                SceneOptions.create("Missionary",
+                SceneOptions.onBed("Missionary",
                         8,
                         List.of("missionary_intro"),
                         List.of("missionary_slow"),
@@ -57,7 +56,7 @@ public class MikaEntity extends GirlEntityAI {
                         "sit_down",
                         "sit_down_idle"),
 
-                SceneOptions.create("Cowgirl",
+                SceneOptions.onBed("Cowgirl",
                         10,
                         List.of("cowgirl_intro"),
                         List.of("cowgirl_slow"),
@@ -68,7 +67,20 @@ public class MikaEntity extends GirlEntityAI {
                         false,
                         0.5f,
                         "sit_down",
-                        "sit_down_idle")
+                        "sit_down_idle"),
+
+                SceneOptions.stationaryIntro("Test Stat",
+                        4,
+                        List.of("sit_down","missionary_intro", "carry_cum"),
+                        "cowgirl_cum",
+                        3,
+                        false),
+
+                SceneOptions.stationary("Test Stat Loop",
+                        4,
+                        "carry_fast",
+                        5,
+                        true)
         );
     }
 

@@ -13,6 +13,7 @@ import com.sandymandy.pleasurecraft.util.PleasureCraftMessages;
 import com.sandymandy.pleasurecraft.util.Utils;
 import com.sandymandy.pleasurecraft.util.variables.SceneOptions;
 import com.sandymandy.pleasurecraft.util.variables.ScenePhase;
+import com.sandymandy.pleasurecraft.util.variables.SceneType;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.block.BlockState;
@@ -59,8 +60,11 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
     private static final TrackedData<String> ANIMATION_KEY_FRAME_EVENT = DataTracker.registerData(GirlEntityScene.class, TrackedDataHandlerRegistry.STRING);
     public static final TrackedData<Float> SCENE_PROGRESS = DataTracker.registerData(GirlEntityScene.class, TrackedDataHandlerRegistry.FLOAT);
     public static final TrackedData<Float> CUM_THRESHOLD = DataTracker.registerData(GirlEntityScene.class, TrackedDataHandlerRegistry.FLOAT);
+    public static final TrackedData<Integer> STATIONARY_LOOP = DataTracker.registerData(GirlEntityScene.class, TrackedDataHandlerRegistry.INTEGER);
+    public static final TrackedData<Integer> STATIONARY_LOOP_THRESHOLD = DataTracker.registerData(GirlEntityScene.class, TrackedDataHandlerRegistry.INTEGER);
     private static final TrackedData<Boolean> THRUSTING = DataTracker.registerData(GirlEntityScene.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<Integer> INTRO_INDEX = DataTracker.registerData(GirlEntityScene.class, TrackedDataHandlerRegistry.INTEGER);
+    private static final TrackedData<Integer> STATIONARY_INDEX = DataTracker.registerData(GirlEntityScene.class, TrackedDataHandlerRegistry.INTEGER);
     private static final Random RANDOM = new Random();
     private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
     public BlockPos targetBedPos;
@@ -93,8 +97,11 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
         builder.add(ANIMATION_KEY_FRAME_EVENT,"");
         builder.add(SCENE_PROGRESS,0f);
         builder.add(CUM_THRESHOLD,5f);
+        builder.add(STATIONARY_LOOP,0);
+        builder.add(STATIONARY_LOOP_THRESHOLD,0);
         builder.add(THRUSTING,false);
         builder.add(INTRO_INDEX, 0);
+        builder.add(STATIONARY_INDEX, 0);
     }
 
     public void setCurrentSceneOptions(SceneOptions options){
@@ -133,6 +140,18 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
         this.dataTracker.set(INTRO_INDEX, num);
     }
 
+    public int getIntroIndex(){
+        return this.dataTracker.get(INTRO_INDEX);
+    }
+
+    public void setStationaryIndex(int num){
+        this.dataTracker.set(STATIONARY_INDEX, num);
+    }
+
+    public int getStationaryIndex(){
+        return this.dataTracker.get(STATIONARY_INDEX);
+    }
+
     public void setSceneProgress(float progress){
         this.dataTracker.set(SCENE_PROGRESS, progress);
     }
@@ -141,16 +160,28 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
         return this.dataTracker.get(SCENE_PROGRESS);
     }
 
+    public void setStationaryLoop(int progress){
+        this.dataTracker.set(STATIONARY_LOOP, progress);
+    }
+
+    public int getStationaryLoop(){
+        return this.dataTracker.get(STATIONARY_LOOP);
+    }
+
+    public void setStationaryLoopThreshold(int progress){
+        this.dataTracker.set(STATIONARY_LOOP_THRESHOLD, progress);
+    }
+
+    public int getStationaryLoopThreshold(){
+        return this.dataTracker.get(STATIONARY_LOOP_THRESHOLD);
+    }
+
     public void setCumThreshold(float threshold){
         this.dataTracker.set(CUM_THRESHOLD, threshold);
     }
 
     public float getCumThreshold(){
         return this.dataTracker.get(CUM_THRESHOLD);
-    }
-
-    public int getIntroIndex(){
-        return this.dataTracker.get(INTRO_INDEX);
     }
 
     public void setBoneVisibility(List<String> bones, boolean visible){
@@ -244,7 +275,7 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
             return;
         }
 
-        if (isBedScene()) {
+        if (option.sceneType().equals(SceneType.ON_BED)) {
             //  Check for a bed before starting
             Utils.BlockInfo bedInfo = Utils.findNearbyBed(
                     this.getWorld(),
@@ -265,14 +296,25 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
 
 
             this.requestMoveToBed();
-            return; // Don't start yet – let the goal handle it
+            return;
+        }
+        if (option.sceneType().equals(SceneType.ON_PLAYER)) {
+            this.requestMoveToPlayer();
+            return;
         }
 
+        if (option.sceneType().equals(SceneType.STATIONARY_INTRO)) {
+            this.startStationaryIntro(option);
+            return;
+        }
 
-        this.requestMoveToPlayer();
+        this.startStationaryLoop(option);
     }
 
-    public void onSceneStart() {
+    public void startRidingScene() {
+        SceneType type = getCurrentSceneOptions().sceneType();
+        if (type.equals(SceneType.STATIONARY_INTRO) || type.equals(SceneType.STATIONARY))
+            return;
         scenePlayer.setInvisible(true);
         scenePlayer.sendMessage(Text.of("msg.pleasurecraft.canGoInToFreeCam"), true);
         this.setSceneProgress(0f);
@@ -287,6 +329,28 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
         this.setSceneState(true);
     }
 
+    private void startStationaryIntro(SceneOptions option) {
+        this.setSceneState(true);
+        this.setSceneProgress(0f);
+        this.setCurrentScenePhase(ScenePhase.STATIONARY_INTRO);
+        this.lastSceneAnim = "";
+        this.setStationaryIndex(0);
+        this.setStationaryLoop(0);
+        this.setStationaryLoopThreshold(option.amountOfLoops());
+    }
+
+    private void startStationaryLoop(SceneOptions option) {
+        this.setSceneState(true);
+        this.setSceneProgress(0f);
+        this.setCurrentScenePhase(ScenePhase.STATIONARY);
+        this.lastSceneAnim = "";
+        this.setStationaryLoop(0);
+        this.setStationaryLoopThreshold(option.amountOfLoops());
+
+    }
+
+
+
     public void stopScene() {
         if (!this.isSceneActive()) return;
         if(this.getWorld().isClient()){
@@ -297,6 +361,7 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
         PleasureCraft.usedBeds.remove(this.getUuid());
         PleasureCraft.activeScenes.remove(this.scenePlayer.getUuid());
         setIntroIndex(0);
+        setStationaryIndex(0);
         this.setSceneProgress(0f);
         onSceneStop();
         setCurrentScenePhase(ScenePhase.NONE);
@@ -477,7 +542,7 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
         if (this.isSceneActive()) onSceneActive();
 
         boolean isStopPhase = switch (getCurrentScenePhase()) {
-            case BED_IDLE, LAYING_DOWN, DIALOG -> false;
+            case BED_IDLE, LAYING_DOWN, DIALOG, STATIONARY, STATIONARY_INTRO -> false;
             default -> true;
         };
 
@@ -592,7 +657,35 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
                     }
                 }
                 case CUM -> {
-                    return setSceneAnimIfChanged(state, options.cumAnim(), Animation.LoopType.PLAY_ONCE);
+                    return setSceneAnimIfChanged(state, options.cumAnim(), Animation.LoopType.HOLD_ON_LAST_FRAME);
+                }
+                case STATIONARY_INTRO -> {
+                    List<String> sequence = options.stationaryIntroAnim(); // add to SceneOptions
+                    if(sequence.isEmpty()){
+                        playPhase(ScenePhase.STATIONARY);
+                        return PlayState.CONTINUE;
+                    }
+                    String current = sequence.get(Math.min(getStationaryIndex(), sequence.size() - 1));
+                    return setSceneAnimIfChanged(state, current, Animation.LoopType.HOLD_ON_LAST_FRAME);
+                }
+                case STATIONARY -> {
+                    String loopAnim = options.stationaryLoopAnim();
+                    int loopsNeeded = getStationaryLoopThreshold();
+
+                    // Safety: if no animation provided, stop scene
+                    if (loopAnim == null || loopAnim.isEmpty()) {
+                        stopScene();
+                        return PlayState.STOP;
+                    }
+
+                    // Has the loop run enough times?
+                    if (getStationaryLoop() >= loopsNeeded) {
+                        stopScene();
+                        return PlayState.STOP;
+                    }
+
+                    // Continue looping
+                    return setSceneAnimIfChanged(state, loopAnim, Animation.LoopType.HOLD_ON_LAST_FRAME);
                 }
                 default -> {
                     return PlayState.STOP;
@@ -656,6 +749,26 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
             }
             case CUM -> stopScene();
             case LAYING_DOWN -> playPhase(ScenePhase.BED_IDLE);
+            case STATIONARY_INTRO -> {
+                SceneOptions options = getCurrentSceneOptions();
+                List<String> sequence = options.stationaryIntroAnim();
+                if(getStationaryIndex() < sequence.size() - 1){
+                    setStationaryIndex(getStationaryIndex() + 1);
+                } else {
+                    playPhase(ScenePhase.STATIONARY);
+                }
+            }
+            case STATIONARY -> {
+                int current = getStationaryLoop();
+                int needed = getStationaryLoopThreshold();
+
+                if (current < needed) {
+                    setStationaryLoop(current + 1);
+                } else {
+                    // finished all loops
+                    stopScene();
+                }
+            }
             default -> { /* nothing */ }
         }
     }
@@ -805,7 +918,7 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
     }
 
     public boolean isBedScene(){
-        return this.getCurrentSceneOptions().isBedScene();
+        return this.getCurrentSceneOptions().sceneType().equals(SceneType.ON_BED);
     }
 
     public void messageAsEntity(boolean sendFromServer, String message){

@@ -11,7 +11,6 @@ import net.minecraft.entity.ai.pathing.MobNavigation;
 import net.minecraft.entity.ai.pathing.Path;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.state.property.Properties;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 
@@ -138,7 +137,7 @@ public class BedGoal extends Goal {
 
             PleasureCraft.activeScenes.put(playerId, entity.getUuid()); // reserve player
             this.entity.setPosition(scenePos);
-            this.entity.onSceneStart();
+            this.entity.startRidingScene();
         }
     }
 

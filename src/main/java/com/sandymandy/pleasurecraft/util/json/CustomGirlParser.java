@@ -33,29 +33,86 @@ public class CustomGirlParser {
         // Scene options
         List<SceneOptions> scenes = new ArrayList<>();
         if (json.has("scenes")) {
-            JsonArray sceneArray = json.getAsJsonArray("scenes");
-            for (JsonElement e : sceneArray) {
-                JsonObject s = e.getAsJsonObject();
-                scenes.add(SceneOptions.create(
-                        s.get("name").getAsString(),
-                        s.get("required_level").getAsInt(),
-                        jsonArrayToList(s.getAsJsonArray("intro_anim")),
-                        jsonArrayToList(s.getAsJsonArray("slow_anim")),
-                        jsonArrayToList(s.getAsJsonArray("fast_anim")),
-                        s.get("cum_anim").getAsString(),
-                        s.get("cum_threshold").getAsFloat(),
-                        s.has("needs_to_strip") && s.get("needs_to_strip").getAsBoolean(),
-                        s.has("is_bed_scene") && s.get("is_bed_scene").getAsBoolean(),
-                        s.has("use_keyframe") && s.get("use_keyframe").getAsBoolean(),
-                        s.has("bed_offset") ? s.get("bed_offset").getAsFloat() : 0f,
-                        s.has("lay_on_bed_anim") ? s.get("lay_on_bed_anim").getAsString() : "",
-                        s.has("bed_idle_anim") ? s.get("bed_idle_anim").getAsString() : ""
-                ));
+            JsonArray array = json.getAsJsonArray("scenes");
+            for (JsonElement e : array) {
+                scenes.add(parseScene(e.getAsJsonObject()));
             }
         }
 
         return new CustomGirlProfile(id, name, hitboxHeight, guiSize, guiYOffset, tameItem, health, speed, damage, scenes);
     }
+
+    private static SceneOptions parseScene(JsonObject s) {
+        String name = s.get("name").getAsString();
+        int level = s.get("required_level").getAsInt();
+        boolean needsStrip = s.has("needs_to_strip") && s.get("needs_to_strip").getAsBoolean();
+
+        String type = s.has("scene_type") ? s.get("scene_type").getAsString() : "on_player";
+
+        switch (type) {
+
+            case "on_bed":
+                return SceneOptions.onBed(
+                        name,
+                        level,
+                        jsonArrayToList(s.getAsJsonArray("intro_anim")),
+                        jsonArrayToList(s.getAsJsonArray("slow_anim")),
+                        jsonArrayToList(s.getAsJsonArray("fast_anim")),
+                        s.get("cum_anim").getAsString(),
+                        s.get("cum_threshold").getAsFloat(),
+                        needsStrip,
+                        s.has("use_keyframe") && s.get("use_keyframe").getAsBoolean(),
+                        s.has("bed_offset") ? s.get("bed_offset").getAsFloat() : 0f,
+                        s.has("lay_on_bed_anim") ? s.get("lay_on_bed_anim").getAsString() : "",
+                        s.has("bed_idle_anim") ? s.get("bed_idle_anim").getAsString() : ""
+                );
+
+            case "on_player":
+                return SceneOptions.onPlayer(
+                        name,
+                        level,
+                        jsonArrayToList(s.getAsJsonArray("intro_anim")),
+                        jsonArrayToList(s.getAsJsonArray("slow_anim")),
+                        jsonArrayToList(s.getAsJsonArray("fast_anim")),
+                        s.get("cum_anim").getAsString(),
+                        s.get("cum_threshold").getAsFloat(),
+                        needsStrip
+                );
+
+            case "stationary_intro":
+                return SceneOptions.stationaryIntro(
+                        name,
+                        level,
+                        jsonArrayToList(s.getAsJsonArray("intro_anim")),
+                        s.get("anim").getAsString(),
+                        s.get("amount_of_loops").getAsInt(),
+                        needsStrip
+                );
+
+            case "stationary":
+                return SceneOptions.stationary(
+                        name,
+                        level,
+                        s.get("anim").getAsString(),
+                        s.get("amount_of_loops").getAsInt(),
+                        needsStrip
+                );
+
+            default:
+                // fallback for old JSON that didn’t have scene_type
+                return SceneOptions.onPlayer(
+                        name,
+                        level,
+                        jsonArrayToList(s.getAsJsonArray("intro_anim")),
+                        jsonArrayToList(s.getAsJsonArray("slow_anim")),
+                        jsonArrayToList(s.getAsJsonArray("fast_anim")),
+                        s.get("cum_anim").getAsString(),
+                        s.get("cum_threshold").getAsFloat(),
+                        needsStrip
+                );
+        }
+    }
+
 
     private static List<String> jsonArrayToList(JsonArray array) {
         List<String> list = new ArrayList<>();
