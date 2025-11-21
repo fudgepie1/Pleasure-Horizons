@@ -41,6 +41,7 @@ public class MikaEntity extends GirlEntityAI {
                         List.of("carry_fast"),
                         "carry_cum",
                         2.5f,
+                        false,
                         false),
 
                 SceneOptions.onBed("Missionary",
@@ -67,20 +68,7 @@ public class MikaEntity extends GirlEntityAI {
                         false,
                         0.5f,
                         "sit_down",
-                        "sit_down_idle"),
-
-                SceneOptions.stationaryIntro("Test Stat",
-                        4,
-                        List.of("sit_down","missionary_intro", "carry_cum"),
-                        "cowgirl_cum",
-                        3,
-                        false),
-
-                SceneOptions.stationary("Test Stat Loop",
-                        4,
-                        "carry_fast",
-                        5,
-                        true)
+                        "sit_down_idle")
         );
     }
 

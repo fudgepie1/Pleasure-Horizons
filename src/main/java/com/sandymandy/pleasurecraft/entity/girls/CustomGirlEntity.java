@@ -11,9 +11,15 @@ import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
+import net.minecraft.text.Text;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
 import net.minecraft.world.World;
 
 import java.util.List;
@@ -27,6 +33,7 @@ public class CustomGirlEntity extends GirlEntityAI {
     private static final TrackedData<String> GIRL_ID = DataTracker.registerData(CustomGirlEntity.class, TrackedDataHandlerRegistry.STRING);
     private static final TrackedData<String> GIRL_NAME = DataTracker.registerData(CustomGirlEntity.class, TrackedDataHandlerRegistry.STRING);
     private static final TrackedData<Float> HITBOX_HEIGHT = DataTracker.registerData(CustomGirlEntity.class, TrackedDataHandlerRegistry.FLOAT);
+    private static final TrackedData<Boolean> IS_PROFILE_PERMANENT = DataTracker.registerData(CustomGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
 
     public CustomGirlEntity(EntityType<? extends GirlEntityAI> type, World world) {
         super(type, world);
@@ -38,9 +45,11 @@ public class CustomGirlEntity extends GirlEntityAI {
         builder.add(GIRL_ID, "default");
         builder.add(GIRL_NAME, "Default Girl");
         builder.add(HITBOX_HEIGHT, 1.95f);
+        builder.add(IS_PROFILE_PERMANENT, false);
     }
 
-    public void setProfile(CustomGirlProfile profile) {
+    public void setProfile(CustomGirlProfile profile, boolean isPermanent) {
+        if(this.dataTracker.get(IS_PROFILE_PERMANENT)) return;
         if (profile == null) profile = CustomGirlProfile.DEFAULT;
         this.profile = profile;
 
@@ -58,6 +67,8 @@ public class CustomGirlEntity extends GirlEntityAI {
             this.dataTracker.set(HITBOX_HEIGHT, profile.hitboxHeight());
         }
         this.calculateDimensions();
+
+        if(isPermanent) this.dataTracker.set(IS_PROFILE_PERMANENT, true);
     }
 
     public CustomGirlProfile getProfile() {
@@ -128,6 +139,70 @@ public class CustomGirlEntity extends GirlEntityAI {
             }
         }
     }
+
+    @Override
+    public ActionResult interactMob(PlayerEntity player, Hand hand) {
+        ItemStack itemStack = player.getStackInHand(Hand.MAIN_HAND);
+
+        if (!this.getWorld().isClient()) {
+            if (this.isTamed()) {
+                if (this.isOwner(player)) {
+                    if (player.isSneaking() && itemStack.getItem().equals(Items.STICK)) {
+
+                        // Current profile ID
+                        String currentId = this.getProfile().id();
+
+                        // Get next profile
+                        CustomGirlProfile next = CustomGirlLoader.getNextProfile(currentId);
+                        if (next != null) {
+                            // Apply it
+                            this.setProfile(next, false);
+
+                            player.sendMessage(
+                                    Text.literal("§dSwitched girl profile → §b" + next.id()),
+                                    true
+                            );
+                        } else {
+                            player.sendMessage(
+                                    Text.literal("§cNo girl profiles found."),
+                                    true
+                            );
+                        }
+
+                        return ActionResult.SUCCESS;
+                    }
+                }
+            } else {
+                if (player.isSneaking() && itemStack.getItem().equals(Items.STICK)) {
+
+                    // Current profile ID
+                    String currentId = this.getProfile().id();
+
+                    // Get next profile
+                    CustomGirlProfile next = CustomGirlLoader.getNextProfile(currentId);
+                    if (next != null) {
+                        // Apply it
+                        this.setProfile(next, false);
+
+                        player.sendMessage(
+                                Text.literal("§dSwitched girl profile → §b" + next.id()),
+                                true
+                        );
+                    } else {
+                        player.sendMessage(
+                                Text.literal("§cNo girl profiles found."),
+                                true
+                        );
+                    }
+
+                    return ActionResult.SUCCESS;
+                }
+            }
+        }
+
+        return super.interactMob(player, hand);
+    }
+
 
     @Override
     public void writeCustomData(WriteView view) {

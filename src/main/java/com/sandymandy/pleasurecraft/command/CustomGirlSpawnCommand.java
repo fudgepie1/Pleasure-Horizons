@@ -84,7 +84,7 @@ public class CustomGirlSpawnCommand {
         }
 
         // Apply profile and attributes
-        girl.setProfile(profile);
+        girl.setProfile(profile, true);
 
 
         // Position & rotation

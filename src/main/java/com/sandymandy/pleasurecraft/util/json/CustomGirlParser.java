@@ -76,7 +76,8 @@ public class CustomGirlParser {
                         jsonArrayToList(s.getAsJsonArray("fast_anim")),
                         s.get("cum_anim").getAsString(),
                         s.get("cum_threshold").getAsFloat(),
-                        needsStrip
+                        needsStrip,
+                        s.has("use_keyframe") && s.get("use_keyframe").getAsBoolean()
                 );
 
             case "stationary_intro":
@@ -108,7 +109,8 @@ public class CustomGirlParser {
                         jsonArrayToList(s.getAsJsonArray("fast_anim")),
                         s.get("cum_anim").getAsString(),
                         s.get("cum_threshold").getAsFloat(),
-                        needsStrip
+                        needsStrip,
+                        s.has("use_keyframe") && s.get("use_keyframe").getAsBoolean()
                 );
         }
     }

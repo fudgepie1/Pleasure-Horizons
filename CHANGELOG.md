@@ -16,6 +16,9 @@
 - Added a new system that allows players to add their own girls
 - Fixed the scene progress overlay not showing in some cases
 - Added a new command called /girls which is used to spawn a custom girl, locate all your tamed girls and more
+- Fixed How animations get pick so that its properly random when needed
+- Added a way to spawn the custom girls in survival with the use of the "Carved Girl Pumpkin" and White wool
+- Added a way to cycle through the loaded profiles on a custom girl; by shift clicking with a stick
 
 ___
 

@@ -43,6 +43,7 @@ public class SlimeEntity extends GirlEntityAI {
                         List.of("blowjob_fast"),
                         "blowjob_cum",
                         4,
+                        false,
                         false),
 
                 SceneOptions.onBed("Doggy",

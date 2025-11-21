@@ -121,6 +121,12 @@ public class TamedGirlManager extends PersistentState {
         return list;
     }
 
+    public boolean containsGirl(UUID uuid) {
+        return girls.values().stream()
+                .flatMap(List::stream)
+                .anyMatch(entry -> entry.id().equals(uuid));
+    }
+
     public void cleanupDeadGirls(ServerWorld world) {
         for (UUID owner : new HashSet<>(girls.keySet())) {
             List<GirlEntry> list = girls.get(owner);

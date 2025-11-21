@@ -41,7 +41,8 @@ public class LucyEntity extends GirlEntityAI {
                         List.of("paizuri_fast"),
                         "paizuri_cum",
                         4,
-                        true),
+                        true,
+                        false),
 
 
                 SceneOptions.onPlayer("Blow Job",
@@ -51,6 +52,7 @@ public class LucyEntity extends GirlEntityAI {
                         List.of("blowjob_fast"),
                         "blowjob_cum",
                         4,
+                        false,
                         false),
 
                 SceneOptions.onBed("Doggy",
@@ -61,7 +63,7 @@ public class LucyEntity extends GirlEntityAI {
                         "doggy_cum",
                         6f,
                         true,
-                        true,
+                        false,
                         0f,
                         "doggy_lay_on_bed",
                         "doggy_bed_idle")

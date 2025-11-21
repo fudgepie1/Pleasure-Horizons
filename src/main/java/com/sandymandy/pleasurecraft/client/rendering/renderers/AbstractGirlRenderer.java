@@ -1,6 +1,7 @@
 package com.sandymandy.pleasurecraft.client.rendering.renderers;
 
 import com.mojang.datafixers.util.Either;
+import com.sandymandy.pleasurecraft.client.rendering.layers.BoneOverrideRenderLayer;
 import com.sandymandy.pleasurecraft.entity.base.GirlEntityScene;
 import com.sandymandy.pleasurecraft.networking.C2S.BonePosSyncC2SPacket;
 import com.sandymandy.pleasurecraft.registries.PleasureCraftDataTicketRegistry;
@@ -101,6 +102,7 @@ public abstract class AbstractGirlRenderer<T extends GirlEntityScene, R extends 
 
         });
 
+//        this.addRenderLayer(new BoneOverrideRenderLayer<>(this));
 
     }
 
@@ -132,7 +134,7 @@ public abstract class AbstractGirlRenderer<T extends GirlEntityScene, R extends 
         renderState.addGeckolibData(PleasureCraftDataTicketRegistry.GIRL_MAIN_HAND_STACK, animatable.getMainHandStack());
         renderState.addGeckolibData(PleasureCraftDataTicketRegistry.GIRL_BONE_VISIBILITY, animatable.boneVisibility);
         renderState.addGeckolibData(PleasureCraftDataTicketRegistry.GIRL_BONE_UV_OFFSETS, animatable.boneUVOffsets);
-        renderState.addGeckolibData(PleasureCraftDataTicketRegistry.GIRL_BONE_TEXTURE_OVERRIDES, new HashMap<>(animatable.boneTextureOverrides));
+        renderState.addGeckolibData(PleasureCraftDataTicketRegistry.GIRL_BONE_TEXTURE_OVERRIDES, animatable.boneTextureOverrides);
         renderState.addGeckolibData(PleasureCraftDataTicketRegistry.GIRL_BONE_TEXTURE_OVERRIDES_LAYER_TWO, new HashMap<>(animatable.boneTextureOverridesLayer2));
         renderState.addGeckolibData(PleasureCraftDataTicketRegistry.GIRL_BONE_TEXTURE_OVERRIDES_LAYER_THREE, new HashMap<>(animatable.boneTextureOverridesLayer3));
         renderState.addGeckolibData(PleasureCraftDataTicketRegistry.GIRL_BONE_COLOR_OVERRIDES, new HashMap<>(animatable.boneColorOverrides));

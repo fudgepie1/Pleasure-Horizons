@@ -30,8 +30,8 @@ public class ModConfig implements ConfigData {
         @ConfigEntry.Gui.Tooltip
         public boolean boobWindow = false;
 
-        @ConfigEntry.Gui.Tooltip
-        public boolean applyShading = false;
+//        @ConfigEntry.Gui.Tooltip
+//        public boolean applyShading = false;
     }
 
     public static class PlayerConfig {

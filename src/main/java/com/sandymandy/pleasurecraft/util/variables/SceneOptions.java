@@ -165,14 +165,15 @@ public class SceneOptions{
             List<String> fastAnim,
             String cumAnim,
             float cumThreshold,
-            boolean needsToStrip
+            boolean needsToStrip,
+            boolean useKeyFrameEvents
     ) {
         return new SceneOptions(
                 name, requiredRelationshipLevel, introAnim, slowAnim, fastAnim,
                 cumAnim, cumThreshold, needsToStrip,
                 SceneType.ON_PLAYER,
 
-                false,
+                useKeyFrameEvents,
                 0f, "", "",
                 new ArrayList<>(), "", 0
         );

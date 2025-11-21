@@ -58,6 +58,7 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
     private static final TrackedData<SceneOptions> CURRENT_SCENE_OPTIONS = DataTracker.registerData(GirlEntityScene.class, PleasureCraftTrackedDataRegistry.SCENE_OPTION);
     private static final TrackedData<ScenePhase> CURRENT_SCENE_PHASE = DataTracker.registerData(GirlEntityScene.class, PleasureCraftTrackedDataRegistry.SCENE_PHASE);
     private static final TrackedData<String> ANIMATION_KEY_FRAME_EVENT = DataTracker.registerData(GirlEntityScene.class, TrackedDataHandlerRegistry.STRING);
+    private static final TrackedData<String> CURRENT_SEX_ANIM = DataTracker.registerData(GirlEntityScene.class, TrackedDataHandlerRegistry.STRING);
     public static final TrackedData<Float> SCENE_PROGRESS = DataTracker.registerData(GirlEntityScene.class, TrackedDataHandlerRegistry.FLOAT);
     public static final TrackedData<Float> CUM_THRESHOLD = DataTracker.registerData(GirlEntityScene.class, TrackedDataHandlerRegistry.FLOAT);
     public static final TrackedData<Integer> STATIONARY_LOOP = DataTracker.registerData(GirlEntityScene.class, TrackedDataHandlerRegistry.INTEGER);
@@ -74,9 +75,10 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
     private boolean requestMoveToPlayer;
     private String lastSceneAnim = "";
     public String passengerBoneName = "boyCam";
+    private String lastSoundKey = null;
     BlockPos bedPos;
-    private boolean swinging = false;
-    private long lastSwing = 0L;
+//    private boolean swinging = false;
+//    private long lastSwing = 0L;
     public PlayerEntity scenePlayer = (PlayerEntity) this.getOwner();
     private static final float PROGRESS_SPEED = 0.1f;
 
@@ -95,6 +97,7 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
         builder.add(CURRENT_SCENE_OPTIONS, SceneOptions.EMPTY);
         builder.add(CURRENT_SCENE_PHASE, ScenePhase.NONE);
         builder.add(ANIMATION_KEY_FRAME_EVENT,"");
+        builder.add(CURRENT_SEX_ANIM,"");
         builder.add(SCENE_PROGRESS,0f);
         builder.add(CUM_THRESHOLD,5f);
         builder.add(STATIONARY_LOOP,0);
@@ -118,6 +121,14 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
 
     public ScenePhase getCurrentScenePhase(){
         return this.dataTracker.get(CURRENT_SCENE_PHASE);
+    }
+
+    public void setCurrentSexAnim(String anim){
+        this.dataTracker.set(CURRENT_SEX_ANIM, anim);
+    }
+
+    public String getCurrentSexAnim() {
+        return this.dataTracker.get(CURRENT_SEX_ANIM);
     }
 
     public void setAnimationKeyFrameEventState(String  str){
@@ -265,7 +276,6 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
     public void startScene(SceneOptions option) {
         if (this.isSceneActive()) return;
         if (this.scenePlayer == null) return;
-
         if (this.isSitting()) this.setSitting(false);
 
         this.setCurrentSceneOptions(option);
@@ -349,8 +359,6 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
 
     }
 
-
-
     public void stopScene() {
         if (!this.isSceneActive()) return;
         if(this.getWorld().isClient()){
@@ -398,10 +406,6 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
         }
     }
 
-    private String getRandomFromList(List<String> list) {
-        return list.get(RANDOM.nextInt(list.size()));
-    }
-
     private PlayState setSceneAnimIfChanged(AnimationTest<?> state, String anim, Animation.LoopType loop) {
         if (anim == null || anim.isEmpty()) return null;
 
@@ -441,8 +445,6 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
 
         this.setBoneVisibility(Wide , !isPlayerModelSlim() && isActivePhase );
     }
-    private String lastSoundKey = null;
-
 
     private void keyFrameEventHandler() {
         String key = getAnimationKeyFrameEvent();
@@ -483,7 +485,6 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
             this.messageAsOwner(msg);
         }
     }
-
 
     private void handleSceneFootstepSounds(){
         BlockPos posBelow = this.getBlockPos().down();
@@ -562,6 +563,7 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
         // Attack controller, higher priority so it can override
         /*controllerRegistrar.add(new AnimationController<>("attack", 2, this::handleAttackAnimations));*/
     }
+
     /*private PlayState handleAttackAnimations(AnimationTest<SceneEntity> state) {
         // Calculate horizontal velocity (not required, but kept from original)
      double dx = this.getX() - this.prevX;
@@ -626,37 +628,34 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
                 case HAVING_SEX -> {
                     boolean thrustKeyDown = isThrusting();
 
+                    if(getCurrentSexAnim().isBlank()){
+                        setCurrentSexAnim(getRandomFromList(options.slowAnim()));
+                    }
+
                     if(options.useKeyFrameEvents()){
                         String key = getAnimationKeyFrameEvent();
-                        String anim = getRandomFromList(options.slowAnim());
 
                         if (key.contains("switch") && thrustKeyDown) {
-                            anim = getRandomFromList(options.fastAnim());
+                            setCurrentSexAnim(getRandomFromList(options.fastAnim()));
                         }
 
                         if (key.contains("reset") && thrustKeyDown) {
-                            return setSceneAnimIfChanged(state, getRandomFromList(options.fastAnim()), Animation.LoopType.LOOP);
+                            return state.setAndContinue(RawAnimation.begin().then(getAnimationPath(getRandomFromList(options.fastAnim())), Animation.LoopType.LOOP));
                         }
 
                         if (key.contains("reset") && !thrustKeyDown) {
-                            anim = getRandomFromList(options.slowAnim());
+                            setCurrentSexAnim(getRandomFromList(options.slowAnim()));
                         }
 
-
-
-                        return setSceneAnimIfChanged(state, anim, Animation.LoopType.LOOP);
+                        return setSceneAnimIfChanged(state, getCurrentSexAnim(), Animation.LoopType.LOOP);
                     }
                     else {
-                        if(thrustKeyDown){
-                            return setSceneAnimIfChanged(state, getRandomFromList(options.fastAnim()), Animation.LoopType.LOOP);
-                        }
-                        else {
-                            return setSceneAnimIfChanged(state, getRandomFromList(options.slowAnim()), Animation.LoopType.LOOP);
-                        }
-
+                        List<String> anims = thrustKeyDown ? options.fastAnim() : options.slowAnim();
+                        return state.setAndContinue(RawAnimation.begin().then(getAnimationPath(anims.getFirst()), Animation.LoopType.LOOP));
                     }
                 }
                 case CUM -> {
+                    setCurrentSexAnim("");
                     return setSceneAnimIfChanged(state, options.cumAnim(), Animation.LoopType.HOLD_ON_LAST_FRAME);
                 }
                 case STATIONARY_INTRO -> {
@@ -769,8 +768,15 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
                     stopScene();
                 }
             }
-            default -> { /* nothing */ }
+            default -> {}
         }
+    }
+
+    private String getRandomFromList(List<String> list) {
+        if(list.size() == 1) return list.getFirst();
+        String anim = list.get(RANDOM.nextInt(list.size()));
+//        PleasureCraft.LOGGER.info(anim);
+        return anim;
     }
 
 

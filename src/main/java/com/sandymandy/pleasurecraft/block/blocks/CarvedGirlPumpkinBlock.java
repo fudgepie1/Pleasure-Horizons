@@ -2,6 +2,7 @@ package com.sandymandy.pleasurecraft.block.blocks;
 
 import com.mojang.serialization.MapCodec;
 import com.sandymandy.pleasurecraft.block.PleasureCraftBlocks;
+import com.sandymandy.pleasurecraft.entity.girls.CustomGirlEntity;
 import com.sandymandy.pleasurecraft.entity.girls.SlimeEntity;
 import com.sandymandy.pleasurecraft.registries.GirlRegistry;
 import net.minecraft.advancement.criterion.Criteria;
@@ -31,9 +32,9 @@ public class CarvedGirlPumpkinBlock extends HorizontalFacingBlock {
     public static final MapCodec<CarvedGirlPumpkinBlock> CODEC = createCodec(CarvedGirlPumpkinBlock::new);
     public static final EnumProperty<Direction> FACING = HorizontalFacingBlock.FACING;
     @Nullable
-    private BlockPattern snowGolemDispenserPattern;
+    private BlockPattern customGirlDispenserPattern;
     @Nullable
-    private BlockPattern snowGolemPattern;
+    private BlockPattern customGirlPattern;
     @Nullable
     private BlockPattern ironGolemDispenserPattern;
     @Nullable
@@ -59,13 +60,13 @@ public class CarvedGirlPumpkinBlock extends HorizontalFacingBlock {
     }
 
     public boolean canDispense(WorldView world, BlockPos pos) {
-        return this.getSnowGolemDispenserPattern().searchAround(world, pos) != null || this.getIronGolemDispenserPattern().searchAround(world, pos) != null;
+        return this.getCustomGirlDispenserPattern().searchAround(world, pos) != null || this.getIronGolemDispenserPattern().searchAround(world, pos) != null;
     }
 
     private void trySpawnEntity(World world, BlockPos pos) {
-        BlockPattern.Result result = this.getSnowGolemPattern().searchAround(world, pos);
+        BlockPattern.Result result = this.getCustomGirlPattern().searchAround(world, pos);
         if (result != null) {
-            SlimeEntity girl = GirlRegistry.SLIME.create(world, SpawnReason.TRIGGERED);
+            CustomGirlEntity girl = GirlRegistry.CUSTOM_GIRL.create(world, SpawnReason.TRIGGERED);
             if (girl != null) {
                 spawnEntity(world, result, girl, result.translate(0, 1, 0).getBlockPos());
             }
@@ -122,27 +123,27 @@ public class CarvedGirlPumpkinBlock extends HorizontalFacingBlock {
         builder.add(FACING);
     }
 
-    private BlockPattern getSnowGolemDispenserPattern() {
-        if (this.snowGolemDispenserPattern == null) {
-            this.snowGolemDispenserPattern = BlockPatternBuilder.start()
+    private BlockPattern getCustomGirlDispenserPattern() {
+        if (this.customGirlDispenserPattern == null) {
+            this.customGirlDispenserPattern = BlockPatternBuilder.start()
                     .aisle(" ", "#")
                     .where('#', CachedBlockPosition.matchesBlockState(BlockStatePredicate.forBlock(Blocks.COPPER_BLOCK)))
                     .build();
         }
 
-        return this.snowGolemDispenserPattern;
+        return this.customGirlDispenserPattern;
     }
 
-    private BlockPattern getSnowGolemPattern() {
-        if (this.snowGolemPattern == null) {
-            this.snowGolemPattern = BlockPatternBuilder.start()
+    private BlockPattern getCustomGirlPattern() {
+        if (this.customGirlPattern == null) {
+            this.customGirlPattern = BlockPatternBuilder.start()
                     .aisle("^", "#")
                     .where('^', CachedBlockPosition.matchesBlockState(IS_GOLEM_HEAD_PREDICATE))
-                    .where('#', CachedBlockPosition.matchesBlockState(BlockStatePredicate.forBlock(Blocks.COPPER_BLOCK)))
+                    .where('#', CachedBlockPosition.matchesBlockState(BlockStatePredicate.forBlock(Blocks.WHITE_WOOL)))
                     .build();
         }
 
-        return this.snowGolemPattern;
+        return this.customGirlPattern;
     }
 
     private BlockPattern getIronGolemDispenserPattern() {

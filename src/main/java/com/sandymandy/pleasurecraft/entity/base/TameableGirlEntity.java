@@ -367,78 +367,78 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
 
     @Override
     public ActionResult interactMob(PlayerEntity player, Hand hand) {
-        ItemStack itemStack = player.getStackInHand(hand);
+        ItemStack itemStack = player.getStackInHand(Hand.MAIN_HAND);
         Item itemInHand = itemStack.getItem();
         if(this.getOverrideAnim().isEmpty()) {
-            if (this.isTamed()) {
-                if (this.isFoodItem(itemStack) && this.getHealth() < this.getMaxHealth()) {
-                    this.getNavigation().findPathTo(player, 20);
-                    this.eat(player, hand, itemStack);
-                    FoodComponent foodComponent = itemStack.get(DataComponentTypes.FOOD);
-                    float f = foodComponent != null ? foodComponent.nutrition() : 1.0F;
-                    this.heal(2.0F * f);
-                    this.getWorld().sendEntityStatus(this, EntityStatuses.CONSUME_ITEM);
-                    return ActionResult.CONSUME;
-                }
+            if (!this.getWorld().isClient()) {
+                if (this.isTamed()) {
 
-                if (this.isOwner(player)) {
+                    if (this.isFoodItem(itemStack) && this.getHealth() < this.getMaxHealth()) {
+                        this.getNavigation().findPathTo(player, 20);
+                        this.eat(player, hand, itemStack);
+                        FoodComponent foodComponent = itemStack.get(DataComponentTypes.FOOD);
+                        float f = foodComponent != null ? foodComponent.nutrition() : 1.0F;
+                        this.heal(2.0F * f);
+                        this.getWorld().sendEntityStatus(this, EntityStatuses.CONSUME_ITEM);
+                        return ActionResult.CONSUME;
+                    }
 
-                    if (itemInHand.equals(getTameItem())) {
-                        if(getCurrentRelationshipLevel() < maxRelationshipLevel()){
-                            itemStack.decrementUnlessCreative(1, player);
-                            player.sendMessage(Text.literal("She Liked The Gift"), true);
-                            setCurrentRelationshipLevel(getCurrentRelationshipLevel() + 1);
-                            this.getWorld().sendEntityStatus(this, EntityStatuses.ADD_BREEDING_PARTICLES);
-                            return ActionResult.CONSUME;
+                    if (this.isOwner(player)) {
+
+                        if (itemInHand.equals(getTameItem())) {
+                            if (getCurrentRelationshipLevel() < maxRelationshipLevel()) {
+                                itemStack.decrementUnlessCreative(1, player);
+                                player.sendMessage(Text.literal("She Liked The Gift"), true);
+                                setCurrentRelationshipLevel(getCurrentRelationshipLevel() + 1);
+                                this.getWorld().sendEntityStatus(this, EntityStatuses.ADD_BREEDING_PARTICLES);
+                                return ActionResult.SUCCESS;
+                            } else {
+                                return ActionResult.PASS;
+                            }
                         }
-                        else {
+
+                        if (itemStack.isEmpty()) {
+                            if (player.isSneaking()) {
+                                this.setSitting(!this.isSitting());
+                                this.jumping = false;
+                                this.navigation.stop();
+                                this.setTarget(null);
+                                return ActionResult.SUCCESS.noIncrementStat();
+                            } else {
+                                player.openHandledScreen(new GirlInventoryScreenHandlerFactory(this));
+                                this.setInInventory(true);
+                                getLookControl().lookAt(player, this.getMaxHeadRotation() + 20, this.getMaxLookPitchChange());
+                                return ActionResult.SUCCESS;
+                            }
+                        }
+                    } else {
+                        if (itemInHand.equals(getTameItem())) {
+                            player.sendMessage(Text.of(PleasureCraftLangUtils.getStringFromKey("msg.pleasurecraft.alreadyInRelationship")), true);
                             return ActionResult.FAIL;
                         }
                     }
+                } else {
 
-                    if (player.isSneaking()) {
-                        this.setSitting(!this.isSitting());
-                        this.jumping = false;
-                        this.navigation.stop();
-                        this.setTarget(null);
-                        return ActionResult.SUCCESS.noIncrementStat();
-                    }
-                    else {
+                    if (itemStack.isEmpty() && player.isSneaking()) {
+                        this.getNavigation().findPathTo(player, 20);
                         player.openHandledScreen(new GirlInventoryScreenHandlerFactory(this));
                         this.setInInventory(true);
                         getLookControl().lookAt(player, this.getMaxHeadRotation() + 20, this.getMaxLookPitchChange());
                         return ActionResult.SUCCESS;
                     }
 
-                }
-                else {
-                    if (itemInHand.equals(getTameItem())) {
-                        player.sendMessage(Text.of(PleasureCraftLangUtils.getStringFromKey("msg.pleasurecraft.alreadyInRelationship")), true);
-                        return ActionResult.FAIL;
-                    }
-                }
-            }
-            else {
-
-                if (itemStack.isEmpty() && player.isSneaking()) {
-                    this.getNavigation().findPathTo(player, 20);
-                    player.openHandledScreen(new GirlInventoryScreenHandlerFactory(this));
-                    this.setInInventory(true);
-                    getLookControl().lookAt(player, this.getMaxHeadRotation() + 20, this.getMaxLookPitchChange());
-                    return ActionResult.SUCCESS;
-                }
-
-                if (!this.getWorld().isClient()) {
-                    if (itemInHand.equals(getTameItem()) && !player.isSneaking()) {
-                        itemStack.decrementUnlessCreative(1, player);
-                        this.tryTame(player);
-                        return ActionResult.SUCCESS;
-                    } else {
-                        // Wrong item OR empty hand (not sneaking)
-                        player.sendMessage(Text.literal(
-                                "She ignores you. Maybe try giving her a " + getReadableTameItemName(this.getTameItem()) + "."
-                        ), true);
-                        return ActionResult.FAIL;
+                    if (!this.getWorld().isClient()) {
+                        if (itemInHand.equals(getTameItem()) && !player.isSneaking()) {
+                            itemStack.decrementUnlessCreative(1, player);
+                            this.tryTame(player);
+                            return ActionResult.SUCCESS;
+                        } else {
+                            // Wrong item OR empty hand (not sneaking)
+                            player.sendMessage(Text.literal(
+                                    "She ignores you. Maybe try giving her a " + getReadableTameItemName(this.getTameItem()) + "."
+                            ), true);
+                            return ActionResult.FAIL;
+                        }
                     }
                 }
             }
@@ -449,7 +449,6 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
     private void tryTame(PlayerEntity player) {
         if (this.random.nextInt(3) == 0) {
             this.setTamedBy(player);
-            TamedGirlManager.get((ServerWorld) this.getWorld()).registerGirl(this);
             this.navigation.stop();
             setTarget(null);
             this.getWorld().sendEntityStatus(this, EntityStatuses.ADD_POSITIVE_PLAYER_REACTION_PARTICLES);
@@ -480,11 +479,9 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
     @Override
     public void writeCustomData(WriteView view) {
         super.writeCustomData(view);
-        RegistryWrapper.WrapperLookup registryLookup = this.getWorld().getRegistryManager();
         Inventories.writeData(view, this.inventory.getItems());
         view.putBoolean("SitSate", this.isSitting());
         view.putBoolean("StripState", this.isStripped());
-        view.putBoolean("SceneState", this.isSceneActive());
         view.putBoolean("FollowState", this.isFollowing());
         view.putInt("RelationshipLevel", this.getCurrentRelationshipLevel());
 
@@ -527,7 +524,6 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
         int y = view.getInt("BaseY", 0);
         int z = view.getInt("BaseZ", 0);
         this.setBasePos(new BlockPos(x, y, z));
-
 
         LazyEntityReference<LivingEntity> lazyEntityReference =
                 LazyEntityReference.fromDataOrPlayerName(view, "Owner", this.getWorld());
@@ -631,7 +627,7 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
 
     @Override
     public boolean canTarget(LivingEntity target) {
-        return this.isOwner(target) ? false : super.canTarget(target);
+        return !this.isOwner(target) && super.canTarget(target);
     }
 
     public boolean isOwner(LivingEntity entity) {
@@ -684,6 +680,8 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
                 && this.getOwner() instanceof ServerPlayerEntity serverPlayerEntity) {
             serverPlayerEntity.sendMessage(this.getDamageTracker().getDeathMessage());
         }
+
+        this.removeAllPassengers();
 
         super.onDeath(damageSource);
     }
@@ -764,7 +762,7 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
             if (this.isTamed()) {
                 TamedGirlManager.get(world).updateGirl(this);
             }
-            else {
+            else if (TamedGirlManager.get(world).containsGirl(this.getUuid())){
                 // not tamed anymore → remove
                 TamedGirlManager.get(world).removeGirl(this.getUuid());
             }
@@ -835,7 +833,7 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
             // If basePos is still null, fall back to current position
 
             // Send a message referencing whichever Pos we have
-            new PleasureCraftMessages().GlobleMessage(
+            PleasureCraftMessages.GlobleMessage(
                     this.getWorld(),
                     getGirlDisplayName() + " died and respawned at base: " +
                             this.getBasePos().getX() + ", " +
@@ -853,7 +851,7 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
         }
         else if(isMovementLocked() &! damageType.equals("outOfWorld") || damageType.equals("genericKill")){
             if(!this.hasPassengers()){
-                new PleasureCraftMessages().GlobleMessage(
+                PleasureCraftMessages.GlobleMessage(
                         this.getWorld(),getGirlDisplayName() + " is busy at the moment");
             }
             return false;

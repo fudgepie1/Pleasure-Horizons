@@ -44,4 +44,18 @@ public class CustomGirlLoader {
             PleasureCraft.LOGGER.error("Error parsing girl JSON: " + file, e);
         }
     }
+
+    public static CustomGirlProfile getNextProfile(String currentId) {
+        if (PROFILES.isEmpty()) return null;
+
+        var keys = PROFILES.keySet().stream().toList();
+
+        int index = keys.indexOf(currentId);
+        if (index == -1) index = 0; // if current not found, start at 0
+
+        // cycle
+        index = (index + 1) % keys.size();
+
+        return PROFILES.get(keys.get(index));
+    }
 }
