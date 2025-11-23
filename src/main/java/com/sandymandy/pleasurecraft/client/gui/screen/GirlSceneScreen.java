@@ -56,7 +56,6 @@ public class GirlSceneScreen extends Screen {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        int alpha = 120; // adjust blur opacity
         super.render(context, mouseX, mouseY, delta);
 
         // draw relationship icon + number

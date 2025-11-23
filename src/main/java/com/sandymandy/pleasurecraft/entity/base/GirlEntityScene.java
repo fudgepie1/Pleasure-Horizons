@@ -444,6 +444,7 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
         this.setBoneVisibility(Slim , isPlayerModelSlim() && isActivePhase );
 
         this.setBoneVisibility(Wide , !isPlayerModelSlim() && isActivePhase );
+        this.setBoneSize("boobs", this.getBreastSize());
     }
 
     private void keyFrameEventHandler() {

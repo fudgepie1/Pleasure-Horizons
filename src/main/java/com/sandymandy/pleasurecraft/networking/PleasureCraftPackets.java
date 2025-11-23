@@ -33,6 +33,7 @@ public class PleasureCraftPackets {
         PayloadTypeRegistry.playC2S().register(RegisterCustomGirlMessageC2SPacket.ID, RegisterCustomGirlMessageC2SPacket.CODEC);
         PayloadTypeRegistry.playC2S().register(RegisterCustomGirlSoundC2SPacket.ID, RegisterCustomGirlSoundC2SPacket.CODEC);
         PayloadTypeRegistry.playC2S().register(RegisterCustomGirlRandomSoundC2SPacket.ID, RegisterCustomGirlRandomSoundC2SPacket.CODEC);
+        PayloadTypeRegistry.playC2S().register(GirlCustomizeC2SPacket.ID, GirlCustomizeC2SPacket.CODEC);
 
 
 
@@ -167,6 +168,17 @@ public class PleasureCraftPackets {
                         girl.setAnimationKeyFrameEventState(packet.soundEvent());
                     }
                 }));
+
+        ServerPlayNetworking.registerGlobalReceiver(GirlCustomizeC2SPacket.ID,
+                (packet, context) -> Objects.requireNonNull(context.player().getServer()).execute(() -> {
+                    var entity = context.player().getWorld().getEntityById(packet.entityId());
+                    if (entity instanceof GirlEntityScene girl) {
+
+                        girl.setBreastSize(packet.breastSize());
+                        girl.setAssSize(packet.assSize());
+                    }
+                }));
+
 
     }
 
