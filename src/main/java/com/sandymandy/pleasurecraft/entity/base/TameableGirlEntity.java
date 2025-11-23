@@ -1,5 +1,6 @@
 package com.sandymandy.pleasurecraft.entity.base;
 
+import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.advancement.criterion.PleasureCraftCriteria;
 import com.sandymandy.pleasurecraft.registries.PleasureCraftTrackedDataRegistry;
 import com.sandymandy.pleasurecraft.screen.GirlInventoryScreenHandlerFactory;
@@ -19,6 +20,7 @@ import net.minecraft.entity.ai.goal.EscapeDangerGoal;
 import net.minecraft.entity.ai.pathing.LandPathNodeMaker;
 import net.minecraft.entity.ai.pathing.PathNodeType;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
+import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.damage.DamageType;
@@ -34,7 +36,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
-import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.scoreboard.Team;
@@ -362,7 +363,7 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
 
     @Override
     public void equipStack(EquipmentSlot slot, ItemStack stack) {
-        inventory.setArmorStack(slot, stack);
+        inventory.setEquipmentStack(slot, stack);
     }
 
     @Override
@@ -767,9 +768,35 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
                 TamedGirlManager.get(world).removeGirl(this.getUuid());
             }
         }
+
+        updateSpeedBoost(isRunning());
         previousYaw = getYaw();
         previousVelocity = getVelocity();
         this.setMovementLockedState(this.isFrozenInPlace() || this.isWaitingAtBed() || this.isSceneActive());
+        PleasureCraft.LOGGER.info(this.getEquippedStack(EquipmentSlot.MAINHAND)+"");
+    }
+
+    private static final Identifier RUNNING_SPEED_BOOST = Identifier.of(PleasureCraft.MOD_ID, "running_speed_boost");
+
+    public void updateSpeedBoost(boolean active) {
+        var attr = this.getAttributeInstance(EntityAttributes.MOVEMENT_SPEED);
+        if (attr == null) return;
+
+        // Remove previous modifier if it exists
+        var oldModifier = attr.getModifier(RUNNING_SPEED_BOOST);
+        if (oldModifier != null) {
+            attr.removeModifier(oldModifier);
+        }
+
+        if (active) {
+            // 1.65x total movement speed boost
+            EntityAttributeModifier modifier = new EntityAttributeModifier(
+                    RUNNING_SPEED_BOOST,
+                    1.65 - 1.0,  // multiplier modifier must be (multiplier - 1)
+                    EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL
+            );
+            attr.addTemporaryModifier(modifier);
+        }
     }
 
     protected void eat(PlayerEntity player, Hand hand, ItemStack stack) {
@@ -911,12 +938,12 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
                 .add(EntityAttributes.ATTACK_DAMAGE, 2);
     }
 
-    public class TameableEscapeDangerGoal extends EscapeDangerGoal {
-        public TameableEscapeDangerGoal(final double speed, final TagKey<DamageType> dangerousDamageTypes) {
+    public class TameableGirlEscapeDangerGoal extends EscapeDangerGoal {
+        public TameableGirlEscapeDangerGoal(final double speed, final TagKey<DamageType> dangerousDamageTypes) {
             super(TameableGirlEntity.this, speed, dangerousDamageTypes);
         }
 
-        public TameableEscapeDangerGoal(final double speed) {
+        public TameableGirlEscapeDangerGoal(final double speed) {
             super(TameableGirlEntity.this, speed);
         }
 

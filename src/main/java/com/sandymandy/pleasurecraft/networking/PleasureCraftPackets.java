@@ -4,6 +4,7 @@ import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.entity.base.GirlEntityScene;
 import com.sandymandy.pleasurecraft.networking.C2S.*;
 import com.sandymandy.pleasurecraft.networking.S2C.ClothingArmorVisibilityS2CPacket;
+import com.sandymandy.pleasurecraft.networking.S2C.OpenCustomizeScreenS2CPacket;
 import com.sandymandy.pleasurecraft.networking.S2C.PlayCumHudAnimationS2CPacket;
 import com.sandymandy.pleasurecraft.networking.S2C.SceneOptionsS2CPacket;
 import com.sandymandy.pleasurecraft.registries.PleasureCraftSoundEventRegistry;
@@ -39,7 +40,7 @@ public class PleasureCraftPackets {
         PayloadTypeRegistry.playS2C().register(ClothingArmorVisibilityS2CPacket.ID, ClothingArmorVisibilityS2CPacket.CODEC);
         PayloadTypeRegistry.playS2C().register(SceneOptionsS2CPacket.ID, SceneOptionsS2CPacket.CODEC);
         PayloadTypeRegistry.playS2C().register(PlayCumHudAnimationS2CPacket.ID, PlayCumHudAnimationS2CPacket.CODEC);
-
+        PayloadTypeRegistry.playS2C().register(OpenCustomizeScreenS2CPacket.ID, OpenCustomizeScreenS2CPacket.CODEC);
 
     }
 
@@ -58,16 +59,7 @@ public class PleasureCraftPackets {
                                     case "goToBase" -> girl.teleportToBase();
                                     case "sit" -> girl.setSitting(!girl.isSitting());
                                     case "follow" -> girl.setFollowing(!girl.isFollowing());
-                                    case "testSound" -> {
-                                        girl.playSound(PleasureCraftSoundEventRegistry.LUCY_MOAN, 2f, 1f);
-                                        girl.playSound(PleasureCraftSoundEventRegistry.TOUCH, 2f, 1f);
-                                        girl.playSound(PleasureCraftSoundEventRegistry.CLAP, 2f, 1f);
-                                        girl.playSound(PleasureCraftSoundEventRegistry.CUMINFLATION, 2f, 1f);
-                                        girl.playSound(PleasureCraftSoundEventRegistry.BELLJINGLE, 2f, 1f);
-                                        girl.playSound(PleasureCraftSoundEventRegistry.LUCY_HEAVYBREATHING, 2f, 1f);
-                                        girl.playSound(PleasureCraftSoundEventRegistry.LUCY_HUH, 2f, 1f);
-                                        girl.playSound(PleasureCraftSoundEventRegistry.LUCY_HMPH, 2f, 1f);
-                                    }
+                                    case "customize" -> ServerPlayNetworking.send(context.player(), new OpenCustomizeScreenS2CPacket(girl.getId()));
                                     default -> PleasureCraft.LOGGER.warn("Unknown Girl interaction: " + packet.actionId());
                                 }
                             }

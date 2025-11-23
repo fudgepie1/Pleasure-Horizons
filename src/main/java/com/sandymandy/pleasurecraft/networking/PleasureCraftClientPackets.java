@@ -1,9 +1,11 @@
 package com.sandymandy.pleasurecraft.networking;
 
 import com.sandymandy.pleasurecraft.PleasureCraft;
+import com.sandymandy.pleasurecraft.client.gui.screen.GirlCustomizeScreen;
 import com.sandymandy.pleasurecraft.entity.base.GirlEntityScene;
 import com.sandymandy.pleasurecraft.client.gui.screen.hud.SceneProgressOverlay;
 import com.sandymandy.pleasurecraft.networking.S2C.ClothingArmorVisibilityS2CPacket;
+import com.sandymandy.pleasurecraft.networking.S2C.OpenCustomizeScreenS2CPacket;
 import com.sandymandy.pleasurecraft.networking.S2C.PlayCumHudAnimationS2CPacket;
 import com.sandymandy.pleasurecraft.networking.S2C.SceneOptionsS2CPacket;
 import com.sandymandy.pleasurecraft.client.gui.screen.GirlSceneScreen;
@@ -39,6 +41,12 @@ public class PleasureCraftClientPackets {
         ClientPlayNetworking.registerGlobalReceiver(SceneOptionsS2CPacket.ID, (packet, context) -> {
             context.client().execute(() -> {
                 MinecraftClient.getInstance().setScreen(new GirlSceneScreen(packet.entityId(), packet.currentRelationshipLevel(),packet.options()));
+            });
+        });
+
+        ClientPlayNetworking.registerGlobalReceiver(OpenCustomizeScreenS2CPacket.ID, (packet, context) -> {
+            context.client().execute(() -> {
+                MinecraftClient.getInstance().setScreen(new GirlCustomizeScreen(packet.entityId()));
             });
         });
 

@@ -3,7 +3,6 @@ package com.sandymandy.pleasurecraft.entity.base;
 import com.sandymandy.pleasurecraft.entity.ai.goal.*;
 import com.sandymandy.pleasurecraft.settlement.Settlement;
 import com.sandymandy.pleasurecraft.settlement.SettlementMember;
-import com.sandymandy.pleasurecraft.util.variables.SceneOptions;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -12,12 +11,12 @@ import net.minecraft.entity.ai.goal.*;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
+import net.minecraft.entity.passive.FoxEntity;
 import net.minecraft.entity.passive.IronGolemEntity;
 import net.minecraft.entity.passive.TurtleEntity;
 import net.minecraft.entity.passive.WolfEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.recipe.Ingredient;
-import net.minecraft.registry.Registries;
 import net.minecraft.registry.tag.DamageTypeTags;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.World;
@@ -72,10 +71,10 @@ public abstract class GirlEntityAI extends GirlEntityScene implements SmartBrain
             this.goalSelector.add(0, new GirlSitGoal(this));
             this.goalSelector.add(1, new SwimGoal(this));
             this.goalSelector.add(2, new LongDoorInteractGoal(this, true));
-            this.goalSelector.add(3, new TameableEscapeDangerGoal(1.5D, DamageTypeTags.PANIC_ENVIRONMENTAL_CAUSES));
-            this.goalSelector.add(4, new GirlAttackGoal(this, 1.5, false));
-            this.goalSelector.add(5, new ConditionalGoal(new GirlFollowOwnerGoal(this, 1.65, 5.0F, 2.0F), this::isFollowing));
-            this.goalSelector.add(6, new TemptGoal(this, 1.25D, Ingredient.ofItems(getTameItem()), false));
+            this.goalSelector.add(3, new TameableGirlEscapeDangerGoal(1.5D, DamageTypeTags.PANIC_ENVIRONMENTAL_CAUSES));
+            this.goalSelector.add(4, new GirlAttackGoal(this, 1D, false));
+            this.goalSelector.add(5, new ConditionalGoal(new GirlFollowOwnerGoal(this, 1D, 10.0F, 2.0F), this::isFollowing));
+            this.goalSelector.add(6, new TemptGoal(this, 1D, Ingredient.ofItems(getTameItem()), false));
             this.goalSelector.add(7, new GirlStayNearBaseGoal(this, 1.0, 2.0F, 15.0F, 150));
             this.goalSelector.add(8, new WanderAroundGoal(this, 1.0D));
             this.goalSelector.add(9, new ConditionalGoal(new LookAtEntityGoal(this, PlayerEntity.class, 6.0F), () -> !isMovementLocked()));
@@ -85,7 +84,6 @@ public abstract class GirlEntityAI extends GirlEntityScene implements SmartBrain
             this.targetSelector.add(3, new RevengeGoal(this, PlayerEntity.class, GirlEntityAI.class));
         }
     }
-
 
     @Override
     public @Nullable Settlement getSettlement() {
