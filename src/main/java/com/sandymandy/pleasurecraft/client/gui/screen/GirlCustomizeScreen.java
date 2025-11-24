@@ -8,22 +8,29 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.SliderWidget;
+import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
+import net.minecraft.util.math.Vec3d;
 
 public class GirlCustomizeScreen extends Screen {
 
     private final int entityId;
 
-    private int breastSize = 100;
-    private int assSize = 100;
+    private int breastSize;
 
-    private SliderWidget breastSlider;
-    private SliderWidget assSlider;
+    private double breastOffsetX;
+    private double breastOffsetY;
+    private double breastOffsetZ;
 
-    public GirlCustomizeScreen(int entityId) {
+
+    public GirlCustomizeScreen(int entityId, int breastSize, Vec3d breastOffset) {
         super(Text.literal("Customize Girl"));
         this.entityId = entityId;
+        this.breastSize = breastSize;
+        this.breastOffsetX = breastOffset.getX();
+        this.breastOffsetY = breastOffset.getY();
+        this.breastOffsetZ = breastOffset.getZ();
     }
 
     @Override
@@ -31,9 +38,8 @@ public class GirlCustomizeScreen extends Screen {
         int centerX = this.width / 2;
         int y = this.height / 4 + 20;
 
-        // BREAST SIZE SLIDER
-        // ----------------------------------
-        breastSlider = new SliderWidget(centerX - 100, y, 200, 20,
+//      Breast Size Slider
+        SliderWidget breastSlider = new SliderWidget(centerX - 100, y, 200, 20,
                 Text.literal("Breast Size"),
                 (breastSize - 25f) / 125f  // convert 25–150 → 0–1
         ) {
@@ -44,47 +50,79 @@ public class GirlCustomizeScreen extends Screen {
 
             @Override
             protected void applyValue() {
-                breastSize = 25 + (int)(this.value * 125); // convert 0–1 → 25–150
+                breastSize = 25 + (int) (this.value * 125); // convert 0–1 → 25–150
             }
         };
         breastSlider.setTooltip(Tooltip.of(Text.literal("Adjust breast size")));
         this.addDrawableChild(breastSlider);
         y += 30;
 
+//      Breast Offset
+        this.addDrawableChild(new net.minecraft.client.gui.widget.TextWidget(
+                centerX - 100, y, 200, 20,
+                Text.literal("Breast Offset (Vec3d)"),
+                this.textRenderer
+        ));
+        y += 20;
 
-/*        // ASS SIZE SLIDER
-        // ----------------------------------
-        assSlider = new SliderWidget(centerX - 100, y, 200, 20,
-                Text.literal("Ass Size"),
-                (assSize - 25f) / 125f
-        ) {
-            @Override
-            protected void updateMessage() {
-                this.setMessage(Text.literal("Ass Size: " + assSize));
-            }
+//      X FIELD
+        TextFieldWidget offsetXField = new TextFieldWidget(this.textRenderer, centerX - 100, y, 60, 20, Text.literal("X"));
+        offsetXField.setText(String.valueOf(breastOffsetX));
+        offsetXField.setTooltip(Tooltip.of(Text.literal("Offset X")));
+        this.addDrawableChild(offsetXField);
 
-            @Override
-            protected void applyValue() {
-                assSize = 25 + (int)(this.value * 125);
-            }
-        };
-        assSlider.setTooltip(Tooltip.of(Text.literal("Adjust ass size")));
-        this.addDrawableChild(assSlider);
-        y += 40;*/
+//      Y FIELD
+        TextFieldWidget offsetYField = new TextFieldWidget(this.textRenderer, centerX - 30, y, 60, 20, Text.literal("Y"));
+        offsetYField.setText(String.valueOf(breastOffsetY));
+        offsetYField.setTooltip(Tooltip.of(Text.literal("Offset Y")));
+        this.addDrawableChild(offsetYField);
 
+//      Z FIELD
+        TextFieldWidget offsetZField = new TextFieldWidget(this.textRenderer, centerX + 40, y, 60, 20, Text.literal("Z"));
+        offsetZField.setText(String.valueOf(breastOffsetZ));
+        offsetZField.setTooltip(Tooltip.of(Text.literal("Offset Z")));
+        this.addDrawableChild(offsetZField);
+
+        y += 40;
+
+//      Confirm
         this.addDrawableChild(ButtonWidget.builder(Text.literal("Confirm"), button -> {
+            // parse updated offset
+            breastOffsetX = parseDouble(offsetXField.getText());
+            breastOffsetY = parseDouble(offsetYField.getText());
+            breastOffsetZ = parseDouble(offsetZField.getText());
+
             ClientPlayNetworking.send(new GirlCustomizeC2SPacket(
                     this.entityId,
                     this.breastSize,
-                    this.assSize
+                    new Vec3d(breastOffsetX, breastOffsetY, breastOffsetZ)
             ));
             MinecraftClient.getInstance().setScreen(null); // close screen
-        }).dimensions(centerX - 100, y, 95, 20).build());
+        }).dimensions(centerX - 100, y, 60, 20).build());
 
+//      Clear
+        this.addDrawableChild(ButtonWidget.builder(Text.literal("Clear"), button -> {
+            ClientPlayNetworking.send(new GirlCustomizeC2SPacket(
+                    this.entityId,
+                    100,
+                    new Vec3d(0, 0, 0)
+            ));
+            MinecraftClient.getInstance().setScreen(null); // close screen
+        }).dimensions(centerX - 30, y, 60, 20).build());
+
+//      Cancel
         this.addDrawableChild(ButtonWidget.builder(Text.literal("Cancel"), button -> {
             MinecraftClient.getInstance().setScreen(null);
-        }).dimensions(centerX + 5, y, 95, 20).build());
+        }).dimensions(centerX + 40, y, 60, 20).build());    }
+
+    private double parseDouble(String s) {
+        try {
+            return Double.parseDouble(s);
+        } catch (Exception e) {
+            return 0;
+        }
     }
+
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {

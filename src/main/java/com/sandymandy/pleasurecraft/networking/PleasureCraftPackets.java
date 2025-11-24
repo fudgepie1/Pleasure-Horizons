@@ -3,16 +3,11 @@ package com.sandymandy.pleasurecraft.networking;
 import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.entity.base.GirlEntityScene;
 import com.sandymandy.pleasurecraft.networking.C2S.*;
-import com.sandymandy.pleasurecraft.networking.S2C.ClothingArmorVisibilityS2CPacket;
-import com.sandymandy.pleasurecraft.networking.S2C.OpenCustomizeScreenS2CPacket;
-import com.sandymandy.pleasurecraft.networking.S2C.PlayCumHudAnimationS2CPacket;
-import com.sandymandy.pleasurecraft.networking.S2C.SceneOptionsS2CPacket;
-import com.sandymandy.pleasurecraft.registries.PleasureCraftSoundEventRegistry;
+import com.sandymandy.pleasurecraft.networking.S2C.*;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 
 import java.util.Objects;
-import java.util.UUID;
 
 public class PleasureCraftPackets {
 
@@ -42,6 +37,7 @@ public class PleasureCraftPackets {
         PayloadTypeRegistry.playS2C().register(SceneOptionsS2CPacket.ID, SceneOptionsS2CPacket.CODEC);
         PayloadTypeRegistry.playS2C().register(PlayCumHudAnimationS2CPacket.ID, PlayCumHudAnimationS2CPacket.CODEC);
         PayloadTypeRegistry.playS2C().register(OpenCustomizeScreenS2CPacket.ID, OpenCustomizeScreenS2CPacket.CODEC);
+        PayloadTypeRegistry.playS2C().register(RefreshModelsS2CPacket.ID, RefreshModelsS2CPacket.CODEC);
 
     }
 
@@ -60,7 +56,7 @@ public class PleasureCraftPackets {
                                     case "goToBase" -> girl.teleportToBase();
                                     case "sit" -> girl.setSitting(!girl.isSitting());
                                     case "follow" -> girl.setFollowing(!girl.isFollowing());
-                                    case "customize" -> ServerPlayNetworking.send(context.player(), new OpenCustomizeScreenS2CPacket(girl.getId()));
+                                    case "customize" -> ServerPlayNetworking.send(context.player(), new OpenCustomizeScreenS2CPacket(girl.getId(), girl.getBreastSize(), girl.getBreastOffset()));
                                     default -> PleasureCraft.LOGGER.warn("Unknown Girl interaction: " + packet.actionId());
                                 }
                             }
@@ -175,7 +171,7 @@ public class PleasureCraftPackets {
                     if (entity instanceof GirlEntityScene girl) {
 
                         girl.setBreastSize(packet.breastSize());
-                        girl.setAssSize(packet.assSize());
+                        girl.setBreastOffset(packet.breastOffset());
                     }
                 }));
 

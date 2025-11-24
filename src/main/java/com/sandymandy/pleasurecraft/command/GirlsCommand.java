@@ -2,15 +2,22 @@ package com.sandymandy.pleasurecraft.command;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
+import com.sandymandy.pleasurecraft.client.models.AbstractGirlModel;
 import com.sandymandy.pleasurecraft.entity.girls.CustomGirlEntity;
+import com.sandymandy.pleasurecraft.networking.S2C.RefreshModelsS2CPacket;
 import com.sandymandy.pleasurecraft.registries.GirlRegistry;
 import com.sandymandy.pleasurecraft.util.json.CustomGirlLoader;
+import com.sandymandy.pleasurecraft.util.managers.TamedGirlManager;
 import com.sandymandy.pleasurecraft.util.variables.CustomGirlProfile;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.argument.BlockPosArgumentType;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
@@ -21,7 +28,7 @@ import java.util.concurrent.CompletableFuture;
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
-public class CustomGirlSpawnCommand {
+public class GirlsCommand {
 
     // Suggestion provider for auto-complete
     private static final SuggestionProvider<ServerCommandSource> PROFILE_SUGGESTIONS = (context, builder) -> {
@@ -35,8 +42,23 @@ public class CustomGirlSpawnCommand {
 
         dispatcher.register(
                 literal("girls")
-                        .requires(src -> src.hasPermissionLevel(2))
+                        .requires(src -> true) // anyone can run the base command
+
+                        // --- locateAll ---
+                        .then(literal("locateAll")
+                                .requires(src -> true)
+                                .executes(ctx -> locateAllGirls(ctx.getSource()))
+                        )
+
+                        // --- reload ---
+                        .then(literal("refreshJiggle")
+                                .requires(src -> true)
+                                .executes(ctx -> refresh(ctx.getSource()))
+                        )
+
+                        // --- spawn <girlName> ---
                         .then(literal("spawn")
+                                .requires(src -> src.hasPermissionLevel(2))
                                 // /girl spawn <id>
                                 .then(argument("id", StringArgumentType.string())
                                         .suggests(PROFILE_SUGGESTIONS)
@@ -57,6 +79,50 @@ public class CustomGirlSpawnCommand {
                                 )
                         )
         );
+    }
+
+    private static int refresh(ServerCommandSource source) throws CommandSyntaxException {
+        ServerPlayNetworking.send(source.getPlayerOrThrow(), new RefreshModelsS2CPacket());
+        source.sendFeedback(() ->
+                        Text.literal("Refreshed All Loaded Girl Models"),
+                false
+        );
+
+        return 1;
+    }
+
+    private static int locateAllGirls(ServerCommandSource source) {
+        ServerPlayerEntity player = source.getPlayer();
+        if (player == null) return 0;
+
+        ServerWorld world = player.getWorld();
+        TamedGirlManager manager = TamedGirlManager.get(world);
+
+        var owned = manager.getGirlsOwnedBy(player.getUuid());
+        if (owned.isEmpty()) {
+            player.sendMessage(Text.literal("§cYou have no tamed girls in this world."), false);
+            return 0;
+        }
+
+        int found = 0;
+        for (var entry : owned) {
+
+            found++;
+
+            var pos = entry.pos();
+            String name = entry.name();
+
+            player.sendMessage(
+                    Text.literal("§d" + name
+                            + "§r → X: " + (int) pos.x
+                            + " Y: " + (int) pos.y
+                            + " Z: " + (int) pos.z),
+                    false
+            );
+        }
+
+        player.sendMessage(Text.literal("§aTotal girls found: §e" + found), false);
+        return found;
     }
 
     private static int spawnGirl(ServerCommandSource source, String id, Vec3d pos) {
@@ -102,4 +168,6 @@ public class CustomGirlSpawnCommand {
         source.sendFeedback(() -> Text.literal("Spawned girl: " + id), true);
         return 1;
     }
+
+
 }

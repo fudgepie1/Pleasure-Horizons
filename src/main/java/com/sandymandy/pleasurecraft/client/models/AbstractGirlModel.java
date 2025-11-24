@@ -29,7 +29,18 @@ public abstract class AbstractGirlModel<T extends GirlEntityScene> extends GeoMo
     private final Map<Long, Long> lastUpdateTimeByEntity = new HashMap<>();
     private static final double FIXED_TIMESTEP = 1.0 / 25.0;// 25Hz
     private final Map<Long, Double> timeAccumulator = new HashMap<>();
+    private static final List<AbstractGirlModel<?>> MODEL_INSTANCES = new ArrayList<>();
 
+    public AbstractGirlModel() {
+        MODEL_INSTANCES.add(this);
+    }
+
+    /** Reloads ALL girl models (global wipe). */
+    public static void refreshAllModels() {
+        for (AbstractGirlModel<?> model : MODEL_INSTANCES) {
+            model.refreshAllDefaults();
+        }
+    }
 
     @Override
     public Identifier getModelResource(GeoRenderState renderState) {
@@ -193,5 +204,12 @@ public abstract class AbstractGirlModel<T extends GirlEntityScene> extends GeoMo
         }
 
         return bones;
+    }
+
+    public void refreshAllDefaults() {
+        this.defaultRotationsByEntity.clear();
+        this.jiggleMapByEntity.clear();
+        this.timeAccumulator.clear();
+        this.lastUpdateTimeByEntity.clear();
     }
 }

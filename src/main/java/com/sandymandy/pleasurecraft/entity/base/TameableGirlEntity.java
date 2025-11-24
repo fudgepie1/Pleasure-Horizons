@@ -74,7 +74,7 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
     private static final TrackedData<Boolean> RUNNING = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<String> OVERRIDE_ANIM = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.STRING);
     private static final TrackedData<Integer> BREAST_SIZE = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.INTEGER);
-    private static final TrackedData<Integer> ASS_SIZE = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.INTEGER);
+    private static final TrackedData<Vec3d> BREAST_OFFSET = DataTracker.registerData(TameableGirlEntity.class, PleasureCraftTrackedDataRegistry.VEC3D);
     private static final TrackedData<String> SCENE_ANIM = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.STRING);
     private static final TrackedData<Integer> RELATIONSHIP_LEVEL = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.INTEGER);
     private static final TrackedData<Integer> MAX_RELATIONSHIP_LEVEL = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.INTEGER);
@@ -90,6 +90,7 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
     public Map<String, Identifier> boneTextureOverridesLayer2 = new HashMap<>();
     public Map<String, Identifier> boneTextureOverridesLayer3 = new HashMap<>();
     public Map<String, Vec3d> boneSizeOverrides = new HashMap<>();
+    public Map<String, Vec3d> bonePositionOffset = new HashMap<>();
     public Map<String, Vec2f> boneUVOffsets = new HashMap<>();
     public final Map<EquipmentSlot, Boolean> armorVisibility = new EnumMap<>(EquipmentSlot.class);
     public Vec3d previousVelocity = Vec3d.ZERO;
@@ -125,7 +126,7 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
         builder.add(RELATIONSHIP_LEVEL,0);
         builder.add(MAX_RELATIONSHIP_LEVEL,0);
         builder.add(BREAST_SIZE,100);
-        builder.add(ASS_SIZE,100);
+        builder.add(BREAST_OFFSET, Vec3d.ZERO);
         builder.add(PASSENGER_BONE_POSITION, Vec3d.ZERO);
         builder.add(BASE_POS, this.getBlockPos());
         builder.add(OVERRIDE_ANIM,"");
@@ -258,9 +259,9 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
 
     public int getBreastSize() { return this.dataTracker.get(BREAST_SIZE); }
 
-    public void setAssSize(int value) { this.dataTracker.set(ASS_SIZE, value); }
+    public void setBreastOffset(Vec3d value) { this.dataTracker.set(BREAST_OFFSET, value); }
 
-    public int getAssSize() { return this.dataTracker.get(ASS_SIZE); }
+    public Vec3d getBreastOffset() { return this.dataTracker.get(BREAST_OFFSET); }
 
     public GirlInventory getInventory() {
         return inventory;

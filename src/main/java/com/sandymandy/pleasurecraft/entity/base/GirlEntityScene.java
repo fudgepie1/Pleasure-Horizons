@@ -261,6 +261,16 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
 
     }
 
+    public void setBonePos(String bone, float x, float y, float z) {
+        this.setBonePos(bone, new Vec3d(x, y, z));
+    }
+
+    public void setBonePos(String bone, Vec3d pos) {
+        if (this.bonePositionOffset == null) this.bonePositionOffset = new HashMap<>();
+
+        this.bonePositionOffset.put(bone, pos);
+    }
+
     public void setBoneSize(String bone, int size) {
         float finalSize = (float) size / 100;
         setBoneSize(bone, finalSize, finalSize, finalSize);
@@ -445,6 +455,7 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
 
         this.setBoneVisibility(Wide , !isPlayerModelSlim() && isActivePhase );
         this.setBoneSize("boobs", this.getBreastSize());
+        this.setBonePos("boobs", this.getBreastOffset());
     }
 
     private void keyFrameEventHandler() {

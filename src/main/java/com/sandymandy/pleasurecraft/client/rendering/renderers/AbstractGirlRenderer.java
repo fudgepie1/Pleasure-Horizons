@@ -1,7 +1,6 @@
 package com.sandymandy.pleasurecraft.client.rendering.renderers;
 
 import com.mojang.datafixers.util.Either;
-import com.sandymandy.pleasurecraft.client.rendering.layers.BoneOverrideRenderLayer;
 import com.sandymandy.pleasurecraft.entity.base.GirlEntityScene;
 import com.sandymandy.pleasurecraft.networking.C2S.BonePosSyncC2SPacket;
 import com.sandymandy.pleasurecraft.registries.PleasureCraftDataTicketRegistry;
@@ -102,7 +101,6 @@ public abstract class AbstractGirlRenderer<T extends GirlEntityScene, R extends 
 
         });
 
-//        this.addRenderLayer(new BoneOverrideRenderLayer<>(this));
 
     }
 
@@ -139,15 +137,11 @@ public abstract class AbstractGirlRenderer<T extends GirlEntityScene, R extends 
         renderState.addGeckolibData(PleasureCraftDataTicketRegistry.GIRL_BONE_TEXTURE_OVERRIDES_LAYER_THREE, new HashMap<>(animatable.boneTextureOverridesLayer3));
         renderState.addGeckolibData(PleasureCraftDataTicketRegistry.GIRL_BONE_COLOR_OVERRIDES, new HashMap<>(animatable.boneColorOverrides));
         renderState.addGeckolibData(PleasureCraftDataTicketRegistry.GIRL_BONE_SIZE_OVERRIDES, new HashMap<>(animatable.boneSizeOverrides));
+        renderState.addGeckolibData(PleasureCraftDataTicketRegistry.GIRL_BONE_POSITION_OFFSET, new HashMap<>(animatable.bonePositionOffset));
         renderState.addGeckolibData(PleasureCraftDataTicketRegistry.PASSENGER_BONE_NAME, animatable.passengerBoneName);
         renderState.addGeckolibData(PleasureCraftDataTicketRegistry.YAW, animatable.getYaw());
         renderState.addGeckolibData(PleasureCraftDataTicketRegistry.PREVIOUS_YAW, animatable.previousYaw);
         renderState.addGeckolibData(PleasureCraftDataTicketRegistry.PREVIOUS_VELOCITY, animatable.previousVelocity);
-    }
-
-    @Override
-    public void defaultRender(R renderState, MatrixStack poseStack, VertexConsumerProvider bufferSource, @Nullable RenderLayer renderType, @Nullable VertexConsumer buffer) {
-        super.defaultRender(renderState, poseStack, bufferSource, renderType, buffer);
     }
 
     @Override
@@ -158,6 +152,7 @@ public abstract class AbstractGirlRenderer<T extends GirlEntityScene, R extends 
 
         Map<String, Boolean> boneVisibility = renderState.getGeckolibData(PleasureCraftDataTicketRegistry.GIRL_BONE_VISIBILITY);
         Map<String, Vec3d> boneSize = renderState.getGeckolibData(PleasureCraftDataTicketRegistry.GIRL_BONE_SIZE_OVERRIDES);
+        Map<String, Vec3d> bonePos = renderState.getGeckolibData(PleasureCraftDataTicketRegistry.GIRL_BONE_POSITION_OFFSET);
 
         if (boneVisibility != null) {
             for (Map.Entry<String, Boolean> entry : boneVisibility.entrySet()) {
@@ -180,6 +175,19 @@ public abstract class AbstractGirlRenderer<T extends GirlEntityScene, R extends 
                     bone.setScaleX(size.toVector3f().x());
                     bone.setScaleY(size.toVector3f().y());
                     bone.setScaleZ(size.toVector3f().z());
+                });
+            }
+        }
+
+        if (bonePos != null) {
+            for (Map.Entry<String, Vec3d> entry : bonePos.entrySet()) {
+                String boneName = entry.getKey();
+                Vec3d size = entry.getValue();
+
+                model.getBone(boneName).ifPresent(bone -> {
+                    bone.setPosX(size.toVector3f().x());
+                    bone.setPosY(size.toVector3f().y());
+                    bone.setPosZ(size.toVector3f().z());
                 });
             }
         }
