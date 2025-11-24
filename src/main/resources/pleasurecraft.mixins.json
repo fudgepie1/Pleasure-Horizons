@@ -4,9 +4,26 @@
   "package": "com.sandymandy.pleasurecraft.mixins",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "bugfix.ScreenHandlerMixin"
+    "BlockStateBaseMixin",
+    "EntityMixin",
+    "LivingEntityMixin"
   ],
   "client": [
+    "BubbleColumnAmbientSoundHandlerMixin",
+    "CameraMixin",
+    "ClientPacketListenerMixin",
+    "EntityRenderDispatcherAccessor",
+    "EntityRenderDispatcherMixin",
+    "EntityRendererMixin",
+    "GameRendererMixin",
+    "GuiMixin",
+    "ItemInHandRendererMixin",
+    "LevelRendererMixin",
+    "LightTextureMixin",
+    "LocalPlayerMixin",
+    "MinecraftMixin",
+    "MultiPlayerGameModeMixin",
+    "OptionsMixin",
     "geckolib.GeoBoneMixin"
   ],
   "injectors": {
