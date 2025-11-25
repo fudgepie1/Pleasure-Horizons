@@ -1,11 +1,14 @@
 package com.sandymandy.pleasurecraft.client.rendering.renderers;
 
+import com.mojang.blaze3d.pipeline.BlendFunction;
+import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.datafixers.util.Either;
 import com.sandymandy.pleasurecraft.entity.base.GirlEntityScene;
 import com.sandymandy.pleasurecraft.networking.C2S.BonePosSyncC2SPacket;
 import com.sandymandy.pleasurecraft.registries.PleasureCraftDataTicketRegistry;
 import com.sandymandy.pleasurecraft.util.rendering.OffsetVertexConsumer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -280,6 +283,8 @@ public abstract class AbstractGirlRenderer<T extends GirlEntityScene, R extends 
         }
 
     }
+
+
 
     @Override
     public void renderRecursively(R renderState,

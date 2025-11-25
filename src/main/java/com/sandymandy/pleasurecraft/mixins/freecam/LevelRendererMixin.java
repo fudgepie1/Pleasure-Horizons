@@ -1,6 +1,6 @@
-package com.sandymandy.pleasurecraft.mixins;
+package com.sandymandy.pleasurecraft.mixins.freecam;
 
-import com.sandymandy.pleasurecraft.Freecam;
+import com.sandymandy.pleasurecraft.freecam.Freecam;
 import net.minecraft.client.render.BufferBuilderStorage;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.RenderTickCounter;
@@ -19,7 +19,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
 
-import static com.sandymandy.pleasurecraft.Freecam.MC;
+import static com.sandymandy.pleasurecraft.freecam.Freecam.MC;
 import static org.spongepowered.asm.mixin.injection.callback.LocalCapture.CAPTURE_FAILHARD;
 
 @Mixin(WorldRenderer.class)

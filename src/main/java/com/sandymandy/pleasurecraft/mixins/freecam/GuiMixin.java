@@ -1,6 +1,6 @@
-package com.sandymandy.pleasurecraft.mixins;
+package com.sandymandy.pleasurecraft.mixins.freecam;
 
-import com.sandymandy.pleasurecraft.Freecam;
+import com.sandymandy.pleasurecraft.freecam.Freecam;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.entity.player.PlayerEntity;
@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import static com.sandymandy.pleasurecraft.Freecam.MC;
+import static com.sandymandy.pleasurecraft.freecam.Freecam.MC;
 
 @Mixin(InGameHud.class)
 public class GuiMixin {

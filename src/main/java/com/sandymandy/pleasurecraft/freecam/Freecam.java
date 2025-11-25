@@ -1,11 +1,9 @@
-package com.sandymandy.pleasurecraft;
+package com.sandymandy.pleasurecraft.freecam;
 
 import com.sandymandy.pleasurecraft.config.ModBindings;
 import com.sandymandy.pleasurecraft.config.ModConfig;
-import com.sandymandy.pleasurecraft.tripod.TripodRegistry;
-import com.sandymandy.pleasurecraft.tripod.TripodSlot;
-import com.sandymandy.pleasurecraft.util.FreeCamera;
-import com.sandymandy.pleasurecraft.util.FreecamPosition;
+import com.sandymandy.pleasurecraft.freecam.tripod.TripodRegistry;
+import com.sandymandy.pleasurecraft.freecam.tripod.TripodSlot;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.input.Input;
 import net.minecraft.client.input.KeyboardInput;

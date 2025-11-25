@@ -1,4 +1,4 @@
-package com.sandymandy.pleasurecraft.util;
+package com.sandymandy.pleasurecraft.freecam;
 
 import com.mojang.authlib.GameProfile;
 import net.minecraft.block.BlockState;
@@ -24,7 +24,7 @@ import org.jetbrains.annotations.ApiStatus;
 import java.util.Collections;
 import java.util.UUID;
 
-import static com.sandymandy.pleasurecraft.Freecam.MC;
+import static com.sandymandy.pleasurecraft.freecam.Freecam.MC;
 
 @ApiStatus.Internal
 @ApiStatus.AvailableSince("0.4.0")

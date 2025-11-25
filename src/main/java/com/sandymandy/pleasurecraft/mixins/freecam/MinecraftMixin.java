@@ -1,6 +1,6 @@
-package com.sandymandy.pleasurecraft.mixins;
+package com.sandymandy.pleasurecraft.mixins.freecam;
 
-import com.sandymandy.pleasurecraft.Freecam;
+import com.sandymandy.pleasurecraft.freecam.Freecam;
 import com.sandymandy.pleasurecraft.config.ModConfig;
 import net.minecraft.client.MinecraftClient;
 import org.spongepowered.asm.mixin.Mixin;

@@ -7,6 +7,7 @@ import com.sandymandy.pleasurecraft.client.gui.screen.settlement.SettlementHubSc
 import com.sandymandy.pleasurecraft.client.rendering.renderers.*;
 import com.sandymandy.pleasurecraft.config.ModBindings;
 import com.sandymandy.pleasurecraft.config.ModConfig;
+import com.sandymandy.pleasurecraft.freecam.Freecam;
 import com.sandymandy.pleasurecraft.networking.C2S.CumKeybindC2SPacket;
 import com.sandymandy.pleasurecraft.networking.C2S.ThrustKeybindC2SPacket;
 import com.sandymandy.pleasurecraft.networking.PleasureCraftClientPackets;

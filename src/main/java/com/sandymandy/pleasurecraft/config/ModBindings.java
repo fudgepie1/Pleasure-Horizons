@@ -2,7 +2,7 @@ package com.sandymandy.pleasurecraft.config;
 
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
-import com.sandymandy.pleasurecraft.Freecam;
+import com.sandymandy.pleasurecraft.freecam.Freecam;
 import me.shedaniel.autoconfig.AutoConfig;
 import com.sandymandy.pleasurecraft.config.keys.FreecamKeyMapping;
 import org.jetbrains.annotations.NotNull;
@@ -11,7 +11,7 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-import static com.sandymandy.pleasurecraft.Freecam.MC;
+import static com.sandymandy.pleasurecraft.freecam.Freecam.MC;
 import static com.sandymandy.pleasurecraft.config.keys.FreecamKeyMappingBuilder.builder;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_F4;
 

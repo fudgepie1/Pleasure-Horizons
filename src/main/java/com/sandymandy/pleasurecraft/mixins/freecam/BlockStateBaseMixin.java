@@ -1,7 +1,7 @@
-package com.sandymandy.pleasurecraft.mixins;
+package com.sandymandy.pleasurecraft.mixins.freecam;
 
-import com.sandymandy.pleasurecraft.Freecam;
-import com.sandymandy.pleasurecraft.util.FreeCamera;
+import com.sandymandy.pleasurecraft.freecam.Freecam;
+import com.sandymandy.pleasurecraft.freecam.FreeCamera;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.EntityShapeContext;

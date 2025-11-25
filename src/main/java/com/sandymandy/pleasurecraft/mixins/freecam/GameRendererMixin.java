@@ -1,6 +1,6 @@
-package com.sandymandy.pleasurecraft.mixins;
+package com.sandymandy.pleasurecraft.mixins.freecam;
 
-import com.sandymandy.pleasurecraft.Freecam;
+import com.sandymandy.pleasurecraft.freecam.Freecam;
 import com.sandymandy.pleasurecraft.config.ModConfig;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.entity.Entity;
@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import static com.sandymandy.pleasurecraft.Freecam.MC;
+import static com.sandymandy.pleasurecraft.freecam.Freecam.MC;
 import static com.sandymandy.pleasurecraft.config.ModConfig.InteractionMode.PLAYER;
 
 @Mixin(GameRenderer.class)

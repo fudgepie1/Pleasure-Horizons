@@ -1,6 +1,6 @@
-package com.sandymandy.pleasurecraft.mixins;
+package com.sandymandy.pleasurecraft.mixins.freecam;
 
-import com.sandymandy.pleasurecraft.util.FreeCamera;
+import com.sandymandy.pleasurecraft.freecam.FreeCamera;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.sound.BubbleColumnSoundPlayer;
 import org.spongepowered.asm.mixin.Final;

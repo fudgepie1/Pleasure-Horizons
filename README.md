@@ -39,10 +39,10 @@
 - [x] Keybinds for advancing and exiting scenes
 - [x] Player model integration with girl's scene pose
 - [x] Armor and equipment rendering
+- [x] JSON-driven entity definition (animations, stats, behavior)
 
 ### Planned
 - [ ] Better AI (pathfinding, behavior trees, etc.)
-- [ ] JSON-driven entity definition (animations, stats, behavior)
 
 ---
 

@@ -1,4 +1,4 @@
-package com.sandymandy.pleasurecraft.tripod;
+package com.sandymandy.pleasurecraft.freecam.tripod;
 
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_0;
 

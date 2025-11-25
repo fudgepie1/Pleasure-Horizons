@@ -1,4 +1,4 @@
-package com.sandymandy.pleasurecraft.util;
+package com.sandymandy.pleasurecraft.freecam;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityPose;
