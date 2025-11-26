@@ -124,6 +124,7 @@ public class BedGoal extends Goal {
             this.navigation.startMovingAlong(this.pathToBed, this.speed);
         }
     }
+
     private void startOnContact() {
         if (!entity.isWaitingAtBed()) return;
 

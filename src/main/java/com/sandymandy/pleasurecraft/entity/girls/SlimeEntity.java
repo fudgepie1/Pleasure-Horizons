@@ -31,7 +31,10 @@ public class SlimeEntity extends GirlEntityAI {
     }
 
     @Override
-    public int getSizeGUI(){return 35;}
+    public int getSizeGUI(){return 29;}
+
+    @Override
+    public float getYAxisGUI(){return 0.0525F;}
 
     @Override
     public List<SceneOptions> getSceneOptions() {
@@ -46,16 +49,15 @@ public class SlimeEntity extends GirlEntityAI {
                         false,
                         false),
 
-                SceneOptions.onBed("Doggy",
+                SceneOptions.stationaryContact("Doggy",
                         10,
                         List.of("doggy_intro"),
                         List.of("doggy_slow"),
-                        List.of("doggy_fast1"),
+                        List.of("doggy_fast"),
                         "doggy_cum",
-                        6f,
+                        4.5f,
                         true,
                         false,
-                        0f,
                         "doggy_lay_on_bed",
                         "doggy_bed_idle")
         );

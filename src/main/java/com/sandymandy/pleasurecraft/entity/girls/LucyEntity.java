@@ -61,12 +61,14 @@ public class LucyEntity extends GirlEntityAI {
                         List.of("doggy_slow"),
                         List.of("doggy_fast1", "doggy_fast2"),
                         "doggy_cum",
-                        6f,
+                        4.5f,
                         true,
                         false,
                         0f,
                         "doggy_lay_on_bed",
                         "doggy_bed_idle")
                 );
+
+
     }
 }

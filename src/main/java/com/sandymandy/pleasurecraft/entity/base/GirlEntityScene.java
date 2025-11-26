@@ -73,6 +73,7 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
     private boolean requestStrip = false;
     private boolean requestMoveToBed = false;
     private boolean requestMoveToPlayer;
+    private boolean requestWaitForPlayer;
     private String lastSceneAnim = "";
     public String passengerBoneName = "boyCam";
     private String lastSoundKey = null;
@@ -318,8 +319,14 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
             this.requestMoveToBed();
             return;
         }
+
         if (option.sceneType().equals(SceneType.ON_PLAYER)) {
             this.requestMoveToPlayer();
+            return;
+        }
+
+        if(option.sceneType().equals(SceneType.STATIONARY_CONTACT)){
+            this.requestWaitForPlayer();
             return;
         }
 
@@ -978,6 +985,18 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
     public boolean shouldMoveToPlayer() {
         if (requestMoveToPlayer) {
             requestMoveToPlayer = false;
+            return true;
+        }
+        return false;
+    }
+
+    public void requestWaitForPlayer() {
+        this.requestWaitForPlayer = true;
+    }
+
+    public boolean shouldWaitForPlayer() {
+        if (requestWaitForPlayer) {
+            requestWaitForPlayer = false;
             return true;
         }
         return false;

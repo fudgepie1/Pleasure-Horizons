@@ -11490,9 +11490,6 @@
                 }
             },
             "sound_effects": {
-                "0.16": {
-                    "effect": "sexUiOn"
-                },
                 "0.64": {
                     "effect": "bjiMSG12"
                 },
@@ -12933,10 +12930,7 @@
             },
             "sound_effects": {
                 "0.28": {
-                    "effect": "bjtMSG1"
-                },
-                "0.4": {
-                    "effect": "thrust"
+                    "effect": "bjtMSG1, thrust"
                 },
                 "1.24": {
                     "effect": "bjtReady"
@@ -27677,7 +27671,7 @@
             },
             "sound_effects": {
                 "0.16": {
-                    "effect": "doggyfastMSG1 thrust"
+                    "effect": "doggyfastMSG1, thrust"
                 },
                 "0.52": {
                     "effect": "reset"
@@ -29263,7 +29257,7 @@
             },
             "sound_effects": {
                 "0.16": {
-                    "effect": "doggyfastMSG1 thrust"
+                    "effect": "doggyfastMSG1, thrust"
                 },
                 "0.52": {
                     "effect": "reset"

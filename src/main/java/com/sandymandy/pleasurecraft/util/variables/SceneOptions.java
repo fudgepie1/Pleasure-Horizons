@@ -148,10 +148,8 @@ public class SceneOptions{
                 name, requiredRelationshipLevel, introAnim, slowAnim, fastAnim,
                 cumAnim, cumThreshold, needsToStrip,
                 SceneType.ON_BED,
-
                 useKeyFrameEvents,
                 bedOffset, layOnBed, bedIdle,
-
                 new ArrayList<>(), "", 0
         );
     }
@@ -172,9 +170,31 @@ public class SceneOptions{
                 name, requiredRelationshipLevel, introAnim, slowAnim, fastAnim,
                 cumAnim, cumThreshold, needsToStrip,
                 SceneType.ON_PLAYER,
-
                 useKeyFrameEvents,
                 0f, "", "",
+                new ArrayList<>(), "", 0
+        );
+    }
+
+    public static SceneOptions stationaryContact(
+            String name,
+            int requiredRelationshipLevel,
+            List<String> introAnim,
+            List<String> slowAnim,
+            List<String> fastAnim,
+            String cumAnim,
+            float cumThreshold,
+            boolean needsToStrip,
+            boolean useKeyFrameEvents,
+            String layDown,
+            String idle
+    ) {
+        return new SceneOptions(
+                name, requiredRelationshipLevel, introAnim, slowAnim, fastAnim,
+                cumAnim, cumThreshold, needsToStrip,
+                SceneType.STATIONARY_CONTACT,
+                useKeyFrameEvents,
+                0f, layDown, idle,
                 new ArrayList<>(), "", 0
         );
     }
@@ -192,9 +212,7 @@ public class SceneOptions{
                 new ArrayList<>(), new ArrayList<>(), new ArrayList<>(),
                 "", 0f, needsToStrip,
                 SceneType.STATIONARY_INTRO,
-
                 false, 0f, "", "",
-
                 stationaryIntroAnim,
                 anim,
                 amountOfLoops

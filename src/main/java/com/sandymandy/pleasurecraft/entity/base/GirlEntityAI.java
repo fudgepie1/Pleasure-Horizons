@@ -61,6 +61,7 @@ public abstract class GirlEntityAI extends GirlEntityScene implements SmartBrain
     @Override
     protected void initGoals() {
         super.initGoals();
+        this.goalSelector.add(-4, new StationaryContactGoal(this));
         this.goalSelector.add(-3, new MoveToPlayerGoal(this, 1.25D));
         this.goalSelector.add(-2, new BedGoal(this, 1.25D));
         this.goalSelector.add(-1, new StripGoal(this));

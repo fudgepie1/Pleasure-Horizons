@@ -80,6 +80,21 @@ public class CustomGirlParser {
                         s.has("use_keyframe") && s.get("use_keyframe").getAsBoolean()
                 );
 
+            case "stationary_contact":
+                return SceneOptions.stationaryContact(
+                        name,
+                        level,
+                        jsonArrayToList(s.getAsJsonArray("intro_anim")),
+                        jsonArrayToList(s.getAsJsonArray("slow_anim")),
+                        jsonArrayToList(s.getAsJsonArray("fast_anim")),
+                        s.get("cum_anim").getAsString(),
+                        s.get("cum_threshold").getAsFloat(),
+                        needsStrip,
+                        s.has("use_keyframe") && s.get("use_keyframe").getAsBoolean(),
+                        s.has("lay_down_anim") ? s.get("lay_down_anim").getAsString() : "",
+                        s.has("idle_anim") ? s.get("idle_anim").getAsString() : ""
+                );
+
             case "stationary_intro":
                 return SceneOptions.stationaryIntro(
                         name,

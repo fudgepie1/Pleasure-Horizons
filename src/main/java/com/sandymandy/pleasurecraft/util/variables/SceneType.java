@@ -8,6 +8,7 @@ import net.minecraft.network.codec.PacketCodecs;
 public enum SceneType {
     ON_PLAYER,
     ON_BED,
+    STATIONARY_CONTACT,
     STATIONARY_INTRO,
     STATIONARY;
 

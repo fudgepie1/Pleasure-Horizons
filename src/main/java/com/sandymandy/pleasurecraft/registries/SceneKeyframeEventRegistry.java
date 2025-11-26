@@ -27,25 +27,39 @@ public class SceneKeyframeEventRegistry {
         RANDOM_SOUNDS.computeIfAbsent(key, k -> new ArrayList<>()).addAll(events);
     }
 
-    public static List<SoundEvent> getSound(String girlID, String key) {
-        key = key.toLowerCase();
+    public static List<SoundEvent> getSound(String girlID, String keyframe) {
+        keyframe = keyframe.toLowerCase(Locale.ROOT);
+
+        // Remove all white spaces and split on "," to different strings
+        String[] tokens = keyframe.strip().split(",");
+
         List<SoundEvent> result = new ArrayList<>();
 
-        // Go through all registered keys and find ones that "contain" or "start with" the key
+        // Exact match only
         for (Map.Entry<SceneKey, List<SoundEvent>> entry : SOUND_EVENTS.entrySet()) {
-            SceneKey sceneKey = entry.getKey();
-            if (sceneKey.girlID().equals(girlID) && key.contains(sceneKey.key())) {
-                result.addAll(entry.getValue());
+            SceneKey sk = entry.getKey();
+
+            if (!sk.girlID().equals(girlID)) continue;
+
+            for (String token : tokens) {
+                if (token.equals(sk.key())) {
+                    result.addAll(entry.getValue());
+                }
             }
         }
 
-        // Add random sounds if partial key matches
+        // Random sound system (exact match too)
         for (Map.Entry<SceneKey, List<SoundEvent>> entry : RANDOM_SOUNDS.entrySet()) {
-            SceneKey sceneKey = entry.getKey();
-            if (sceneKey.girlID().equals(girlID) && key.contains(sceneKey.key())) {
-                List<SoundEvent> pool = entry.getValue();
-                if (!pool.isEmpty()) {
-                    result.add(pool.get(RANDOM.nextInt(pool.size())));
+            SceneKey sk = entry.getKey();
+
+            if (!sk.girlID().equals(girlID)) continue;
+
+            for (String token : tokens) {
+                if (token.equals(sk.key())) {
+                    List<SoundEvent> pool = entry.getValue();
+                    if (!pool.isEmpty()) {
+                        result.add(pool.get(RANDOM.nextInt(pool.size())));
+                    }
                 }
             }
         }
@@ -71,14 +85,21 @@ public class SceneKeyframeEventRegistry {
         return PLAYER_MESSAGES.getOrDefault(key, Collections.emptyList());
     }
 
-    public static List<String> getMessage(String girlID, String key) {
-        key = key.toLowerCase();
+    public static List<String> getMessage(String girlID, String keyframe) {
+        keyframe = keyframe.toLowerCase(Locale.ROOT);
+        String[] tokens = keyframe.split("-");
+
         List<String> result = new ArrayList<>();
 
         for (Map.Entry<SceneKey, List<String>> entry : CHAT_MESSAGES.entrySet()) {
-            SceneKey sceneKey = entry.getKey();
-            if (sceneKey.girlID().equals(girlID) && key.contains(sceneKey.key())) {
-                result.addAll(entry.getValue());
+            SceneKey sk = entry.getKey();
+
+            if (!sk.girlID().equals(girlID)) continue;
+
+            for (String token : tokens) {
+                if (token.equals(sk.key())) {
+                    result.addAll(entry.getValue());
+                }
             }
         }
 

@@ -28308,10 +28308,7 @@
             },
             "sound_effects": {
                 "0.7083": {
-                    "effect": "pound"
-                },
-                "0.75": {
-                    "effect": "doggyMoan"
+                    "effect": "pound-doggyMoan"
                 }
             }
         },
@@ -31693,7 +31690,7 @@
             },
             "sound_effects": {
                 "0.2083": {
-                    "effect": "pound doggyMoan thrust"
+                    "effect": "pound, doggyMoan, thrust"
                 },
                 "0.375": {
                     "effect": "doggySwitch"
@@ -36893,7 +36890,7 @@
             },
             "sound_effects": {
                 "0.375": {
-                    "effect": "pound doggyMoan thrust"
+                    "effect": "pound, doggyMoan, thrust"
                 },
                 "0.625": {
                     "effect": "doggyReset"
@@ -40525,7 +40522,7 @@
             },
             "sound_effects": {
                 "0.375": {
-                    "effect": "pound doggyMoan thrust"
+                    "effect": "pound, doggyMoan, thrust"
                 },
                 "0.625": {
                     "effect": "doggyReset"
@@ -44157,7 +44154,7 @@
             },
             "sound_effects": {
                 "0.375": {
-                    "effect": "pound doggyMoan thrust"
+                    "effect": "pound, doggyMoan, thrust"
                 },
                 "0.625": {
                     "effect": "doggyReset"
@@ -47298,9 +47295,9 @@
             },
             "sound_effects": {
                 "0.375": {
-                    "effect": "pound cum orgasm1"
+                    "effect": "pound-cum-orgasm1"
                 },
-                "1.375": {
+                "1.2917": {
                     "effect": "orgasm2"
                 },
                 "1.9167": {

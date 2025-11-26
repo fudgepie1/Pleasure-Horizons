@@ -4,6 +4,7 @@
   "package": "com.sandymandy.pleasurecraft.mixins",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "bugfix.ScreenHandlerMixin",
     "freecam.BlockStateBaseMixin",
     "freecam.EntityMixin",
     "freecam.LivingEntityMixin"

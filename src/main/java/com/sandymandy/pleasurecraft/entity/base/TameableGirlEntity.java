@@ -61,6 +61,7 @@ import static com.sandymandy.pleasurecraft.util.Utils.getReadableTameItemName;
 public abstract class TameableGirlEntity extends PathAwareEntity implements Tameable {
     private static final TrackedData<Boolean> WAITING_AT_BED = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<Boolean> LOCKED_STATE = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+    private static final TrackedData<Boolean> WAITING_FOR_PLAYER = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<Boolean> FROZEN_STATE = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<Boolean> STRIPPED = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<Boolean> FOLLOWING = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
@@ -113,6 +114,7 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
         builder.add(WAITING_AT_BED, false);
         builder.add(LOCKED_STATE, false);
         builder.add(FROZEN_STATE, false);
+        builder.add(WAITING_FOR_PLAYER, false);
         builder.add(STRIPPED, false);
         builder.add(FOLLOWING, false);
         builder.add(IN_SCENE, false);
@@ -213,6 +215,14 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
 
     public void setWaitingAtBedState(boolean state){
         this.dataTracker.set(WAITING_AT_BED, state);
+    }
+
+    public boolean isWaitingForPlayer(){
+        return this.dataTracker.get(WAITING_FOR_PLAYER);
+    }
+
+    public void setWaitingForPlayerState(boolean state){
+        this.dataTracker.set(WAITING_FOR_PLAYER, state);
     }
 
     public void setIsPlayerModelSlim(boolean isSlim){
@@ -782,15 +792,15 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
             }
         }
 
-        updateSpeedBoost(isRunning());
+        updateRunningSpeedBoost(isRunning());
         previousYaw = getYaw();
         previousVelocity = getVelocity();
-        this.setMovementLockedState(this.isFrozenInPlace() || this.isWaitingAtBed() || this.isSceneActive());
+        this.setMovementLockedState(this.isFrozenInPlace() || this.isWaitingAtBed() || this.isSceneActive() || this.isWaitingForPlayer());
     }
 
     private static final Identifier RUNNING_SPEED_BOOST = Identifier.of(PleasureCraft.MOD_ID, "running_speed_boost");
 
-    public void updateSpeedBoost(boolean active) {
+    public void updateRunningSpeedBoost(boolean active) {
         var attr = this.getAttributeInstance(EntityAttributes.MOVEMENT_SPEED);
         if (attr == null) return;
 
