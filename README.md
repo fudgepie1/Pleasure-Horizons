@@ -52,7 +52,7 @@
 > As of v0.5 you should use minecraft 1.21.5 **Fabric**.
 > But In v0.6 we are on 1.21.8
 
-➞ ** How do I interact with the girls**
+➞ **How do I interact with the girls**
 > Before you can do anything with the girls you need to tame and improve your relationship with them by using the corresponding flower
 >
 > **Momo**: Poppy
