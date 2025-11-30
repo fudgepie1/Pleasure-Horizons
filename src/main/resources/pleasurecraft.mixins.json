@@ -5,9 +5,8 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "bugfix.ScreenHandlerMixin",
-    "freecam.BlockStateBaseMixin",
-    "freecam.EntityMixin",
-    "freecam.LivingEntityMixin"
+    "glsl.GlImportProcessorMixin",
+    "glsl.ShaderLoader$1Mixin"
   ],
   "client": [
     "freecam.BubbleColumnAmbientSoundHandlerMixin",
@@ -15,6 +14,9 @@
     "freecam.ClientPacketListenerMixin",
     "freecam.EntityRenderDispatcherAccessor",
     "freecam.EntityRenderDispatcherMixin",
+    "freecam.BlockStateBaseMixin",
+    "freecam.EntityMixin",
+    "freecam.LivingEntityMixin",
     "freecam.EntityRendererMixin",
     "freecam.GameRendererMixin",
     "freecam.GuiMixin",
