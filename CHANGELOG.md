@@ -1,7 +1,7 @@
 # Changelog
 
 ## v0.6.0
-- Updated to 1.21.7
+- Updated to 1.21.6
 - Added a new slime girl.
 - Added a new block called "Carved Girl Pumpkin" To summon Golem Girls in the future
 - Added a new block called "Settlement Hub" to create and manage settlements

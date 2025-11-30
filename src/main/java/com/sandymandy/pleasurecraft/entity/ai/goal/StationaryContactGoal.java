@@ -39,6 +39,21 @@ public class StationaryContactGoal extends Goal {
         if (this.entity.scenePlayer != null) {
             this.navigation.stop();
 
+            float targetYaw = this.entity.getYaw();
+
+            // Freeze state first
+            this.entity.setWaitingAtBedState(true);
+
+            // Mirror to model this tick (safe on both sides)
+            this.entity.setYaw(targetYaw);
+            this.entity.setHeadYaw(targetYaw);
+            this.entity.setBodyYaw(targetYaw);
+
+            // Keep LookControl from fighting the snap while waiting
+            this.entity.getLookControl().lookAt(
+                    this.entity.getX(), this.entity.getEyeY(), this.entity.getZ()
+            );
+
             // Freeze state first
             this.entity.setWaitingForPlayerState(true);
 

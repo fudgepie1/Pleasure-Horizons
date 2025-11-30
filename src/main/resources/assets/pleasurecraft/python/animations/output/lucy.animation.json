@@ -37364,7 +37364,7 @@
             },
             "sound_effects": {
                 "0.1": {
-                    "effect": "paizuriFastMSG1 thrust"
+                    "effect": "paizuriFastMSG1, thrust"
                 },
                 "0.8": {
                     "effect": "paizuriReady"

@@ -20219,8 +20219,11 @@
                 "3.12": {
                     "effect": "cowgirlcumMSG3"
                 },
-                "10.36": {
+                "6.28": {
                     "effect": "cowgirlcumMSG4"
+                },
+                "10.36": {
+                    "effect": "cowgirlcumMSG5"
                 },
                 "13.84": {
                     "effect": "cowgirlcumMSG6"
@@ -25299,6 +25302,9 @@
                 }
             },
             "sound_effects": {
+                "1.0833": {
+                    "effect": "openSexUi"
+                },
                 "1.375": {
                     "effect": "missionary_fastMSG1"
                 },
@@ -32041,6 +32047,9 @@
                 }
             },
             "sound_effects": {
+                "0.0": {
+                    "effect": "openSexUi"
+                },
                 "0.04": {
                     "effect": "bedRustle"
                 },
@@ -32052,6 +32061,9 @@
                 },
                 "11.04": {
                     "effect": "missionary_cumMSG2"
+                },
+                "12.84": {
+                    "effect": "cowgirlcumMSG6"
                 },
                 "13.88": {
                     "effect": "missionary_cumDone"
@@ -52087,11 +52099,8 @@
                 }
             },
             "sound_effects": {
-                "0.1667": {
-                    "effect": "suckFast"
-                },
-                "0.2083": {
-                    "effect": "thrust"
+                "0.0833": {
+                    "effect": "suckFast, thrust"
                 },
                 "0.7083": {
                     "effect": "carry_fastDone"

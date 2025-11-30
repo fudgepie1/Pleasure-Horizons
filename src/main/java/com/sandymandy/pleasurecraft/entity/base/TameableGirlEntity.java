@@ -126,7 +126,7 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
         builder.add(SITTING, false);
         builder.add(RUNNING, false);
         builder.add(RELATIONSHIP_LEVEL,0);
-        builder.add(MAX_RELATIONSHIP_LEVEL,0);
+        builder.add(MAX_RELATIONSHIP_LEVEL,4);
         builder.add(BREAST_SIZE,100);
         builder.add(BREAST_OFFSET, Vec3d.ZERO);
         builder.add(PASSENGER_BONE_POSITION, Vec3d.ZERO);
@@ -428,7 +428,8 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
                                 this.navigation.stop();
                                 this.setTarget(null);
                                 return ActionResult.SUCCESS.noIncrementStat();
-                            } else {
+                            }
+                            else if (!this.isSceneActive()){
                                 player.openHandledScreen(new GirlInventoryScreenHandlerFactory(this));
                                 this.setInInventory(true);
                                 getLookControl().lookAt(player, this.getMaxHeadRotation() + 20, this.getMaxLookPitchChange());
@@ -508,10 +509,9 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
         view.putBoolean("StripState", this.isStripped());
         view.putBoolean("FollowState", this.isFollowing());
         view.putInt("RelationshipLevel", this.getCurrentRelationshipLevel());
-
-        view.putInt("BaseX", this.getBasePos().getX());
-        view.putInt("BaseY", this.getBasePos().getY());
-        view.putInt("BaseZ", this.getBasePos().getZ());
+        view.putInt("BreastSize", getBreastSize());
+        view.put("BreastOffset", Vec3d.CODEC, getBreastOffset());
+        view.put("BasePos", BlockPos.CODEC, this.getBasePos());
 
         LazyEntityReference<LivingEntity> lazyEntityReference = this.getOwnerReference();
         if (lazyEntityReference != null) {
@@ -544,10 +544,9 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
         int relationship = view.getInt("RelationshipLevel", 0);
         this.setCurrentRelationshipLevel(relationship);
 
-        int x = view.getInt("BaseX",0);
-        int y = view.getInt("BaseY", 0);
-        int z = view.getInt("BaseZ", 0);
-        this.setBasePos(new BlockPos(x, y, z));
+        this.setBasePos(view.read("BasePos", BlockPos.CODEC).orElse(new BlockPos(0,0,0)));
+        this.setBreastOffset(view.read("BreastOffset", Vec3d.CODEC).orElse(Vec3d.ZERO));
+        this.setBreastSize(view.getInt("BreastSize", 100));
 
         LazyEntityReference<LivingEntity> lazyEntityReference =
                 LazyEntityReference.fromDataOrPlayerName(view, "Owner", this.getWorld());

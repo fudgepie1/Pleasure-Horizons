@@ -8478,10 +8478,7 @@
             },
             "sound_effects": {
                 "0.4": {
-                    "effect": "anal_slowMSG1"
-                },
-                "0.48": {
-                    "effect": "thrust"
+                    "effect": "anal_slowMSG1, thrust"
                 }
             }
         },
@@ -9914,10 +9911,7 @@
             },
             "sound_effects": {
                 "0.08": {
-                    "effect": "anal_fastMSG1"
-                },
-                "0.12": {
-                    "effect": "thrust"
+                    "effect": "anal_fastMSG1, thrust"
                 }
             }
         },
