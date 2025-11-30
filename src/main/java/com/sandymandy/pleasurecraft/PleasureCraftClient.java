@@ -51,6 +51,18 @@ public class PleasureCraftClient implements ClientModInitializer {
         SceneKeyframeEventReloader.registerReloader();
     }
 
+    public static boolean areIrisShadersEnabled() {
+        try {
+            Class<?> irisApiClass = Class.forName("net.irisshaders.iris.api.v0.IrisApi");
+            Object irisApi = irisApiClass.getMethod("getInstance").invoke(null);
+
+            return (boolean) irisApiClass.getMethod("isShaderPackInUse").invoke(irisApi);
+
+        } catch (Throwable ignored) {
+            return false;
+        }
+    }
+
     private static void handleKeybinds() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (client.player == null) return;
