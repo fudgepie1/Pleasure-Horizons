@@ -35,6 +35,9 @@ public class ModConfig implements ConfigData {
     public static class GirlConfig {
         @ConfigEntry.Gui.Tooltip
         public boolean boobWindow = false;
+
+        @ConfigEntry.Gui.Tooltip
+        public boolean disableShading = false;
     }
 
     public static class PlayerConfig {
