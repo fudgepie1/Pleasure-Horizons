@@ -1,14 +1,14 @@
 package com.sandymandy.pleasurecraft.client.rendering.renderers;
 
-import com.mojang.blaze3d.pipeline.BlendFunction;
-import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.datafixers.util.Either;
+import com.sandymandy.pleasurecraft.PleasureCraftClient;
+import com.sandymandy.pleasurecraft.config.ModConfig;
 import com.sandymandy.pleasurecraft.entity.base.GirlEntityScene;
 import com.sandymandy.pleasurecraft.networking.C2S.BonePosSyncC2SPacket;
 import com.sandymandy.pleasurecraft.registries.PleasureCraftDataTicketRegistry;
+import com.sandymandy.pleasurecraft.util.rendering.UnlitNormalVertexConsumer;
 import com.sandymandy.pleasurecraft.util.rendering.OffsetVertexConsumer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -284,7 +284,21 @@ public abstract class AbstractGirlRenderer<T extends GirlEntityScene, R extends 
 
     }
 
+    @Override
+    public void defaultRender(R renderState, MatrixStack poseStack, VertexConsumerProvider bufferSource, @Nullable RenderLayer renderType, @Nullable VertexConsumer buffer) {
+        super.defaultRender(renderState, poseStack, bufferSource, renderType, buffer);
+    }
+    public static boolean IS_SHADING_DISABLED = ModConfig.INSTANCE.girls.disableShading;
+    public static boolean ARE_SHADERS_DISABLED = PleasureCraftClient.areIrisShadersDisabled();
 
+    public static void updateShadingState() {
+        IS_SHADING_DISABLED = ModConfig.INSTANCE.girls.disableShading;
+        ARE_SHADERS_DISABLED = PleasureCraftClient.areIrisShadersDisabled();
+    }
+
+    protected boolean isShadingDisabled() {
+        return IS_SHADING_DISABLED && ARE_SHADERS_DISABLED;
+    }
 
     @Override
     public void renderRecursively(R renderState,
@@ -297,6 +311,10 @@ public abstract class AbstractGirlRenderer<T extends GirlEntityScene, R extends 
                                   int packedLight,
                                   int packedOverlay,
                                   int renderColor) {
+
+        if (isShadingDisabled()) {
+            buffer = new UnlitNormalVertexConsumer(buffer);
+        }
 
         Map<String, Identifier> boneTexOverrides = renderState.getGeckolibData(PleasureCraftDataTicketRegistry.GIRL_BONE_TEXTURE_OVERRIDES);
         Map<String, Vec2f> boneUVOffsets = renderState.getGeckolibData(PleasureCraftDataTicketRegistry.GIRL_BONE_UV_OFFSETS);

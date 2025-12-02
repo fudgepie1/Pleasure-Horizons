@@ -30,6 +30,9 @@ import static com.sandymandy.pleasurecraft.registries.PleasureCraftScreenHandler
 
 public class PleasureCraftClient implements ClientModInitializer {
 
+    private boolean isShadingDisabled;
+    private boolean shouldReload = false;
+
     @Override
     public void onInitializeClient() {
         ModConfig.init();
@@ -49,17 +52,23 @@ public class PleasureCraftClient implements ClientModInitializer {
         PleasureCraftHudRegistry.register();
         handleKeybinds();
         SceneKeyframeEventReloader.registerReloader();
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            boolean current = ModConfig.INSTANCE.girls.disableShading;
+            if (current != AbstractGirlRenderer.IS_SHADING_DISABLED) {
+                AbstractGirlRenderer.updateShadingState();
+            }
+        });
     }
 
-    public static boolean areIrisShadersEnabled() {
+    public static boolean areIrisShadersDisabled() {
         try {
             Class<?> irisApiClass = Class.forName("net.irisshaders.iris.api.v0.IrisApi");
             Object irisApi = irisApiClass.getMethod("getInstance").invoke(null);
 
-            return (boolean) irisApiClass.getMethod("isShaderPackInUse").invoke(irisApi);
+            return !((boolean) irisApiClass.getMethod("isShaderPackInUse").invoke(irisApi));
 
         } catch (Throwable ignored) {
-            return false;
+            return true;
         }
     }
 

@@ -3,6 +3,7 @@ package com.sandymandy.pleasurecraft.util.json;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.util.variables.CustomGirlProfile;
 import com.sandymandy.pleasurecraft.util.variables.SceneOptions;
 import net.minecraft.item.Item;
@@ -13,7 +14,7 @@ import java.util.List;
 
 public class CustomGirlParser {
 
-    public static CustomGirlProfile parse(JsonObject json) {
+    public static CustomGirlProfile parse(JsonObject json) throws Exception {
         String id = json.get("id").getAsString();
         String name = json.get("name").getAsString();
         float hitboxHeight = json.has("hitbox_height") ? json.get("hitbox_height").getAsFloat() : 1.65f;
@@ -21,7 +22,10 @@ public class CustomGirlParser {
         float guiYOffset = json.has("gui_y_offset") ? json.get("gui_y_offset").getAsFloat() : 0.05f;
 
         // Tame item
-        String tameItemId = json.has("tame_item") ? json.get("tame_item").getAsString() : "minecraft:allium";
+        String tameItemId = json.has("tame_item") ? json.get("tame_item").getAsString() : null;
+        if(tameItemId == null){
+            throw new Exception("Girl does not have a tame_item property");
+        }
         Item tameItem = Registries.ITEM.get(Identifier.of(tameItemId));
 
         // Attributes

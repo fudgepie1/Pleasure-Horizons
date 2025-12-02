@@ -4,14 +4,13 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
-import com.sandymandy.pleasurecraft.client.models.AbstractGirlModel;
+import com.sandymandy.pleasurecraft.entity.base.TameableGirlEntity;
 import com.sandymandy.pleasurecraft.entity.girls.CustomGirlEntity;
 import com.sandymandy.pleasurecraft.networking.S2C.RefreshModelsS2CPacket;
 import com.sandymandy.pleasurecraft.registries.GirlRegistry;
 import com.sandymandy.pleasurecraft.util.json.CustomGirlLoader;
 import com.sandymandy.pleasurecraft.util.managers.TamedGirlManager;
 import com.sandymandy.pleasurecraft.util.variables.CustomGirlProfile;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.argument.BlockPosArgumentType;
@@ -25,6 +24,7 @@ import net.minecraft.util.math.Vec3d;
 
 import java.util.concurrent.CompletableFuture;
 
+import static com.sandymandy.pleasurecraft.util.Utils.getReadableTameItemName;
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
@@ -32,7 +32,7 @@ public class GirlsCommand {
 
     // Suggestion provider for auto-complete
     private static final SuggestionProvider<ServerCommandSource> PROFILE_SUGGESTIONS = (context, builder) -> {
-        CustomGirlLoader.PROFILES.keySet().forEach(builder::suggest);
+        CustomGirlLoader.LOADED_PROFILES.keySet().forEach(builder::suggest);
         return CompletableFuture.completedFuture(builder.build());
     };
 
@@ -44,16 +44,19 @@ public class GirlsCommand {
                 literal("girls")
                         .requires(src -> true) // anyone can run the base command
 
-                        // --- locateAll ---
                         .then(literal("locateAll")
                                 .requires(src -> true)
                                 .executes(ctx -> locateAllGirls(ctx.getSource()))
                         )
 
-                        // --- reload ---
                         .then(literal("refreshJiggle")
                                 .requires(src -> true)
                                 .executes(ctx -> refresh(ctx.getSource()))
+                        )
+
+                        .then(literal("showCustomGirlInfo")
+                                .requires(src -> true)
+                                .executes(ctx -> customGirlInfo(ctx.getSource()))
                         )
 
                         // --- spawn <girlName> ---
@@ -91,6 +94,19 @@ public class GirlsCommand {
         return 1;
     }
 
+    private static int customGirlInfo(ServerCommandSource source) {
+        ServerPlayerEntity player = source.getPlayer();
+        if (player == null) return 0;
+        if(CustomGirlLoader.REGISTERED_PROFILES.isEmpty()) {
+            player.sendMessage(Text.literal("§cYou have no profiles registered."), false);
+            return 0;
+        }
+        for (CustomGirlProfile profile : CustomGirlLoader.REGISTERED_PROFILES.values()){
+            player.sendMessage(Text.of("§d"+profile.id() + " → §b" + getReadableTameItemName(profile.tameItem())), false);
+        }
+        return 1;
+    }
+
     private static int locateAllGirls(ServerCommandSource source) {
         ServerPlayerEntity player = source.getPlayer();
         if (player == null) return 0;
@@ -106,15 +122,15 @@ public class GirlsCommand {
 
         int found = 0;
         for (var entry : owned) {
-
+            TameableGirlEntity girl = (TameableGirlEntity) player.getWorld().getEntity(entry);
             found++;
 
-            var pos = entry.pos();
-            String name = entry.name();
+            Vec3d pos = girl.getPos();
+            String name = girl.getGirlDisplayName();
 
             player.sendMessage(
                     Text.literal("§d" + name
-                            + "§r → X: " + (int) pos.x
+                            + "§b → X: " + (int) pos.x
                             + " Y: " + (int) pos.y
                             + " Z: " + (int) pos.z),
                     false
@@ -129,7 +145,7 @@ public class GirlsCommand {
         ServerWorld world = source.getWorld();
 
         // Validate profile
-        CustomGirlProfile profile = CustomGirlLoader.PROFILES.get(id);
+        CustomGirlProfile profile = CustomGirlLoader.LOADED_PROFILES.get(id);
         if (profile == null) {
             source.sendError(Text.literal("Girl profile not found: " + id));
             return 0;

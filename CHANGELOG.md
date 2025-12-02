@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.6.1
+- Fixed the issue where girls in villagers would have tiny breasts
+- Added the ability to turn off shading
+- Made it so that instead of cycling each profile you now how to use the profile's tame item to set it
+- Added a new command to show the tame item for each loaded profile
+- Made the girl spawn eggs craftable
+
 ## v0.6.0
 - Updated to 1.21.6
 - Added a new slime girl.

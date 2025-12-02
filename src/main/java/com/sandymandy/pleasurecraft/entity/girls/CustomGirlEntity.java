@@ -49,7 +49,6 @@ public class CustomGirlEntity extends GirlEntityAI {
     }
 
     public void setProfile(CustomGirlProfile profile, boolean isPermanent) {
-        if(this.dataTracker.get(IS_PROFILE_PERMANENT)) return;
         if (profile == null) profile = CustomGirlProfile.DEFAULT;
         this.profile = profile;
 
@@ -68,7 +67,7 @@ public class CustomGirlEntity extends GirlEntityAI {
         }
         this.calculateDimensions();
 
-        if(isPermanent) this.dataTracker.set(IS_PROFILE_PERMANENT, true);
+        this.dataTracker.set(IS_PROFILE_PERMANENT, isPermanent);
     }
 
     public CustomGirlProfile getProfile() {
@@ -142,65 +141,38 @@ public class CustomGirlEntity extends GirlEntityAI {
 
     @Override
     public ActionResult interactMob(PlayerEntity player, Hand hand) {
-        ItemStack itemStack = player.getStackInHand(Hand.MAIN_HAND);
 
         if (!this.getWorld().isClient()) {
             if (this.isTamed()) {
-                if (this.isOwner(player)) {
-                    if (player.isSneaking() && itemStack.getItem().equals(Items.STICK)) {
-
-                        // Current profile ID
-                        String currentId = this.getProfile().id();
-
-                        // Get next profile
-                        CustomGirlProfile next = CustomGirlLoader.getNextProfile(currentId);
-                        if (next != null) {
-                            // Apply it
-                            this.setProfile(next, false);
-
-                            player.sendMessage(
-                                    Text.literal("§dSwitched girl profile → §b" + next.id()),
-                                    true
-                            );
-                        } else {
-                            player.sendMessage(
-                                    Text.literal("§cNo girl profiles found."),
-                                    true
-                            );
-                        }
-
-                        return ActionResult.SUCCESS;
-                    }
-                }
+                if (this.isOwner(player) && player.isSneaking()) return trySwitchingProfiles(player);
             } else {
-                if (player.isSneaking() && itemStack.getItem().equals(Items.STICK)) {
-
-                    // Current profile ID
-                    String currentId = this.getProfile().id();
-
-                    // Get next profile
-                    CustomGirlProfile next = CustomGirlLoader.getNextProfile(currentId);
-                    if (next != null) {
-                        // Apply it
-                        this.setProfile(next, false);
-
-                        player.sendMessage(
-                                Text.literal("§dSwitched girl profile → §b" + next.id()),
-                                true
-                        );
-                    } else {
-                        player.sendMessage(
-                                Text.literal("§cNo girl profiles found."),
-                                true
-                        );
-                    }
-
-                    return ActionResult.SUCCESS;
-                }
+                if (player.isSneaking()) return trySwitchingProfiles(player);
             }
         }
 
         return super.interactMob(player, hand);
+    }
+
+    private ActionResult trySwitchingProfiles(PlayerEntity player){
+        if(this.dataTracker.get(IS_PROFILE_PERMANENT)) return ActionResult.FAIL;
+        ItemStack itemStack = player.getStackInHand(Hand.MAIN_HAND);
+        Item itemInHand = itemStack.getItem();
+        CustomGirlProfile profile = CustomGirlLoader.checkItem(itemInHand);
+        if (profile != null) {
+            // Skip it if it's already applied
+            if(this.getProfile().equals(profile)) return ActionResult.FAIL;
+
+            // Apply it
+            this.setProfile(profile, false);
+
+            player.sendMessage(
+                    Text.literal("§dSwitched girl profile → §b" + profile.id()),
+                    true
+            );
+            return ActionResult.SUCCESS;
+        }
+
+        return ActionResult.FAIL;
     }
 
 
@@ -208,15 +180,18 @@ public class CustomGirlEntity extends GirlEntityAI {
     public void writeCustomData(WriteView view) {
         super.writeCustomData(view);
         view.putString("GirlProfileID", profile.id());
+        view.putBoolean("IsPermanent", this.dataTracker.get(IS_PROFILE_PERMANENT));
     }
 
     @Override
     public void readCustomData(ReadView view) {
         super.readCustomData(view);
         String id = view.getString("GirlProfileID", "default_girl");
-        CustomGirlProfile p = CustomGirlLoader.PROFILES.get(id);
+        CustomGirlProfile p = CustomGirlLoader.LOADED_PROFILES.get(id);
         this.profile = (p != null ? p : CustomGirlProfile.DEFAULT);
         this.dataTracker.set(HITBOX_HEIGHT, this.profile.hitboxHeight());
         this.calculateDimensions();
+        boolean isPer = view.getBoolean("IsPermanent", false);
+        this.dataTracker.set(IS_PROFILE_PERMANENT, isPer);
     }
 }

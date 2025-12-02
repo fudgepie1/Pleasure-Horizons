@@ -175,9 +175,11 @@
 
   "text.autoconfig.pleasurecraft.option.girls.boobWindow": "Boob Window",
 
-  "text.autoconfig.pleasurecraft.option.girls.disableShading": "Disable Shading (Needs Resource Refresh)",
+  "text.autoconfig.pleasurecraft.option.girls.disableShading": "Disable Shading",
 
   "text.autoconfig.pleasurecraft.option.girls.boobWindow.@Tooltip": "Makes the armor on the girls have a window to see their breast",
+
+  "text.autoconfig.pleasurecraft.option.girls.disableShading.@Tooltip": "Disables the shading/shadows on the girls and makes them have flat lighting",
 
   "text.autoconfig.pleasurecraft.option.player": "Player",
 

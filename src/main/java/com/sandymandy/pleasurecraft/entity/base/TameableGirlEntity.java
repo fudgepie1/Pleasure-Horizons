@@ -783,7 +783,7 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
             ServerWorld world = (ServerWorld) this.getWorld();
 
             if (this.isTamed()) {
-                TamedGirlManager.get(world).updateGirl(this);
+                TamedGirlManager.get(world).registerGirl(this);
             }
             else if (TamedGirlManager.get(world).containsGirl(this.getUuid())){
                 // not tamed anymore → remove

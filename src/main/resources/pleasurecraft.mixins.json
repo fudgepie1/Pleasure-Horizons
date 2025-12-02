@@ -4,9 +4,7 @@
   "package": "com.sandymandy.pleasurecraft.mixins",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "bugfix.ScreenHandlerMixin",
-    "glsl.GlImportProcessorMixin",
-    "glsl.ShaderLoader$1Mixin"
+    "bugfix.ScreenHandlerMixin"
   ],
   "client": [
     "freecam.BubbleColumnAmbientSoundHandlerMixin",
