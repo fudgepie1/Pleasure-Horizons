@@ -31,6 +31,8 @@ public class ModConfig implements ConfigData {
     @ConfigEntry.Gui.CollapsibleObject
     public PlayerConfig player = new PlayerConfig();
 
+    @ConfigEntry.Gui.CollapsibleObject
+    public KeybindConfig keybinds = new KeybindConfig();
 
     public static class GirlConfig {
         @ConfigEntry.Gui.Tooltip
@@ -48,6 +50,11 @@ public class ModConfig implements ConfigData {
         @ConfigEntry.Gui.Tooltip
         @ConfigEntry.ColorPicker
         public int penisHeadColor = 0xF5A7A9;
+    }
+
+    public static class KeybindConfig {
+        @ConfigEntry.Gui.Tooltip
+        public boolean holdThrust = true;
     }
 
     @ConfigEntry.Category("freecam")

@@ -1,8 +1,7 @@
 package com.sandymandy.pleasurecraft.entity.girls;
 
 import com.sandymandy.pleasurecraft.entity.base.GirlEntityAI;
-import com.sandymandy.pleasurecraft.entity.base.GirlEntityScene;
-import com.sandymandy.pleasurecraft.util.variables.SceneOptions;
+import com.sandymandy.pleasurecraft.util.variables.Scene;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
@@ -33,9 +32,9 @@ public class MomoEntity extends GirlEntityAI {
     public int getSizeGUI(){return 35;}
 
     @Override
-    public List<SceneOptions> getSceneOptions() {
+    public List<Scene> getScenes() {
         return List.of(
-                SceneOptions.onBed("Anal",
+                Scene.onBed("Anal",
                         6,
                         List.of("anal_intro"),
                         List.of("anal_slow"),
@@ -44,17 +43,19 @@ public class MomoEntity extends GirlEntityAI {
                         6f,
                         true,
                         false,
+                        false,
                         0f,
                         "anal_lay_on_bed",
                         "anal_bed_idle"),
 
-                SceneOptions.onBed("Doggy",
+                Scene.onBed("Doggy",
                         8,
                         List.of("prone_doggy_intro", "prone_doggy_insert"),
                         List.of("prone_doggy_slow"),
                         List.of("prone_doggy_hard1","prone_doggy_hard2","prone_doggy_hard3"),
                         "prone_doggy_cum",
                         6f,
+                        true,
                         true,
                         true,
                         1f,

@@ -6,6 +6,8 @@
 - Made it so that instead of cycling each profile you now how to use the profile's tame item to set it
 - Added a new command to show the tame item for each loaded profile
 - Made the girl spawn eggs craftable
+- Added a new pregnancy system
+- Added support for making the thrust key in to a toggle instead of a hold via the mod menu
 
 ## v0.6.0
 - Updated to 1.21.6

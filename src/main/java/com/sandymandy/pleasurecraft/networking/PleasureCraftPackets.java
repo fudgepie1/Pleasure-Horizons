@@ -52,11 +52,11 @@ public class PleasureCraftPackets {
                                     case "stripOrDressup" -> girl.requestStrip();
                                     case "breakUp" -> girl.breakUp(context.player());
                                     case "setBase" -> girl.setBasePosHere();
-                                    case "talk" -> ServerPlayNetworking.send(context.player(), new SceneOptionsS2CPacket(girl.getId(), girl.getCurrentRelationshipLevel(), girl.getSceneOptions()));
+                                    case "talk" -> ServerPlayNetworking.send(context.player(), new SceneOptionsS2CPacket(girl.getId(), girl.getCurrentRelationshipLevel(), girl.getScenes()));
                                     case "goToBase" -> girl.teleportToBase();
                                     case "sit" -> girl.setSitting(!girl.isSitting());
                                     case "follow" -> girl.setFollowing(!girl.isFollowing());
-                                    case "customize" -> ServerPlayNetworking.send(context.player(), new OpenCustomizeScreenS2CPacket(girl.getId(), girl.getBreastSize(), girl.getBreastOffset()));
+                                    case "customize" -> ServerPlayNetworking.send(context.player(), new OpenCustomizeScreenS2CPacket(girl.getId(), girl.getBreastSize(), girl.getBreastOffset(), girl.canGetImpregnated()));
                                     default -> PleasureCraft.LOGGER.warn("Unknown Girl interaction: " + packet.actionId());
                                 }
                             }
@@ -121,7 +121,7 @@ public class PleasureCraftPackets {
                 (packet, context) -> Objects.requireNonNull(context.player().getServer()).execute(() -> {
                     var entity = context.player().getWorld().getEntityById(packet.entityId());
                     if (entity instanceof GirlEntityScene girl) {
-                        girl.startScene(packet.sceneOptions());
+                        girl.startScene(packet.scene());
                     }
                 }));
 
@@ -172,6 +172,7 @@ public class PleasureCraftPackets {
 
                         girl.setBreastSize(packet.breastSize());
                         girl.setBreastOffset(packet.breastOffset());
+                        girl.canGetImpregnatedState(packet.canGetImpregnated());
                     }
                 }));
 

@@ -1,7 +1,7 @@
 package com.sandymandy.pleasurecraft.entity.girls;
 
 import com.sandymandy.pleasurecraft.entity.base.GirlEntityAI;
-import com.sandymandy.pleasurecraft.util.variables.SceneOptions;
+import com.sandymandy.pleasurecraft.util.variables.Scene;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
@@ -32,9 +32,9 @@ public class MikaEntity extends GirlEntityAI {
     public int getSizeGUI(){return 25;}
 
     @Override
-    public List<SceneOptions> getSceneOptions() {
+    public List<Scene> getScenes() {
         return List.of(
-                SceneOptions.onPlayer("Face fuck",
+                Scene.onPlayer("Face fuck",
                         6,
                         List.of("carry_intro"),
                         List.of("carry_slow1"),
@@ -42,9 +42,10 @@ public class MikaEntity extends GirlEntityAI {
                         "carry_cum",
                         2.5f,
                         false,
+                        false,
                         false),
 
-                SceneOptions.onBed("Missionary",
+                Scene.onBed("Missionary",
                         8,
                         List.of("missionary_intro"),
                         List.of("missionary_slow"),
@@ -53,11 +54,12 @@ public class MikaEntity extends GirlEntityAI {
                         3f,
                         true,
                         false,
+                        true,
                         0.5f,
                         "sit_down",
                         "sit_down_idle"),
 
-                SceneOptions.onBed("Cowgirl",
+                Scene.onBed("Cowgirl",
                         10,
                         List.of("cowgirl_intro"),
                         List.of("cowgirl_slow"),
@@ -66,6 +68,7 @@ public class MikaEntity extends GirlEntityAI {
                         3f,
                         true,
                         false,
+                        true,
                         0.5f,
                         "sit_down",
                         "sit_down_idle")

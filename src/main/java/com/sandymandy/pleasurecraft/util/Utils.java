@@ -11,6 +11,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.tag.BlockTags;
@@ -200,6 +201,12 @@ public class Utils {
         } else {
             return "Unknown Item";
         }
+    }
+
+    public static String getPlayerName(PlayerEntity player){
+        String name = player.getName().getString();
+        name.replace("literal{","").replace("}","");
+        return name;
     }
 
     // simple record to hold info

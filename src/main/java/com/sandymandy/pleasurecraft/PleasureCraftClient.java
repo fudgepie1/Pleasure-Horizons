@@ -30,8 +30,8 @@ import static com.sandymandy.pleasurecraft.registries.PleasureCraftScreenHandler
 
 public class PleasureCraftClient implements ClientModInitializer {
 
-    private boolean isShadingDisabled;
-    private boolean shouldReload = false;
+    private static boolean thrustToggleState = false;
+    private static boolean lastSentThrustState = false;
 
     @Override
     public void onInitializeClient() {
@@ -76,15 +76,33 @@ public class PleasureCraftClient implements ClientModInitializer {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (client.player == null) return;
 
-            // Thrust button held
-            boolean thrustHeld = PleasureCraftKeybinds.thrustKey.isPressed();
-            ClientPlayNetworking.send(new ThrustKeybindC2SPacket(thrustHeld));
+            boolean holdMode = ModConfig.INSTANCE.keybinds.holdThrust;
 
-            // Cum button (pressed once)
-            ClientPlayNetworking.send(new CumKeybindC2SPacket(PleasureCraftKeybinds.cumKey.wasPressed()));
+            boolean newThrustState;
 
+            if (holdMode) {
+                newThrustState = PleasureCraftKeybinds.thrustKey.isPressed();
+            }
+            else {
+                if (PleasureCraftKeybinds.thrustKey.wasPressed()) {
+                    thrustToggleState = !thrustToggleState;
+                }
+                newThrustState = thrustToggleState;
+            }
+
+            // Only send packet when value actually changed
+            if (newThrustState != lastSentThrustState) {
+                lastSentThrustState = newThrustState;
+                ClientPlayNetworking.send(new ThrustKeybindC2SPacket(newThrustState));
+            }
+
+            // Cum key (single press)
+            if (PleasureCraftKeybinds.cumKey.wasPressed()) {
+                ClientPlayNetworking.send(new CumKeybindC2SPacket(true));
+            }
         });
     }
+
 
     public record GirlScreenData(int entityId) {
         public static final PacketCodec<RegistryByteBuf, GirlScreenData> PACKET_CODEC = PacketCodec.tuple(

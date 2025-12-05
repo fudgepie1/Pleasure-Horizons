@@ -8,7 +8,7 @@ import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
 
-public record OpenCustomizeScreenS2CPacket(int entityId, int breastSize, Vec3d breastOffset) implements CustomPayload {
+public record OpenCustomizeScreenS2CPacket(int entityId, int breastSize, Vec3d breastOffset, boolean canGetImpregnated) implements CustomPayload {
     public static final Id<OpenCustomizeScreenS2CPacket> ID = new Id<>(Identifier.of(PleasureCraft.MOD_ID, "customize_screen"));
 
     public static final PacketCodec<RegistryByteBuf, OpenCustomizeScreenS2CPacket> CODEC =
@@ -16,6 +16,7 @@ public record OpenCustomizeScreenS2CPacket(int entityId, int breastSize, Vec3d b
                     PacketCodecs.VAR_INT, OpenCustomizeScreenS2CPacket::entityId,
                     PacketCodecs.VAR_INT, OpenCustomizeScreenS2CPacket::breastSize,
                     Vec3d.PACKET_CODEC, OpenCustomizeScreenS2CPacket::breastOffset,
+                    PacketCodecs.BOOLEAN, OpenCustomizeScreenS2CPacket::canGetImpregnated,
                     OpenCustomizeScreenS2CPacket::new
             );
 

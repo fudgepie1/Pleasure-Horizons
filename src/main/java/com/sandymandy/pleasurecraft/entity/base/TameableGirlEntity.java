@@ -5,10 +5,9 @@ import com.sandymandy.pleasurecraft.advancement.criterion.PleasureCraftCriteria;
 import com.sandymandy.pleasurecraft.registries.PleasureCraftTrackedDataRegistry;
 import com.sandymandy.pleasurecraft.screen.GirlInventoryScreenHandlerFactory;
 import com.sandymandy.pleasurecraft.util.PleasureCraftLangUtils;
-import com.sandymandy.pleasurecraft.util.PleasureCraftMessages;
 import com.sandymandy.pleasurecraft.util.inventory.GirlInventory;
 import com.sandymandy.pleasurecraft.util.managers.TamedGirlManager;
-import com.sandymandy.pleasurecraft.util.variables.SceneOptions;
+import com.sandymandy.pleasurecraft.util.variables.Scene;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.LeavesBlock;
 import net.minecraft.component.DataComponentTypes;
@@ -73,14 +72,17 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
     private static final TrackedData<Boolean> HAVING_SEX = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<Boolean> SITTING = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<Boolean> RUNNING = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+    private static final TrackedData<Boolean> PREGNANT = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+    private static final TrackedData<Boolean> CAN_GET_IMPREGNATED = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<String> OVERRIDE_ANIM = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.STRING);
-    private static final TrackedData<Integer> BREAST_SIZE = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.INTEGER);
-    private static final TrackedData<Vec3d> BREAST_OFFSET = DataTracker.registerData(TameableGirlEntity.class, PleasureCraftTrackedDataRegistry.VEC3D);
     private static final TrackedData<String> SCENE_ANIM = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.STRING);
+    private static final TrackedData<Integer> BREAST_SIZE = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.INTEGER);
     private static final TrackedData<Integer> RELATIONSHIP_LEVEL = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.INTEGER);
     private static final TrackedData<Integer> MAX_RELATIONSHIP_LEVEL = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.INTEGER);
+    private static final TrackedData<Integer> AMOUNT_OF_SEX_UNTIL_IMPREGNATION = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.INTEGER);
     private static final TrackedData<BlockPos> BASE_POS = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.BLOCK_POS);
     private static final TrackedData<Vec3d> PASSENGER_BONE_POSITION = DataTracker.registerData(TameableGirlEntity.class, PleasureCraftTrackedDataRegistry.VEC3D);
+    private static final TrackedData<Vec3d> BREAST_OFFSET = DataTracker.registerData(TameableGirlEntity.class, PleasureCraftTrackedDataRegistry.VEC3D);
     protected static final TrackedData<Byte> TAMEABLE_FLAGS = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.BYTE);
     protected static final TrackedData<Optional<LazyEntityReference<LivingEntity>>> OWNER_UUID = DataTracker.registerData(
             TameableGirlEntity.class, TrackedDataHandlerRegistry.LAZY_ENTITY_REFERENCE
@@ -125,6 +127,9 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
         builder.add(HAVING_SEX, false);
         builder.add(SITTING, false);
         builder.add(RUNNING, false);
+        builder.add(PREGNANT,false);
+        builder.add(CAN_GET_IMPREGNATED,false);
+        builder.add(AMOUNT_OF_SEX_UNTIL_IMPREGNATION, 0);
         builder.add(RELATIONSHIP_LEVEL,0);
         builder.add(MAX_RELATIONSHIP_LEVEL,4);
         builder.add(BREAST_SIZE,100);
@@ -249,6 +254,30 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
         return this.dataTracker.get(RUNNING);
     }
 
+    public void setPregnantState(boolean preggo){
+        this.dataTracker.set(PREGNANT, preggo);
+    }
+
+    public boolean isPregnant(){
+        return this.dataTracker.get(PREGNANT);
+    }
+
+    public void canGetImpregnatedState(boolean preggo){
+        this.dataTracker.set(CAN_GET_IMPREGNATED, preggo);
+    }
+
+    public boolean canGetImpregnated(){
+        return this.dataTracker.get(CAN_GET_IMPREGNATED);
+    }
+
+    public void setAmountOfUnprotectedSex(int num){
+        this.dataTracker.set(AMOUNT_OF_SEX_UNTIL_IMPREGNATION, num);
+    }
+
+    public int amountOfUnprotectedSex(){
+        return this.dataTracker.get(AMOUNT_OF_SEX_UNTIL_IMPREGNATION);
+    }
+
     public int getCurrentRelationshipLevel() { return this.dataTracker.get(RELATIONSHIP_LEVEL);}
 
     public void setCurrentRelationshipLevel(int value) { this.dataTracker.set(RELATIONSHIP_LEVEL, value);}
@@ -293,14 +322,18 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
 
     public float getYAxisGUI(){return 0.0625F;}
 
-    public List<SceneOptions> getSceneOptions() {
+    public List<Scene> getScenes() {
         return new ArrayList<>();
     }
+
+    public int getMaxBellySizeWhenPregnant() { return 450;}
+
+    public int maxAmountOfSexUntilImpregnation(){return 5;}
 
     protected int maxRelationshipLevel() {
         try {
             // Get all scene options
-            List<SceneOptions> options = getSceneOptions();
+            List<Scene> options = getScenes();
 
             // If null or empty, return default
             if (options == null || options.isEmpty()) {
@@ -309,7 +342,7 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
             }
 
             int value = options.stream()
-                    .map(SceneOptions::requiredRelationshipLevel)
+                    .map(Scene::requiredRelationshipLevel)
                     .max(Integer::compareTo)
                     .orElse(4);
 
@@ -510,6 +543,9 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
         view.putBoolean("FollowState", this.isFollowing());
         view.putInt("RelationshipLevel", this.getCurrentRelationshipLevel());
         view.putInt("BreastSize", getBreastSize());
+        view.putBoolean("CanGetImpregnated", this.canGetImpregnated());
+        view.putBoolean("PregnantState", this.isPregnant());
+        view.putInt("AmountOfUnprotectedSex", this.amountOfUnprotectedSex());
         view.put("BreastOffset", Vec3d.CODEC, getBreastOffset());
         view.put("BasePos", BlockPos.CODEC, this.getBasePos());
 
@@ -547,7 +583,9 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
         this.setBasePos(view.read("BasePos", BlockPos.CODEC).orElse(new BlockPos(0,0,0)));
         this.setBreastOffset(view.read("BreastOffset", Vec3d.CODEC).orElse(Vec3d.ZERO));
         this.setBreastSize(view.getInt("BreastSize", 100));
-
+        this.canGetImpregnatedState(view.getBoolean("CanGetImpregnated", false));
+        this.setPregnantState(view.getBoolean("PregnantState", false));
+        this.setAmountOfUnprotectedSex(view.getInt("AmountOfUnprotectedSex", 0));
         LazyEntityReference<LivingEntity> lazyEntityReference =
                 LazyEntityReference.fromDataOrPlayerName(view, "Owner", this.getWorld());
 
@@ -866,48 +904,7 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
         this.getInventory().clear();
     }
 
-    @Override
-    public boolean damage(ServerWorld world, DamageSource source, float amount) {
-        if (this.isInvulnerableTo(world, source)) return false;
 
-        String damageType = source.getName();
-        // If killed by /kill or void, allow normal death
-        if (damageType.equals("outOfWorld") || damageType.equals("genericKill")) {
-            return super.damage(world, source, amount);
-        }
-
-        if(this.isTamed() && (this.getHealth() - amount <= 0.0F) &! (damageType.equals("outOfWorld") || damageType.equals("genericKill") || isMovementLocked())) {
-            this.setHealth(getMaxHealth());
-            // If basePos is still null, fall back to current position
-
-            // Send a message referencing whichever Pos we have
-            PleasureCraftMessages.GlobleMessage(
-                    this.getWorld(),
-                    getGirlDisplayName() + " died and respawned at base: " +
-                            this.getBasePos().getX() + ", " +
-                            this.getBasePos().getY() + ", " +
-                            this.getBasePos().getZ()
-            );
-
-            // Drops inventory as if she died
-            this.dropInventory(world);
-
-            teleportToBase();
-
-
-            return false;
-        }
-        else if(isMovementLocked() &! damageType.equals("outOfWorld") || damageType.equals("genericKill")){
-            if(!this.hasPassengers()){
-                PleasureCraftMessages.GlobleMessage(
-                        this.getWorld(),getGirlDisplayName() + " is busy at the moment");
-            }
-            return false;
-        }
-        else{
-            return super.damage(world, source, amount);
-        }
-    }
 
     @Override
     public void pushAwayFrom(Entity entity) {

@@ -37,6 +37,8 @@
 
   "msg.pleasurecraft.alreadyInRelationship" : "She's Already In A Relationship With Someone",
 
+  "msg.pleasurecraft.isPregnant": "She isn't in the mood to talk",
+
   "msg.pleasurecraft.canGoInToFreeCam" : "To go into freecam mode press F4",
 
   "key.pleasurecraft.thrust": "Thrust",
@@ -190,6 +192,12 @@
   "text.autoconfig.pleasurecraft.option.player.penisHeadColor": "Penis Head Color",
 
   "text.autoconfig.pleasurecraft.option.player.penisHeadColor.@Tooltip": "Sets the color of the head of penis on the player model",
+
+  "text.autoconfig.pleasurecraft.option.keybinds": "Keybinds",
+
+  "text.autoconfig.pleasurecraft.option.keybinds.holdThrust": "Hold Thrust",
+
+  "text.autoconfig.pleasurecraft.option.keybinds.holdThrust.@Tooltip": "Makes the thrust key act either as a toggle or a hold",
 
   "text.autoconfig.pleasurecraft.option.controls": "Key Bindings",
 

@@ -44,7 +44,7 @@ public class PleasureCraftClientPackets {
 
         ClientPlayNetworking.registerGlobalReceiver(OpenCustomizeScreenS2CPacket.ID, (packet, context) -> {
             context.client().execute(() -> {
-                MinecraftClient.getInstance().setScreen(new GirlCustomizeScreen(packet.entityId(), packet.breastSize(), packet.breastOffset()));
+                MinecraftClient.getInstance().setScreen(new GirlCustomizeScreen(packet.entityId(), packet.breastSize(), packet.breastOffset(), packet.canGetImpregnated()));
             });
         });
 

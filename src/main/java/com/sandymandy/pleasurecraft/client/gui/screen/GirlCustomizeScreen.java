@@ -18,19 +18,20 @@ public class GirlCustomizeScreen extends Screen {
     private final int entityId;
 
     private int breastSize;
-
+    private boolean canGetImpregnated;
     private double breastOffsetX;
     private double breastOffsetY;
     private double breastOffsetZ;
 
 
-    public GirlCustomizeScreen(int entityId, int breastSize, Vec3d breastOffset) {
+    public GirlCustomizeScreen(int entityId, int breastSize, Vec3d breastOffset, boolean canGetImpregnated) {
         super(Text.literal("Customize Girl"));
         this.entityId = entityId;
         this.breastSize = breastSize;
         this.breastOffsetX = breastOffset.getX();
         this.breastOffsetY = breastOffset.getY();
         this.breastOffsetZ = breastOffset.getZ();
+        this.canGetImpregnated = canGetImpregnated;
     }
 
     @Override
@@ -83,7 +84,20 @@ public class GirlCustomizeScreen extends Screen {
         offsetZField.setTooltip(Tooltip.of(Text.literal("Offset Z")));
         this.addDrawableChild(offsetZField);
 
-        y += 40;
+        y += 30;
+
+//      Can Get Impregnated toggle
+        ButtonWidget impregnateButton = ButtonWidget.builder(
+                Text.literal(getImpregnationLabel()),
+                button -> {
+                    this.canGetImpregnated = !this.canGetImpregnated;
+                    button.setMessage(Text.literal(getImpregnationLabel()));
+                }
+        ).dimensions(centerX - 100, y, 200, 20).build();
+
+        this.addDrawableChild(impregnateButton);
+        y += 30;
+
 
 //      Confirm
         this.addDrawableChild(ButtonWidget.builder(Text.literal("Confirm"), button -> {
@@ -95,7 +109,8 @@ public class GirlCustomizeScreen extends Screen {
             ClientPlayNetworking.send(new GirlCustomizeC2SPacket(
                     this.entityId,
                     this.breastSize,
-                    new Vec3d(breastOffsetX, breastOffsetY, breastOffsetZ)
+                    new Vec3d(breastOffsetX, breastOffsetY, breastOffsetZ),
+                    this.canGetImpregnated
             ));
             MinecraftClient.getInstance().setScreen(null); // close screen
         }).dimensions(centerX - 100, y, 60, 20).build());
@@ -105,7 +120,8 @@ public class GirlCustomizeScreen extends Screen {
             ClientPlayNetworking.send(new GirlCustomizeC2SPacket(
                     this.entityId,
                     100,
-                    new Vec3d(0, 0, 0)
+                    new Vec3d(0, 0, 0),
+                    this.canGetImpregnated
             ));
             MinecraftClient.getInstance().setScreen(null); // close screen
         }).dimensions(centerX - 30, y, 60, 20).build());
@@ -123,6 +139,9 @@ public class GirlCustomizeScreen extends Screen {
         }
     }
 
+    private String getImpregnationLabel() {
+        return this.canGetImpregnated ? "Can Get Pregnant: YES" : "Can Get Pregnant: NO";
+    }
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {

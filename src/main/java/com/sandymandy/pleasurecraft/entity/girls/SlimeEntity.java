@@ -1,7 +1,7 @@
 package com.sandymandy.pleasurecraft.entity.girls;
 
 import com.sandymandy.pleasurecraft.entity.base.GirlEntityAI;
-import com.sandymandy.pleasurecraft.util.variables.SceneOptions;
+import com.sandymandy.pleasurecraft.util.variables.Scene;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
@@ -37,9 +37,9 @@ public class SlimeEntity extends GirlEntityAI {
     public float getYAxisGUI(){return 0.0525F;}
 
     @Override
-    public List<SceneOptions> getSceneOptions() {
+    public List<Scene> getScenes() {
         return List.of(
-                SceneOptions.onPlayer("Blow Job",
+                Scene.onPlayer("Blow Job",
                         8,
                         List.of("blowjob_intro"),
                         List.of("blowjob_slow"),
@@ -47,9 +47,10 @@ public class SlimeEntity extends GirlEntityAI {
                         "blowjob_cum",
                         4,
                         false,
+                        false,
                         false),
 
-                SceneOptions.stationaryContact("Doggy",
+                Scene.stationaryContact("Doggy",
                         10,
                         List.of("doggy_intro"),
                         List.of("doggy_slow"),
@@ -58,6 +59,7 @@ public class SlimeEntity extends GirlEntityAI {
                         4.5f,
                         true,
                         false,
+                        true,
                         "doggy_lay_on_bed",
                         "doggy_bed_idle")
         );

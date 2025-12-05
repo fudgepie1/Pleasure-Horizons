@@ -6,12 +6,13 @@ import com.sandymandy.pleasurecraft.config.ModConfig;
 import com.sandymandy.pleasurecraft.networking.C2S.*;
 import com.sandymandy.pleasurecraft.networking.S2C.ClothingArmorVisibilityS2CPacket;
 import com.sandymandy.pleasurecraft.networking.S2C.PlayCumHudAnimationS2CPacket;
+import com.sandymandy.pleasurecraft.registries.PleasureCraftSoundEventRegistry;
 import com.sandymandy.pleasurecraft.registries.PleasureCraftTrackedDataRegistry;
 import com.sandymandy.pleasurecraft.registries.SceneKeyframeEventRegistry;
 import com.sandymandy.pleasurecraft.util.PleasureCraftLangUtils;
 import com.sandymandy.pleasurecraft.util.PleasureCraftMessages;
 import com.sandymandy.pleasurecraft.util.Utils;
-import com.sandymandy.pleasurecraft.util.variables.SceneOptions;
+import com.sandymandy.pleasurecraft.util.variables.Scene;
 import com.sandymandy.pleasurecraft.util.variables.ScenePhase;
 import com.sandymandy.pleasurecraft.util.variables.SceneType;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -24,18 +25,27 @@ import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.DyedColorComponent;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.loot.LootTable;
+import net.minecraft.loot.LootTables;
+import net.minecraft.loot.context.LootContextParameters;
+import net.minecraft.loot.context.LootContextTypes;
+import net.minecraft.loot.context.LootWorldContext;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -54,8 +64,10 @@ import software.bernie.geckolib.animation.keyframe.event.data.SoundKeyframeData;
 
 import java.util.*;
 
+import static com.sandymandy.pleasurecraft.util.Utils.getPlayerName;
+
 public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
-    private static final TrackedData<SceneOptions> CURRENT_SCENE_OPTIONS = DataTracker.registerData(GirlEntityScene.class, PleasureCraftTrackedDataRegistry.SCENE_OPTION);
+    private static final TrackedData<Scene> CURRENT_SCENE = DataTracker.registerData(GirlEntityScene.class, PleasureCraftTrackedDataRegistry.SCENE);
     private static final TrackedData<ScenePhase> CURRENT_SCENE_PHASE = DataTracker.registerData(GirlEntityScene.class, PleasureCraftTrackedDataRegistry.SCENE_PHASE);
     private static final TrackedData<String> ANIMATION_KEY_FRAME_EVENT = DataTracker.registerData(GirlEntityScene.class, TrackedDataHandlerRegistry.STRING);
     private static final TrackedData<String> CURRENT_SEX_ANIM = DataTracker.registerData(GirlEntityScene.class, TrackedDataHandlerRegistry.STRING);
@@ -65,23 +77,26 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
     public static final TrackedData<Integer> STATIONARY_LOOP_THRESHOLD = DataTracker.registerData(GirlEntityScene.class, TrackedDataHandlerRegistry.INTEGER);
     private static final TrackedData<Boolean> THRUSTING = DataTracker.registerData(GirlEntityScene.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<Integer> INTRO_INDEX = DataTracker.registerData(GirlEntityScene.class, TrackedDataHandlerRegistry.INTEGER);
+    private static final TrackedData<Integer> PREGNANCY_TICKS = DataTracker.registerData(GirlEntityScene.class, TrackedDataHandlerRegistry.INTEGER);
+    private static final TrackedData<Integer> PREGNANCY_DURATION = DataTracker.registerData(GirlEntityScene.class, TrackedDataHandlerRegistry.INTEGER);
     private static final TrackedData<Integer> STATIONARY_INDEX = DataTracker.registerData(GirlEntityScene.class, TrackedDataHandlerRegistry.INTEGER);
     private static final Random RANDOM = new Random();
     private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
     public BlockPos targetBedPos;
-    public SceneOptions stripOptions = SceneOptions.EMPTY;
+    public Scene stripOptions = Scene.EMPTY;
     private boolean requestStrip = false;
     private boolean requestMoveToBed = false;
     private boolean requestMoveToPlayer;
     private boolean requestWaitForPlayer;
     private String lastSceneAnim = "";
-    public String passengerBoneName = "boyCam";
+    public String passengerBoneName = "boyCam"; //The name of the bone that the player snaps to when in a scene
     private String lastSoundKey = null;
     BlockPos bedPos;
-//    private boolean swinging = false;
-//    private long lastSwing = 0L;
-    public PlayerEntity scenePlayer = (PlayerEntity) this.getOwner();
+    private static final int PREGNANCY_DUR = 20 * 60 * 5; // 5 minutes
     private static final float PROGRESS_SPEED = 0.1f;
+    public PlayerEntity scenePlayer = (PlayerEntity) this.getOwner();
+    /*    private boolean swinging = false;
+        private long lastSwing = 0L;*/
 
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
@@ -95,7 +110,7 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
     @Override
     protected void initDataTracker(DataTracker.Builder builder) {
         super.initDataTracker(builder);
-        builder.add(CURRENT_SCENE_OPTIONS, SceneOptions.EMPTY);
+        builder.add(CURRENT_SCENE, Scene.EMPTY);
         builder.add(CURRENT_SCENE_PHASE, ScenePhase.NONE);
         builder.add(ANIMATION_KEY_FRAME_EVENT,"");
         builder.add(CURRENT_SEX_ANIM,"");
@@ -103,17 +118,19 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
         builder.add(CUM_THRESHOLD,5f);
         builder.add(STATIONARY_LOOP,0);
         builder.add(STATIONARY_LOOP_THRESHOLD,0);
+        builder.add(PREGNANCY_TICKS,0);
+        builder.add(PREGNANCY_DURATION, PREGNANCY_DUR);
         builder.add(THRUSTING,false);
         builder.add(INTRO_INDEX, 0);
         builder.add(STATIONARY_INDEX, 0);
     }
 
-    public void setCurrentSceneOptions(SceneOptions options){
-        this.dataTracker.set(CURRENT_SCENE_OPTIONS, options);
+    public void setCurrentScene(Scene scene){
+        this.dataTracker.set(CURRENT_SCENE, scene);
     }
 
-    public SceneOptions getCurrentSceneOptions(){
-        return this.dataTracker.get(CURRENT_SCENE_OPTIONS);
+    public Scene getCurrentScene(){
+        return this.dataTracker.get(CURRENT_SCENE);
     }
 
     public void setCurrentScenePhase(ScenePhase phase){
@@ -140,7 +157,7 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
         return this.dataTracker.get(ANIMATION_KEY_FRAME_EVENT);
     }
 
-    public void setThrusting(boolean  thrust){
+    public void setThrusting(boolean thrust){
         this.dataTracker.set(THRUSTING, thrust);
     }
 
@@ -211,6 +228,22 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
         }
     }
 
+    public void setPregnancyDuration(int progress){
+        this.dataTracker.set(PREGNANCY_DURATION, progress);
+    }
+
+    public int getPregnancyDuration(){
+        return this.dataTracker.get(PREGNANCY_DURATION);
+    }
+
+    public void setPregnancyTicks(int progress){
+        this.dataTracker.set(PREGNANCY_TICKS, progress);
+    }
+
+    public int getPregnancyTicks(){
+        return this.dataTracker.get(PREGNANCY_TICKS);
+    }
+
     public void overrideBoneTexture(String boneName, Identifier texture) {
         this.overrideBoneTexture(List.of(boneName), texture);
     }
@@ -251,17 +284,6 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
 
     }
 
-    public void setBoneSize(String bone, float x, float y, float z) {
-        if (this.boneSizeOverrides == null) this.boneSizeOverrides = new HashMap<>();
-
-        x = Math.clamp(x,0.25f,1.5f);
-        y = Math.clamp(y,0.25f,1.5f);
-        z = Math.clamp(z,0.25f,1.5f);
-
-        this.boneSizeOverrides.put(bone, new Vec3d(x,y,z));
-
-    }
-
     public void setBonePos(String bone, float x, float y, float z) {
         this.setBonePos(bone, new Vec3d(x, y, z));
     }
@@ -272,24 +294,58 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
         this.bonePositionOffset.put(bone, pos);
     }
 
-    public void setBoneSize(String bone, int size) {
-        float finalSize = (float) size / 100;
-        setBoneSize(bone, finalSize, finalSize, finalSize);
+    public void setBoneSize(String bone, float x, float y, float z, float min, float max) {
+        if (this.boneSizeOverrides == null) this.boneSizeOverrides = new HashMap<>();
+
+        if(min != 0 && max != 0) {
+            x = Math.clamp(x, min, max);
+            y = Math.clamp(y, min, max);
+            z = Math.clamp(z, min, max);
+        }
+        this.boneSizeOverrides.put(bone, new Vec3d(x,y,z));
+
     }
 
-    public void setBoneSize(String bone, int x, int y, int z) {
+    public void setBoneSize(String bone, int size, int min, int max) {
+        float finalSize = (float) size / 100;
+        if(min == 0 && max == 0){
+            setBoneSize(bone, finalSize, finalSize, finalSize, 0, 0);
+            return;
+        }
+        float finalMin = (float) min / 100;
+        float finalMax = (float) max / 100;
+        setBoneSize(bone, finalSize, finalSize, finalSize, finalMin, finalMax);
+    }
+
+    public void setBoneSize(String bone, int size) {
+        setBoneSize(bone, size, 0, 0);
+    }
+
+
+    public void setBoneSize(String bone, int x, int y, int z, int min, int max) {
         float finalX = (float) x / 100;
         float finalY = (float) y / 100;
         float finalZ = (float) z / 100;
-        setBoneSize(bone, finalX, finalY, finalZ);
+        float finalMin = (float) min / 100;
+        float finalMax = (float) max / 100;
+        setBoneSize(bone, finalX, finalY, finalZ, finalMin, finalMax);
     }
 
-    public void startScene(SceneOptions option) {
+    public float getPregnancyProgress() {
+        if (!isPregnant()) return 0f;
+        return 1f - (getPregnancyTicks() / (float) getPregnancyDuration());
+    }
+
+    public void startScene(Scene option) {
         if (this.isSceneActive()) return;
+        if(isPregnant()){
+            this.scenePlayer.sendMessage(Text.translatable("msg.pleasurecraft.isPregnant"), false);
+            return;
+        }
         if (this.scenePlayer == null) return;
         if (this.isSitting()) this.setSitting(false);
 
-        this.setCurrentSceneOptions(option);
+        this.setCurrentScene(option);
 
         if (!this.isStripped() && option.needsToStrip()){
             this.requestStrip(option);
@@ -339,13 +395,13 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
     }
 
     public void startRidingScene() {
-        SceneType type = getCurrentSceneOptions().sceneType();
+        SceneType type = getCurrentScene().sceneType();
         if (type.equals(SceneType.STATIONARY_INTRO) || type.equals(SceneType.STATIONARY))
             return;
         scenePlayer.setInvisible(true);
         scenePlayer.sendMessage(Text.of("msg.pleasurecraft.canGoInToFreeCam"), true);
         this.setSceneProgress(0f);
-        this.setCumThreshold(getCurrentSceneOptions().cumThreshold());
+        this.setCumThreshold(getCurrentScene().cumThreshold());
         setThrusting(false);
         this.targetBedPos = null;
         scenePlayer.startRiding(this, false);
@@ -356,7 +412,7 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
         this.setSceneState(true);
     }
 
-    private void startStationaryIntro(SceneOptions option) {
+    private void startStationaryIntro(Scene option) {
         this.setSceneState(true);
         this.setSceneProgress(0f);
         this.setCurrentScenePhase(ScenePhase.STATIONARY_INTRO);
@@ -366,7 +422,7 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
         this.setStationaryLoopThreshold(option.amountOfLoops());
     }
 
-    private void startStationaryLoop(SceneOptions option) {
+    private void startStationaryLoop(Scene option) {
         this.setSceneState(true);
         this.setSceneProgress(0f);
         this.setCurrentScenePhase(ScenePhase.STATIONARY);
@@ -443,7 +499,7 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
         }
     }
 
-    private void playerModelLogic(){
+    private void modelLogic(){
         if(!this.getWorld().isClient()) return;
         boolean isActivePhase = switch (getCurrentScenePhase()) {
             case NONE, BED_IDLE, LAYING_DOWN -> false; // Inactive/resting
@@ -461,9 +517,13 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
         this.setBoneVisibility(Slim , isPlayerModelSlim() && isActivePhase );
 
         this.setBoneVisibility(Wide , !isPlayerModelSlim() && isActivePhase );
-        this.setBoneSize("boobs", this.getBreastSize());
+        this.setBoneSize("boobs", this.getBreastSize(), 25, 150);
         this.setBonePos("boobs", this.getBreastOffset());
-    }
+        int bellySize = isPregnant()
+                ? MathHelper.lerp(getPregnancyProgress(), 100, getMaxBellySizeWhenPregnant())
+                : 100;
+
+        this.setBoneSize("belly", bellySize);    }
 
     private void keyFrameEventHandler() {
         String key = getAnimationKeyFrameEvent();
@@ -531,6 +591,8 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
         this.setSceneProgress(Math.clamp(this.getSceneProgress(), 0, this.getCumThreshold()));
     }
 
+    private boolean wasPregnantLastTick = false;
+
     @Override
     public void tick() {
         super.tick();
@@ -538,7 +600,7 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
         //Rendering
         this.updateClothingAndArmor();
         this.applySkinToBone(scenePlayer);
-        this.playerModelLogic();
+        this.modelLogic();
 
         //Scene
         keyFrameEventHandler();
@@ -568,9 +630,33 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
 
         if(!this.hasPassengers() && this.isSceneActive() && isStopPhase) stopScene();
 
-        // Handle scene speed
         if(!this.getWorld().isClient()) {
             handleSceneSpeed();
+
+            if(amountOfUnprotectedSex() >= maxAmountOfSexUntilImpregnation()){
+                this.setPregnantState(true);
+                this.setAmountOfUnprotectedSex(0);
+            }
+
+            if(isPregnant() != wasPregnantLastTick){
+                this.setPregnancyTicks(this.getPregnancyDuration());
+                wasPregnantLastTick = isPregnant();
+            }
+
+            if(!canGetImpregnated()){
+                setAmountOfUnprotectedSex(0);
+                setPregnantState(false);
+                this.setPregnancyTicks(0);
+            }
+
+            if (isPregnant() && this.getPregnancyTicks() > 0) {
+                this.setPregnancyTicks(this.getPregnancyTicks() - 1);
+
+                // Pregnancy completed
+                if (this.getPregnancyTicks()     == 0) {
+                    pregnancyFinished();
+                }
+            }
         }
     }
 
@@ -618,7 +704,7 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
     private PlayState handleAnimations(AnimationTest<GirlEntityScene> state) {
         if (isSceneActive() && getOverrideAnim().isEmpty()) {
             final AnimationController<?> controller = state.controller();
-            final SceneOptions options = this.getCurrentSceneOptions();
+            final Scene options = this.getCurrentScene();
 
             // Notify server when an animation finishes (only once per cycle)
             if ((controller.hasAnimationFinished() || controller.getAnimationState() == AnimationController.State.PAUSED) && !lastSceneAnim.isEmpty()) {
@@ -758,17 +844,20 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
 
         switch (getCurrentScenePhase()) {
             case INTRO -> {
-                List<String> intros = getCurrentSceneOptions().introAnim();
+                List<String> intros = getCurrentScene().introAnim();
                 if (getIntroIndex() < intros.size() - 1) {
                     setIntroIndex(getIntroIndex() + 1);
                 } else {
                     playPhase(ScenePhase.HAVING_SEX);
                 }
             }
-            case CUM -> stopScene();
+            case CUM -> {
+                if(this.getCurrentScene().countTowardsImpregnation() && this.canGetImpregnated()) this.setAmountOfUnprotectedSex(this.amountOfUnprotectedSex() + 1);
+                stopScene();
+            }
             case LAYING_DOWN -> playPhase(ScenePhase.BED_IDLE);
             case STATIONARY_INTRO -> {
-                SceneOptions options = getCurrentSceneOptions();
+                Scene options = getCurrentScene();
                 List<String> sequence = options.stationaryIntroAnim();
                 if(getStationaryIndex() < sequence.size() - 1){
                     setStationaryIndex(getStationaryIndex() + 1);
@@ -791,11 +880,33 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
         }
     }
 
+    private void pregnancyFinished(){
+        this.playSound(PleasureCraftSoundEventRegistry.PLOB, 1f,1f);
+        this.dropPregnancyLoot(LootTables.END_CITY_TREASURE_CHEST);
+        this.setPregnantState(false);
+    }
+
+    private void dropPregnancyLoot(RegistryKey<LootTable> lootTableRegistryKey) {
+        ServerWorld world = (ServerWorld) this.getWorld();
+        LootTable lootTable = world.getServer()
+                .getReloadableRegistries()
+                .getLootTable(lootTableRegistryKey);
+
+        DamageSource fakeSource = world.getDamageSources().generic();
+
+        LootWorldContext context = new LootWorldContext.Builder(world)
+                .add(LootContextParameters.THIS_ENTITY, this)
+                .add(LootContextParameters.ORIGIN, this.getPos())
+                .add(LootContextParameters.DAMAGE_SOURCE, fakeSource)
+                .build(LootContextTypes.ENTITY);
+
+        lootTable.generateLoot(context, this.getLootTableSeed(), stack -> this.dropStack(world, stack));
+    }
+
+
     private String getRandomFromList(List<String> list) {
         if(list.size() == 1) return list.getFirst();
-        String anim = list.get(RANDOM.nextInt(list.size()));
-//        PleasureCraft.LOGGER.info(anim);
-        return anim;
+        return  list.get(RANDOM.nextInt(list.size()));
     }
 
 
@@ -939,11 +1050,11 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
     }
 
     public float getBedOffset(){
-        return this.getCurrentSceneOptions().bedAlignmentOffset();
+        return this.getCurrentScene().bedAlignmentOffset();
     }
 
     public boolean isBedScene(){
-        return this.getCurrentSceneOptions().sceneType().equals(SceneType.ON_BED);
+        return this.getCurrentScene().sceneType().equals(SceneType.ON_BED);
     }
 
     public void messageAsEntity(boolean sendFromServer, String message){
@@ -964,6 +1075,50 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
         GameProfile profile = scenePlayer.getGameProfile();
         String finalMessage = "<" + profile.getName() + "> " + message;
         PleasureCraftMessages.PlayerSpecificMessage(scenePlayer, finalMessage);
+    }
+
+    @Override
+    public boolean damage(ServerWorld world, DamageSource source, float amount) {
+        if (this.isInvulnerableTo(world, source)) return false;
+
+        String damageType = source.getName();
+        // If killed by /kill or void, allow normal death
+        if (damageType.equals("outOfWorld") || damageType.equals("genericKill")) {
+            return super.damage(world, source, amount);
+        }
+
+        if(this.isTamed() && (this.getHealth() - amount <= 0.0F) &! (damageType.equals("outOfWorld") || damageType.equals("genericKill") || isMovementLocked())) {
+            this.setHealth(getMaxHealth());
+            // If basePos is still null, fall back to current position
+
+            // Send a message referencing whichever Pos we have
+            PleasureCraftMessages.GlobleMessage(
+                    this.getWorld(),
+                    getPlayerName(this.scenePlayer) + "'s " +
+                            getGirlDisplayName() + " died and respawned at base: " +
+                            this.getBasePos().getX() + ", " +
+                            this.getBasePos().getY() + ", " +
+                            this.getBasePos().getZ()
+            );
+
+            // Drops inventory as if she died
+            this.dropInventory(world);
+
+            teleportToBase();
+
+
+            return false;
+        }
+        else if(isMovementLocked() &! damageType.equals("outOfWorld") || damageType.equals("genericKill")){
+            if(!this.hasPassengers()){
+                this.scenePlayer.sendMessage(
+                        Text.of(getGirlDisplayName() + " is busy at the moment"), true);
+            }
+            return false;
+        }
+        else{
+            return super.damage(world, source, amount);
+        }
     }
 
     public void requestMoveToBed() {
@@ -1006,7 +1161,7 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
         this.requestStrip(null);
     }
 
-    public void requestStrip(@Nullable SceneOptions options) {
+    public void requestStrip(@Nullable Scene options) {
         this.requestStrip = true;
 
         if(options != null){

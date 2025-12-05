@@ -25,6 +25,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
+import static com.sandymandy.pleasurecraft.util.Utils.getPlayerName;
+
 public class SettlementHubBlockEntity extends BlockEntity {
     private Settlement settlement;
 
@@ -81,7 +83,7 @@ public class SettlementHubBlockEntity extends BlockEntity {
             PlayerEntity owner = world.getPlayerByUuid(ownerId);
             String name = "Settlement@" + getPos().toShortString();
 
-            if(owner != null) name = owner.getName().getString().replace("literal{","").replace("}","") + "'s Settlement";
+            if(owner != null) name = getPlayerName(owner) + "'s Settlement";
 
             this.settlement = manager.createSettlement(getPos(), name, ownerId);
             markDirty();

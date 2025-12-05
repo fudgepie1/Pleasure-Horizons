@@ -1,7 +1,7 @@
 package com.sandymandy.pleasurecraft.entity.girls;
 
 import com.sandymandy.pleasurecraft.entity.base.GirlEntityAI;
-import com.sandymandy.pleasurecraft.util.variables.SceneOptions;
+import com.sandymandy.pleasurecraft.util.variables.Scene;
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
@@ -32,9 +32,9 @@ public class LucyEntity extends GirlEntityAI {
     public float getYAxisGUI(){return 0.0525F;}
 
     @Override
-    public List<SceneOptions> getSceneOptions() {
+    public List<Scene> getScenes() {
         return List.of(
-                SceneOptions.onPlayer("Paizuri",
+                Scene.onPlayer("Paizuri",
                         6,
                         List.of("paizuri_intro"),
                         List.of("paizuri_slow"),
@@ -42,10 +42,11 @@ public class LucyEntity extends GirlEntityAI {
                         "paizuri_cum",
                         4,
                         true,
+                        false,
                         false),
 
 
-                SceneOptions.onPlayer("Blow Job",
+                Scene.onPlayer("Blow Job",
                         8,
                         List.of("blowjob_intro"),
                         List.of("blowjob_slow"),
@@ -53,9 +54,10 @@ public class LucyEntity extends GirlEntityAI {
                         "blowjob_cum",
                         4,
                         false,
+                        false,
                         false),
 
-                SceneOptions.onBed("Doggy",
+                Scene.onBed("Doggy",
                         10,
                         List.of("doggy_intro"),
                         List.of("doggy_slow"),
@@ -63,7 +65,8 @@ public class LucyEntity extends GirlEntityAI {
                         "doggy_cum",
                         4.5f,
                         true,
-                        false,
+                        true,
+                        true,
                         0f,
                         "doggy_lay_on_bed",
                         "doggy_bed_idle")

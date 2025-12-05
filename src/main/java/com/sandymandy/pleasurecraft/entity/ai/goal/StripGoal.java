@@ -1,7 +1,7 @@
 package com.sandymandy.pleasurecraft.entity.ai.goal;
 
 import com.sandymandy.pleasurecraft.entity.base.GirlEntityScene;
-import com.sandymandy.pleasurecraft.util.variables.SceneOptions;
+import com.sandymandy.pleasurecraft.util.variables.Scene;
 import net.minecraft.entity.ai.goal.Goal;
 
 import java.util.EnumSet;
@@ -10,7 +10,7 @@ public class StripGoal extends Goal {
     private final GirlEntityScene girl; ;
     private boolean stripTrigged = false;
     private boolean started = false;
-    private SceneOptions sceneOptions = SceneOptions.EMPTY;
+    private Scene scene = Scene.EMPTY;
 
     public StripGoal(GirlEntityScene girl) {
         this.girl = girl;
@@ -27,10 +27,10 @@ public class StripGoal extends Goal {
     public void start() {
         girl.setFreeze(true);
         girl.playAnimation("strip", false, false); // play strip anim
-        if(!girl.stripOptions.equals(SceneOptions.EMPTY))
+        if(!girl.stripOptions.equals(Scene.EMPTY))
         {
-            this.sceneOptions = girl.stripOptions;
-            girl.stripOptions = SceneOptions.EMPTY;
+            this.scene = girl.stripOptions;
+            girl.stripOptions = Scene.EMPTY;
         }
         stripTrigged = false;
         started = true;
@@ -57,9 +57,9 @@ public class StripGoal extends Goal {
     public void stop() {
         girl.setFreeze(false);
         started = false;
-        if(!this.sceneOptions.equals(SceneOptions.EMPTY)){
-            girl.startScene(this.sceneOptions);
-            this.sceneOptions = SceneOptions.EMPTY;
+        if(!this.scene.equals(Scene.EMPTY)){
+            girl.startScene(this.scene);
+            this.scene = Scene.EMPTY;
         }
     }
 }

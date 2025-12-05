@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:lily_pad",
+    "#minecraft:eggs"
+  ],
+  "result": {
+    "count": 1,
+    "id": "pleasurecraft:slime_spawn_egg"
+  }
+}

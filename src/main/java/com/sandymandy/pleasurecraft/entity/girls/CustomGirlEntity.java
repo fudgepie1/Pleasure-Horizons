@@ -3,7 +3,7 @@ package com.sandymandy.pleasurecraft.entity.girls;
 import com.sandymandy.pleasurecraft.entity.base.GirlEntityAI;
 import com.sandymandy.pleasurecraft.util.json.CustomGirlLoader;
 import com.sandymandy.pleasurecraft.util.variables.CustomGirlProfile;
-import com.sandymandy.pleasurecraft.util.variables.SceneOptions;
+import com.sandymandy.pleasurecraft.util.variables.Scene;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.EntityType;
@@ -14,7 +14,6 @@ import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
 import net.minecraft.text.Text;
@@ -90,7 +89,7 @@ public class CustomGirlEntity extends GirlEntityAI {
     }
 
     @Override
-    public List<SceneOptions> getSceneOptions() {
+    public List<Scene> getScenes() {
         return getProfile().scenes();
     }
 

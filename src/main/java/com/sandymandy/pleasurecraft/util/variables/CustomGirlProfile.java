@@ -18,7 +18,7 @@ public record CustomGirlProfile(
         double maxHealth,
         double movementSpeed,
         double attackDamage,
-        List<SceneOptions> scenes
+        List<Scene> scenes
 ) {
     public static final Codec<CustomGirlProfile> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.STRING.fieldOf("id").forGetter(CustomGirlProfile::id),
@@ -30,7 +30,7 @@ public record CustomGirlProfile(
             Codec.DOUBLE.fieldOf("maxHealth").forGetter(CustomGirlProfile::maxHealth),
             Codec.DOUBLE.fieldOf("movementSpeed").forGetter(CustomGirlProfile::movementSpeed),
             Codec.DOUBLE.fieldOf("attackDamage").forGetter(CustomGirlProfile::attackDamage),
-            SceneOptions.CODEC.listOf().fieldOf("scenes").forGetter(CustomGirlProfile::scenes)
+            Scene.CODEC.listOf().fieldOf("scenes").forGetter(CustomGirlProfile::scenes)
     ).apply(instance, CustomGirlProfile::new));
 
     public static final CustomGirlProfile DEFAULT = new CustomGirlProfile(

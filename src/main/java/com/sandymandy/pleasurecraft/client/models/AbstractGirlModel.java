@@ -194,6 +194,7 @@ public abstract class AbstractGirlModel<T extends GirlEntityScene> extends GeoMo
 
         bones.add(new JiggleBoneConfig("cheekL", 0.2, 0.2));
         bones.add(new JiggleBoneConfig("cheekR", 0.2, 0.2));
+        bones.add(new JiggleBoneConfig("belly", 0.3, 0.4));
 
         if (!animationState.getDataOrDefault(PleasureCraftDataTicketRegistry.IS_STRIPPED, false)) {
             bones.add(new JiggleBoneConfig("boobs", 0.2, 0.4));

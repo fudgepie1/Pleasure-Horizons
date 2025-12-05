@@ -3,9 +3,8 @@ package com.sandymandy.pleasurecraft.util.json;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.util.variables.CustomGirlProfile;
-import com.sandymandy.pleasurecraft.util.variables.SceneOptions;
+import com.sandymandy.pleasurecraft.util.variables.Scene;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
@@ -35,7 +34,7 @@ public class CustomGirlParser {
         double damage = attr.has("damage") ? attr.get("damage").getAsDouble() : 2;
 
         // Scene options
-        List<SceneOptions> scenes = new ArrayList<>();
+        List<Scene> scenes = new ArrayList<>();
         if (json.has("scenes")) {
             JsonArray array = json.getAsJsonArray("scenes");
             for (JsonElement e : array) {
@@ -46,7 +45,7 @@ public class CustomGirlParser {
         return new CustomGirlProfile(id, name, hitboxHeight, guiSize, guiYOffset, tameItem, health, speed, damage, scenes);
     }
 
-    private static SceneOptions parseScene(JsonObject s) {
+    private static Scene parseScene(JsonObject s) {
         String name = s.get("name").getAsString();
         int level = s.get("required_level").getAsInt();
         boolean needsStrip = s.has("needs_to_strip") && s.get("needs_to_strip").getAsBoolean();
@@ -56,7 +55,7 @@ public class CustomGirlParser {
         switch (type) {
 
             case "on_bed":
-                return SceneOptions.onBed(
+                return Scene.onBed(
                         name,
                         level,
                         jsonArrayToList(s.getAsJsonArray("intro_anim")),
@@ -66,26 +65,14 @@ public class CustomGirlParser {
                         s.get("cum_threshold").getAsFloat(),
                         needsStrip,
                         s.has("use_keyframe") && s.get("use_keyframe").getAsBoolean(),
+                        s.has("counts_towards_impregnation") && s.get("counts_towards_impregnation").getAsBoolean(),
                         s.has("bed_offset") ? s.get("bed_offset").getAsFloat() : 0f,
                         s.has("lay_on_bed_anim") ? s.get("lay_on_bed_anim").getAsString() : "",
                         s.has("bed_idle_anim") ? s.get("bed_idle_anim").getAsString() : ""
                 );
 
             case "on_player":
-                return SceneOptions.onPlayer(
-                        name,
-                        level,
-                        jsonArrayToList(s.getAsJsonArray("intro_anim")),
-                        jsonArrayToList(s.getAsJsonArray("slow_anim")),
-                        jsonArrayToList(s.getAsJsonArray("fast_anim")),
-                        s.get("cum_anim").getAsString(),
-                        s.get("cum_threshold").getAsFloat(),
-                        needsStrip,
-                        s.has("use_keyframe") && s.get("use_keyframe").getAsBoolean()
-                );
-
-            case "stationary_contact":
-                return SceneOptions.stationaryContact(
+                return Scene.onPlayer(
                         name,
                         level,
                         jsonArrayToList(s.getAsJsonArray("intro_anim")),
@@ -95,12 +82,28 @@ public class CustomGirlParser {
                         s.get("cum_threshold").getAsFloat(),
                         needsStrip,
                         s.has("use_keyframe") && s.get("use_keyframe").getAsBoolean(),
+                        s.has("counts_towards_impregnation") && s.get("counts_towards_impregnation").getAsBoolean()
+                );
+
+            case "stationary_contact":
+                return Scene.stationaryContact(
+                        name,
+                        level,
+                        jsonArrayToList(s.getAsJsonArray("intro_anim")),
+                        jsonArrayToList(s.getAsJsonArray("slow_anim")),
+                        jsonArrayToList(s.getAsJsonArray("fast_anim")),
+                        s.get("cum_anim").getAsString(),
+                        s.get("cum_threshold").getAsFloat(),
+                        needsStrip,
+                        s.has("use_keyframe") && s.get("use_keyframe").getAsBoolean(),
+                        s.has("counts_towards_impregnation") && s.get("counts_towards_impregnation").getAsBoolean(),
                         s.has("lay_down_anim") ? s.get("lay_down_anim").getAsString() : "",
+
                         s.has("idle_anim") ? s.get("idle_anim").getAsString() : ""
                 );
 
             case "stationary_intro":
-                return SceneOptions.stationaryIntro(
+                return Scene.stationaryIntro(
                         name,
                         level,
                         jsonArrayToList(s.getAsJsonArray("intro_anim")),
@@ -110,7 +113,7 @@ public class CustomGirlParser {
                 );
 
             case "stationary":
-                return SceneOptions.stationary(
+                return Scene.stationary(
                         name,
                         level,
                         s.get("anim").getAsString(),
@@ -120,7 +123,7 @@ public class CustomGirlParser {
 
             default:
                 // fallback for old JSON that didn’t have scene_type
-                return SceneOptions.onPlayer(
+                return Scene.onPlayer(
                         name,
                         level,
                         jsonArrayToList(s.getAsJsonArray("intro_anim")),
@@ -129,7 +132,9 @@ public class CustomGirlParser {
                         s.get("cum_anim").getAsString(),
                         s.get("cum_threshold").getAsFloat(),
                         needsStrip,
-                        s.has("use_keyframe") && s.get("use_keyframe").getAsBoolean()
+                        s.has("use_keyframe") && s.get("use_keyframe").getAsBoolean(),
+                        s.has("counts_towards_impregnation") && s.get("counts_towards_impregnation").getAsBoolean()
+
                 );
         }
     }
