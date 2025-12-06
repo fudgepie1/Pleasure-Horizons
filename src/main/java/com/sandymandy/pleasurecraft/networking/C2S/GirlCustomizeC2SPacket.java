@@ -1,7 +1,6 @@
 package com.sandymandy.pleasurecraft.networking.C2S;
 
 import com.sandymandy.pleasurecraft.PleasureCraft;
-import com.sandymandy.pleasurecraft.networking.S2C.OpenCustomizeScreenS2CPacket;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;

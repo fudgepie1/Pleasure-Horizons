@@ -5,6 +5,7 @@ import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.config.ModConfig;
 import com.sandymandy.pleasurecraft.networking.C2S.*;
 import com.sandymandy.pleasurecraft.networking.S2C.ClothingArmorVisibilityS2CPacket;
+import com.sandymandy.pleasurecraft.networking.S2C.PlayAttackAnimationS2CPacket;
 import com.sandymandy.pleasurecraft.networking.S2C.PlayCumHudAnimationS2CPacket;
 import com.sandymandy.pleasurecraft.registries.PleasureCraftSoundEventRegistry;
 import com.sandymandy.pleasurecraft.registries.PleasureCraftTrackedDataRegistry;
@@ -23,6 +24,7 @@ import net.minecraft.client.texture.PlayerSkinProvider;
 import net.minecraft.client.util.SkinTextures;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.DyedColorComponent;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.damage.DamageSource;
@@ -50,6 +52,7 @@ import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+import software.bernie.geckolib.animatable.GeoAnimatable;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animatable.instance.SingletonAnimatableInstanceCache;
@@ -95,8 +98,8 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
     private static final int PREGNANCY_DUR = 20 * 60 * 5; // 5 minutes
     private static final float PROGRESS_SPEED = 0.1f;
     public PlayerEntity scenePlayer = (PlayerEntity) this.getOwner();
-    /*    private boolean swinging = false;
-        private long lastSwing = 0L;*/
+    private boolean swinging = false;
+    private long lastSwing = 0L;
 
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
@@ -660,46 +663,52 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
         }
     }
 
-
+    public void triggerSwing() {
+        this.swinging = true;
+        this.lastSwing = this.getWorld().getTime();
+    }
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllerRegistrar) {
         controllerRegistrar.add(new AnimationController<>("girl_animations", 4, this::handleAnimations).setSoundKeyframeHandler(new SoundKeyframeHandler(this)));
         // Attack controller, higher priority so it can override
-        /*controllerRegistrar.add(new AnimationController<>("attack", 2, this::handleAttackAnimations));*/
+        controllerRegistrar.add(new AnimationController<>("girl_attack", 3, this::handleAttackAnimations));
     }
 
-    /*private PlayState handleAttackAnimations(AnimationTest<SceneEntity> state) {
-        // Calculate horizontal velocity (not required, but kept from original)
-     double dx = this.getX() - this.prevX;
-       double dz = this.getZ() - this.prevZ;
-
-        // Detect swing (built-in swing progress > 0)
-        if (this.getHandSwingProgress(state.getPartialTick()) > 0.0F && !this.swinging) {
-            this.swinging = true;
-            this.lastSwing = this.getWorld().getTime();
-        }
+    private PlayState handleAttackAnimations(AnimationTest<GeoAnimatable> state) {
+        AnimationController<?> controller = state.controller();
 
         // End swing after 7 ticks
         if (this.swinging && this.lastSwing + 7L <= this.getWorld().getTime()) {
             this.swinging = false;
         }
 
-        // If swinging and controller is idle, play correct animation
-        if (this.swinging && state.controller().getAnimationState() == AnimationController.State.STOPPED) {
-            state.resetCurrentAnimation();
-
-
-            this.messageAsEntity("Swing");
-            return state.setAndContinue(RawAnimation.begin().then(getAnimationPath("attack1"), Animation.LoopType.PLAY_ONCE));
-        }
-        else {
-            this.messageAsEntity("Not Swing");
-            return PlayState.CONTINUE;
+        // If swinging and controller is idle, play attack animation once
+        if (this.swinging && controller.getAnimationState() == AnimationController.State.STOPPED) {
+            controller.forceAnimationReset();
+            return state.setAndContinue(
+                    //Get a random animation out of the three
+                    RawAnimation.begin().then(getAnimationPath("attack" + RANDOM.nextInt(0, 2)), Animation.LoopType.PLAY_ONCE)
+            );
         }
 
+        return PlayState.CONTINUE;
 
-    }*/
+    }
+
+    @Override
+    public boolean tryAttack(ServerWorld world, Entity target) {
+        boolean hit = super.tryAttack(world, target);
+
+        if (hit && !this.getWorld().isClient) {
+            for (ServerPlayerEntity player : world.getPlayers()){
+                ServerPlayNetworking.send(player, new PlayAttackAnimationS2CPacket(this.getId()));
+            }
+        }
+
+        return hit;
+    }
+
 
     private PlayState handleAnimations(AnimationTest<GirlEntityScene> state) {
         if (isSceneActive() && getOverrideAnim().isEmpty()) {
@@ -1055,6 +1064,10 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
 
     public boolean isBedScene(){
         return this.getCurrentScene().sceneType().equals(SceneType.ON_BED);
+    }
+
+    public void messageAsEntity(String message) {
+        messageAsEntity(false, message);
     }
 
     public void messageAsEntity(boolean sendFromServer, String message){

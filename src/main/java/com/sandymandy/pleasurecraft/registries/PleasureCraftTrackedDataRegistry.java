@@ -21,7 +21,7 @@ public class PleasureCraftTrackedDataRegistry {
 
     public static void registerTrackedData(){
         PleasureCraft.LOGGER.info("Registering custom TrackedDataHandlers for PleasureCraft");
-        FabricTrackedDataRegistry.register(Identifier.of(PleasureCraft.MOD_ID, "scene_option"), PleasureCraftTrackedDataRegistry.SCENE);
+        FabricTrackedDataRegistry.register(Identifier.of(PleasureCraft.MOD_ID, "scene"), PleasureCraftTrackedDataRegistry.SCENE);
         FabricTrackedDataRegistry.register(Identifier.of(PleasureCraft.MOD_ID, "scene_phase"), PleasureCraftTrackedDataRegistry.SCENE_PHASE);
         FabricTrackedDataRegistry.register(Identifier.of(PleasureCraft.MOD_ID, "vec3d"), PleasureCraftTrackedDataRegistry.VEC3D);
 

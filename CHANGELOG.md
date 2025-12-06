@@ -8,6 +8,7 @@
 - Made the girl spawn eggs craftable
 - Added a new pregnancy system
 - Added support for making the thrust key in to a toggle instead of a hold via the mod menu
+- Added an animation when attacking
 
 ## v0.6.0
 - Updated to 1.21.6

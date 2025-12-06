@@ -63,5 +63,20 @@ public class PleasureCraftClientPackets {
                 }
         );
 
+        ClientPlayNetworking.registerGlobalReceiver(
+                PlayAttackAnimationS2CPacket.ID,
+                (packet, context) -> context.client().execute(() -> {
+                    var world = context.client().world;
+                    if (world == null) return;
+
+                    Entity entity = world.getEntityById(packet.entityId());
+                    if (entity instanceof GirlEntityScene girl) {
+                        girl.triggerSwing(); // <-- You add this method
+                    }
+                })
+        );
+
+
+
     }
 }

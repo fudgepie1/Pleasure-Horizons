@@ -38,6 +38,7 @@ public class PleasureCraftPackets {
         PayloadTypeRegistry.playS2C().register(PlayCumHudAnimationS2CPacket.ID, PlayCumHudAnimationS2CPacket.CODEC);
         PayloadTypeRegistry.playS2C().register(OpenCustomizeScreenS2CPacket.ID, OpenCustomizeScreenS2CPacket.CODEC);
         PayloadTypeRegistry.playS2C().register(RefreshModelsS2CPacket.ID, RefreshModelsS2CPacket.CODEC);
+        PayloadTypeRegistry.playS2C().register(PlayAttackAnimationS2CPacket.ID, PlayAttackAnimationS2CPacket.CODEC);
 
     }
 
