@@ -18,7 +18,8 @@ public class CustomGirlParser {
         String name = json.get("name").getAsString();
         float hitboxHeight = json.has("hitbox_height") ? json.get("hitbox_height").getAsFloat() : 1.65f;
         int guiSize = json.has("gui_size") ? json.get("gui_size").getAsInt() : 30;
-        float guiYOffset = json.has("gui_y_offset") ? json.get("gui_y_offset").getAsFloat() : 0.05f;
+        float guiYOffset = json.has("gui_y_offset") ? json.get("gui_y_offset").getAsFloat() : 0.0625F;
+        float weaponBoneRotation = json.has("weapon_bone_rotation") ? json.get("weapon_bone_rotation").getAsFloat() : 150f;
 
         // Tame item
         String tameItemId = json.has("tame_item") ? json.get("tame_item").getAsString() : null;
@@ -42,7 +43,7 @@ public class CustomGirlParser {
             }
         }
 
-        return new CustomGirlProfile(id, name, hitboxHeight, guiSize, guiYOffset, tameItem, health, speed, damage, scenes);
+        return new CustomGirlProfile(id, name, hitboxHeight, guiSize, guiYOffset, weaponBoneRotation, tameItem, health, speed, damage, scenes);
     }
 
     private static Scene parseScene(JsonObject s) {

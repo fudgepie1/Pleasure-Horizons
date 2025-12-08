@@ -71,7 +71,7 @@ public class PleasureCraftClientPackets {
 
                     Entity entity = world.getEntityById(packet.entityId());
                     if (entity instanceof GirlEntityScene girl) {
-                        girl.triggerSwing(); // <-- You add this method
+                        girl.triggerSwing();
                     }
                 })
         );

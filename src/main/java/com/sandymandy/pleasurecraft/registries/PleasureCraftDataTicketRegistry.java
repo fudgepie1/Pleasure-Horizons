@@ -16,6 +16,7 @@ public class PleasureCraftDataTicketRegistry {
     public static final DataTicket<String> GIRL_ID = DataTicket.create("girl_id", String.class);
     public static final DataTicket<Integer> ENTITY_ID = DataTicket.create("entity_id", Integer.class);
     public static final DataTicket<Entity> GIRL_FIRST_PASSENGER = DataTicket.create("girl_first_passenger", Entity.class);
+    public static final DataTicket<Float> GIRL_WEAPON_BONE_ROTATION_X = DataTicket.create("wep_bone_rot_x", Float.class);
     public static final DataTicket<ItemStack> GIRL_MAIN_HAND_STACK = DataTicket.create("girl_main_hand_stack", ItemStack.class);
     public static final DataTicket<Map<String, Boolean>> GIRL_BONE_VISIBILITY = (DataTicket<Map<String, Boolean>>) (Object) DataTicket.create("girl_bone_visibility", Map.class);
     public static final DataTicket<Map<String, Vec2f>> GIRL_BONE_UV_OFFSETS = (DataTicket<Map<String, Vec2f>>) (Object) DataTicket.create("girl_bone_uv_offsets", Map.class);

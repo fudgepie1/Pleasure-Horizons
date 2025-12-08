@@ -6,8 +6,8 @@ import com.sandymandy.pleasurecraft.config.ModConfig;
 import com.sandymandy.pleasurecraft.entity.base.GirlEntityScene;
 import com.sandymandy.pleasurecraft.networking.C2S.BonePosSyncC2SPacket;
 import com.sandymandy.pleasurecraft.registries.PleasureCraftDataTicketRegistry;
-import com.sandymandy.pleasurecraft.util.rendering.UnlitNormalVertexConsumer;
 import com.sandymandy.pleasurecraft.util.rendering.OffsetVertexConsumer;
+import com.sandymandy.pleasurecraft.util.rendering.UnlitNormalVertexConsumer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
@@ -17,8 +17,6 @@ import net.minecraft.client.render.entity.state.LivingEntityRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemDisplayContext;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ShieldItem;
-import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec2f;
@@ -39,13 +37,16 @@ import java.util.Map;
 
 public abstract class AbstractGirlRenderer<T extends GirlEntityScene, R extends LivingEntityRenderState & GeoRenderState> extends GeoEntityRenderer<T, R> {
 
-
     protected ItemStack mainHandItem;
 
     public AbstractGirlRenderer(EntityRendererFactory.Context renderManager, GeoModel<T> model) {
         super(renderManager, model);
         this.addRenderLayer(new BlockAndItemGeoLayer<>(this) {
-            private float heldItemScale = 1.0F;
+            @Override
+            public void addRenderData(T animatable, Void relatedObject, R renderState) {
+                renderState.addGeckolibData(PleasureCraftDataTicketRegistry.GIRL_MAIN_HAND_STACK, animatable.getMainHandStack());
+                renderState.addGeckolibData(PleasureCraftDataTicketRegistry.GIRL_WEAPON_BONE_ROTATION_X, animatable.getWeaponBoneXRotation());
+            }
 
             @Override
             protected List<RenderData<R>> getRelevantBones(R renderState, BakedGeoModel model) {
@@ -56,19 +57,11 @@ public abstract class AbstractGirlRenderer<T extends GirlEntityScene, R extends 
                         "weapon",
                         ItemDisplayContext.THIRD_PERSON_RIGHT_HAND,
                         (bone, state) -> {
-                            // Return Either<ItemStack, BlockState>
                             ItemStack stack = AbstractGirlRenderer.this.mainHandItem;
                             return Either.left(stack);
                         }
                 ));
-
                 return list;
-            }
-
-            @Override
-            public void addRenderData(T animatable, Void relatedObject, R renderState) {
-                // You don’t need extra data for this layer,
-                // but you could attach custom tickets if needed
             }
 
             @Override
@@ -82,24 +75,18 @@ public abstract class AbstractGirlRenderer<T extends GirlEntityScene, R extends 
                     int light,
                     int overlay
             ) {
-                if (bone.getName().equals("weapon") && stack == AbstractGirlRenderer.this.mainHandItem) {
-                    // Rotate around X -90°
-                    matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(-90.0F));
+                String name = bone.getName();
+                float boneRotX = renderState.getGeckolibData(PleasureCraftDataTicketRegistry.GIRL_WEAPON_BONE_ROTATION_X);
 
-                    if (stack.getItem() instanceof ShieldItem) {
-                        matrices.translate(0.0F, 0.125F, -0.25F);
-                    } else if (stack.isIn(ItemTags.SWORDS)) {
-                        matrices.translate(0.0F, 0.05F, 0.0F);
-                        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(10.0F));
-                        matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(5.0F));
-                    }
+                if ("weapon".equals(name)) {
+                    matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(boneRotX));
+                    matrices.scale(0.7F, 0.7F, 0.7F);
                 }
 
-                this.heldItemScale = 0.7F;
-                matrices.scale(this.heldItemScale, this.heldItemScale, this.heldItemScale);
-
-                // Call parent to actually render
-                super.renderStackForBone(matrices, bone, stack, displayContext, renderState, bufferSource, light, overlay);
+                super.renderStackForBone(
+                        matrices, bone, stack, displayContext,
+                        renderState, bufferSource, light, overlay
+                );
             }
 
         });
@@ -132,7 +119,6 @@ public abstract class AbstractGirlRenderer<T extends GirlEntityScene, R extends 
         renderState.addGeckolibData(PleasureCraftDataTicketRegistry.GIRL_ID, animatable.getGirlID());
         renderState.addGeckolibData(PleasureCraftDataTicketRegistry.ENTITY_ID, animatable.getId());
         renderState.addGeckolibData(PleasureCraftDataTicketRegistry.GIRL_FIRST_PASSENGER, animatable.getFirstPassenger());
-        renderState.addGeckolibData(PleasureCraftDataTicketRegistry.GIRL_MAIN_HAND_STACK, animatable.getMainHandStack());
         renderState.addGeckolibData(PleasureCraftDataTicketRegistry.GIRL_BONE_VISIBILITY, animatable.boneVisibility);
         renderState.addGeckolibData(PleasureCraftDataTicketRegistry.GIRL_BONE_UV_OFFSETS, animatable.boneUVOffsets);
         renderState.addGeckolibData(PleasureCraftDataTicketRegistry.GIRL_BONE_TEXTURE_OVERRIDES, animatable.boneTextureOverrides);

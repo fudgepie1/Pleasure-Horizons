@@ -37,6 +37,11 @@ public class SlimeEntity extends GirlEntityAI {
     public float getYAxisGUI(){return 0.0525F;}
 
     @Override
+    public float getWeaponBoneXRotation() {
+        return -100f;
+    }
+
+    @Override
     public List<Scene> getScenes() {
         return List.of(
                 Scene.onPlayer("Blow Job",

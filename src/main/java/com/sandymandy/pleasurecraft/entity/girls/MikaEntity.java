@@ -32,6 +32,11 @@ public class MikaEntity extends GirlEntityAI {
     public int getSizeGUI(){return 25;}
 
     @Override
+    public float getWeaponBoneXRotation() {
+        return -80f;
+    }
+
+    @Override
     public List<Scene> getScenes() {
         return List.of(
                 Scene.onPlayer("Face fuck",

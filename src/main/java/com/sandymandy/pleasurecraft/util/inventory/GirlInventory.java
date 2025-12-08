@@ -10,22 +10,25 @@ import net.minecraft.util.collection.DefaultedList;
 import java.util.List;
 
 public interface GirlInventory extends Inventory {
-    // Slot indices
+    // Main Hand
     int MAIN_HAND_SLOT = 0;
 
-    // Armor slots mapped to vanilla slots
+    // Armor
     int ARMOR_FEET_SLOT = 1;
     int ARMOR_LEGS_SLOT = 2;
     int ARMOR_CHEST_SLOT = 3;
     int ARMOR_HEAD_SLOT = 4;
-
     int ARMOR_START = ARMOR_FEET_SLOT;
     int ARMOR_END = ARMOR_HEAD_SLOT;
 
+    // Backpack
+    // slots 5..16 inclusive
     int BACKPACK_START = 5;
-    int BACKPACK_SIZE = 12;  // slots 5..16 inclusive
     int BACKPACK_END = 16;
-    int TOTAL_SLOTS = BACKPACK_START + BACKPACK_SIZE;  // 17 total slots
+
+    // Offhand
+    int OFF_HAND_SLOT = BACKPACK_END + 1;
+    int TOTAL_SLOTS = OFF_HAND_SLOT + 1;  // 18 total slots
 
     // Must always return the same instance backing the inventory
     DefaultedList<ItemStack> getItems();
@@ -43,18 +46,16 @@ public interface GirlInventory extends Inventory {
 
     // === Armor access helpers ===
 
-    default ItemStack getArmorStack(EquipmentSlot slot) {
+    default ItemStack getEquipmentStack(EquipmentSlot slot) {
         return switch (slot) {
             case FEET -> getStack(ARMOR_FEET_SLOT);
             case LEGS -> getStack(ARMOR_LEGS_SLOT);
             case CHEST -> getStack(ARMOR_CHEST_SLOT);
             case HEAD -> getStack(ARMOR_HEAD_SLOT);
-            default -> ItemStack.EMPTY; // mainhand/offhand not handled here
+            case MAINHAND -> getStack(MAIN_HAND_SLOT);
+            case OFFHAND -> getStack(OFF_HAND_SLOT);
+            default -> ItemStack.EMPTY;
         };
-    }
-
-    default ItemStack getHandStack() {
-        return getStack(MAIN_HAND_SLOT);
     }
 
     default void setEquipmentStack(EquipmentSlot slot, ItemStack stack) {
@@ -63,7 +64,8 @@ public interface GirlInventory extends Inventory {
             case LEGS -> setStack(ARMOR_LEGS_SLOT, stack);
             case CHEST -> setStack(ARMOR_CHEST_SLOT, stack);
             case HEAD -> setStack(ARMOR_HEAD_SLOT, stack);
-            case MAINHAND -> setStack(1, stack);
+            case MAINHAND -> setStack(MAIN_HAND_SLOT, stack);
+            case OFFHAND -> setStack(OFF_HAND_SLOT, stack);
             default -> {}
         }
     }

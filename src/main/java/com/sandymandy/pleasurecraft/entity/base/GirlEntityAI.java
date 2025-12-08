@@ -6,19 +6,25 @@ import com.sandymandy.pleasurecraft.settlement.SettlementMember;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.ai.RangedAttackMob;
 import net.minecraft.entity.ai.brain.Brain;
 import net.minecraft.entity.ai.goal.*;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
-import net.minecraft.entity.passive.FoxEntity;
 import net.minecraft.entity.passive.IronGolemEntity;
 import net.minecraft.entity.passive.TurtleEntity;
 import net.minecraft.entity.passive.WolfEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.projectile.PersistentProjectileEntity;
+import net.minecraft.entity.projectile.ProjectileEntity;
+import net.minecraft.entity.projectile.ProjectileUtil;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.registry.tag.DamageTypeTags;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.world.World;
 import net.tslat.smartbrainlib.api.SmartBrainOwner;
 import net.tslat.smartbrainlib.api.core.BrainActivityGroup;
@@ -42,7 +48,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public abstract class GirlEntityAI extends GirlEntityScene implements SmartBrainOwner<GirlEntityAI>, SettlementMember {
+public abstract class GirlEntityAI extends GirlEntityScene implements SmartBrainOwner<GirlEntityAI>, SettlementMember, RangedAttackMob {
     private Settlement settlement;
     private LivingEntity attackTarget;
     private int ticksSinceLastHit;
@@ -73,7 +79,11 @@ public abstract class GirlEntityAI extends GirlEntityScene implements SmartBrain
             this.goalSelector.add(1, new SwimGoal(this));
             this.goalSelector.add(2, new LongDoorInteractGoal(this, true));
             this.goalSelector.add(3, new TameableGirlEscapeDangerGoal(1.5D, DamageTypeTags.PANIC_ENVIRONMENTAL_CAUSES));
-            this.goalSelector.add(4, new GirlAttackGoal(this, 1D, false));
+            this.goalSelector.add(4, new GirlAttackSwitchGoal(this, 1.0, 5));
+/*
+            this.goalSelector.add(4, new GirlBowAttackGoal(this, 1.0, 10, 15));
+            this.goalSelector.add(4, new GirlMeleeAttackGoal(this, 1D, false));
+*/
             this.goalSelector.add(5, new ConditionalGoal(new GirlFollowOwnerGoal(this, 1D, 10.0F, 2.0F), this::isFollowing));
             this.goalSelector.add(6, new TemptGoal(this, 1D, Ingredient.ofItems(getTameItem()), false));
             this.goalSelector.add(7, new GirlStayNearBaseGoal(this, 1.0, 2.0F, 15.0F, 150));
@@ -219,4 +229,25 @@ public abstract class GirlEntityAI extends GirlEntityScene implements SmartBrain
         this.dataTracker.set(SHOULD_TICK_BRAIN, !(isMovementLocked() && isSitting() && this.targetBedPos != null && this.isFollowing()) && this.hasSettlement());
     }
 
+    @Override
+    public void shootAt(LivingEntity target, float pullProgress) {
+        ItemStack itemStack = this.getStackInHand(ProjectileUtil.getHandPossiblyHolding(this, Items.BOW));
+        ItemStack itemStack2 = this.getProjectileType(itemStack);
+        PersistentProjectileEntity persistentProjectileEntity = this.createArrowProjectile(itemStack2, pullProgress, itemStack);
+        double d = target.getX() - this.getX();
+        double e = target.getBodyY(0.3333333333333333) - persistentProjectileEntity.getY();
+        double f = target.getZ() - this.getZ();
+        double g = Math.sqrt(d * d + f * f);
+        if (this.getWorld() instanceof ServerWorld serverWorld) {
+            ProjectileEntity.spawnWithVelocity(
+                    persistentProjectileEntity, serverWorld, itemStack2, d, e + g * 0.2F, f, 1.6F, 1
+            );
+        }
+
+        this.playSound(SoundEvents.ENTITY_SKELETON_SHOOT, 1.0F, 1.0F / (this.getRandom().nextFloat() * 0.4F + 0.8F));
+    }
+
+    protected PersistentProjectileEntity createArrowProjectile(ItemStack arrow, float damageModifier, @Nullable ItemStack shotFrom) {
+        return ProjectileUtil.createArrowProjectile(this, arrow, damageModifier, shotFrom);
+    }
 }

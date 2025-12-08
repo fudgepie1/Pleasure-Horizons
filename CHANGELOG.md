@@ -9,6 +9,8 @@
 - Added a new pregnancy system
 - Added support for making the thrust key in to a toggle instead of a hold via the mod menu
 - Added an animation when attacking
+- Fixed my implementation of the main hand **(So now they deal the proper amount of damage depending on the item they are holding)**
+- Added bow support when fighting
 
 ## v0.6.0
 - Updated to 1.21.6

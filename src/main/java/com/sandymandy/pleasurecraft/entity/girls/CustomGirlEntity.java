@@ -108,6 +108,11 @@ public class CustomGirlEntity extends GirlEntityAI {
     }
 
     @Override
+    public float getWeaponBoneXRotation() {
+        return getProfile().weaponBoneRotation();
+    }
+
+    @Override
     protected EntityDimensions getBaseDimensions(EntityPose pose) {
         return EntityDimensions.changing(0.5f, getHitBoxHeight());
     }

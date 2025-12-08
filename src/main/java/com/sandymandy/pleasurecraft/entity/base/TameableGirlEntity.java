@@ -326,6 +326,8 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
         return new ArrayList<>();
     }
 
+    public float getWeaponBoneXRotation() {return 150.0F;}
+
     public int getMaxBellySizeWhenPregnant() { return 450;}
 
     public int maxAmountOfSexUntilImpregnation(){return 5;}
@@ -409,12 +411,7 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
 
     @Override
     public ItemStack getEquippedStack(EquipmentSlot slot) {
-        return inventory.getArmorStack(slot);
-    }
-
-    @Override
-    public ItemStack getMainHandStack() {
-        return inventory.getHandStack();
+        return inventory.getEquipmentStack(slot);
     }
 
     @Override

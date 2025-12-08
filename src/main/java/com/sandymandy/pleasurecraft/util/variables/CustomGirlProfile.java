@@ -14,6 +14,7 @@ public record CustomGirlProfile(
         float hitboxHeight,
         int guiSize,
         float guiYOffset,
+        float weaponBoneRotation,
         Item tameItem,
         double maxHealth,
         double movementSpeed,
@@ -26,6 +27,7 @@ public record CustomGirlProfile(
             Codec.FLOAT.fieldOf("hitboxHeight").forGetter(CustomGirlProfile::hitboxHeight),
             Codec.INT.fieldOf("guiSize").forGetter(CustomGirlProfile::guiSize),
             Codec.FLOAT.fieldOf("guiYOffset").forGetter(CustomGirlProfile::guiYOffset),
+            Codec.FLOAT.fieldOf("weaponBoneRotation").forGetter(CustomGirlProfile::weaponBoneRotation),
             Registries.ITEM.getCodec().fieldOf("tameItem").forGetter(CustomGirlProfile::tameItem),
             Codec.DOUBLE.fieldOf("maxHealth").forGetter(CustomGirlProfile::maxHealth),
             Codec.DOUBLE.fieldOf("movementSpeed").forGetter(CustomGirlProfile::movementSpeed),
@@ -38,7 +40,8 @@ public record CustomGirlProfile(
             "Default Custom Girl",
             1.65f,
             30,                   // gui size
-            0.05f,                // gui offset
+            0.0625F,                // gui offset
+            150f,                 // weapon bone rotation
             Items.APPLE,          // tame item
             20.0,                 // health
             0.20,                 // speed

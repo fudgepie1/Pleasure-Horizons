@@ -1,15 +1,21 @@
 package com.sandymandy.pleasurecraft.screen;
 
+import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.PleasureCraftClient;
 import com.sandymandy.pleasurecraft.entity.base.TameableGirlEntity;
 import com.sandymandy.pleasurecraft.util.inventory.GirlInventory;
+import com.sandymandy.pleasurecraft.util.inventory.slot.ExclusiveSlot;
+import com.sandymandy.pleasurecraft.util.inventory.slot.InclusiveSlot;
 import com.sandymandy.pleasurecraft.util.inventory.slot.PublicArmorSlot;
+import com.sandymandy.pleasurecraft.util.inventory.slot.TexturedSlot;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.util.Identifier;
@@ -26,6 +32,8 @@ public class GirlInventoryScreenHandler extends ScreenHandler {
     public static final Identifier EMPTY_CHESTPLATE_SLOT_TEXTURE = Identifier.ofVanilla( "container/slot/chestplate");
     public static final Identifier EMPTY_LEGGINGS_SLOT_TEXTURE = Identifier.ofVanilla( "container/slot/leggings");
     public static final Identifier EMPTY_BOOTS_SLOT_TEXTURE = Identifier.ofVanilla( "container/slot/boots");
+    public static final Identifier EMPTY_SWORD_TEXTURE = Identifier.ofVanilla( "container/slot/sword");
+    public static final Identifier EMPTY_BOW_TEXTURE = Identifier.of(PleasureCraft.MOD_ID,"container/slot/bow");
     public static final Map<EquipmentSlot, Identifier> EMPTY_ARMOR_SLOT_TEXTURES = Map.of(
             EquipmentSlot.FEET,
             EMPTY_BOOTS_SLOT_TEXTURE,
@@ -76,7 +84,8 @@ public class GirlInventoryScreenHandler extends ScreenHandler {
         }
 
         // ───── Main Hand Slot = index 0 ─────
-        this.addSlot(new Slot(inventory, GirlInventory.MAIN_HAND_SLOT, 125, 63));
+        this.addSlot(new ExclusiveSlot(inventory, GirlInventory.MAIN_HAND_SLOT, 116, 63, EMPTY_SWORD_TEXTURE, Items.BOW));
+        this.addSlot(new InclusiveSlot(inventory, GirlInventory.OFF_HAND_SLOT, 134, 63, EMPTY_BOW_TEXTURE, Items.BOW));
 
         for (int i = 0; i < 4; i++) {
             EquipmentSlot equipmentSlot = EQUIPMENT_SLOT_ORDER[i];

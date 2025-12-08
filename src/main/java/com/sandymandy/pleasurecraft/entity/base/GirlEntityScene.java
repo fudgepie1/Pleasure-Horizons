@@ -948,6 +948,14 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
         return "animation." + this.getGirlID() + "." + animation;
     }
 
+    private boolean isGirlArmorSlot(EquipmentSlot slot) {
+        return slot == EquipmentSlot.HEAD
+                || slot == EquipmentSlot.CHEST
+                || slot == EquipmentSlot.LEGS
+                || slot == EquipmentSlot.FEET;
+    }
+
+
     public void applySkinToBone(PlayerEntity player) {
         if (!this.getWorld().isClient()) return;
 
@@ -982,7 +990,8 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
         boolean stripped = isStripped();
 
         for (EquipmentSlot slot : EquipmentSlot.values()) {
-            boolean hasArmor = !this.inventory.getArmorStack(slot).isEmpty();
+            if (!isGirlArmorSlot(slot)) continue;
+            boolean hasArmor = !this.inventory.getEquipmentStack(slot).isEmpty();
             armorVisibility.put(slot, hasArmor &! stripped);
         }
 
@@ -1004,6 +1013,7 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
         if (!this.getWorld().isClient()) return;
 
         for (EquipmentSlot slot : EquipmentSlot.values()) {
+            if (!isGirlArmorSlot(slot)) continue;
             List<String> armorBones = getArmorBones().get(slot);
             if (armorBones != null) {
                 setBoneVisibility(armorBones, armorVisibility.getOrDefault(slot, false));
@@ -1018,7 +1028,7 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
     }
 
     private void displayArmor(EquipmentSlot slot){
-        if (this.inventory.getArmorStack(slot).isEmpty()) {
+        if (this.inventory.getEquipmentStack(slot).isEmpty()) {
             return;
         }
 
@@ -1026,7 +1036,7 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
 
         float offset = 0.017578125f;
 
-        ItemStack item = this.inventory.getArmorStack(slot);
+        ItemStack item = this.inventory.getEquipmentStack(slot);
 
         String armorType = item.toString().toLowerCase();
 
@@ -1037,7 +1047,7 @@ public class GirlEntityScene extends TameableGirlEntity implements GeoEntity {
         if (armorType.contains("chain")) u = offset * 5;
         if (armorType.contains("leather")){
             u = offset * 6;
-            this.overrideBoneColor(this.getArmorBones().get(slot), getDyedArmorColor(inventory.getArmorStack(slot)));
+            this.overrideBoneColor(this.getArmorBones().get(slot), getDyedArmorColor(inventory.getEquipmentStack(slot)));
         }
         if (armorType.contains("turtle")) u = offset * 7;
 
