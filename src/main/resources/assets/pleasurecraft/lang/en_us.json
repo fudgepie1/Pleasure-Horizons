@@ -239,8 +239,6 @@
 
   "text.autoconfig.pleasurecraft.option.collision.ignoreCustom.@Tooltip[0]": "Allows travelling through specific blocks in freecam.",
 
-  "text.autoconfig.pleasurecraft.option.collision.ignoreCustom.@ModrinthTooltip[1]": "\u00A7cNOTE: Can only be used in singleplayer, creative, or with operator status.",
-
   "text.autoconfig.pleasurecraft.option.collision.whitelist.ids": "Ignore IDs",
 
   "text.autoconfig.pleasurecraft.option.collision.whitelist.ids.@Tooltip[0]": "Use block id, e.g. \"grass_block\".",
@@ -313,17 +311,9 @@
 
   "text.autoconfig.pleasurecraft.option.utility.freezePlayer.@Tooltip[1]": "§cWARNING: Multiplayer usage not advised.",
 
-  "text.autoconfig.pleasurecraft.option..freezePlayer.@ModrinthTooltip[1]": "§cNOTE: Can only be used in singleplayer, creative, or with operator status.",
-
   "text.autoconfig.pleasurecraft.option.utility.allowInteract": "Allow Interaction",
 
   "text.autoconfig.pleasurecraft.option.utility.allowInteract.@Tooltip[0]": "Whether you can interact with blocks/entities in freecam.",
-
-  "text.autoconfig.pleasurecraft.option.utility.allowInteract.@Tooltip[1]": "§cWARNING: Multiplayer usage not advised.",
-
-  "text.autoconfig.pleasurecraft.option.utility.allowInteract.@ModrinthTooltip[1]": "§cNOTE: Can only be used in singleplayer, creative, or with operator status.",
-
-  "text.autoconfig.pleasurecraft.option.utility.allowInteract.@ModrinthTooltip[2]": "§c*Unless, using interaction mode 'Player'",
 
   "text.autoconfig.pleasurecraft.option.utility.interactionMode": "Interaction Mode",
 
@@ -343,7 +333,5 @@
 
   "text.autoconfig.pleasurecraft.option.notification.notifyTripod": "Tripod Notifications",
 
-  "text.autoconfig.pleasurecraft.option.notification.notifyTripod.@Tooltip": "Notifies you when entering/exiting tripod cameras.",
-
-  "text.autoconfig.pleasurecraft.error.invalidRegex": "Invalid regex: %s"
+  "text.autoconfig.pleasurecraft.option.notification.notifyTripod.@Tooltip": "Notifies you when entering/exiting tripod cameras."
 }
