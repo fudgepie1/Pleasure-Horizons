@@ -11,6 +11,7 @@
 - Added an animation when attacking
 - Fixed my implementation of the main hand **(So now they deal the proper amount of damage depending on the item they are holding)**
 - Added bow support when fighting
+- Reworked how attacking is handled
 
 ## v0.6.0
 - Updated to 1.21.6

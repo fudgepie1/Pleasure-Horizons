@@ -893,15 +893,19 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
     @Override
     protected void dropInventory(ServerWorld world) {
         super.dropInventory(world); // calls standard drop logic
-        for (ItemStack stack : this.getInventory().getItems()) {
-            if (!stack.isEmpty()) {
-                this.dropStack(world,stack);
+        if(!isRuleEnabled((ServerWorld) this.getWorld(), GameRules.KEEP_INVENTORY)) {
+            for (ItemStack stack : this.getInventory().getItems()) {
+                if (!stack.isEmpty()) {
+                    this.dropStack(world, stack);
+                }
             }
+            this.getInventory().clear();
         }
-        this.getInventory().clear();
     }
 
-
+    public boolean isRuleEnabled(ServerWorld world, GameRules.Key<GameRules.BooleanRule> rule) {
+        return world.getGameRules().getBoolean(rule);
+    }
 
     @Override
     public void pushAwayFrom(Entity entity) {
@@ -950,6 +954,7 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
                 .add(EntityAttributes.MAX_HEALTH, 20)
                 .add(EntityAttributes.MOVEMENT_SPEED, .20)
                 .add(EntityAttributes.TEMPT_RANGE, 15)
+                .add(EntityAttributes.FOLLOW_RANGE, 100)
                 .add(EntityAttributes.ATTACK_DAMAGE, 2);
     }
 

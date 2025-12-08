@@ -30,10 +30,10 @@ import software.bernie.geckolib.renderer.GeoEntityRenderer;
 import software.bernie.geckolib.renderer.base.GeoRenderState;
 import software.bernie.geckolib.renderer.layer.BlockAndItemGeoLayer;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
 
 public abstract class AbstractGirlRenderer<T extends GirlEntityScene, R extends LivingEntityRenderState & GeoRenderState> extends GeoEntityRenderer<T, R> {
 
@@ -83,10 +83,8 @@ public abstract class AbstractGirlRenderer<T extends GirlEntityScene, R extends 
                     matrices.scale(0.7F, 0.7F, 0.7F);
                 }
 
-                super.renderStackForBone(
-                        matrices, bone, stack, displayContext,
-                        renderState, bufferSource, light, overlay
-                );
+                boolean isNotInScene = !renderState.getGeckolibData(PleasureCraftDataTicketRegistry.IS_IN_SCENE);
+                if(isNotInScene) super.renderStackForBone(matrices, bone, stack, displayContext, renderState, bufferSource, light, overlay);
             }
 
         });

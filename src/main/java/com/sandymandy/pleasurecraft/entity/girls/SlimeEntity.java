@@ -1,12 +1,12 @@
 package com.sandymandy.pleasurecraft.entity.girls;
 
 import com.sandymandy.pleasurecraft.entity.base.GirlEntityAI;
+import com.sandymandy.pleasurecraft.entity.base.TameableGirlEntity;
 import com.sandymandy.pleasurecraft.util.variables.Scene;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.registry.tag.DamageTypeTags;
@@ -79,10 +79,9 @@ public class SlimeEntity extends GirlEntityAI {
     }
 
     public static DefaultAttributeContainer.Builder createAttributes() {
-        return MobEntity.createMobAttributes()
+        return TameableGirlEntity.createDefaultAttributes()
                 .add(EntityAttributes.MAX_HEALTH, 15)
                 .add(EntityAttributes.MOVEMENT_SPEED, .20)
-                .add(EntityAttributes.TEMPT_RANGE, 15)
                 .add(EntityAttributes.ATTACK_DAMAGE, 2);
     }
 }

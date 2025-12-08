@@ -17,11 +17,11 @@ public class GirlAttackSwitchGoal extends Goal {
 
     private Goal activeGoal = null;
 
-    public GirlAttackSwitchGoal(GirlEntityAI girl, double speed, float switchDistance) {
+    public GirlAttackSwitchGoal(GirlEntityAI girl, double speed, float switchDistance, float minBowRange, float maxBowRange) {
         this.girl = girl;
 
         this.meleeGoal = new GirlMeleeAttackGoal(girl, speed, false);
-        this.bowGoal = new GirlBowAttackGoal(girl, speed, 15, 10);
+        this.bowGoal = new GirlBowAttackGoal(girl, speed, minBowRange, maxBowRange, 5);
 
         this.switchDistanceSq = switchDistance * switchDistance;
 
@@ -73,21 +73,35 @@ public class GirlAttackSwitchGoal extends Goal {
         }
 
         double distSq = girl.squaredDistanceTo(target);
-
         boolean canUseBow = hasBow();
+        boolean mainHandEmpty = this.girl.getMainHandStack().isEmpty();
+        double healthRatio = girl.getHealth() / girl.getMaxHealth();
 
         // Decide what to use:
-        if (canUseBow && distSq > switchDistanceSq) {
-            // Long range → bow
-            swapTo(bowGoal);
+        if (canUseBow) {
+            if(mainHandEmpty){
+                swapTo(bowGoal);
+            }
+            else {
+                if (healthRatio > 0.5) {
+                    // Aggressive → still switch to melee if in range
+                    if (distSq > switchDistanceSq) {
+                        swapTo(bowGoal);
+                    } else {
+                        swapTo(meleeGoal);
+                    }
+                } else {
+                    // Defensive → never switch to melee
+                    swapTo(bowGoal);
+                }
+            }
         } else {
-            // Close range → melee
+            // No bow → always melee
             swapTo(meleeGoal);
         }
 
         // Let the active goal handle the real attacking
-        if (activeGoal != null) {
-            activeGoal.tick();
-        }
+        if (activeGoal != null) activeGoal.tick();
     }
+
 }

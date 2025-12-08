@@ -79,11 +79,7 @@ public abstract class GirlEntityAI extends GirlEntityScene implements SmartBrain
             this.goalSelector.add(1, new SwimGoal(this));
             this.goalSelector.add(2, new LongDoorInteractGoal(this, true));
             this.goalSelector.add(3, new TameableGirlEscapeDangerGoal(1.5D, DamageTypeTags.PANIC_ENVIRONMENTAL_CAUSES));
-            this.goalSelector.add(4, new GirlAttackSwitchGoal(this, 1.0, 5));
-/*
-            this.goalSelector.add(4, new GirlBowAttackGoal(this, 1.0, 10, 15));
-            this.goalSelector.add(4, new GirlMeleeAttackGoal(this, 1D, false));
-*/
+            this.goalSelector.add(4, new GirlAttackSwitchGoal(this, 1.0, 5, 6, 11));
             this.goalSelector.add(5, new ConditionalGoal(new GirlFollowOwnerGoal(this, 1D, 10.0F, 2.0F), this::isFollowing));
             this.goalSelector.add(6, new TemptGoal(this, 1D, Ingredient.ofItems(getTameItem()), false));
             this.goalSelector.add(7, new GirlStayNearBaseGoal(this, 1.0, 2.0F, 15.0F, 150));
