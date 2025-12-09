@@ -1,6 +1,6 @@
 package com.sandymandy.pleasurecraft.entity.ai.goal;
 
-import com.sandymandy.pleasurecraft.entity.base.GirlEntityAI;
+import com.sandymandy.pleasurecraft.entity.base.SettlementGirlEntityAI;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.item.Items;
@@ -9,7 +9,7 @@ import java.util.EnumSet;
 
 public class GirlAttackSwitchGoal extends Goal {
 
-    private final GirlEntityAI girl;
+    private final SettlementGirlEntityAI girl;
     private final GirlMeleeAttackGoal meleeGoal;
     private final GirlBowAttackGoal bowGoal;
 
@@ -17,7 +17,7 @@ public class GirlAttackSwitchGoal extends Goal {
 
     private Goal activeGoal = null;
 
-    public GirlAttackSwitchGoal(GirlEntityAI girl, double speed, float switchDistance, float minBowRange, float maxBowRange) {
+    public GirlAttackSwitchGoal(SettlementGirlEntityAI girl, double speed, float switchDistance, float minBowRange, float maxBowRange) {
         this.girl = girl;
 
         this.meleeGoal = new GirlMeleeAttackGoal(girl, speed, false);

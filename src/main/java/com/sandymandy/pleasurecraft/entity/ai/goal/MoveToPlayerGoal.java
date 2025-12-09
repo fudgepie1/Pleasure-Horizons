@@ -40,15 +40,15 @@ public class MoveToPlayerGoal extends Goal {
 
     private void handleMovement() {
         if (!started) {
-            this.girl.getNavigation().startMovingTo(this.girl.scenePlayer, this.speed);
+            this.girl.getNavigation().startMovingTo(this.girl.getScenePlayer(), this.speed);
         }
     }
 
     private void startOnContact(){
-        if(this.girl.squaredDistanceTo(this.girl.scenePlayer) <= 2.5){
+        if(this.girl.squaredDistanceTo(this.girl.getScenePlayer()) <= 2.5){
             this.girl.setVelocity(Vec3d.ZERO);
             this.girl.getNavigation().stop();
-            this.girl.startRidingScene();
+            this.girl.startRidingScene(this.girl.getScenePlayer());
             this.started = true;
         }
     }

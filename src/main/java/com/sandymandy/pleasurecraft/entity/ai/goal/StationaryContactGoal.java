@@ -5,7 +5,6 @@ import com.sandymandy.pleasurecraft.entity.base.GirlEntityScene;
 import com.sandymandy.pleasurecraft.util.variables.ScenePhase;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.ai.pathing.EntityNavigation;
-import net.minecraft.util.math.Direction;
 
 import java.util.UUID;
 
@@ -36,7 +35,7 @@ public class StationaryContactGoal extends Goal {
     }
 
     private void handleMovement() {
-        if (this.entity.scenePlayer != null) {
+        if (this.entity.getScenePlayer() != null) {
             this.navigation.stop();
 
             float targetYaw = this.entity.getYaw();
@@ -66,16 +65,16 @@ public class StationaryContactGoal extends Goal {
     private void startOnContact() {
         if (!entity.isWaitingForPlayer()) return;
 
-        UUID playerId = entity.scenePlayer.getUuid();
+        UUID playerId = entity.getScenePlayer().getUuid();
 
         // Someone else already has this player in a scene
         if (PleasureCraft.activeScenes.containsKey(playerId)) return;
 
-        if (this.entity.squaredDistanceTo(this.entity.scenePlayer) <= 1.5 &&
+        if (this.entity.squaredDistanceTo(this.entity.getScenePlayer()) <= 1.5 &&
                 entity.getCurrentScenePhase().equals(ScenePhase.BED_IDLE)) {
 
             PleasureCraft.activeScenes.put(playerId, entity.getUuid()); // reserve player
-            this.entity.startRidingScene();
+            this.entity.startRidingScene(this.entity.getScenePlayer());
             this.stop = true;
         }
     }

@@ -1,41 +1,26 @@
 package com.sandymandy.pleasurecraft.entity.base;
 
-import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.advancement.criterion.PleasureCraftCriteria;
-import com.sandymandy.pleasurecraft.registries.PleasureCraftTrackedDataRegistry;
 import com.sandymandy.pleasurecraft.screen.GirlInventoryScreenHandlerFactory;
 import com.sandymandy.pleasurecraft.util.PleasureCraftLangUtils;
-import com.sandymandy.pleasurecraft.util.inventory.GirlInventory;
+import com.sandymandy.pleasurecraft.util.PleasureCraftMessages;
 import com.sandymandy.pleasurecraft.util.managers.TamedGirlManager;
-import com.sandymandy.pleasurecraft.util.variables.Scene;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.LeavesBlock;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.FoodComponent;
-import net.minecraft.component.type.UseRemainderComponent;
 import net.minecraft.entity.*;
-import net.minecraft.entity.ai.control.MoveControl;
 import net.minecraft.entity.ai.goal.EscapeDangerGoal;
 import net.minecraft.entity.ai.pathing.LandPathNodeMaker;
 import net.minecraft.entity.ai.pathing.PathNodeType;
-import net.minecraft.entity.attribute.DefaultAttributeContainer;
-import net.minecraft.entity.attribute.EntityAttributeModifier;
-import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.damage.DamageType;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
-import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Inventories;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
-import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.scoreboard.Team;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -45,378 +30,33 @@ import net.minecraft.storage.WriteView;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec2f;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.Optional;
 
+import static com.sandymandy.pleasurecraft.util.Utils.getPlayerName;
 import static com.sandymandy.pleasurecraft.util.Utils.getReadableTameItemName;
 
-public abstract class TameableGirlEntity extends PathAwareEntity implements Tameable {
-    private static final TrackedData<Boolean> WAITING_AT_BED = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
-    private static final TrackedData<Boolean> LOCKED_STATE = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
-    private static final TrackedData<Boolean> WAITING_FOR_PLAYER = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
-    private static final TrackedData<Boolean> FROZEN_STATE = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
-    private static final TrackedData<Boolean> STRIPPED = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
-    private static final TrackedData<Boolean> FOLLOWING = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
-    private static final TrackedData<Boolean> IN_SCENE = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
-    private static final TrackedData<Boolean> OVERRIDE_LOOP = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
-    private static final TrackedData<Boolean> OVERRIDE_HOLD = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
-    private static final TrackedData<Boolean> OVERRIDE_ANIM_PLAYING = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
-    private static final TrackedData<Boolean> PLAYER_MODEL_SLIM = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
-    private static final TrackedData<Boolean> HAVING_SEX = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
-    private static final TrackedData<Boolean> SITTING = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
-    private static final TrackedData<Boolean> RUNNING = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
-    private static final TrackedData<Boolean> PREGNANT = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
-    private static final TrackedData<Boolean> CAN_GET_IMPREGNATED = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
-    private static final TrackedData<String> OVERRIDE_ANIM = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.STRING);
-    private static final TrackedData<String> SCENE_ANIM = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.STRING);
-    private static final TrackedData<Integer> BREAST_SIZE = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.INTEGER);
-    private static final TrackedData<Integer> RELATIONSHIP_LEVEL = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.INTEGER);
-    private static final TrackedData<Integer> MAX_RELATIONSHIP_LEVEL = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.INTEGER);
-    private static final TrackedData<Integer> AMOUNT_OF_SEX_UNTIL_IMPREGNATION = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.INTEGER);
-    private static final TrackedData<BlockPos> BASE_POS = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.BLOCK_POS);
-    private static final TrackedData<Vec3d> PASSENGER_BONE_POSITION = DataTracker.registerData(TameableGirlEntity.class, PleasureCraftTrackedDataRegistry.VEC3D);
-    private static final TrackedData<Vec3d> BREAST_OFFSET = DataTracker.registerData(TameableGirlEntity.class, PleasureCraftTrackedDataRegistry.VEC3D);
+public class TameableGirlEntity extends GirlEntityScene implements Tameable {
+
     protected static final TrackedData<Byte> TAMEABLE_FLAGS = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.BYTE);
     protected static final TrackedData<Optional<LazyEntityReference<LivingEntity>>> OWNER_UUID = DataTracker.registerData(
             TameableGirlEntity.class, TrackedDataHandlerRegistry.LAZY_ENTITY_REFERENCE
     );
-    public Map<String, Boolean> boneVisibility = new HashMap<>();
-    public Map<String, Integer> boneColorOverrides = new HashMap<>();
-    public Map<String, Identifier> boneTextureOverrides = new HashMap<>();
-    public Map<String, Identifier> boneTextureOverridesLayer2 = new HashMap<>();
-    public Map<String, Identifier> boneTextureOverridesLayer3 = new HashMap<>();
-    public Map<String, Vec3d> boneSizeOverrides = new HashMap<>();
-    public Map<String, Vec3d> bonePositionOffset = new HashMap<>();
-    public Map<String, Vec2f> boneUVOffsets = new HashMap<>();
-    public final Map<EquipmentSlot, Boolean> armorVisibility = new EnumMap<>(EquipmentSlot.class);
-    public Vec3d previousVelocity = Vec3d.ZERO;
-    public float previousYaw = 0;
-    public float passengerYOffset = -0.8f;
-    public String currentAnimState = "idle";
-    public boolean currentLoopState = false;
-    public boolean currentHoldState = false;
-    public final GirlInventory inventory = GirlInventory.ofSize();
-    private boolean inInventory = false;
 
-
-    protected TameableGirlEntity(EntityType<? extends TameableGirlEntity> entityType, World world) {
+    protected TameableGirlEntity(EntityType<? extends GirlEntityScene> entityType, World world) {
         super(entityType, world);
     }
+
 
     @Override
     protected void initDataTracker(DataTracker.Builder builder) {
         super.initDataTracker(builder);
-        builder.add(WAITING_AT_BED, false);
-        builder.add(LOCKED_STATE, false);
-        builder.add(FROZEN_STATE, false);
-        builder.add(WAITING_FOR_PLAYER, false);
-        builder.add(STRIPPED, false);
-        builder.add(FOLLOWING, false);
-        builder.add(IN_SCENE, false);
-        builder.add(OVERRIDE_LOOP, false);
-        builder.add(OVERRIDE_HOLD, false);
-        builder.add(OVERRIDE_ANIM_PLAYING, false);
-        builder.add(PLAYER_MODEL_SLIM, false);
-        builder.add(HAVING_SEX, false);
-        builder.add(SITTING, false);
-        builder.add(RUNNING, false);
-        builder.add(PREGNANT,false);
-        builder.add(CAN_GET_IMPREGNATED,false);
-        builder.add(AMOUNT_OF_SEX_UNTIL_IMPREGNATION, 0);
-        builder.add(RELATIONSHIP_LEVEL,0);
-        builder.add(MAX_RELATIONSHIP_LEVEL,4);
-        builder.add(BREAST_SIZE,100);
-        builder.add(BREAST_OFFSET, Vec3d.ZERO);
-        builder.add(PASSENGER_BONE_POSITION, Vec3d.ZERO);
-        builder.add(BASE_POS, this.getBlockPos());
-        builder.add(OVERRIDE_ANIM,"");
-        builder.add(SCENE_ANIM,"");
         builder.add(TAMEABLE_FLAGS, (byte)0);
         builder.add(OWNER_UUID, Optional.empty());
-    }
-
-    public void setFollowing(boolean follow) {
-        this.dataTracker.set(FOLLOWING, follow);
-    }
-
-    public boolean isFollowing() {
-        return this.dataTracker.get(FOLLOWING);
-    }
-
-    public void setStripped(boolean stripped) {
-        this.dataTracker.set(STRIPPED, stripped);
-    }
-
-    public boolean isStripped() {
-        return this.dataTracker.get(STRIPPED);
-    }
-
-    public void setFreeze(boolean locked) {
-        this.dataTracker.set(FROZEN_STATE,locked);
-    }
-
-    public boolean isFrozenInPlace() {
-        return this.dataTracker.get(FROZEN_STATE);
-    }
-
-    public void setMovementLockedState(boolean locked) {
-        this.dataTracker.set(LOCKED_STATE, locked);
-    }
-
-    public boolean isMovementLocked() {
-        return this.dataTracker.get(LOCKED_STATE);
-    }
-
-    public void setInInventory(boolean state) {
-        inInventory = state;
-    }
-
-    public boolean isInInventory() {
-        return inInventory;
-    }
-
-    public void setSceneState(boolean inScene) {
-        this.dataTracker.set(IN_SCENE, inScene);
-    }
-
-    public boolean isSceneActive() {
-        return this.dataTracker.get(IN_SCENE);
-    }
-
-    public void setOverrideAnim(String anim){
-        this.dataTracker.set(OVERRIDE_ANIM, anim);
-    }
-
-    public String getOverrideAnim(){
-        return this.dataTracker.get(OVERRIDE_ANIM);
-    }
-
-    public void setOverrideLoop(boolean loop){
-        this.dataTracker.set(OVERRIDE_LOOP, loop);
-    }
-
-    public boolean getOverrideLoopState(){
-        return this.dataTracker.get(OVERRIDE_LOOP);
-    }
-
-    public void setOverrideHold(boolean hold){
-        this.dataTracker.set(OVERRIDE_HOLD, hold);
-    }
-
-    public boolean getOverrideHoldState(){
-        return this.dataTracker.get(OVERRIDE_HOLD);
-    }
-
-    public boolean isWaitingAtBed(){
-        return this.dataTracker.get(WAITING_AT_BED);
-    }
-
-    public void setWaitingAtBedState(boolean state){
-        this.dataTracker.set(WAITING_AT_BED, state);
-    }
-
-    public boolean isWaitingForPlayer(){
-        return this.dataTracker.get(WAITING_FOR_PLAYER);
-    }
-
-    public void setWaitingForPlayerState(boolean state){
-        this.dataTracker.set(WAITING_FOR_PLAYER, state);
-    }
-
-    public void setIsPlayerModelSlim(boolean isSlim){
-        this.dataTracker.set(PLAYER_MODEL_SLIM, isSlim);
-    }
-
-    public boolean isPlayerModelSlim(){
-        return this.dataTracker.get(PLAYER_MODEL_SLIM);
-    }
-
-    public void setHavingSex(boolean state) {
-        this.dataTracker.set(HAVING_SEX, state);
-    }
-
-    public boolean isHavingSex() {
-        return this.dataTracker.get(HAVING_SEX);
-    }
-
-    public void setRunning(boolean state) {
-        this.dataTracker.set(RUNNING, state);
-    }
-
-    public boolean isRunning() {
-        return this.dataTracker.get(RUNNING);
-    }
-
-    public void setPregnantState(boolean preggo){
-        this.dataTracker.set(PREGNANT, preggo);
-    }
-
-    public boolean isPregnant(){
-        return this.dataTracker.get(PREGNANT);
-    }
-
-    public void canGetImpregnatedState(boolean preggo){
-        this.dataTracker.set(CAN_GET_IMPREGNATED, preggo);
-    }
-
-    public boolean canGetImpregnated(){
-        return this.dataTracker.get(CAN_GET_IMPREGNATED);
-    }
-
-    public void setAmountOfUnprotectedSex(int num){
-        this.dataTracker.set(AMOUNT_OF_SEX_UNTIL_IMPREGNATION, num);
-    }
-
-    public int amountOfUnprotectedSex(){
-        return this.dataTracker.get(AMOUNT_OF_SEX_UNTIL_IMPREGNATION);
-    }
-
-    public int getCurrentRelationshipLevel() { return this.dataTracker.get(RELATIONSHIP_LEVEL);}
-
-    public void setCurrentRelationshipLevel(int value) { this.dataTracker.set(RELATIONSHIP_LEVEL, value);}
-
-    public void setPassengerBonePosition(Vec3d position){
-        this.dataTracker.set(PASSENGER_BONE_POSITION, position);
-    }
-
-    public Vec3d getPassengerBonePosition(){
-        return this.dataTracker.get(PASSENGER_BONE_POSITION);
-    }
-
-    public void setBasePos(BlockPos block){this.dataTracker.set(BASE_POS, block);}
-
-    public BlockPos getBasePos(){return this.dataTracker.get(BASE_POS);}
-
-    public void setBreastSize(int value) { this.dataTracker.set(BREAST_SIZE, value); }
-
-    public int getBreastSize() { return this.dataTracker.get(BREAST_SIZE); }
-
-    public void setBreastOffset(Vec3d value) { this.dataTracker.set(BREAST_OFFSET, value); }
-
-    public Vec3d getBreastOffset() { return this.dataTracker.get(BREAST_OFFSET); }
-
-    public GirlInventory getInventory() {
-        return inventory;
-    }
-
-    protected Item getTameItem() {
-        return Items.DANDELION;
-    }
-
-    public String getGirlID() {
-        return "null";
-    }
-
-    public String getGirlDisplayName() {
-        return PleasureCraftLangUtils.getStringFromKey("entity.pleasurecraft." + getGirlID());
-    }
-
-    public int getSizeGUI(){return 20;}
-
-    public float getYAxisGUI(){return 0.0625F;}
-
-    public List<Scene> getScenes() {
-        return new ArrayList<>();
-    }
-
-    public float getWeaponBoneXRotation() {return 150.0F;}
-
-    public int getMaxBellySizeWhenPregnant() { return 450;}
-
-    public int maxAmountOfSexUntilImpregnation(){return 5;}
-
-    protected int maxRelationshipLevel() {
-        try {
-            // Get all scene options
-            List<Scene> options = getScenes();
-
-            // If null or empty, return default
-            if (options == null || options.isEmpty()) {
-                this.dataTracker.set(MAX_RELATIONSHIP_LEVEL, 4);
-                return this.dataTracker.get(MAX_RELATIONSHIP_LEVEL);
-            }
-
-            int value = options.stream()
-                    .map(Scene::requiredRelationshipLevel)
-                    .max(Integer::compareTo)
-                    .orElse(4);
-
-            this.dataTracker.set(MAX_RELATIONSHIP_LEVEL, value);
-
-            return this.dataTracker.get(MAX_RELATIONSHIP_LEVEL);
-        } catch (Exception e) {
-            // In case something unexpected happens
-            this.dataTracker.set(MAX_RELATIONSHIP_LEVEL, 4);
-            return this.dataTracker.get(MAX_RELATIONSHIP_LEVEL);        }
-    }
-
-    protected Map<EquipmentSlot, List<String>> getArmorBones() {
-        Map<EquipmentSlot, List<String>> armor = new HashMap<>();
-
-        armor.put(EquipmentSlot.HEAD, new ArrayList<>(List.of(
-                "armorHelmet"
-        )));
-
-        armor.put(EquipmentSlot.CHEST, new ArrayList<>(List.of(
-                "armorBoobs",
-                "armorChest",
-                "armorShoulderL",
-                "armorShoulderR"
-        )));
-
-        armor.put(EquipmentSlot.LEGS, new ArrayList<>(List.of(
-                "armorHip",
-                "armorPantsLowL",
-                "armorPantsUpL",
-                "armorPantsLowR",
-                "armorPantsUpR",
-                "armorBootyL",
-                "armorBootyR"
-        )));
-
-        armor.put(EquipmentSlot.FEET, new ArrayList<>(List.of(
-                "armorShoesL",
-                "armorShoesR"
-        )));
-
-        return armor;
-    }
-
-    public boolean isFoodItem(ItemStack stack) {
-        return stack.isIn(ItemTags.WOLF_FOOD);
-    }
-
-    @Override
-    public boolean shouldRenderName() {
-        this.setCustomName(Text.of(getGirlDisplayName()));
-        this.setCustomNameVisible(true);
-        return true;
-    }
-
-    public void setBasePosHere(){
-        setBasePos(this.getBlockPos());
-    }
-
-    public void teleportToBase() {
-        setSitting(true);
-        this.teleport(this.getBasePos().getX(), this.getBasePos().getY(), this.getBasePos().getZ(), false);
-    }
-
-    @Override
-    public ItemStack getEquippedStack(EquipmentSlot slot) {
-        return inventory.getEquipmentStack(slot);
-    }
-
-    @Override
-    public void equipStack(EquipmentSlot slot, ItemStack stack) {
-        inventory.setEquipmentStack(slot, stack);
     }
 
     @Override
@@ -426,16 +66,6 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
         if(this.getOverrideAnim().isEmpty()) {
             if (!this.getWorld().isClient()) {
                 if (this.isTamed()) {
-
-                    if (this.isFoodItem(itemStack) && this.getHealth() < this.getMaxHealth()) {
-                        this.getNavigation().findPathTo(player, 20);
-                        this.eat(player, hand, itemStack);
-                        FoodComponent foodComponent = itemStack.get(DataComponentTypes.FOOD);
-                        float f = foodComponent != null ? foodComponent.nutrition() : 1.0F;
-                        this.heal(2.0F * f);
-                        this.getWorld().sendEntityStatus(this, EntityStatuses.CONSUME_ITEM);
-                        return ActionResult.CONSUME;
-                    }
 
                     if (this.isOwner(player)) {
 
@@ -501,6 +131,76 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
         return super.interactMob(player, hand);
     }
 
+    @Override
+    public boolean damage(ServerWorld world, DamageSource source, float amount) {
+        if (this.isInvulnerableTo(world, source)) return false;
+
+        String damageType = source.getName();
+        // If killed by /kill or void, allow normal death
+        if (damageType.equals("outOfWorld") || damageType.equals("genericKill")) {
+            return super.damage(world, source, amount);
+        }
+
+        if(this.isTamed() && (this.getHealth() - amount <= 0.0F) &! (damageType.equals("outOfWorld") || damageType.equals("genericKill") || isMovementLocked())) {
+            this.setHealth(getMaxHealth());
+            // If basePos is still null, fall back to current position
+
+            // Send a message referencing whichever Pos we have
+            PleasureCraftMessages.GlobleMessage(
+                    this.getWorld(),
+                    getPlayerName((PlayerEntity) this.getOwner()) + "'s " +
+                            getGirlDisplayName() + " died and respawned at base: " +
+                            this.getBasePos().getX() + ", " +
+                            this.getBasePos().getY() + ", " +
+                            this.getBasePos().getZ()
+            );
+
+            // Drops inventory as if she died
+            this.dropInventory(world);
+
+            teleportToBase();
+
+
+            return false;
+        }
+        else if(isMovementLocked() &! damageType.equals("outOfWorld") || damageType.equals("genericKill")){
+            if(!this.hasPassengers()){
+                ((PlayerEntity)this.getOwner()).sendMessage(
+                        Text.of(getGirlDisplayName() + " is busy at the moment"), true);
+            }
+            return false;
+        }
+        else{
+            return super.damage(world, source, amount);
+        }
+    }
+
+    @Override
+    public void onDeath(DamageSource damageSource) {
+        if (this.getWorld() instanceof ServerWorld serverWorld
+                && serverWorld.getGameRules().getBoolean(GameRules.SHOW_DEATH_MESSAGES)
+                && this.getOwner() instanceof ServerPlayerEntity serverPlayerEntity) {
+            serverPlayerEntity.sendMessage(this.getDamageTracker().getDeathMessage());
+        }
+        super.onDeath(damageSource);
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        if (!this.getWorld().isClient()) {
+            ServerWorld world = (ServerWorld) this.getWorld();
+
+            if (this.isTamed()) {
+                TamedGirlManager.get(world).registerGirl(this);
+            }
+            else if (TamedGirlManager.get(world).containsGirl(this.getUuid())){
+                // not tamed anymore → remove
+                TamedGirlManager.get(world).removeGirl(this.getUuid());
+            }
+        }
+    }
+
     private void tryTame(PlayerEntity player) {
         if (this.random.nextInt(3) == 0) {
             this.setTamedBy(player);
@@ -531,73 +231,6 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
         }
     }
 
-    @Override
-    public void writeCustomData(WriteView view) {
-        super.writeCustomData(view);
-        Inventories.writeData(view, this.inventory.getItems());
-        view.putBoolean("SitSate", this.isSitting());
-        view.putBoolean("StripState", this.isStripped());
-        view.putBoolean("FollowState", this.isFollowing());
-        view.putInt("RelationshipLevel", this.getCurrentRelationshipLevel());
-        view.putInt("BreastSize", getBreastSize());
-        view.putBoolean("CanGetImpregnated", this.canGetImpregnated());
-        view.putBoolean("PregnantState", this.isPregnant());
-        view.putInt("AmountOfUnprotectedSex", this.amountOfUnprotectedSex());
-        view.put("BreastOffset", Vec3d.CODEC, getBreastOffset());
-        view.put("BasePos", BlockPos.CODEC, this.getBasePos());
-
-        LazyEntityReference<LivingEntity> lazyEntityReference = this.getOwnerReference();
-        if (lazyEntityReference != null) {
-            lazyEntityReference.writeData(view, "Owner");
-        }
-
-        view.putBoolean("Sitting", this.isSitting());
-    }
-
-    @Override
-    public void readCustomData(ReadView view) {
-        super.readCustomData(view);
-
-        var w = this.getWorld();
-        if (w != null) {
-            Inventories.readData(view, this.inventory.getItems());
-        }
-
-        boolean sitting = view.getBoolean("Sitting", false);
-
-        this.setSitting(sitting);
-        this.setInSittingPose(sitting);
-
-        boolean following = view.getBoolean("FollowState", false);
-        this.setFollowing(following);
-
-        boolean stripped = view.getBoolean("StripState", false);
-        this.setStripped(stripped);
-
-        int relationship = view.getInt("RelationshipLevel", 0);
-        this.setCurrentRelationshipLevel(relationship);
-
-        this.setBasePos(view.read("BasePos", BlockPos.CODEC).orElse(new BlockPos(0,0,0)));
-        this.setBreastOffset(view.read("BreastOffset", Vec3d.CODEC).orElse(Vec3d.ZERO));
-        this.setBreastSize(view.getInt("BreastSize", 100));
-        this.canGetImpregnatedState(view.getBoolean("CanGetImpregnated", false));
-        this.setPregnantState(view.getBoolean("PregnantState", false));
-        this.setAmountOfUnprotectedSex(view.getInt("AmountOfUnprotectedSex", 0));
-        LazyEntityReference<LivingEntity> lazyEntityReference =
-                LazyEntityReference.fromDataOrPlayerName(view, "Owner", this.getWorld());
-
-        if (lazyEntityReference != null) {
-            try {
-                this.dataTracker.set(OWNER_UUID, Optional.of(lazyEntityReference));
-                this.setTamed(true, false);
-            } catch (Throwable t) {
-                this.setTamed(false, true);
-            }
-        } else {
-            this.dataTracker.set(OWNER_UUID, Optional.empty());
-            this.setTamed(false, true);
-        }
-    }
     @Override
     public boolean canBeLeashed() {
         return true;
@@ -653,7 +286,9 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
         return (this.dataTracker.get(TAMEABLE_FLAGS) & 1) != 0;
     }
 
-    public void setInSittingPose(boolean inSittingPose) {
+    @Override
+    public void setSitting(boolean inSittingPose) {
+        super.setSitting(inSittingPose);
         byte b = this.dataTracker.get(TAMEABLE_FLAGS);
         if (inSittingPose) {
             this.dataTracker.set(TAMEABLE_FLAGS, (byte)(b | 1));
@@ -692,10 +327,6 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
         return entity == this.getOwner();
     }
 
-    public boolean canAttackWithOwner(LivingEntity target, LivingEntity owner) {
-        return true;
-    }
-
     @Nullable
     @Override
     public Team getScoreboardTeam() {
@@ -729,28 +360,6 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
         }
 
         return super.isInSameTeam(other);
-    }
-
-    @Override
-    public void onDeath(DamageSource damageSource) {
-        if (this.getWorld() instanceof ServerWorld serverWorld
-                && serverWorld.getGameRules().getBoolean(GameRules.SHOW_DEATH_MESSAGES)
-                && this.getOwner() instanceof ServerPlayerEntity serverPlayerEntity) {
-            serverPlayerEntity.sendMessage(this.getDamageTracker().getDeathMessage());
-        }
-
-        this.removeAllPassengers();
-
-        super.onDeath(damageSource);
-    }
-
-    public boolean isSitting() {
-        return this.dataTracker.get(SITTING);
-    }
-
-    public void setSitting(boolean sitting) {
-        this.setTarget(null);
-        this.dataTracker.set(SITTING, sitting);
     }
 
     public void tryTeleportToOwner() {
@@ -788,6 +397,8 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
         }
     }
 
+
+
     private boolean canTeleportTo(BlockPos pos) {
         PathNodeType pathNodeType = LandPathNodeMaker.getLandNodeType(this, pos);
         if (pathNodeType != PathNodeType.WALKABLE) {
@@ -812,151 +423,35 @@ public abstract class TameableGirlEntity extends PathAwareEntity implements Tame
     }
 
     @Override
-    public void tick() {
-        super.tick();
-        if (!this.getWorld().isClient()) {
-            ServerWorld world = (ServerWorld) this.getWorld();
+    public void writeCustomData(WriteView view) {
+        super.writeCustomData(view);
+        LazyEntityReference<LivingEntity> lazyEntityReference = this.getOwnerReference();
+        if (lazyEntityReference != null) {
+            lazyEntityReference.writeData(view, "Owner");
+        }
+    }
 
-            if (this.isTamed()) {
-                TamedGirlManager.get(world).registerGirl(this);
+    @Override
+    public void readCustomData(ReadView view) {
+        super.readCustomData(view);
+
+        LazyEntityReference<LivingEntity> lazyEntityReference =
+                LazyEntityReference.fromDataOrPlayerName(view, "Owner", this.getWorld());
+
+        if (lazyEntityReference != null) {
+            try {
+                this.dataTracker.set(OWNER_UUID, Optional.of(lazyEntityReference));
+                this.setTamed(true, false);
+            } catch (Throwable t) {
+                this.setTamed(false, true);
             }
-            else if (TamedGirlManager.get(world).containsGirl(this.getUuid())){
-                // not tamed anymore → remove
-                TamedGirlManager.get(world).removeGirl(this.getUuid());
-            }
-        }
-
-        updateRunningSpeedBoost(isRunning());
-        previousYaw = getYaw();
-        previousVelocity = getVelocity();
-        this.setMovementLockedState(this.isFrozenInPlace() || this.isWaitingAtBed() || this.isSceneActive() || this.isWaitingForPlayer());
-    }
-
-    private static final Identifier RUNNING_SPEED_BOOST = Identifier.of(PleasureCraft.MOD_ID, "running_speed_boost");
-
-    public void updateRunningSpeedBoost(boolean active) {
-        var attr = this.getAttributeInstance(EntityAttributes.MOVEMENT_SPEED);
-        if (attr == null) return;
-
-        // Remove previous modifier if it exists
-        var oldModifier = attr.getModifier(RUNNING_SPEED_BOOST);
-        if (oldModifier != null) {
-            attr.removeModifier(oldModifier);
-        }
-
-        if (active) {
-            // 1.65x total movement speed boost
-            EntityAttributeModifier modifier = new EntityAttributeModifier(
-                    RUNNING_SPEED_BOOST,
-                    1.65 - 1.0,  // multiplier modifier must be (multiplier - 1)
-                    EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL
-            );
-            attr.addTemporaryModifier(modifier);
-        }
-    }
-
-    protected void eat(PlayerEntity player, Hand hand, ItemStack stack) {
-        int i = stack.getCount();
-        UseRemainderComponent useRemainderComponent = stack.get(DataComponentTypes.USE_REMAINDER);
-        stack.decrementUnlessCreative(1, player);
-        if (useRemainderComponent != null) {
-            ItemStack itemStack = useRemainderComponent.convert(stack, i, player.isInCreativeMode(), player::giveOrDropStack);
-            player.setStackInHand(hand, itemStack);
-        }
-    }
-
-    public Vec3d getPassengerPos() {
-        boolean isZero = this.getPassengerBonePosition().lengthSquared() < 1.0E-12; // ~0
-        if(isZero){
-            return this.getPos().add(1.5, 0.9, 0);
-        }
-        else {
-            return this.getPassengerBonePosition().add(0, this.passengerYOffset, 0);
-        }
-    }
-
-    @Override
-    public Vec3d updatePassengerForDismount(LivingEntity passenger) {
-        return this.getPassengerPos();
-    }
-
-    @Override
-    public Vec3d getPassengerRidingPos(Entity passenger) {
-        return this.getPassengerPos();
-    }
-
-    @Override
-    public boolean canImmediatelyDespawn(double distanceSquared) {
-        return false;
-    }
-
-    @Override
-    protected void dropInventory(ServerWorld world) {
-        super.dropInventory(world); // calls standard drop logic
-        if(!isRuleEnabled((ServerWorld) this.getWorld(), GameRules.KEEP_INVENTORY)) {
-            for (ItemStack stack : this.getInventory().getItems()) {
-                if (!stack.isEmpty()) {
-                    this.dropStack(world, stack);
-                }
-            }
-            this.getInventory().clear();
-        }
-    }
-
-    public boolean isRuleEnabled(ServerWorld world, GameRules.Key<GameRules.BooleanRule> rule) {
-        return world.getGameRules().getBoolean(rule);
-    }
-
-    @Override
-    public void pushAwayFrom(Entity entity) {
-        if (!this.isMovementLocked()) {
-            super.pushAwayFrom(entity);
-        }
-    }
-
-    @Override
-    public void takeKnockback(double strength, double x, double z) {
-        if (!this.isMovementLocked()) {
-            super.takeKnockback(strength, x, z);
         } else {
-            this.setVelocity(Vec3d.ZERO); // ensure no leftover knockback velocity
+            this.dataTracker.set(OWNER_UUID, Optional.empty());
+            this.setTamed(false, true);
         }
     }
 
-    @Override
-    public boolean isPushable() {
-        return !this.isMovementLocked();
-    }
 
-
-    @Override
-    public void addVelocity(double dx, double dy, double dz) {
-        if (!this.isMovementLocked()) {
-            super.addVelocity(dx, dy, dz);
-        }
-    }
-
-    @Override
-    public void stopMovement() {
-        super.stopMovement();
-        this.setVelocity(0, this.getVelocity().y > 0 ? 0 : this.getVelocity().y, 0); // stops lateral motion
-        this.setJumping(false);
-        this.bodyYaw = this.getBodyYaw();
-
-        MoveControl control = this.getMoveControl();
-        if (control != null) {
-            control.moveTo(this.getX(), this.getY(), this.getZ(), 0); // keep position
-        }
-    }
-
-    public static DefaultAttributeContainer.Builder createDefaultAttributes() {
-        return MobEntity.createMobAttributes()
-                .add(EntityAttributes.MAX_HEALTH, 20)
-                .add(EntityAttributes.MOVEMENT_SPEED, .20)
-                .add(EntityAttributes.TEMPT_RANGE, 15)
-                .add(EntityAttributes.FOLLOW_RANGE, 100)
-                .add(EntityAttributes.ATTACK_DAMAGE, 2);
-    }
 
     public class TameableGirlEscapeDangerGoal extends EscapeDangerGoal {
         public TameableGirlEscapeDangerGoal(final double speed, final TagKey<DamageType> dangerousDamageTypes) {

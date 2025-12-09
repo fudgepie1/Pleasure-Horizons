@@ -31,9 +31,6 @@ import software.bernie.geckolib.renderer.base.GeoRenderState;
 import software.bernie.geckolib.renderer.layer.BlockAndItemGeoLayer;
 
 import java.util.*;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
 
 public abstract class AbstractGirlRenderer<T extends GirlEntityScene, R extends LivingEntityRenderState & GeoRenderState> extends GeoEntityRenderer<T, R> {
 

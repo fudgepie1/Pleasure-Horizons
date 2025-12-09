@@ -2,6 +2,7 @@ package com.sandymandy.pleasurecraft.networking;
 
 import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.entity.base.GirlEntityScene;
+import com.sandymandy.pleasurecraft.entity.base.TameableGirlEntity;
 import com.sandymandy.pleasurecraft.networking.C2S.*;
 import com.sandymandy.pleasurecraft.networking.S2C.*;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
@@ -48,7 +49,7 @@ public class PleasureCraftPackets {
         ServerPlayNetworking.registerGlobalReceiver(InventoryButtonC2SPacket.ID,
                 (packet, context) -> Objects.requireNonNull(context.player().getServer()).execute(() -> {
                             var entity = context.player().getWorld().getEntityById(packet.entityId());
-                            if (entity instanceof GirlEntityScene girl) {
+                            if (entity instanceof TameableGirlEntity girl) {
                                 switch (packet.actionId()) {
                                     case "stripOrDressup" -> girl.requestStrip();
                                     case "breakUp" -> girl.breakUp(context.player());
@@ -76,12 +77,10 @@ public class PleasureCraftPackets {
                         if (!(entity instanceof GirlEntityScene girl))
                             return;
 
-                        if (!girl.isOwner(context.player())) {
-                            // Not the owner — ignore
+                        if (!girl.isCurrentScenePlayer(context.player())) {
                             return;
                         }
 
-                        // 3. Safe → update the bone pos
                         girl.setPassengerBonePosition(packet.position());
                     });
                 }
@@ -122,7 +121,7 @@ public class PleasureCraftPackets {
                 (packet, context) -> Objects.requireNonNull(context.player().getServer()).execute(() -> {
                     var entity = context.player().getWorld().getEntityById(packet.entityId());
                     if (entity instanceof GirlEntityScene girl) {
-                        girl.startScene(packet.scene());
+                        girl.startScene(context.player(), packet.scene());
                     }
                 }));
 

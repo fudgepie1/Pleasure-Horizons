@@ -7,7 +7,6 @@ import net.minecraft.datafixer.DataFixTypes;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Uuids;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.PersistentState;
 import net.minecraft.world.PersistentStateType;
 

@@ -1,6 +1,6 @@
 package com.sandymandy.pleasurecraft.entity.girls;
 
-import com.sandymandy.pleasurecraft.entity.base.GirlEntityAI;
+import com.sandymandy.pleasurecraft.entity.base.SettlementGirlEntityAI;
 import com.sandymandy.pleasurecraft.util.json.CustomGirlLoader;
 import com.sandymandy.pleasurecraft.util.variables.CustomGirlProfile;
 import com.sandymandy.pleasurecraft.util.variables.Scene;
@@ -24,7 +24,7 @@ import net.minecraft.world.World;
 import java.util.List;
 import java.util.Objects;
 
-public class CustomGirlEntity extends GirlEntityAI {
+public class CustomGirlEntity extends SettlementGirlEntityAI {
 
     private CustomGirlProfile profile = CustomGirlProfile.DEFAULT;
     private float lastHitboxHeight = 1f;
@@ -34,7 +34,7 @@ public class CustomGirlEntity extends GirlEntityAI {
     private static final TrackedData<Float> HITBOX_HEIGHT = DataTracker.registerData(CustomGirlEntity.class, TrackedDataHandlerRegistry.FLOAT);
     private static final TrackedData<Boolean> IS_PROFILE_PERMANENT = DataTracker.registerData(CustomGirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
 
-    public CustomGirlEntity(EntityType<? extends GirlEntityAI> type, World world) {
+    public CustomGirlEntity(EntityType<? extends SettlementGirlEntityAI> type, World world) {
         super(type, world);
     }
 

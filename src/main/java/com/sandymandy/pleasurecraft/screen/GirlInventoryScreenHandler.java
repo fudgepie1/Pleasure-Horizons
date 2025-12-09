@@ -2,18 +2,17 @@ package com.sandymandy.pleasurecraft.screen;
 
 import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.PleasureCraftClient;
+import com.sandymandy.pleasurecraft.entity.base.GirlEntity;
 import com.sandymandy.pleasurecraft.entity.base.TameableGirlEntity;
 import com.sandymandy.pleasurecraft.util.inventory.GirlInventory;
 import com.sandymandy.pleasurecraft.util.inventory.slot.ExclusiveSlot;
 import com.sandymandy.pleasurecraft.util.inventory.slot.InclusiveSlot;
 import com.sandymandy.pleasurecraft.util.inventory.slot.PublicArmorSlot;
-import com.sandymandy.pleasurecraft.util.inventory.slot.TexturedSlot;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.screen.ScreenHandler;
@@ -62,7 +61,7 @@ public class GirlInventoryScreenHandler extends ScreenHandler {
 
         Entity entity = world.getEntityById(girlId);
         if (!(entity instanceof TameableGirlEntity girlEntity)) {
-            throw new IllegalStateException("LucyEntity not found or mismatched entity ID");
+            throw new IllegalStateException("Girl not found or mismatched entity ID");
         }
         this.girl = girlEntity;
 

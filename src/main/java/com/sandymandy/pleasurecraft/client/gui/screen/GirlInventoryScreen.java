@@ -1,7 +1,7 @@
 package com.sandymandy.pleasurecraft.client.gui.screen;
 
-import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.sandymandy.pleasurecraft.PleasureCraft;
+import com.sandymandy.pleasurecraft.entity.base.GirlEntity;
 import com.sandymandy.pleasurecraft.entity.base.TameableGirlEntity;
 import com.sandymandy.pleasurecraft.networking.C2S.InInventoryC2SPacket;
 import com.sandymandy.pleasurecraft.registries.InventoryButtonRegistry;
@@ -14,14 +14,11 @@ import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
 import net.minecraft.util.Identifier;
-import org.joml.Quaternionf;
-import org.joml.Vector3f;
 
 public class GirlInventoryScreen extends HandledScreen<GirlInventoryScreenHandler> {
     private static final Identifier TEXTURE = Identifier.of(PleasureCraft.MOD_ID, "/textures/gui/inventory.png");

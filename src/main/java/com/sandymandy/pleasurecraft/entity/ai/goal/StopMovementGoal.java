@@ -1,16 +1,16 @@
 package com.sandymandy.pleasurecraft.entity.ai.goal;
 
-import com.sandymandy.pleasurecraft.entity.base.TameableGirlEntity;
+import com.sandymandy.pleasurecraft.entity.base.GirlEntity;
 import net.minecraft.entity.ai.control.MoveControl;
 import net.minecraft.entity.ai.goal.Goal;
 
 import java.util.EnumSet;
 
 public class StopMovementGoal extends Goal {
-    private final TameableGirlEntity entity;
+    private final GirlEntity entity;
     public float bodyYaw;
 
-    public StopMovementGoal(TameableGirlEntity entity) {
+    public StopMovementGoal(GirlEntity entity) {
         this.entity = entity;
         this.setControls(EnumSet.of(Goal.Control.MOVE, Goal.Control.JUMP));
     }

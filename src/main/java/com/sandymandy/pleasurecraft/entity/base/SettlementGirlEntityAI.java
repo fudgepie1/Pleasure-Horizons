@@ -48,13 +48,13 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public abstract class GirlEntityAI extends GirlEntityScene implements SmartBrainOwner<GirlEntityAI>, SettlementMember, RangedAttackMob {
+public abstract class SettlementGirlEntityAI extends TameableGirlEntity implements SmartBrainOwner<SettlementGirlEntityAI>, SettlementMember {
     private Settlement settlement;
     private LivingEntity attackTarget;
     private int ticksSinceLastHit;
     private static final int MAX_TICKS_NO_HIT = 20 * 20;
-    private static final TrackedData<Boolean> SHOULD_TICK_BRAIN = DataTracker.registerData(GirlEntityAI.class, TrackedDataHandlerRegistry.BOOLEAN);
-    protected GirlEntityAI(EntityType<? extends GirlEntityAI> entityType, World world) {
+    private static final TrackedData<Boolean> SHOULD_TICK_BRAIN = DataTracker.registerData(SettlementGirlEntityAI.class, TrackedDataHandlerRegistry.BOOLEAN);
+    protected SettlementGirlEntityAI(EntityType<? extends SettlementGirlEntityAI> entityType, World world) {
         super(entityType, world);
     }
 
@@ -67,12 +67,6 @@ public abstract class GirlEntityAI extends GirlEntityScene implements SmartBrain
     @Override
     protected void initGoals() {
         super.initGoals();
-        this.goalSelector.add(-4, new StationaryContactGoal(this));
-        this.goalSelector.add(-3, new MoveToPlayerGoal(this, 1.25D));
-        this.goalSelector.add(-2, new BedGoal(this, 1.25D));
-        this.goalSelector.add(-1, new StripGoal(this));
-        this.goalSelector.add(0, new StopMovementGoal(this));
-        this.goalSelector.add(1, new GirlSitGoal(this));
 
         if(!this.dataTracker.get(SHOULD_TICK_BRAIN)) {
             this.goalSelector.add(0, new GirlSitGoal(this));
@@ -87,8 +81,8 @@ public abstract class GirlEntityAI extends GirlEntityScene implements SmartBrain
             this.goalSelector.add(9, new ConditionalGoal(new LookAtEntityGoal(this, PlayerEntity.class, 6.0F), () -> !isMovementLocked()));
             this.goalSelector.add(10, new ConditionalGoal(new LookAroundGoal(this), () -> !isMovementLocked()));
             this.targetSelector.add(1, new ConditionalGoal(new GirlTrackOwnerAttackerGoal(this), this::isFollowing));
-            this.targetSelector.add(2, new ConditionalGoal(new GirlAttackWithOwnerGoal(this, GirlEntityAI.class), this::isFollowing));
-            this.targetSelector.add(3, new RevengeGoal(this, PlayerEntity.class, GirlEntityAI.class));
+            this.targetSelector.add(2, new ConditionalGoal(new GirlAttackWithOwnerGoal(this, SettlementGirlEntityAI.class), this::isFollowing));
+            this.targetSelector.add(3, new RevengeGoal(this, PlayerEntity.class, SettlementGirlEntityAI.class));
         }
     }
 
@@ -113,9 +107,9 @@ public abstract class GirlEntityAI extends GirlEntityScene implements SmartBrain
     }
 
     @Override
-    public List<? extends ExtendedSensor<? extends GirlEntityAI>> getSensors() {
+    public List<? extends ExtendedSensor<? extends SettlementGirlEntityAI>> getSensors() {
         return List.of(
-                new NearbyLivingEntitySensor<GirlEntityAI>()
+                new NearbyLivingEntitySensor<SettlementGirlEntityAI>()
                         .setPredicate((target, entity) ->
                                 target instanceof PlayerEntity ||
                                         target instanceof IronGolemEntity ||
@@ -126,7 +120,7 @@ public abstract class GirlEntityAI extends GirlEntityScene implements SmartBrain
     }
 
     @Override
-    public BrainActivityGroup<? extends GirlEntityAI> getCoreTasks() { // These are the tasks that run all the time (usually)
+    public BrainActivityGroup<? extends SettlementGirlEntityAI> getCoreTasks() { // These are the tasks that run all the time (usually)
         return BrainActivityGroup.coreTasks(
                 new LookAtTarget<>(),                      // Have the entity turn to face and look at its current look target
                 new MoveToWalkTarget<>());          // Walk towards the current walk target
@@ -134,9 +128,9 @@ public abstract class GirlEntityAI extends GirlEntityScene implements SmartBrain
 
 
     @Override
-    public BrainActivityGroup<? extends GirlEntityAI> getIdleTasks() { // These are the tasks that run when the mob isn't doing anything else (usually)
+    public BrainActivityGroup<? extends SettlementGirlEntityAI> getIdleTasks() { // These are the tasks that run when the mob isn't doing anything else (usually)
         return BrainActivityGroup.idleTasks(
-                new FirstApplicableBehaviour<GirlEntityAI>(      // Run only one of the below behaviours, trying each one in order. Include the generic type because JavaC is silly
+                new FirstApplicableBehaviour<SettlementGirlEntityAI>(      // Run only one of the below behaviours, trying each one in order. Include the generic type because JavaC is silly
                         new TargetOrRetaliate<>(),            // Set the attack target and walk target based on nearby entities
                         new SetPlayerLookTarget<>(),          // Set the look target for the nearest player
                         new SetRandomLookTarget<>()),         // Set a random look target
@@ -146,7 +140,7 @@ public abstract class GirlEntityAI extends GirlEntityScene implements SmartBrain
     }
 
     @Override
-    public BrainActivityGroup<? extends GirlEntityAI> getFightTasks() { // These are the tasks that handle fighting
+    public BrainActivityGroup<? extends SettlementGirlEntityAI> getFightTasks() { // These are the tasks that handle fighting
         return BrainActivityGroup.fightTasks(
                 new InvalidateAttackTarget<>(), // Cancel fighting if the target is no longer valid
                 new SetWalkTargetToAttackTarget<>(),      // Set the walk target to the attack target
@@ -225,25 +219,5 @@ public abstract class GirlEntityAI extends GirlEntityScene implements SmartBrain
         this.dataTracker.set(SHOULD_TICK_BRAIN, !(isMovementLocked() && isSitting() && this.targetBedPos != null && this.isFollowing()) && this.hasSettlement());
     }
 
-    @Override
-    public void shootAt(LivingEntity target, float pullProgress) {
-        ItemStack itemStack = this.getStackInHand(ProjectileUtil.getHandPossiblyHolding(this, Items.BOW));
-        ItemStack itemStack2 = this.getProjectileType(itemStack);
-        PersistentProjectileEntity persistentProjectileEntity = this.createArrowProjectile(itemStack2, pullProgress, itemStack);
-        double d = target.getX() - this.getX();
-        double e = target.getBodyY(0.3333333333333333) - persistentProjectileEntity.getY();
-        double f = target.getZ() - this.getZ();
-        double g = Math.sqrt(d * d + f * f);
-        if (this.getWorld() instanceof ServerWorld serverWorld) {
-            ProjectileEntity.spawnWithVelocity(
-                    persistentProjectileEntity, serverWorld, itemStack2, d, e + g * 0.2F, f, 1.6F, 1
-            );
-        }
 
-        this.playSound(SoundEvents.ENTITY_SKELETON_SHOOT, 1.0F, 1.0F / (this.getRandom().nextFloat() * 0.4F + 0.8F));
-    }
-
-    protected PersistentProjectileEntity createArrowProjectile(ItemStack arrow, float damageModifier, @Nullable ItemStack shotFrom) {
-        return ProjectileUtil.createArrowProjectile(this, arrow, damageModifier, shotFrom);
-    }
 }

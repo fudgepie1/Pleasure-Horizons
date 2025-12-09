@@ -4,7 +4,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
-import com.sandymandy.pleasurecraft.entity.base.TameableGirlEntity;
+import com.sandymandy.pleasurecraft.entity.base.GirlEntity;
 import com.sandymandy.pleasurecraft.entity.girls.CustomGirlEntity;
 import com.sandymandy.pleasurecraft.networking.S2C.RefreshModelsS2CPacket;
 import com.sandymandy.pleasurecraft.registries.GirlRegistry;
@@ -122,7 +122,7 @@ public class GirlsCommand {
 
         int found = 0;
         for (var entry : owned) {
-            TameableGirlEntity girl = (TameableGirlEntity) player.getWorld().getEntity(entry);
+            GirlEntity girl = (GirlEntity) player.getWorld().getEntity(entry);
             found++;
 
             Vec3d pos = girl.getPos();

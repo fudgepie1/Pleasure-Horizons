@@ -1,7 +1,7 @@
 package com.sandymandy.pleasurecraft.entity.girls;
 
-import com.sandymandy.pleasurecraft.entity.base.GirlEntityAI;
-import com.sandymandy.pleasurecraft.entity.base.TameableGirlEntity;
+import com.sandymandy.pleasurecraft.entity.base.SettlementGirlEntityAI;
+import com.sandymandy.pleasurecraft.entity.base.GirlEntity;
 import com.sandymandy.pleasurecraft.util.variables.Scene;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
@@ -12,9 +12,9 @@ import net.minecraft.world.World;
 
 import java.util.List;
 
-public class MomoEntity extends GirlEntityAI {
+public class MomoEntity extends SettlementGirlEntityAI {
 
-    public MomoEntity(EntityType<? extends GirlEntityAI> entityType, World world) {
+    public MomoEntity(EntityType<? extends SettlementGirlEntityAI> entityType, World world) {
         super(entityType, world);
     }
 
@@ -65,7 +65,7 @@ public class MomoEntity extends GirlEntityAI {
     }
 
     public static DefaultAttributeContainer.Builder createAttributes() {
-        return TameableGirlEntity.createDefaultAttributes()
+        return GirlEntity.createDefaultAttributes()
                 .add(EntityAttributes.MAX_HEALTH, 15)
                 .add(EntityAttributes.MOVEMENT_SPEED, .20)
                 .add(EntityAttributes.ATTACK_DAMAGE, 2);

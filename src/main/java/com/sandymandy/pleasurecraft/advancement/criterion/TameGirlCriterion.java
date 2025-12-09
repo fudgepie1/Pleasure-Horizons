@@ -3,7 +3,7 @@ package com.sandymandy.pleasurecraft.advancement.criterion;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.sandymandy.pleasurecraft.PleasureCraft;
-import com.sandymandy.pleasurecraft.entity.base.TameableGirlEntity;
+import com.sandymandy.pleasurecraft.entity.base.GirlEntity;
 import net.minecraft.advancement.AdvancementCriterion;
 import net.minecraft.advancement.criterion.AbstractCriterion;
 import net.minecraft.loot.context.LootContext;
@@ -23,7 +23,7 @@ public class TameGirlCriterion extends AbstractCriterion<TameGirlCriterion.Condi
         return Conditions.CODEC;
     }
 
-    public void trigger(ServerPlayerEntity player, TameableGirlEntity entity) {
+    public void trigger(ServerPlayerEntity player, GirlEntity entity) {
         LootContext lootContext = EntityPredicate.createAdvancementEntityLootContext(player, entity);
         this.trigger(player, conditions -> conditions.matches(lootContext));
     }

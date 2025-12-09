@@ -1,6 +1,6 @@
 package com.sandymandy.pleasurecraft.entity.ai.goal;
 
-import com.sandymandy.pleasurecraft.entity.base.GirlEntityAI;
+import com.sandymandy.pleasurecraft.entity.base.SettlementGirlEntityAI;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.projectile.ProjectileUtil;
@@ -10,7 +10,7 @@ import net.minecraft.item.Items;
 import java.util.EnumSet;
 
 public class GirlBowAttackGoal extends Goal {
-    private final GirlEntityAI girl;
+    private final SettlementGirlEntityAI girl;
     private final double moveSpeed;
     private final double minRangeSq;
     private final double maxRangeSq;
@@ -24,7 +24,7 @@ public class GirlBowAttackGoal extends Goal {
      * @param maxRange maximum distance to keep from target in defensive mode
      * @param cooldownTicks bow cooldown
      */
-    public GirlBowAttackGoal(GirlEntityAI girl, double speed, float minRange, float maxRange, int cooldownTicks) {
+    public GirlBowAttackGoal(SettlementGirlEntityAI girl, double speed, float minRange, float maxRange, int cooldownTicks) {
         this.girl = girl;
         this.moveSpeed = speed;
         this.minRangeSq = minRange * minRange;

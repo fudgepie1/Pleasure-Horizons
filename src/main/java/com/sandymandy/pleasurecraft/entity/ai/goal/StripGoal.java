@@ -26,7 +26,7 @@ public class StripGoal extends Goal {
     @Override
     public void start() {
         girl.setFreeze(true);
-        girl.playAnimation("strip", false, false); // play strip anim
+        if(girl.hasStripAnim()) girl.playAnimation("strip", false, false); // play strip anim
         if(!girl.stripOptions.equals(Scene.EMPTY))
         {
             this.scene = girl.stripOptions;
@@ -38,6 +38,7 @@ public class StripGoal extends Goal {
 
     @Override
     public void tick() {
+        if(!girl.hasStripAnim()) return;
         if(started) {
             if (!girl.isFrozenInPlace()) girl.setFreeze(true);
             if (girl.getAnimationKeyFrameEvent().equals("becomeNude".toLowerCase()) && !stripTrigged) {
@@ -49,16 +50,21 @@ public class StripGoal extends Goal {
 
     @Override
     public boolean shouldContinue() {
-        // Continue until animation finishes OR timer hasn’t passed yet
+        if(!girl.hasStripAnim()) return false;
         return !stripTrigged || !girl.getOverrideAnim().isEmpty();
     }
 
     @Override
     public void stop() {
-        girl.setFreeze(false);
+        if(girl.hasStripAnim()) {
+            girl.setFreeze(false);
+        }
+        else {
+            girl.setStripped(!girl.isStripped());
+        }
         started = false;
         if(!this.scene.equals(Scene.EMPTY)){
-            girl.startScene(this.scene);
+            girl.startScene(this.girl.getScenePlayer(), this.scene);
             this.scene = Scene.EMPTY;
         }
     }

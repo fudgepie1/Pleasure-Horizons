@@ -1,7 +1,7 @@
 package com.sandymandy.pleasurecraft.screen;
 
 import com.sandymandy.pleasurecraft.PleasureCraftClient;
-import com.sandymandy.pleasurecraft.entity.base.TameableGirlEntity;
+import com.sandymandy.pleasurecraft.entity.base.GirlEntity;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -11,9 +11,9 @@ import net.minecraft.text.Text;
 import org.jetbrains.annotations.Nullable;
 
 public class GirlInventoryScreenHandlerFactory implements ExtendedScreenHandlerFactory {
-    private final TameableGirlEntity girl;
+    private final GirlEntity girl;
 
-    public GirlInventoryScreenHandlerFactory(TameableGirlEntity girl) {
+    public GirlInventoryScreenHandlerFactory(GirlEntity girl) {
         this.girl = girl;
     }
 

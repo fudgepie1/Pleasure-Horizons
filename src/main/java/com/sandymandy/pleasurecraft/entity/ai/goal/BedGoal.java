@@ -86,7 +86,7 @@ public class BedGoal extends Goal {
 
     private void handleMovement() {
         if (this.entity.squaredDistanceTo(this.entity.targetBedPos.toCenterPos()) <= 3.0D) {
-            if (this.entity.scenePlayer != null) {
+            if (this.entity.getScenePlayer() != null) {
                 this.navigation.stop();
 
                 // Compute target yaw once
@@ -128,17 +128,17 @@ public class BedGoal extends Goal {
     private void startOnContact() {
         if (!entity.isWaitingAtBed()) return;
 
-        UUID playerId = entity.scenePlayer.getUuid();
+        UUID playerId = entity.getScenePlayer().getUuid();
 
         // Someone else already has this player in a scene
         if (PleasureCraft.activeScenes.containsKey(playerId)) return;
 
-        if (this.entity.squaredDistanceTo(this.entity.scenePlayer) <= 1.5 &&
+        if (this.entity.squaredDistanceTo(this.entity.getScenePlayer()) <= 1.5 &&
                 entity.getCurrentScenePhase().equals(ScenePhase.BED_IDLE)) {
 
             PleasureCraft.activeScenes.put(playerId, entity.getUuid()); // reserve player
             this.entity.setPosition(scenePos);
-            this.entity.startRidingScene();
+            this.entity.startRidingScene(entity.getScenePlayer());
         }
     }
 

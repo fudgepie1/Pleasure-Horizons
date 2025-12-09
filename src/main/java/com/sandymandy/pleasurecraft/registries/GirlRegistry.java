@@ -14,7 +14,6 @@ public class GirlRegistry {
 
     public static final EntityType<SlimeEntity> SLIME = PleasureCraftEntities.registerGirl("slime", SlimeEntity::new, 0.5f, 1.95f, SlimeEntity::createAttributes);
 
-
     public static final EntityType<CustomGirlEntity> CUSTOM_GIRL = PleasureCraftEntities.registerGirl(
             "custom_girl",
             CustomGirlEntity::new,
