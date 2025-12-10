@@ -1,12 +1,8 @@
 package com.sandymandy.pleasurecraft.client.gui.screen.settlement;
 
 import com.google.common.collect.Maps;
-import com.sandymandy.pleasurecraft.PleasureCraft;
-import com.sandymandy.pleasurecraft.client.gui.screen.settlement.render.componets.IconButtonComponent;
-import com.sandymandy.pleasurecraft.client.gui.screen.settlement.render.componets.LabelComponent;
-import com.sandymandy.pleasurecraft.client.gui.screen.settlement.render.componets.ProgressBarComponent;
-import com.sandymandy.pleasurecraft.client.gui.screen.settlement.render.pages.BuildingsPage;
-import com.sandymandy.pleasurecraft.client.gui.screen.settlement.render.pages.ResourcePage;
+import com.sandymandy.pleasurecraft.client.gui.screen.settlement.tabs.ResourcesTab;
+import com.sandymandy.pleasurecraft.client.gui.screen.settlement.tabs.SettlersTab;
 import com.sandymandy.pleasurecraft.screen.SettlementHubScreenHandler;
 import com.sandymandy.pleasurecraft.settlement.Settlement;
 import com.sandymandy.pleasurecraft.settlement.SettlementDisplay;
@@ -15,9 +11,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
@@ -38,15 +32,16 @@ public class SettlementHubScreen extends HandledScreen<SettlementHubScreenHandle
     private static final int TITLE_X = 8;
     private static final int TITLE_Y = 6;
 
-    private final Settlement data;
-    private final Map<String, SettlementTab> tabs = Maps.newLinkedHashMap();
+    private final Settlement settlement;
+    private final Map<String, SettlementTabWidget> tabs = Maps.newLinkedHashMap();
     @Nullable
-    private SettlementTab selectedTab;
-    private boolean movingTab;
+    private SettlementTabWidget selectedTab;
 
     public SettlementHubScreen(SettlementHubScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
-        this.data = handler.getData();
+        this.settlement = handler.getData();
+        this.backgroundWidth = WINDOW_WIDTH;
+        this.backgroundHeight = WINDOW_HEIGHT;
     }
 
     @Override
@@ -55,33 +50,39 @@ public class SettlementHubScreen extends HandledScreen<SettlementHubScreenHandle
         tabs.clear();
         selectedTab = null;
 
-        // Automatically handles index
-        addTab("resources", SettlementDisplay.ofBasic(Text.literal("Resources"), Text.literal("Resource overview")))
-                .addRenderable( new ResourcePage());
+        // Create tabs with proper displays
+        addTab("resources", SettlementDisplay.create(
+                Items.CHEST.getDefaultStack(),
+                Text.literal("Resources"),
+                Text.literal("Resource overview"),
+                Identifier.ofVanilla("textures/gui/advancements/backgrounds/end.png")
+        )).setContentProvider(new ResourcesTab(this, settlement));
 
-        addTab("storage", SettlementDisplay.ofBasic(Text.literal("Storage"), Text.literal("Stored resources")))
-                .addRenderable(new LabelComponent(10, 10, Text.literal("Resources")))
-                .addRenderable(new ProgressBarComponent(10, 25, 120, 8, 1,2))
-                .addRenderable(new IconButtonComponent(150, 20, new ItemStack(Items.CHEST),
-                        btn -> client.player.sendMessage(Text.literal("Opened storage!"), false)));
+        addTab("settlers", SettlementDisplay.create(
+                Items.PLAYER_HEAD.getDefaultStack(),
+                Text.literal("Settlers"),
+                Text.literal("Population management"),
+                Identifier.ofVanilla("textures/gui/advancements/backgrounds/end.png")
+        )).setContentProvider(new SettlersTab(this, settlement));
 
-        addTab("buildings", SettlementDisplay.ofBasic(Text.literal("Buildings"), Text.literal("Resource overview")))
-                /*.addRenderable( new BuildingsPage(data))*/;
-
-        // Select first tab automatically
-        if (!tabs.isEmpty()) selectedTab = tabs.values().iterator().next();
+        // Select first tab
+        if (!tabs.isEmpty()) {
+            selectedTab = tabs.values().iterator().next();
+            if (selectedTab != null) {
+                int windowX = (this.width - WINDOW_WIDTH) / 2;
+                int windowY = (this.height - WINDOW_HEIGHT) / 2;
+                selectedTab.initContent(windowX + PAGE_X, windowY + PAGE_Y, PAGE_WIDTH, PAGE_HEIGHT);
+            }
+        }
     }
 
-
-    private SettlementTab addTab(String id, SettlementDisplay display) {
-        int index = tabs.size(); // auto-index based on tab order
-        SettlementTab tab = SettlementTab.create(client, this, index, display);
-
+    private SettlementTabWidget addTab(String id, SettlementDisplay display) {
+        int index = tabs.size();
+        SettlementTabWidget tab = SettlementTabWidget.create(client, this, index, display);
         if (tab != null) {
             tabs.put(id, tab);
         }
-
-        return tab; // return tab so you can chain .addRenderable()
+        return tab;
     }
 
     @Override
@@ -91,15 +92,41 @@ public class SettlementHubScreen extends HandledScreen<SettlementHubScreenHandle
         int x = (this.width - WINDOW_WIDTH) / 2;
         int y = (this.height - WINDOW_HEIGHT) / 2;
 
-        // Draw the background texture + tab buttons
+        // Draw window and tabs
         drawWindow(context, x, y);
 
-        // Draw the current tab contents
+        // Draw tab content
         drawTabPage(context, x, y, mouseX, mouseY);
 
-        // Draw tab tooltips if hovered
+        // Draw tab tooltips
         drawTabTooltips(context, x, y, mouseX, mouseY);
+    }
 
+    private void drawWindow(DrawContext context, int x, int y) {
+        // Draw window background
+        context.drawTexture(RenderPipelines.GUI_TEXTURED, WINDOW_TEXTURE, x, y, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 256, 256);
+
+        // Draw tab backgrounds
+        if (tabs.size() > 1) {
+            for (SettlementTabWidget tab : tabs.values()) {
+                tab.drawBackground(context, x, y, tab == selectedTab);
+            }
+        }
+
+        // Draw tab icons
+        if (tabs.size() > 1) {
+            for (SettlementTabWidget tab : tabs.values()) {
+                tab.drawIcon(context, x, y);
+            }
+        }
+
+        // Draw title
+        context.drawText(
+                textRenderer,
+                selectedTab != null ? selectedTab.getTitle() : title,
+                x + TITLE_X, y + TITLE_Y,
+                0x404040, false
+        );
     }
 
     private void drawTabPage(DrawContext context, int x, int y, int mouseX, int mouseY) {
@@ -111,34 +138,23 @@ public class SettlementHubScreen extends HandledScreen<SettlementHubScreenHandle
             return;
         }
 
-        // Draw tab content
-        selectedTab.render(context, x + PAGE_X, y + PAGE_Y);
-    }
-
-    private void drawWindow(DrawContext context, int x, int y) {
-        context.drawTexture(RenderPipelines.GUI_TEXTURED, WINDOW_TEXTURE, x, y, 0.0F, 0.0F, WINDOW_WIDTH, WINDOW_HEIGHT, 256, 256);
-
-        if (tabs.size() > 1) {
-            for (SettlementTab tab : tabs.values()) {
-                tab.drawBackground(context, x, y, tab == selectedTab);
-            }
-
-            for (SettlementTab tab : tabs.values()) {
-                tab.drawIcon(context, x, y);
-            }
-        }
-
-        context.drawText(
-                textRenderer,
-                selectedTab != null ? selectedTab.getTitle() : title,
-                x + TITLE_X, y + TITLE_Y,
-                0x404040, false
+        // Enable scissor for content area
+        context.enableScissor(
+                x + PAGE_X,
+                y + PAGE_Y,
+                x + PAGE_X + PAGE_WIDTH,
+                y + PAGE_Y + PAGE_HEIGHT
         );
+
+        // Render tab content
+        selectedTab.renderContent(context, mouseX, mouseY, 0);
+
+        context.disableScissor();
     }
 
     private void drawTabTooltips(DrawContext context, int x, int y, int mouseX, int mouseY) {
         if (tabs.size() > 1) {
-            for (SettlementTab tab : tabs.values()) {
+            for (SettlementTabWidget tab : tabs.values()) {
                 if (tab.isClickOnTab(x, y, mouseX, mouseY)) {
                     context.drawTooltip(textRenderer, tab.getTitle(), mouseX, mouseY);
                 }
@@ -146,68 +162,80 @@ public class SettlementHubScreen extends HandledScreen<SettlementHubScreenHandle
         }
     }
 
-    // === Interaction ===
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        int x = (width - WINDOW_WIDTH) / 2;
-        int y = (height - WINDOW_HEIGHT) / 2;
-
-        // Handle tab switching first
         if (button == 0) {
-            for (SettlementTab tab : tabs.values()) {
+            int x = (width - WINDOW_WIDTH) / 2;
+            int y = (height - WINDOW_HEIGHT) / 2;
+
+            // Check tab clicks
+            for (SettlementTabWidget tab : tabs.values()) {
                 if (tab.isClickOnTab(x, y, mouseX, mouseY)) {
-                    this.selectedTab = tab;
+                    selectTab(tab);
                     return true;
                 }
             }
-        }
 
-        // Forward mouse clicks to the current tab, but adjust coordinates
-        if (selectedTab != null) {
-            double localMouseX = mouseX - (x + PAGE_X);
-            double localMouseY = mouseY - (y + PAGE_Y);
-            selectedTab.mouseClicked(localMouseX, localMouseY, button);
+            // Forward to content
+            if (selectedTab != null) {
+                double localMouseX = mouseX - (x + PAGE_X);
+                double localMouseY = mouseY - (y + PAGE_Y);
+                selectedTab.mouseClicked(localMouseX, localMouseY, button);
+            }
         }
 
         return super.mouseClicked(mouseX, mouseY, button);
     }
 
+    private void selectTab(SettlementTabWidget tab) {
+        if (selectedTab != null) {
+            selectedTab.removeContent();
+        }
 
-    @Override
-    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-        if (button != 0) {
-            this.movingTab = false;
-            return false;
-        } else {
-            if (!this.movingTab) {
-                this.movingTab = true;
-            } else if (this.selectedTab != null) {
-                this.selectedTab.move(deltaX, deltaY);
-            }
-            return true;
+        selectedTab = tab;
+
+        if (selectedTab != null) {
+            int windowX = (this.width - WINDOW_WIDTH) / 2;
+            int windowY = (this.height - WINDOW_HEIGHT) / 2;
+            selectedTab.initContent(windowX + PAGE_X, windowY + PAGE_Y, PAGE_WIDTH, PAGE_HEIGHT);
         }
     }
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
         if (selectedTab != null) {
-            selectedTab.move(horizontalAmount * 16.0, verticalAmount * 16.0);
-            return true;
+            return selectedTab.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
         }
-        return false;
+        return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
     }
 
     @Override
     protected void drawBackground(DrawContext context, float deltaTicks, int mouseX, int mouseY) {
-        // background handled by window texture
+        // Background handled by window texture
     }
 
     @Override
     protected void handledScreenTick() {
+        super.handledScreenTick();
         if (selectedTab != null) {
             selectedTab.tick();
         }
+    }
 
-        PleasureCraft.LOGGER.info(data.getAllBuildings() +"");
+    // Helper methods for tab content
+    public void addContentWidget(net.minecraft.client.gui.widget.ButtonWidget widget) {
+        this.addDrawableChild(widget);
+    }
+
+    public void removeContentWidget(net.minecraft.client.gui.widget.ButtonWidget widget) {
+        this.remove(widget);
+    }
+
+    public net.minecraft.client.font.TextRenderer getTextRenderer() {
+        return this.textRenderer;
+    }
+
+    public net.minecraft.client.MinecraftClient getClient() {
+        return this.client;
     }
 }

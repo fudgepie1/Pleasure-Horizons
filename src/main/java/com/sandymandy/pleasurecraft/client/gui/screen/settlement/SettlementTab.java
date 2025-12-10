@@ -1,152 +1,182 @@
 package com.sandymandy.pleasurecraft.client.gui.screen.settlement;
 
-import com.google.common.collect.Lists;
-import com.sandymandy.pleasurecraft.client.gui.screen.settlement.render.SettlementRenderable;
-import com.sandymandy.pleasurecraft.settlement.SettlementDisplay;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.minecraft.client.MinecraftClient;
+import com.sandymandy.pleasurecraft.settlement.Settlement;
 import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.advancement.AdvancementTab;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.item.ItemStack;
+import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.MathHelper;
-import org.joml.Matrix3x2f;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 
-@Environment(EnvType.CLIENT)
-public class SettlementTab {
-    private final MinecraftClient client;
-    private final SettlementHubScreen screen;
-    private final SettlementTabType type;
-    private final int index;
-    private final SettlementDisplay display;
-    private final ItemStack icon;
-    private final Text title;
+/**
+ * Base class for settlement tab content.
+ * Each tab handles its own rendering and interaction within the content area.
+ */
+public abstract class SettlementTab {
+    protected final SettlementHubScreen screen;
+    protected final Settlement settlement;
+    protected final List<ButtonWidget> widgets = new ArrayList<>();
 
-    private final List<SettlementRenderable> renderables = Lists.newArrayList();
+    protected int contentX;
+    protected int contentY;
+    protected int contentWidth;
+    protected int contentHeight;
 
-    private double originX;
-    private double originY;
-    private final int minPanX = Integer.MAX_VALUE;
-    private final int minPanY = Integer.MAX_VALUE;
-    private final int maxPanX = Integer.MIN_VALUE;
-    private final int maxPanY = Integer.MIN_VALUE;
-    private float alpha;
-    private boolean initialized;
+    protected double scrollX = 0;
+    protected double scrollY = 0;
+    protected double maxScrollX = 0;
+    protected double maxScrollY = 0;
 
-    public SettlementTab(MinecraftClient client, SettlementHubScreen screen, SettlementTabType type, int index, SettlementDisplay display) {
-        this.client = client;
+    @Nullable
+    private Identifier backgroundTexture;
+
+    public SettlementTab(SettlementHubScreen screen, Settlement settlement) {
         this.screen = screen;
-        this.type = type;
-        this.index = index;
-        this.display = display;
-        this.icon = display.getIcon();
-        this.title = display.getTitle();
+        this.settlement = settlement;
     }
 
-    // === Modular Renderable System ===
-    public SettlementTab addRenderable(SettlementRenderable renderable) {
-        this.renderables.add(renderable);
-        return this;
+    /**
+     * Initialize the tab - called when tab becomes active
+     */
+    public void init(int x, int y, int width, int height) {
+        this.contentX = x;
+        this.contentY = y;
+        this.contentWidth = width;
+        this.contentHeight = height;
+        this.scrollX = 0;
+        this.scrollY = 0;
+
+        createWidgets();
+        updateScrollBounds();
     }
 
-    public List<SettlementRenderable> getRenderables() {
-        return renderables;
+    /**
+     * Set the background texture for this tab
+     */
+    public void setBackgroundTexture(Identifier texture) {
+        this.backgroundTexture = texture;
     }
 
-    // === Rendering ===
-    public void render(DrawContext context, int x, int y) {
-        if (!this.initialized) {
-            this.originX = 117 - (double) (this.maxPanX + this.minPanX) / 2;
-            this.originY = 56 - (double) (this.maxPanY + this.minPanY) / 2;
-            this.initialized = true;
+    /**
+     * Create widgets for this tab - override in subclasses
+     */
+    protected abstract void createWidgets();
+
+    /**
+     * Get the title of this tab (not currently used, but kept for consistency)
+     */
+    public abstract Text getTitle();
+
+    /**
+     * Update scroll bounds based on content size
+     */
+    protected void updateScrollBounds() {
+        // Override to set maxScrollX and maxScrollY
+        maxScrollX = 0;
+        maxScrollY = 0;
+    }
+
+    /**
+     * Render tab content with tiled background and scrolling
+     */
+    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        // Render tiled background
+        if (backgroundTexture != null) {
+            renderTiledBackground(context);
         }
 
-        context.enableScissor(x, y, x + 234, y + 113);
+        // Render content with scroll offset
         context.getMatrices().pushMatrix();
-        context.getMatrices().translate((float)x, (float)y);
+        context.getMatrices().translate((float)(contentX - scrollX), (float)(contentY - scrollY));
 
-        Identifier bgTex = display.getBackground();
-
-        int i = MathHelper.floor(this.originX);
-        int j = MathHelper.floor(this.originY);
-        int offsetX = i % 16;
-        int offsetY = j % 16;
-
-        // Draw tiled background
-        for (int m = -1; m <= 15; m++) {
-            for (int n = -1; n <= 8; n++) {
-                context.drawTexture(RenderPipelines.GUI_TEXTURED, bgTex,
-                        offsetX + 16 * m, offsetY + 16 * n,
-                        0, 0, 16, 16, 16, 16);
-            }
-        }
-
-        // Render all interactive components
-        for (SettlementRenderable renderable : renderables) {
-            renderable.render(context, 0, 0);
-        }
+        renderContent(context, mouseX, mouseY, delta);
 
         context.getMatrices().popMatrix();
-        context.disableScissor();
     }
 
-    // === Interaction ===
-    public void tick() {
-        for (SettlementRenderable renderable : renderables) {
-            renderable.tick();
+    /**
+     * Render the tiled background texture
+     */
+    private void renderTiledBackground(DrawContext context) {
+        int x = contentX;
+        int y = contentY;
+        int width = contentWidth;
+        int height = contentHeight;
+
+        // Calculate scroll offset for parallax effect
+        int offsetX = ((int)scrollX) % 16;
+        int offsetY = ((int)scrollY) % 16;
+
+        // Draw tiled background
+        for (int m = -1; m <= (width / 16) + 1; m++) {
+            for (int n = -1; n <= (height / 16) + 1; n++) {
+                context.drawTexture(
+                        RenderPipelines.GUI_TEXTURED,
+                        backgroundTexture,
+                        x + (m * 16) - offsetX,
+                        y + (n * 16) - offsetY,
+                        0, 0,
+                        16, 16,
+                        16, 16
+                );
+            }
         }
     }
 
+    /**
+     * Render the actual content - override in subclasses
+     */
+    protected abstract void renderContent(DrawContext context, int mouseX, int mouseY, float delta);
+
+    /**
+     * Handle mouse scrolling
+     */
+    public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+        // Check if mouse is over content area
+        if (mouseX >= contentX && mouseX < contentX + contentWidth &&
+                mouseY >= contentY && mouseY < contentY + contentHeight) {
+
+            scrollY = Math.max(0, Math.min(maxScrollY, scrollY - verticalAmount * 10));
+            scrollX = Math.max(0, Math.min(maxScrollX, scrollX - horizontalAmount * 10));
+
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Handle mouse clicks - forward to widgets if needed
+     */
     public void mouseClicked(double mouseX, double mouseY, int button) {
-        for (SettlementRenderable renderable : renderables) {
-            if (renderable.isMouseOver(mouseX, mouseY)) {
-                renderable.mouseClicked(mouseX, mouseY, button);
-            }
+        // Override if you need custom click handling
+        // Widgets are automatically handled by the screen
+    }
+
+    /**
+     * Tick method for animations or updates
+     */
+    public void tick() {
+        // Override if needed
+    }
+
+    /**
+     * Clean up when tab is deselected
+     */
+    public void removed() {
+        for (ButtonWidget widget : widgets) {
+            screen.removeContentWidget(widget);
         }
+        widgets.clear();
     }
 
-//    public boolean mouseScrolled(double mouseX, double mouseY, double amount, double horizontalAmount) {
-//        return
-//    };
-
-    // === Utility ===
-    public void move(double dx, double dy) {
-        if (this.maxPanX - this.minPanX > 234) {
-            this.originX = MathHelper.clamp(this.originX + dx, -(this.maxPanX - 234), 0.0);
-        }
-        if (this.maxPanY - this.minPanY > 113) {
-            this.originY = MathHelper.clamp(this.originY + dy, -(this.maxPanY - 113), 0.0);
-        }
-    }
-
-    // === Draw Tab Button Background and Icon ===
-    public void drawBackground(DrawContext context, int x, int y, boolean selected) {
-        type.drawBackground(context, x, y, selected, index);
-    }
-
-    public void drawIcon(DrawContext context, int x, int y) {
-        type.drawIcon(context, x, y, index, icon);
-    }
-
-    public SettlementTabType getType() { return this.type; }
-    public Text getTitle() { return this.title; }
-    public boolean isClickOnTab(int baseX, int baseY, double mouseX, double mouseY) {
-        return type.isClickOnTab(baseX, baseY, index, mouseX, mouseY);
-    }
-
-    public static SettlementTab create(MinecraftClient client, SettlementHubScreen screen, int index, SettlementDisplay display) {
-        for (SettlementTabType tabType : SettlementTabType.values()) {
-            if (index < tabType.getTabCount()) {
-                return new SettlementTab(client, screen, tabType, index, display);
-            }
-            index -= tabType.getTabCount();
-        }
-        return null;
+    /**
+     * Helper to add a widget to both local list and screen
+     */
+    protected void addWidget(ButtonWidget widget) {
+        widgets.add(widget);
+        screen.addContentWidget(widget);
     }
 }
