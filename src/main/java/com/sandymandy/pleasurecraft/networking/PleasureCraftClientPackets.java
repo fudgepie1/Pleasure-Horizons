@@ -38,7 +38,7 @@ public class PleasureCraftClientPackets {
 
         ClientPlayNetworking.registerGlobalReceiver(SceneOptionsS2CPacket.ID, (packet, context) -> {
             context.client().execute(() -> {
-                MinecraftClient.getInstance().setScreen(new GirlSceneScreen(packet.entityId(), packet.currentRelationshipLevel(),packet.options()));
+                MinecraftClient.getInstance().setScreen(new GirlSceneScreen(packet.entityId(), packet.currentRelationshipLevel(), packet.attractedTo(),packet.options()));
             });
         });
 

@@ -1,6 +1,6 @@
 package com.sandymandy.pleasurecraft.entity.girls;
 
-import com.sandymandy.pleasurecraft.entity.base.SettlementGirlEntityAI;
+import com.sandymandy.pleasurecraft.entity.base.tamable.SettlementGirlEntityAI;
 import com.sandymandy.pleasurecraft.util.json.CustomGirlLoader;
 import com.sandymandy.pleasurecraft.util.variables.CustomGirlProfile;
 import com.sandymandy.pleasurecraft.util.variables.Scene;
@@ -84,7 +84,7 @@ public class CustomGirlEntity extends SettlementGirlEntityAI {
     }
 
     @Override
-    protected Item getTameItem() {
+    public Item getAttractedTo() {
         return getProfile().tameItem();
     }
 

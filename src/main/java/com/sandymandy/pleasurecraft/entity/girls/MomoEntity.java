@@ -1,6 +1,6 @@
 package com.sandymandy.pleasurecraft.entity.girls;
 
-import com.sandymandy.pleasurecraft.entity.base.SettlementGirlEntityAI;
+import com.sandymandy.pleasurecraft.entity.base.tamable.SettlementGirlEntityAI;
 import com.sandymandy.pleasurecraft.entity.base.GirlEntity;
 import com.sandymandy.pleasurecraft.util.variables.Scene;
 import net.minecraft.entity.EntityType;
@@ -19,7 +19,7 @@ public class MomoEntity extends SettlementGirlEntityAI {
     }
 
     @Override
-    protected Item getTameItem() {
+    public Item getAttractedTo() {
         return Items.POPPY;
     }
 

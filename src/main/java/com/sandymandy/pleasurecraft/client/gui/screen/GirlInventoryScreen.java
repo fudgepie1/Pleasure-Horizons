@@ -1,8 +1,7 @@
 package com.sandymandy.pleasurecraft.client.gui.screen;
 
 import com.sandymandy.pleasurecraft.PleasureCraft;
-import com.sandymandy.pleasurecraft.entity.base.GirlEntity;
-import com.sandymandy.pleasurecraft.entity.base.TameableGirlEntity;
+import com.sandymandy.pleasurecraft.entity.base.tamable.TameableGirlEntity;
 import com.sandymandy.pleasurecraft.networking.C2S.InInventoryC2SPacket;
 import com.sandymandy.pleasurecraft.registries.InventoryButtonRegistry;
 import com.sandymandy.pleasurecraft.screen.GirlInventoryScreenHandler;

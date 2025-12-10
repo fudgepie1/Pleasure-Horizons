@@ -2,8 +2,7 @@ package com.sandymandy.pleasurecraft.screen;
 
 import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.PleasureCraftClient;
-import com.sandymandy.pleasurecraft.entity.base.GirlEntity;
-import com.sandymandy.pleasurecraft.entity.base.TameableGirlEntity;
+import com.sandymandy.pleasurecraft.entity.base.tamable.TameableGirlEntity;
 import com.sandymandy.pleasurecraft.util.inventory.GirlInventory;
 import com.sandymandy.pleasurecraft.util.inventory.slot.ExclusiveSlot;
 import com.sandymandy.pleasurecraft.util.inventory.slot.InclusiveSlot;

@@ -2,7 +2,7 @@ package com.sandymandy.pleasurecraft.util.managers;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.sandymandy.pleasurecraft.entity.base.TameableGirlEntity;
+import com.sandymandy.pleasurecraft.entity.base.tamable.TameableGirlEntity;
 import net.minecraft.datafixer.DataFixTypes;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.server.world.ServerWorld;

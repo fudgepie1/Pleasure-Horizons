@@ -1,7 +1,8 @@
 package com.sandymandy.pleasurecraft.entity.girls;
 
-import com.sandymandy.pleasurecraft.entity.base.SettlementGirlEntityAI;
+import com.sandymandy.pleasurecraft.entity.base.tamable.SettlementGirlEntityAI;
 import com.sandymandy.pleasurecraft.entity.base.GirlEntity;
+import com.sandymandy.pleasurecraft.entity.base.wild.WildGirlEntity;
 import com.sandymandy.pleasurecraft.util.variables.Scene;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
@@ -15,13 +16,13 @@ import net.minecraft.world.World;
 
 import java.util.List;
 
-public class SlimeEntity extends SettlementGirlEntityAI {
-    public SlimeEntity(EntityType<? extends SettlementGirlEntityAI> entityType, World world) {
+public class SlimeEntity extends WildGirlEntity {
+    public SlimeEntity(EntityType<? extends WildGirlEntity> entityType, World world) {
         super(entityType, world);
     }
 
     @Override
-    protected Item getTameItem() {
+    public Item getAttractedTo() {
         return Items.LILY_PAD;
     }
 
@@ -50,7 +51,7 @@ public class SlimeEntity extends SettlementGirlEntityAI {
                         List.of("blowjob_slow"),
                         List.of("blowjob_fast"),
                         "blowjob_cum",
-                        4,
+                        2.5f,
                         false,
                         false,
                         false),

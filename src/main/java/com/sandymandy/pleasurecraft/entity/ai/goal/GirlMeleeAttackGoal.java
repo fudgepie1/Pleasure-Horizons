@@ -1,6 +1,6 @@
 package com.sandymandy.pleasurecraft.entity.ai.goal;
 
-import com.sandymandy.pleasurecraft.entity.base.SettlementGirlEntityAI;
+import com.sandymandy.pleasurecraft.entity.base.tamable.SettlementGirlEntityAI;
 import net.minecraft.entity.ai.goal.MeleeAttackGoal;
 
 public class GirlMeleeAttackGoal extends MeleeAttackGoal {

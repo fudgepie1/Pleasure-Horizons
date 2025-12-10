@@ -1,6 +1,7 @@
-package com.sandymandy.pleasurecraft.entity.base;
+package com.sandymandy.pleasurecraft.entity.base.tamable;
 
 import com.sandymandy.pleasurecraft.advancement.criterion.PleasureCraftCriteria;
+import com.sandymandy.pleasurecraft.entity.base.GirlEntityScene;
 import com.sandymandy.pleasurecraft.screen.GirlInventoryScreenHandlerFactory;
 import com.sandymandy.pleasurecraft.util.PleasureCraftLangUtils;
 import com.sandymandy.pleasurecraft.util.PleasureCraftMessages;
@@ -69,7 +70,7 @@ public class TameableGirlEntity extends GirlEntityScene implements Tameable {
 
                     if (this.isOwner(player)) {
 
-                        if (itemInHand.equals(getTameItem())) {
+                        if (itemInHand.equals(getAttractedTo())) {
                             if (getCurrentRelationshipLevel() < maxRelationshipLevel()) {
                                 itemStack.decrementUnlessCreative(1, player);
                                 player.sendMessage(Text.literal("She Liked The Gift"), true);
@@ -97,7 +98,7 @@ public class TameableGirlEntity extends GirlEntityScene implements Tameable {
                             }
                         }
                     } else {
-                        if (itemInHand.equals(getTameItem())) {
+                        if (itemInHand.equals(getAttractedTo())) {
                             player.sendMessage(Text.of(PleasureCraftLangUtils.getStringFromKey("msg.pleasurecraft.alreadyInRelationship")), true);
                             return ActionResult.FAIL;
                         }
@@ -113,14 +114,14 @@ public class TameableGirlEntity extends GirlEntityScene implements Tameable {
                     }
 
                     if (!this.getWorld().isClient()) {
-                        if (itemInHand.equals(getTameItem()) && !player.isSneaking()) {
+                        if (itemInHand.equals(getAttractedTo()) && !player.isSneaking()) {
                             itemStack.decrementUnlessCreative(1, player);
                             this.tryTame(player);
                             return ActionResult.SUCCESS;
                         } else {
                             // Wrong item OR empty hand (not sneaking)
                             player.sendMessage(Text.literal(
-                                    "She ignores you. Maybe try giving her a " + getReadableTameItemName(this.getTameItem()) + "."
+                                    "She ignores you. Maybe try giving her a " + getReadableTameItemName(this.getAttractedTo()) + "."
                             ), true);
                             return ActionResult.FAIL;
                         }

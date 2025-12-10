@@ -2,7 +2,7 @@ package com.sandymandy.pleasurecraft.settlement;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.sandymandy.pleasurecraft.entity.base.SettlementGirlEntityAI;
+import com.sandymandy.pleasurecraft.entity.base.tamable.SettlementGirlEntityAI;
 import com.sandymandy.pleasurecraft.settlement.building.BuildingScanner;
 import com.sandymandy.pleasurecraft.settlement.building.BuildingType;
 import com.sandymandy.pleasurecraft.settlement.building.SettlementBuilding;
