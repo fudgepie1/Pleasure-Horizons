@@ -86,7 +86,6 @@ public class GirlEntityScene extends GirlEntity implements GeoEntity {
     private static final TrackedData<Integer> PREGNANCY_DURATION = DataTracker.registerData(GirlEntityScene.class, TrackedDataHandlerRegistry.INTEGER);
     private static final TrackedData<Integer> STATIONARY_INDEX = DataTracker.registerData(GirlEntityScene.class, TrackedDataHandlerRegistry.INTEGER);
     public static final TrackedData<Optional<UUID>> CURRENT_SCENE_PLAYER = DataTracker.registerData(GirlEntityScene.class, PleasureCraftTrackedDataRegistry.OPTIONAL_UUID);
-    private static final Random RANDOM = new Random();
     private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
     public BlockPos targetBedPos;
     public Scene stripOptions = Scene.EMPTY;
@@ -405,6 +404,8 @@ public class GirlEntityScene extends GirlEntity implements GeoEntity {
             return;
         }
 
+        if(this.useUpRelationShipLevels()) this.setCurrentRelationshipLevel(this.getCurrentRelationshipLevel() - option.requiredRelationshipLevel());
+
         if (option.sceneType().equals(SceneType.ON_BED)) {
             //  Check for a bed before starting
             Utils.BlockInfo bedInfo = Utils.findNearbyBed(
@@ -507,7 +508,7 @@ public class GirlEntityScene extends GirlEntity implements GeoEntity {
         if (this.hasPassengers()) {
             this.removeAllPassengers();
         }
-        this.getScenePlayer().setInvisible(false);
+        if(this.getScenePlayer() != null) this.getScenePlayer().setInvisible(false);
     }
 
     public void playPhase(ScenePhase phase) {
@@ -720,9 +721,17 @@ public class GirlEntityScene extends GirlEntity implements GeoEntity {
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllerRegistrar) {
+        // Lower = higher priority
         controllerRegistrar.add(new AnimationController<>("girl_animations", 4, this::handleAnimations).setSoundKeyframeHandler(new SoundKeyframeHandler(this)));
-        // Attack controller, higher priority so it can override
-        controllerRegistrar.add(new AnimationController<>("girl_attack", 3, this::handleAttackAnimations));
+        controllerRegistrar.add(new AnimationController<>("girl_attack", 4, this::handleAttackAnimations));
+        controllerRegistrar.add(new AnimationController<>("girl_face", 4, this::handleFacialAnimations));
+    }
+
+    private PlayState handleFacialAnimations(AnimationTest<GeoAnimatable> state){
+        AnimationController<?> controller = state.controller();
+
+
+        return state.setAndContinue(RawAnimation.begin().then(getAnimationPath("blink"), Animation.LoopType.LOOP));
     }
 
     private PlayState handleAttackAnimations(AnimationTest<GeoAnimatable> state) {

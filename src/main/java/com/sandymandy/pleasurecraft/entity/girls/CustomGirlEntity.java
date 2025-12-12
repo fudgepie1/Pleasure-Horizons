@@ -84,7 +84,7 @@ public class CustomGirlEntity extends SettlementGirlEntityAI {
     }
 
     @Override
-    public Item getAttractedTo() {
+    public Item isAttractedTo() {
         return getProfile().tameItem();
     }
 

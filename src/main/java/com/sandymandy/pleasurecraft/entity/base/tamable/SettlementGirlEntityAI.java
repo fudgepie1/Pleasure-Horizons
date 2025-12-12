@@ -1,6 +1,7 @@
 package com.sandymandy.pleasurecraft.entity.base.tamable;
 
 import com.sandymandy.pleasurecraft.entity.ai.goal.*;
+import com.sandymandy.pleasurecraft.entity.base.GirlEntity;
 import com.sandymandy.pleasurecraft.settlement.Settlement;
 import com.sandymandy.pleasurecraft.settlement.SettlementMember;
 import net.minecraft.entity.Entity;
@@ -68,14 +69,14 @@ public abstract class SettlementGirlEntityAI extends TameableGirlEntity implemen
             this.goalSelector.add(3, new TameableGirlEscapeDangerGoal(1.5D, DamageTypeTags.PANIC_ENVIRONMENTAL_CAUSES));
             this.goalSelector.add(4, new GirlAttackSwitchGoal(this, 1.0, 5, 6, 11));
             this.goalSelector.add(5, new ConditionalGoal(new GirlFollowOwnerGoal(this, 1D, 10.0F, 2.0F), this::isFollowing));
-            this.goalSelector.add(6, new TemptGoal(this, 1D, Ingredient.ofItems(getAttractedTo()), false));
+            this.goalSelector.add(6, new TemptGoal(this, 1D, Ingredient.ofItems(isAttractedTo()), false));
             this.goalSelector.add(7, new GirlStayNearBaseGoal(this, 1.0, 2.0F, 15.0F, 150));
             this.goalSelector.add(8, new WanderAroundGoal(this, 1.0D));
             this.goalSelector.add(9, new ConditionalGoal(new LookAtEntityGoal(this, PlayerEntity.class, 6.0F), () -> !isMovementLocked()));
             this.goalSelector.add(10, new ConditionalGoal(new LookAroundGoal(this), () -> !isMovementLocked()));
             this.targetSelector.add(1, new ConditionalGoal(new GirlTrackOwnerAttackerGoal(this), this::isFollowing));
             this.targetSelector.add(2, new ConditionalGoal(new GirlAttackWithOwnerGoal(this, SettlementGirlEntityAI.class), this::isFollowing));
-            this.targetSelector.add(3, new RevengeGoal(this, PlayerEntity.class, SettlementGirlEntityAI.class));
+            this.targetSelector.add(3, new RevengeGoal(this, PlayerEntity.class, GirlEntity.class));
         }
     }
 

@@ -16,7 +16,7 @@ public class LucyEntity extends SettlementGirlEntityAI {
     }
 
     @Override
-    public Item getAttractedTo() {
+    public Item isAttractedTo() {
         return Items.ALLIUM;
     }
 

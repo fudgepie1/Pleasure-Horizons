@@ -32,7 +32,7 @@ public class ResourcesTab extends SettlementTab {
         // Header
         context.drawText(
                 screen.getTextRenderer(),
-                Text.literal("Settlement Resources").formatted(Formatting.BOLD),
+                Text.literal("" + this.settlement.getId()).formatted(Formatting.UNDERLINE),
                 10, yOffset,
                 Colors.WHITE,
                 true

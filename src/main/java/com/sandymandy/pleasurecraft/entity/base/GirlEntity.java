@@ -72,7 +72,7 @@ public abstract class GirlEntity extends PathAwareEntity implements RangedAttack
     private static final TrackedData<BlockPos> BASE_POS = DataTracker.registerData(GirlEntity.class, TrackedDataHandlerRegistry.BLOCK_POS);
     private static final TrackedData<Vec3d> PASSENGER_BONE_POSITION = DataTracker.registerData(GirlEntity.class, PleasureCraftTrackedDataRegistry.VEC3D);
     private static final TrackedData<Vec3d> BREAST_OFFSET = DataTracker.registerData(GirlEntity.class, PleasureCraftTrackedDataRegistry.VEC3D);
-
+    public static final Random RANDOM = new Random();
     public Map<String, Boolean> boneVisibility = new HashMap<>();
     public Map<String, Integer> boneColorOverrides = new HashMap<>();
     public Map<String, Identifier> boneTextureOverrides = new HashMap<>();
@@ -290,8 +290,12 @@ public abstract class GirlEntity extends PathAwareEntity implements RangedAttack
         return inventory;
     }
 
-    public Item getAttractedTo() {
+    public Item isAttractedTo() {
         return Items.DANDELION;
+    }
+
+    public boolean useUpRelationShipLevels(){
+        return false;
     }
 
     public String getGirlID() {

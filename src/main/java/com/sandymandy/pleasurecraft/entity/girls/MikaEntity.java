@@ -19,7 +19,7 @@ public class MikaEntity extends SettlementGirlEntityAI {
     }
 
     @Override
-    public Item getAttractedTo() {
+    public Item isAttractedTo() {
         return Items.OPEN_EYEBLOSSOM;
     }
 

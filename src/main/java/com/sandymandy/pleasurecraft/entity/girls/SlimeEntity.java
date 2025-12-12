@@ -22,7 +22,7 @@ public class SlimeEntity extends WildGirlEntity {
     }
 
     @Override
-    public Item getAttractedTo() {
+    public Item isAttractedTo() {
         return Items.LILY_PAD;
     }
 
@@ -46,7 +46,7 @@ public class SlimeEntity extends WildGirlEntity {
     public List<Scene> getScenes() {
         return List.of(
                 Scene.onPlayer("Blow Job",
-                        8,
+                        4,
                         List.of("blowjob_intro"),
                         List.of("blowjob_slow"),
                         List.of("blowjob_fast"),
@@ -57,7 +57,7 @@ public class SlimeEntity extends WildGirlEntity {
                         false),
 
                 Scene.stationaryContact("Doggy",
-                        10,
+                        6,
                         List.of("doggy_intro"),
                         List.of("doggy_slow"),
                         List.of("doggy_fast"),

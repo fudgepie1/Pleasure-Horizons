@@ -19,7 +19,7 @@ public class MomoEntity extends SettlementGirlEntityAI {
     }
 
     @Override
-    public Item getAttractedTo() {
+    public Item isAttractedTo() {
         return Items.POPPY;
     }
 

@@ -70,7 +70,7 @@ public class TameableGirlEntity extends GirlEntityScene implements Tameable {
 
                     if (this.isOwner(player)) {
 
-                        if (itemInHand.equals(getAttractedTo())) {
+                        if (itemInHand.equals(isAttractedTo())) {
                             if (getCurrentRelationshipLevel() < maxRelationshipLevel()) {
                                 itemStack.decrementUnlessCreative(1, player);
                                 player.sendMessage(Text.literal("She Liked The Gift"), true);
@@ -98,7 +98,7 @@ public class TameableGirlEntity extends GirlEntityScene implements Tameable {
                             }
                         }
                     } else {
-                        if (itemInHand.equals(getAttractedTo())) {
+                        if (itemInHand.equals(isAttractedTo())) {
                             player.sendMessage(Text.of(PleasureCraftLangUtils.getStringFromKey("msg.pleasurecraft.alreadyInRelationship")), true);
                             return ActionResult.FAIL;
                         }
@@ -114,14 +114,14 @@ public class TameableGirlEntity extends GirlEntityScene implements Tameable {
                     }
 
                     if (!this.getWorld().isClient()) {
-                        if (itemInHand.equals(getAttractedTo()) && !player.isSneaking()) {
+                        if (itemInHand.equals(isAttractedTo()) && !player.isSneaking()) {
                             itemStack.decrementUnlessCreative(1, player);
                             this.tryTame(player);
                             return ActionResult.SUCCESS;
                         } else {
                             // Wrong item OR empty hand (not sneaking)
                             player.sendMessage(Text.literal(
-                                    "She ignores you. Maybe try giving her a " + getReadableTameItemName(this.getAttractedTo()) + "."
+                                    "She ignores you. Maybe try giving her a " + getReadableTameItemName(this.isAttractedTo()) + "."
                             ), true);
                             return ActionResult.FAIL;
                         }

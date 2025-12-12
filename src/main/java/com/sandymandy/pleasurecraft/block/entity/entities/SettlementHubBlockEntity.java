@@ -29,6 +29,7 @@ import static com.sandymandy.pleasurecraft.util.Utils.getPlayerName;
 
 public class SettlementHubBlockEntity extends BlockEntity {
     private Settlement settlement;
+    private UUID settlementId; // ← Store the ID
 
     public SettlementHubBlockEntity(BlockPos pos, BlockState state) {
         super(PleasureCraftBlockEntities.SETTLEMENT_HUB_BLOCK_ENTITY, pos, state);
@@ -50,6 +51,7 @@ public class SettlementHubBlockEntity extends BlockEntity {
     /* === GUI Handling === */
 
     public void openGui(ServerWorld world, ServerPlayerEntity player) {
+        Settlement settlement = getSettlement(); // ← Use getter
         if (settlement != null) {
             PlayerEntity owner = world.getPlayerByUuid(settlement.getOwner());
             if(player.equals(owner)) {
@@ -64,28 +66,27 @@ public class SettlementHubBlockEntity extends BlockEntity {
     /* === Tick === */
 
     public static void tick(World world, BlockPos pos, BlockState state, SettlementHubBlockEntity be) {
-
         if (world.isClient()) return;
 
-        if (be.settlement != null) {
-            be.settlement.tick(world);
+        Settlement settlement = be.getSettlement(); // ← Use getter
+        if (settlement != null) {
+            settlement.tick(world);
         }
     }
-
-
 
     /* === Setup === */
 
     public void initializeWithOwner(ServerWorld world, UUID ownerId) {
         SettlementManager manager = SettlementManager.get(world);
 
-        if (this.settlement == null) {
+        if (this.settlement == null && this.settlementId == null) { // ← Check both
             PlayerEntity owner = world.getPlayerByUuid(ownerId);
             String name = "Settlement@" + getPos().toShortString();
 
             if(owner != null) name = getPlayerName(owner) + "'s Settlement";
 
             this.settlement = manager.createSettlement(getPos(), name, ownerId);
+            this.settlementId = this.settlement.getId(); // ← Store ID
             markDirty();
         }
     }
@@ -95,8 +96,16 @@ public class SettlementHubBlockEntity extends BlockEntity {
     @Override
     protected void writeData(WriteView view) {
         super.writeData(view);
+
+        // Try to get settlement if we have an ID but not the object yet
+        if (settlement == null && settlementId != null && world instanceof ServerWorld serverWorld) {
+            settlement = SettlementManager.get(serverWorld).getSettlement(settlementId);
+        }
+
         if (settlement != null) {
             view.put("SettlementId", Uuids.CODEC, settlement.getId());
+        } else if (settlementId != null) {
+            view.put("SettlementId", Uuids.CODEC, settlementId);
         }
     }
 
@@ -104,13 +113,28 @@ public class SettlementHubBlockEntity extends BlockEntity {
     public void readData(ReadView view) {
         super.readData(view);
 
-        // Try to read the UUID using the codec
+        // Just store the UUID for now - we'll fetch the settlement later
         view.read("SettlementId", Uuids.CODEC).ifPresent(id -> {
-            if (this.world instanceof ServerWorld serverWorld) {
-                SettlementManager manager = SettlementManager.get(serverWorld);
-                this.settlement = manager.getSettlement(id);
-            }
+            this.settlementId = id;
+            this.settlement = null; // Clear cached settlement
         });
+    }
+
+    /* === Lazy Getter === */
+
+    @Nullable
+    public Settlement getSettlement() {
+        // If we have the settlement cached, return it
+        if (settlement != null) {
+            return settlement;
+        }
+
+        // If we have an ID but not the settlement, try to fetch it
+        if (settlementId != null && world instanceof ServerWorld serverWorld) {
+            settlement = SettlementManager.get(serverWorld).getSettlement(settlementId);
+        }
+
+        return settlement;
     }
 
     /* === Sync Utility === */
@@ -120,9 +144,5 @@ public class SettlementHubBlockEntity extends BlockEntity {
             world.updateListeners(pos, getCachedState(), getCachedState(), Block.NOTIFY_LISTENERS);
             markDirty();
         }
-    }
-
-    public Settlement getSettlement() {
-        return settlement;
     }
 }

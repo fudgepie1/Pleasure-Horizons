@@ -17347,6 +17347,25 @@
 					]
 				},
 				{
+					"name": "boyCam",
+					"parent": "Head2",
+					"pivot": [0, 26.25, -19.5],
+					"cubes": [
+						{
+							"origin": [1, 26.25, -20.5],
+							"size": [0, 0, 0],
+							"uv": {
+								"north": {"uv": [0, 0], "uv_size": [0, 0]},
+								"east": {"uv": [0, 0], "uv_size": [0, 0]},
+								"south": {"uv": [0, 0], "uv_size": [0, 0]},
+								"west": {"uv": [0, 0], "uv_size": [0, 0]},
+								"up": {"uv": [0, 0], "uv_size": [0, 0]},
+								"down": {"uv": [0, 0], "uv_size": [0, 0]}
+							}
+						}
+					]
+				},
+				{
 					"name": "cock",
 					"parent": "Torso2",
 					"pivot": [-0.05, 11.85, -17.45],
@@ -22131,7 +22150,7 @@
 					]
 				},
 				{
-					"name": "bone10",
+					"name": "bone14",
 					"parent": "ballR",
 					"pivot": [-0.35, 12.28727, -17.8],
 					"rotation": [0, -45, 0],
@@ -22301,7 +22320,7 @@
 					]
 				},
 				{
-					"name": "bone11",
+					"name": "bone16",
 					"parent": "ballR",
 					"pivot": [-0.35, 12.28727, -17.8],
 					"rotation": [0, 45, 0],
@@ -22471,7 +22490,7 @@
 					]
 				},
 				{
-					"name": "bone12",
+					"name": "bone17",
 					"parent": "ballR",
 					"pivot": [-0.35, 12.28727, -17.8],
 					"cubes": [
@@ -24218,7 +24237,7 @@
 					]
 				},
 				{
-					"name": "bone13",
+					"name": "bone18",
 					"parent": "kneeR2",
 					"pivot": [4.25, 5.75, -18.25],
 					"cubes": [
@@ -24557,7 +24576,7 @@
 					]
 				},
 				{
-					"name": "bone14",
+					"name": "bone19",
 					"parent": "kneeR3",
 					"pivot": [-4.25, 5.75, -18.25],
 					"cubes": [
