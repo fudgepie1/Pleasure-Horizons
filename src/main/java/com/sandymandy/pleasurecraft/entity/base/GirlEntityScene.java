@@ -573,7 +573,7 @@ public class GirlEntityScene extends GirlEntity implements GeoEntity {
         this.setBoneVisibility(Slim , isPlayerModelSlim() && isActivePhase );
 
         this.setBoneVisibility(Wide , !isPlayerModelSlim() && isActivePhase );
-        this.setBoneSize("boobs", this.getBreastSize(), 25, 150);
+        this.setBoneSize("boobs", this.getBreastSize(), getBreastMinSize(), getBreastMaxSize());
         this.setBonePos("boobs", this.getBreastOffset());
         int bellySize = isPregnant()
                 ? MathHelper.lerp(getPregnancyProgress(), 100, getMaxBellySizeWhenPregnant())

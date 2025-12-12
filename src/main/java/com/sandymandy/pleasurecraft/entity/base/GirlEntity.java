@@ -306,6 +306,10 @@ public abstract class GirlEntity extends PathAwareEntity implements RangedAttack
         return PleasureCraftLangUtils.getStringFromKey("entity.pleasurecraft." + getGirlID());
     }
 
+    public int getBreastMinSize() { return 150; }
+
+    public int getBreastMaxSize() { return 25; }
+
     public int getSizeGUI(){return 20;}
 
     public float getYAxisGUI(){return 0.0625F;}

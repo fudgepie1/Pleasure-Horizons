@@ -1,5 +1,8 @@
 # Changelog
 
+## v0.6.2
+- Added Kobolds
+
 ## v0.6.1
 - Fixed the issue where girls in villagers would have tiny breasts
 - Added the ability to turn off shading
@@ -129,11 +132,3 @@ ___
 
 ___
 
-## TODO
-- [x] Fix the animation randomizer in the Scene.
-- [x] FreeCam integration
-- [x] Togglable Boob Window
-- [ ] Make the AI more advance.
-- [ ] Fix Attacking animation.
-- [ ] Fix Holding item.
-- [ ] Dialog.
