@@ -44,9 +44,6 @@ import java.util.List;
 
 public abstract class SettlementGirlEntityAI extends TameableGirlEntity implements SmartBrainOwner<SettlementGirlEntityAI>, SettlementMember {
     private Settlement settlement;
-    private LivingEntity attackTarget;
-    private int ticksSinceLastHit;
-    private static final int MAX_TICKS_NO_HIT = 20 * 20;
     private static final TrackedData<Boolean> SHOULD_TICK_BRAIN = DataTracker.registerData(SettlementGirlEntityAI.class, TrackedDataHandlerRegistry.BOOLEAN);
     protected SettlementGirlEntityAI(EntityType<? extends SettlementGirlEntityAI> entityType, World world) {
         super(entityType, world);
@@ -162,50 +159,6 @@ public abstract class SettlementGirlEntityAI extends TameableGirlEntity implemen
 //
 //        return map;
 //    }
-
-    @Override
-    public void tickMovement() {
-        super.tickMovement();
-
-        if (this.attackTarget != null) {
-            ticksSinceLastHit++;
-
-            if (ticksSinceLastHit >= MAX_TICKS_NO_HIT) {
-                // Lost interest — stop attacking
-                this.setTarget(null);
-                attackTarget = null;
-                ticksSinceLastHit = 0;
-            }
-        }
-
-        if(isInInventory()){
-            this.navigation.stop();
-        }
-    }
-
-    @Override
-    public void setTarget(@Nullable LivingEntity target) {
-        super.setTarget(target);
-
-        if (target != null) {
-            attackTarget = target;
-            ticksSinceLastHit = 0; // reset countdown on new target
-        } else {
-            attackTarget = null;
-            ticksSinceLastHit = 0;
-        }
-    }
-
-    @Override
-    public boolean tryAttack(ServerWorld world, Entity target) {
-        boolean success = super.tryAttack(world, target);
-
-        if (success && target == attackTarget) {
-            ticksSinceLastHit = 0; // reset timer on successful hit
-        }
-
-        return success;
-    }
 
     @Override
     public void tick() {

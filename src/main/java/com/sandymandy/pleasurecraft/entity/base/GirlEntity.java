@@ -83,14 +83,17 @@ public abstract class GirlEntity extends PathAwareEntity implements RangedAttack
     public Map<String, Vec2f> boneUVOffsets = new HashMap<>();
     public final Map<EquipmentSlot, Boolean> armorVisibility = new EnumMap<>(EquipmentSlot.class);
     public Vec3d previousVelocity = Vec3d.ZERO;
+    private static final int MAX_TICKS_NO_HIT = 20 * 20;
+    private int ticksSinceLastHit;
     public float previousYaw = 0;
     public float passengerYOffset = -0.8f;
-    public String currentAnimState = "idle";
     public boolean currentLoopState = false;
     public boolean currentHoldState = false;
+    private boolean guiOpenSate = false;
+    public String currentAnimState = "idle";
     public final GirlInventory inventory = GirlInventory.ofSize();
-    private boolean inInventory = false;
-
+    private LivingEntity attackTarget;
+    private PlayerEntity lookAtTarget;
 
     protected GirlEntity(EntityType<? extends GirlEntity> entityType, World world) {
         super(entityType, world);
@@ -158,12 +161,13 @@ public abstract class GirlEntity extends PathAwareEntity implements RangedAttack
         return this.dataTracker.get(LOCKED_STATE);
     }
 
-    public void setInInventory(boolean state) {
-        inInventory = state;
+    public void setGUIOpenState(boolean state, @Nullable PlayerEntity player) {
+        guiOpenSate = state;
+        lookAtTarget = player;
     }
 
-    public boolean isInInventory() {
-        return inInventory;
+    public boolean isGUIOpen() {
+        return guiOpenSate;
     }
 
     public void setSceneState(boolean inScene) {
@@ -660,5 +664,51 @@ public abstract class GirlEntity extends PathAwareEntity implements RangedAttack
         return ProjectileUtil.createArrowProjectile(this, arrow, damageModifier, shotFrom);
     }
 
+
+
+    @Override
+    public void tickMovement() {
+        super.tickMovement();
+
+        if (this.attackTarget != null) {
+            ticksSinceLastHit++;
+
+            if (ticksSinceLastHit >= MAX_TICKS_NO_HIT) {
+                // Lost interest — stop attacking
+                this.setTarget(null);
+                attackTarget = null;
+                ticksSinceLastHit = 0;
+            }
+        }
+
+        if(isGUIOpen() && lookAtTarget != null){
+            this.navigation.stop();
+            getLookControl().lookAt(lookAtTarget, this.getMaxHeadRotation() + 20, this.getMaxLookPitchChange());
+        }
+    }
+
+    @Override
+    public void setTarget(@Nullable LivingEntity target) {
+        super.setTarget(target);
+
+        if (target != null) {
+            attackTarget = target;
+            ticksSinceLastHit = 0; // reset countdown on new target
+        } else {
+            attackTarget = null;
+            ticksSinceLastHit = 0;
+        }
+    }
+
+    @Override
+    public boolean tryAttack(ServerWorld world, Entity target) {
+        boolean success = super.tryAttack(world, target);
+
+        if (success && target == attackTarget) {
+            ticksSinceLastHit = 0; // reset timer on successful hit
+        }
+
+        return success;
+    }
 
 }

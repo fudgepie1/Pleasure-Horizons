@@ -1,9 +1,11 @@
 package com.sandymandy.pleasurecraft.client.gui.screen;
 
 import com.sandymandy.pleasurecraft.PleasureCraft;
+import com.sandymandy.pleasurecraft.networking.C2S.SetGUIOpenStateC2SPacket;
 import com.sandymandy.pleasurecraft.networking.C2S.StartSceneC2SPacket;
 import com.sandymandy.pleasurecraft.util.variables.Scene;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
@@ -42,6 +44,7 @@ public class GirlSceneScreen extends Screen {
                         scene
                 ));
                 MinecraftClient.getInstance().setScreen(null); // close after sending
+                ClientPlayNetworking.send(new SetGUIOpenStateC2SPacket(this.entityId,false));
             }).dimensions(this.width / 2 - 100, y, 200, 20).build();
 
             if (this.currentRelationshipLevel < scene.requiredRelationshipLevel()) {
@@ -85,5 +88,16 @@ public class GirlSceneScreen extends Screen {
                     this.attractedTo.getName(),
                     mouseX, mouseY);
         }
+    }
+
+    @Override
+    public void close() {
+        super.close();
+        ClientPlayNetworking.send(new SetGUIOpenStateC2SPacket(this.entityId,false));
+    }
+
+    @Override
+    public boolean shouldPause() {
+        return false;
     }
 }

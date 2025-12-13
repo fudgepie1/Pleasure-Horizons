@@ -4,6 +4,8 @@ import com.sandymandy.pleasurecraft.entity.base.GirlEntity;
 import com.sandymandy.pleasurecraft.entity.base.wild.WildGirlEntity;
 import com.sandymandy.pleasurecraft.util.Colors;
 import com.sandymandy.pleasurecraft.util.variables.Scene;
+import net.minecraft.entity.EntityDimensions;
+import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
@@ -13,24 +15,39 @@ import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
-import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
 import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class KoboldEntity extends WildGirlEntity {
 
     // ===== Tracked Data =====
+    private static final TrackedData<Boolean> LEADER_STATE = DataTracker.registerData(KoboldEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<Integer> BODY_SIZE = DataTracker.registerData(KoboldEntity.class, TrackedDataHandlerRegistry.INTEGER);
+    private static final TrackedData<Integer> KOBOLD_HEALTH = DataTracker.registerData(KoboldEntity.class, TrackedDataHandlerRegistry.INTEGER);
     private static final TrackedData<Integer> PRIMARY_COLOR = DataTracker.registerData(KoboldEntity.class, TrackedDataHandlerRegistry.INTEGER);
     private static final TrackedData<Integer> SECONDARY_COLOR = DataTracker.registerData(KoboldEntity.class, TrackedDataHandlerRegistry.INTEGER);
     private static final TrackedData<Integer> IRIS_COLOR = DataTracker.registerData(KoboldEntity.class, TrackedDataHandlerRegistry.INTEGER);
     private static final TrackedData<Integer> TOP_HORN_TYPE = DataTracker.registerData(KoboldEntity.class, TrackedDataHandlerRegistry.INTEGER);
     private static final TrackedData<Integer> BOTTOM_HORN_TYPE = DataTracker.registerData(KoboldEntity.class, TrackedDataHandlerRegistry.INTEGER);
+    private static final TrackedData<Float> HITBOX_HEIGHT = DataTracker.registerData(KoboldEntity.class, TrackedDataHandlerRegistry.FLOAT);
+
+    // Hitbox scaling constants
+    private static final float MIN_HITBOX_HEIGHT = 1.0f;   // At size 65
+    private static final float MAX_HITBOX_HEIGHT = 1.75f;  // At size 115
+    private static final int MIN_BODY_SIZE = 65;
+    private static final int MAX_BODY_SIZE = 115;
+    private static final int MIN_HEALTH = 4;
+    private static final int MAX_HEALTH = 12;
+
+    // Track last hitbox height to avoid unnecessary recalculations
+    private float lastHitboxHeight = 1.0f;
 
     @Override
     protected Map<EquipmentSlot, List<String>> getArmorBones() {
@@ -51,14 +68,6 @@ public class KoboldEntity extends WildGirlEntity {
     @Override
     public int getBreastMinSize() {
         return 60;
-    }
-
-    public int getBodyMaxSize() {
-        return 115;
-    }
-
-    public int getBodyMinSize() {
-        return 65;
     }
 
     // Bone Categories
@@ -87,7 +96,7 @@ public class KoboldEntity extends WildGirlEntity {
         }
 
         return  bones;
-    };
+    }
 
     // ===== Horn Type Lists =====
     private final List<String> topHornType0 = List.of("hornUL0", "hornUR0");
@@ -114,23 +123,17 @@ public class KoboldEntity extends WildGirlEntity {
     @Override
     protected void initDataTracker(DataTracker.Builder builder) {
         super.initDataTracker(builder);
+        builder.add(LEADER_STATE, false);
         builder.add(BODY_SIZE, 100);
+        builder.add(KOBOLD_HEALTH, 6);
         builder.add(PRIMARY_COLOR, Colors.PEACH);
         builder.add(SECONDARY_COLOR, Colors.BANANA);
         builder.add(IRIS_COLOR, Colors.SKY_BLUE);
         builder.add(TOP_HORN_TYPE, 0);
         builder.add(BOTTOM_HORN_TYPE, 0);
+        builder.add(HITBOX_HEIGHT, calculateHitboxHeight(100));
     }
 
-    @Override
-    public void onSpawnPacket(EntitySpawnS2CPacket packet) {
-        super.onSpawnPacket(packet);
-        if (!this.getWorld().isClient()) {
-            randomizeAppearance();
-        }
-    }
-
-    // ===== Color Presets =====
     public enum PatternPresets {
         PEACH_BANANA(Colors.PEACH, Colors.BANANA),
         BLUE_WHITE(Colors.BLUE, Colors.WHITE),
@@ -149,10 +152,29 @@ public class KoboldEntity extends WildGirlEntity {
         }
     }
 
-    // ===== Randomization =====
+    /**
+     * Calculates hitbox height based on body size
+     * @param bodySize The body size (65-115)
+     * @return The calculated hitbox height (1.0-1.75)
+     */
+    private static float calculateHitboxHeight(int bodySize) {
+        // Clamp body size to valid range
+        int clampedSize = Math.clamp(bodySize, MIN_BODY_SIZE, MAX_BODY_SIZE);
+
+        // Linear interpolation between min and max heights
+        // Formula: height = minHeight + (size - minSize) * (maxHeight - minHeight) / (maxSize - minSize)
+        float normalizedSize = (float)(clampedSize - MIN_BODY_SIZE) / (MAX_BODY_SIZE - MIN_BODY_SIZE);
+        return MathHelper.lerp(normalizedSize, MIN_HITBOX_HEIGHT, MAX_HITBOX_HEIGHT);
+    }
+
     public void randomizeAppearance() {
+        // Random Health
+        int randomHealth = RANDOM.nextInt(MIN_HEALTH, MAX_HEALTH  + 1);
+        this.setKoboldHealth(randomHealth);
+
         // Random body size
-        this.setBodySize(RANDOM.nextInt(getBodyMinSize(), getBodyMaxSize()));
+        int randomBodySize = RANDOM.nextInt(MIN_BODY_SIZE, MAX_BODY_SIZE + 1);
+        this.setBodySize(randomBodySize);
 
         // Random color
         PatternPresets preset = PatternPresets.values()[RANDOM.nextInt(PatternPresets.values().length)];
@@ -162,22 +184,40 @@ public class KoboldEntity extends WildGirlEntity {
         this.setIrisColor(irisColor);
 
         // Random horn type
-        this.setTopHornType(RANDOM.nextInt(0, 7));
-        this.setBottomHornType(RANDOM.nextInt(0, 2));
+        this.setTopHornType(RANDOM.nextInt(0, 8));// 0-7 inclusive
+        this.setBottomHornType(RANDOM.nextInt(0, 3)); // 0-2 inclusive
 
         // Random breast size
-        this.setBreastSize(RANDOM.nextInt(getBreastMinSize(), getBreastMaxSize()));
+        this.setBreastSize(RANDOM.nextInt(getBreastMinSize(), getBreastMaxSize() + 1));
     }
 
-    // ===== Setters =====
     public void setColorPreset(PatternPresets preset) {
         this.dataTracker.set(PRIMARY_COLOR, preset.primary);
         this.dataTracker.set(SECONDARY_COLOR, preset.secondary);
         customizationApplied = false; // Mark for re-application
     }
 
+    public void setLeaderState(boolean state){
+        this.dataTracker.set(LEADER_STATE, state);
+    }
+
+    public void setKoboldHealth(int num) {
+        int clampedSize = Math.clamp(num, MIN_HEALTH, MAX_HEALTH);
+        this.dataTracker.set(KOBOLD_HEALTH, clampedSize);
+
+        customizationApplied = false;
+    }
+
     public void setBodySize(int size) {
-        this.dataTracker.set(BODY_SIZE, size);
+        int clampedSize = Math.clamp(size, MIN_BODY_SIZE, MAX_BODY_SIZE);
+        this.dataTracker.set(BODY_SIZE, clampedSize);
+
+        // Update hitbox height on server
+        if (!this.getWorld().isClient()) {
+            float newHeight = calculateHitboxHeight(clampedSize);
+            this.dataTracker.set(HITBOX_HEIGHT, newHeight);
+        }
+
         customizationApplied = false;
     }
 
@@ -205,20 +245,25 @@ public class KoboldEntity extends WildGirlEntity {
         this.dataTracker.set(BOTTOM_HORN_TYPE, Math.clamp(type, 0, 2));
         customizationApplied = false;
     }
-
-    // ===== Getters =====
+    public boolean getLeaderState() { return this.dataTracker.get(LEADER_STATE);}
+    public int getKoboldHealth() { return this.dataTracker.get(KOBOLD_HEALTH); }
     public int getBodySize() { return this.dataTracker.get(BODY_SIZE); }
     public int getPrimaryColor() { return this.dataTracker.get(PRIMARY_COLOR); }
     public int getSecondaryColor() { return this.dataTracker.get(SECONDARY_COLOR); }
     public int getIrisColor() { return this.dataTracker.get(IRIS_COLOR); }
     public int getTopHornType() { return this.dataTracker.get(TOP_HORN_TYPE); }
     public int getBottomHornType() { return this.dataTracker.get(BOTTOM_HORN_TYPE); }
+    private float getHitBoxHeight() { return this.dataTracker.get(HITBOX_HEIGHT); }
 
-    // ===== Apply Customizations =====
+    @Override
+    protected EntityDimensions getBaseDimensions(EntityPose pose) {
+        return EntityDimensions.changing(0.5f, getHitBoxHeight());
+    }
+
     private void applyCustomizations() {
         if (!this.getWorld().isClient()) return;
 
-        // Apply
+        this.setBoneVisibility(List.of("crown"), getLeaderState());
 
         // Apply colors
         this.overrideBoneColor(primaryBones(), getPrimaryColor());
@@ -258,13 +303,17 @@ public class KoboldEntity extends WildGirlEntity {
             case 2 -> this.setBoneVisibility(bottomHornType2, true);
         }
 
+        // Health
+        Objects.requireNonNull(this.getAttributeInstance(EntityAttributes.MAX_HEALTH))
+                .setBaseValue(getKoboldHealth());
         customizationApplied = true;
     }
 
-    // ===== Persistence =====
     @Override
     public void writeCustomData(WriteView view) {
         super.writeCustomData(view);
+        view.putBoolean("LeaderSate", getLeaderState());
+        view.putInt("KoboldHealth", getKoboldHealth());
         view.putInt("BodySize", getBodySize());
         view.putInt("PrimaryColor", getPrimaryColor());
         view.putInt("SecondaryColor", getSecondaryColor());
@@ -276,12 +325,18 @@ public class KoboldEntity extends WildGirlEntity {
     @Override
     public void readCustomData(ReadView view) {
         super.readCustomData(view);
-        this.dataTracker.set(BODY_SIZE, view.getInt("BodySize", 100));
+        int bodySize = view.getInt("BodySize", 100);
+        this.dataTracker.set(LEADER_STATE, view.getBoolean("LeaderSate", false));
+        this.dataTracker.set(KOBOLD_HEALTH, view.getInt("KoboldHealth", 6));
+        this.dataTracker.set(BODY_SIZE, bodySize);
+        this.dataTracker.set(HITBOX_HEIGHT, calculateHitboxHeight(bodySize));
         this.dataTracker.set(PRIMARY_COLOR, view.getInt("PrimaryColor", Colors.PEACH));
         this.dataTracker.set(SECONDARY_COLOR, view.getInt("SecondaryColor", Colors.BANANA));
         this.dataTracker.set(IRIS_COLOR, view.getInt("IrisColor", Colors.SKY_BLUE));
         this.dataTracker.set(TOP_HORN_TYPE, view.getInt("TopHornType", 0));
         this.dataTracker.set(BOTTOM_HORN_TYPE, view.getInt("BottomHornType", 0));
+
+        this.calculateDimensions();
         customizationApplied = false; // Re-apply on load
     }
 
@@ -289,12 +344,23 @@ public class KoboldEntity extends WildGirlEntity {
     public void tick() {
         super.tick();
 
-        // Only apply customizations when needed (on client side)
-        if (this.getWorld().isClient() && !customizationApplied) {
-            applyCustomizations();
+        // Server-side: Update hitbox if body size changed
+        if (!this.getWorld().isClient()) {
+            float currentHeight = calculateHitboxHeight(getBodySize());
+            if (Math.abs(currentHeight - lastHitboxHeight) > 0.001f) { // Small threshold to avoid floating point issues
+                lastHitboxHeight = currentHeight;
+                this.dataTracker.set(HITBOX_HEIGHT, currentHeight);
+                this.calculateDimensions();
+            }
         }
 
-        if(this.getWorld().isClient()) this.setBoneSize("body", getBodySize());
+        // Client-side: Apply customizations and bone size
+        if (this.getWorld().isClient()) {
+            if (!customizationApplied) {
+                applyCustomizations();
+            }
+            this.setBoneSize("body", getBodySize());
+        }
     }
 
     // ===== Data Tracker Changes =====
@@ -306,6 +372,11 @@ public class KoboldEntity extends WildGirlEntity {
         if (data.equals(PRIMARY_COLOR) || data.equals(SECONDARY_COLOR) ||
                 data.equals(IRIS_COLOR) || data.equals(TOP_HORN_TYPE) || data.equals(BOTTOM_HORN_TYPE)) {
             customizationApplied = false;
+        }
+
+        // Recalculate dimensions when hitbox height changes (client-side sync)
+        if (data.equals(HITBOX_HEIGHT)) {
+            this.calculateDimensions();
         }
     }
 

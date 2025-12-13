@@ -2,7 +2,7 @@ package com.sandymandy.pleasurecraft.client.gui.screen;
 
 import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.entity.base.tamable.TameableGirlEntity;
-import com.sandymandy.pleasurecraft.networking.C2S.InInventoryC2SPacket;
+import com.sandymandy.pleasurecraft.networking.C2S.SetGUIOpenStateC2SPacket;
 import com.sandymandy.pleasurecraft.registries.InventoryButtonRegistry;
 import com.sandymandy.pleasurecraft.screen.GirlInventoryScreenHandler;
 import com.sandymandy.pleasurecraft.screen.InventoryButtonAction;
@@ -80,7 +80,7 @@ public class GirlInventoryScreen extends HandledScreen<GirlInventoryScreenHandle
     @Override
     public void close() {
         super.close();
-        ClientPlayNetworking.send(new InInventoryC2SPacket(this.girl.getId(),false));
+        ClientPlayNetworking.send(new SetGUIOpenStateC2SPacket(this.girl.getId(),false));
     }
 
     private void drawButton(Text label, InventoryButtonAction action, int x, int y, int buttonWidth, int buttonHeight){
@@ -91,7 +91,7 @@ public class GirlInventoryScreen extends HandledScreen<GirlInventoryScreenHandle
                     if (girl != null && client != null && player != null) {
                         action.action().accept(girl, player);  // Run the button's logic
                         this.client.setScreen(null);
-                        ClientPlayNetworking.send(new InInventoryC2SPacket(this.girl.getId(),false));
+                        ClientPlayNetworking.send(new SetGUIOpenStateC2SPacket(this.girl.getId(),false));
                     }
                 }
         ).dimensions(x, y, buttonWidth, buttonHeight).build();

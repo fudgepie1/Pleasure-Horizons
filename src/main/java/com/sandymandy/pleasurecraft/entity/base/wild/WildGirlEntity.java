@@ -120,6 +120,7 @@ public abstract class WildGirlEntity extends GirlEntityScene {
             }
 
             if (stack.isEmpty() || getCurrentRelationshipLevel() > maxRelationshipLevel()) {
+                this.setGUIOpenState(true, player);
                 ServerPlayNetworking.send((ServerPlayerEntity) player, new SceneOptionsS2CPacket(this.getId(), this.getCurrentRelationshipLevel(), new ItemStack(isAttractedTo()), this.getScenes()));
                 return ActionResult.SUCCESS;
             }

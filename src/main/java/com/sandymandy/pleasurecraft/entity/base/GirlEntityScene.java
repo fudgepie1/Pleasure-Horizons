@@ -747,7 +747,7 @@ public class GirlEntityScene extends GirlEntity implements GeoEntity {
             controller.forceAnimationReset();
             return state.setAndContinue(
                     //Get a random animation out of the three
-                    RawAnimation.begin().then(getAnimationPath("attack" + RANDOM.nextInt(0, 2)), Animation.LoopType.PLAY_ONCE)
+                    RawAnimation.begin().then(getAnimationPath("attack" + RANDOM.nextInt(0, 3)), Animation.LoopType.PLAY_ONCE)
             );
         }
 

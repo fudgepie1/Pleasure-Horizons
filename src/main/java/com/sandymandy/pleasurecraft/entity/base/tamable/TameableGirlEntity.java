@@ -92,8 +92,7 @@ public class TameableGirlEntity extends GirlEntityScene implements Tameable {
                             }
                             else if (!this.isSceneActive()){
                                 player.openHandledScreen(new GirlInventoryScreenHandlerFactory(this));
-                                this.setInInventory(true);
-                                getLookControl().lookAt(player, this.getMaxHeadRotation() + 20, this.getMaxLookPitchChange());
+                                this.setGUIOpenState(true, player);
                                 return ActionResult.SUCCESS;
                             }
                         }
@@ -108,8 +107,7 @@ public class TameableGirlEntity extends GirlEntityScene implements Tameable {
                     if (itemStack.isEmpty() && player.isSneaking()) {
                         this.getNavigation().findPathTo(player, 20);
                         player.openHandledScreen(new GirlInventoryScreenHandlerFactory(this));
-                        this.setInInventory(true);
-                        getLookControl().lookAt(player, this.getMaxHeadRotation() + 20, this.getMaxLookPitchChange());
+                        this.setGUIOpenState(true, player);
                         return ActionResult.SUCCESS;
                     }
 

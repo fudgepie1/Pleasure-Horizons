@@ -22,7 +22,7 @@ public class PleasureCraftPackets {
         PayloadTypeRegistry.playC2S().register(CumKeybindC2SPacket.ID, CumKeybindC2SPacket.CODEC);
         PayloadTypeRegistry.playC2S().register(ThrustKeybindC2SPacket.ID, ThrustKeybindC2SPacket.CODEC);
         PayloadTypeRegistry.playC2S().register(StartSceneC2SPacket.ID, StartSceneC2SPacket.CODEC);
-        PayloadTypeRegistry.playC2S().register(InInventoryC2SPacket.ID, InInventoryC2SPacket.CODEC);
+        PayloadTypeRegistry.playC2S().register(SetGUIOpenStateC2SPacket.ID, SetGUIOpenStateC2SPacket.CODEC);
         PayloadTypeRegistry.playC2S().register(AnimationFinishC2SPacket.ID, AnimationFinishC2SPacket.CODEC);
         PayloadTypeRegistry.playC2S().register(ScenePhaseSyncC2SPacket.ID, ScenePhaseSyncC2SPacket.CODEC);
         PayloadTypeRegistry.playC2S().register(StopSceneOnServerC2SPacket.ID, StopSceneOnServerC2SPacket.CODEC);
@@ -126,11 +126,11 @@ public class PleasureCraftPackets {
                     }
                 }));
 
-        ServerPlayNetworking.registerGlobalReceiver(InInventoryC2SPacket.ID,
+        ServerPlayNetworking.registerGlobalReceiver(SetGUIOpenStateC2SPacket.ID,
                 (packet, context) -> Objects.requireNonNull(context.player().getServer()).execute(() -> {
                     var entity = context.player().getWorld().getEntityById(packet.entityId());
                     if (entity instanceof GirlEntityScene girl) {
-                        girl.setInInventory(packet.data());
+                        girl.setGUIOpenState(packet.data(), null);
                     }
                 }));
 
