@@ -2,6 +2,7 @@ package com.sandymandy.pleasurecraft.networking;
 
 import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.client.gui.screen.GirlCustomizeScreen;
+import com.sandymandy.pleasurecraft.client.gui.screen.KoboldCustomizeScreen;
 import com.sandymandy.pleasurecraft.client.models.AbstractGirlModel;
 import com.sandymandy.pleasurecraft.entity.base.GirlEntityScene;
 import com.sandymandy.pleasurecraft.client.gui.screen.hud.SceneProgressOverlay;
@@ -76,7 +77,12 @@ public class PleasureCraftClientPackets {
                 })
         );
 
-
+        ClientPlayNetworking.registerGlobalReceiver(
+                OpenKoboldCustomizeScreenS2CPacket.ID,
+                (packet, context) -> context.client().execute(() -> {
+                    MinecraftClient.getInstance().setScreen(new KoboldCustomizeScreen(packet.entityId(), packet.previewEntityId()));
+                })
+        );
 
     }
 }

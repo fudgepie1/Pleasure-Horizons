@@ -43,8 +43,7 @@ public class GirlSceneScreen extends Screen {
                         this.entityId,
                         scene
                 ));
-                MinecraftClient.getInstance().setScreen(null); // close after sending
-                ClientPlayNetworking.send(new SetGUIOpenStateC2SPacket(this.entityId,false));
+                this.close();
             }).dimensions(this.width / 2 - 100, y, 200, 20).build();
 
             if (this.currentRelationshipLevel < scene.requiredRelationshipLevel()) {

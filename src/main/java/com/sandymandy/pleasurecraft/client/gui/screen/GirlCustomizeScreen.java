@@ -112,7 +112,7 @@ public class GirlCustomizeScreen extends Screen {
                     new Vec3d(breastOffsetX, breastOffsetY, breastOffsetZ),
                     this.canGetImpregnated
             ));
-            MinecraftClient.getInstance().setScreen(null); // close screen
+            this.close(); // close screen
         }).dimensions(centerX - 100, y, 60, 20).build());
 
 //      Clear
@@ -123,12 +123,12 @@ public class GirlCustomizeScreen extends Screen {
                     new Vec3d(0, 0, 0),
                     this.canGetImpregnated
             ));
-            MinecraftClient.getInstance().setScreen(null); // close screen
+            this.close(); // close screen
         }).dimensions(centerX - 30, y, 60, 20).build());
 
 //      Cancel
         this.addDrawableChild(ButtonWidget.builder(Text.literal("Cancel"), button -> {
-            MinecraftClient.getInstance().setScreen(null);
+            this.close();
         }).dimensions(centerX + 40, y, 60, 20).build());    }
 
     private double parseDouble(String s) {

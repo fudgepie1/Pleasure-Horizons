@@ -48,6 +48,8 @@ import java.util.*;
 
 public abstract class GirlEntity extends PathAwareEntity implements RangedAttackMob {
     private static final TrackedData<Boolean> WAITING_AT_BED = DataTracker.registerData(GirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+    private static final TrackedData<Boolean> IS_TEMPORARY = DataTracker.registerData(GirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+    private static final TrackedData<Boolean> CREATED_CLONE = DataTracker.registerData(GirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<Boolean> LOCKED_STATE = DataTracker.registerData(GirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<Boolean> WAITING_FOR_PLAYER = DataTracker.registerData(GirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<Boolean> FROZEN_STATE = DataTracker.registerData(GirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
@@ -103,6 +105,8 @@ public abstract class GirlEntity extends PathAwareEntity implements RangedAttack
     protected void initDataTracker(DataTracker.Builder builder) {
         super.initDataTracker(builder);
         builder.add(WAITING_AT_BED, false);
+        builder.add(IS_TEMPORARY, false);
+        builder.add(CREATED_CLONE, false);
         builder.add(LOCKED_STATE, false);
         builder.add(FROZEN_STATE, false);
         builder.add(WAITING_FOR_PLAYER, false);
@@ -161,9 +165,9 @@ public abstract class GirlEntity extends PathAwareEntity implements RangedAttack
         return this.dataTracker.get(LOCKED_STATE);
     }
 
-    public void setGUIOpenState(boolean state, @Nullable PlayerEntity player) {
+    public void setGUIOpenState(boolean state, @Nullable PlayerEntity lookAt) {
         guiOpenSate = state;
-        lookAtTarget = player;
+        lookAtTarget = lookAt;
     }
 
     public boolean isGUIOpen() {
@@ -208,6 +212,22 @@ public abstract class GirlEntity extends PathAwareEntity implements RangedAttack
 
     public void setWaitingAtBedState(boolean state){
         this.dataTracker.set(WAITING_AT_BED, state);
+    }
+
+    public boolean isTemporary(){
+        return this.dataTracker.get(IS_TEMPORARY);
+    }
+
+    public void setTemporaryState(boolean state){
+        this.dataTracker.set(IS_TEMPORARY, state);
+    }
+
+    public boolean createdClone(){
+        return this.dataTracker.get(CREATED_CLONE);
+    }
+
+    public void setCreatedCloneState(boolean state){
+        this.dataTracker.set(CREATED_CLONE, state);
     }
 
     public boolean isWaitingForPlayer(){
@@ -310,9 +330,9 @@ public abstract class GirlEntity extends PathAwareEntity implements RangedAttack
         return PleasureCraftLangUtils.getStringFromKey("entity.pleasurecraft." + getGirlID());
     }
 
-    public int getBreastMinSize() { return 150; }
+    public int getBreastMinSize() { return 25; }
 
-    public int getBreastMaxSize() { return 25; }
+    public int getBreastMaxSize() { return 150; }
 
     public int getSizeGUI(){return 20;}
 

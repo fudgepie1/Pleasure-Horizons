@@ -90,8 +90,7 @@ public class GirlInventoryScreen extends HandledScreen<GirlInventoryScreenHandle
                 btn -> {
                     if (girl != null && client != null && player != null) {
                         action.action().accept(girl, player);  // Run the button's logic
-                        this.client.setScreen(null);
-                        ClientPlayNetworking.send(new SetGUIOpenStateC2SPacket(this.girl.getId(),false));
+                        this.close();
                     }
                 }
         ).dimensions(x, y, buttonWidth, buttonHeight).build();

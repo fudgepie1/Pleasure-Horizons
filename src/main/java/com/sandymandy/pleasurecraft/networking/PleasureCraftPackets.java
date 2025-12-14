@@ -3,11 +3,13 @@ package com.sandymandy.pleasurecraft.networking;
 import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.entity.base.GirlEntityScene;
 import com.sandymandy.pleasurecraft.entity.base.tamable.TameableGirlEntity;
+import com.sandymandy.pleasurecraft.entity.girls.KoboldEntity;
 import com.sandymandy.pleasurecraft.networking.C2S.*;
 import com.sandymandy.pleasurecraft.networking.S2C.*;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.world.ServerWorld;
 
 import java.util.Objects;
 
@@ -31,6 +33,8 @@ public class PleasureCraftPackets {
         PayloadTypeRegistry.playC2S().register(RegisterCustomGirlSoundC2SPacket.ID, RegisterCustomGirlSoundC2SPacket.CODEC);
         PayloadTypeRegistry.playC2S().register(RegisterCustomGirlRandomSoundC2SPacket.ID, RegisterCustomGirlRandomSoundC2SPacket.CODEC);
         PayloadTypeRegistry.playC2S().register(GirlCustomizeC2SPacket.ID, GirlCustomizeC2SPacket.CODEC);
+        PayloadTypeRegistry.playC2S().register(KoboldCustomizeC2SPacket.ID, KoboldCustomizeC2SPacket.CODEC);
+        PayloadTypeRegistry.playC2S().register(RemovePreviewEntityC2SPacket.ID, RemovePreviewEntityC2SPacket.CODEC);
 
 
 
@@ -41,6 +45,7 @@ public class PleasureCraftPackets {
         PayloadTypeRegistry.playS2C().register(OpenCustomizeScreenS2CPacket.ID, OpenCustomizeScreenS2CPacket.CODEC);
         PayloadTypeRegistry.playS2C().register(RefreshModelsS2CPacket.ID, RefreshModelsS2CPacket.CODEC);
         PayloadTypeRegistry.playS2C().register(PlayAttackAnimationS2CPacket.ID, PlayAttackAnimationS2CPacket.CODEC);
+        PayloadTypeRegistry.playS2C().register(OpenKoboldCustomizeScreenS2CPacket.ID, OpenKoboldCustomizeScreenS2CPacket.CODEC);
 
     }
 
@@ -174,6 +179,34 @@ public class PleasureCraftPackets {
                         girl.setBreastSize(packet.breastSize());
                         girl.setBreastOffset(packet.breastOffset());
                         girl.canGetImpregnatedState(packet.canGetImpregnated());
+                    }
+                }));
+
+        ServerPlayNetworking.registerGlobalReceiver(KoboldCustomizeC2SPacket.ID,
+                (packet, context) -> Objects.requireNonNull(context.player().getServer()).execute(() -> {
+                    var entity = context.player().getWorld().getEntityById(packet.entityId());
+                    if (entity instanceof KoboldEntity girl) {
+                        girl.setBodySize(packet.bodySize());
+                        girl.setKoboldBreastSize(packet.breastSize());
+                        girl.setPrimaryColor(packet.primaryColor());
+                        girl.setSecondaryColor(packet.secondaryColor());
+                        girl.setIrisColor(packet.irisColor());
+                        girl.setTopHornType(packet.topHornType());
+                        girl.setBottomHornType(packet.bottomHornType());
+                    }
+                }));
+
+        ServerPlayNetworking.registerGlobalReceiver(RemovePreviewEntityC2SPacket.ID,
+                (packet, context) -> Objects.requireNonNull(context.player().getServer()).execute(() -> {
+                    ServerWorld world = context.player().getWorld();
+                    var previewEntity = world.getEntityById(packet.previewEntityId());
+                    if (previewEntity instanceof KoboldEntity kobold) {
+                        kobold.discard();
+                    }
+
+                    var entity = world.getEntityById(packet.entityId());
+                    if (entity instanceof GirlEntityScene girl) {
+                        girl.setCreatedCloneState(false);
                     }
                 }));
 

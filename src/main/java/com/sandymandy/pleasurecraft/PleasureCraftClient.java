@@ -23,6 +23,9 @@ import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
+import software.bernie.geckolib.GeckoLib;
+import software.bernie.geckolib.loading.math.MathParser;
+import software.bernie.geckolib.loading.math.value.Variable;
 
 import static com.sandymandy.pleasurecraft.registries.PleasureCraftScreenHandlerRegistry.GIRL_INVENTORY_SCREEN_HANDLER;
 import static com.sandymandy.pleasurecraft.registries.PleasureCraftScreenHandlerRegistry.SETTLEMENT_HUB_SCREEN_HANDLER;
@@ -59,6 +62,7 @@ public class PleasureCraftClient implements ClientModInitializer {
                 AbstractGirlRenderer.updateShadingState();
             }
         });
+
     }
 
     public static boolean areIrisShadersDisabled() {

@@ -103,9 +103,9 @@ public abstract class WildGirlEntity extends GirlEntityScene {
     @Override
     public ActionResult interactMob(PlayerEntity player, Hand hand) {
         // no taming, no inventory, no following
+        ItemStack stack = player.getStackInHand(Hand.MAIN_HAND);
 
         if (!this.getWorld().isClient() && !this.isSceneActive()) {
-            ItemStack stack = player.getStackInHand(Hand.MAIN_HAND);
 
             if (stack.isOf(isAttractedTo())) {
                 if (getCurrentRelationshipLevel() < maxRelationshipLevel()) {

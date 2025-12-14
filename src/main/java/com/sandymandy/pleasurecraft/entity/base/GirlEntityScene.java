@@ -979,11 +979,11 @@ public class GirlEntityScene extends GirlEntity implements GeoEntity {
 
 
     private String getDefaultAnimation(AnimationTest<?> state) {
-        if (!this.isOnGround() && !isSitting() && !this.hasVehicle()) return "fly";
-        if (state.isMoving() && !isSitting() && !isRunning()) return "walk";
-        if (state.isMoving() && !isSitting() && isRunning()) return "run";
-        if (isSitting()) return "sit";
-        if (this.hasVehicle()) return "ride";
+        if (!this.isOnGround() && !isSitting() && !this.hasVehicle() && !isTemporary()) return "fly";
+        if (state.isMoving() && !isSitting() && !isRunning() && !isTemporary()) return "walk";
+        if (state.isMoving() && !isSitting() && isRunning() && !isTemporary()) return "run";
+        if (isSitting() && !isTemporary()) return "sit";
+        if (this.hasVehicle() && !isTemporary()) return "ride";
         return "idle";
     }
 
@@ -1215,6 +1215,12 @@ public class GirlEntityScene extends GirlEntity implements GeoEntity {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public boolean damage(ServerWorld world, DamageSource source, float amount) {
+        if(this.isTemporary()) return false;
+        return super.damage(world, source, amount);
     }
 
     @Override

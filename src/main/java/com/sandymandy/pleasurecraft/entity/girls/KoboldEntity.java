@@ -1,23 +1,34 @@
 package com.sandymandy.pleasurecraft.entity.girls;
 
+import com.sandymandy.pleasurecraft.client.gui.screen.GirlSceneScreen;
+import com.sandymandy.pleasurecraft.client.gui.screen.KoboldCustomizeScreen;
 import com.sandymandy.pleasurecraft.entity.base.GirlEntity;
 import com.sandymandy.pleasurecraft.entity.base.wild.WildGirlEntity;
+import com.sandymandy.pleasurecraft.networking.S2C.OpenKoboldCustomizeScreenS2CPacket;
+import com.sandymandy.pleasurecraft.registries.GirlRegistry;
 import com.sandymandy.pleasurecraft.util.Colors;
 import com.sandymandy.pleasurecraft.util.variables.Scene;
-import net.minecraft.entity.EntityDimensions;
-import net.minecraft.entity.EntityPose;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.EquipmentSlot;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.entity.*;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
@@ -30,6 +41,7 @@ public class KoboldEntity extends WildGirlEntity {
     // ===== Tracked Data =====
     private static final TrackedData<Boolean> LEADER_STATE = DataTracker.registerData(KoboldEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<Integer> BODY_SIZE = DataTracker.registerData(KoboldEntity.class, TrackedDataHandlerRegistry.INTEGER);
+    private static final TrackedData<Integer> KOBOLD_BREAST_SIZE = DataTracker.registerData(KoboldEntity.class, TrackedDataHandlerRegistry.INTEGER);
     private static final TrackedData<Integer> KOBOLD_HEALTH = DataTracker.registerData(KoboldEntity.class, TrackedDataHandlerRegistry.INTEGER);
     private static final TrackedData<Integer> PRIMARY_COLOR = DataTracker.registerData(KoboldEntity.class, TrackedDataHandlerRegistry.INTEGER);
     private static final TrackedData<Integer> SECONDARY_COLOR = DataTracker.registerData(KoboldEntity.class, TrackedDataHandlerRegistry.INTEGER);
@@ -62,7 +74,7 @@ public class KoboldEntity extends WildGirlEntity {
 
     @Override
     public int getBreastMaxSize() {
-        return 140;
+        return 160;
     }
 
     @Override
@@ -87,7 +99,7 @@ public class KoboldEntity extends WildGirlEntity {
     private List<String> ignoreBones() {
         List<String> bones = new ArrayList<>(List.of(
                 "hornUR", "hornUL", "hornDR", "hornDL", "mouth", "eyes",
-                "dotL", "dotR", "tailpack", "crown"
+                "dotL", "dotR", "tailpack", "crown", "tounge"
         ));
 
         for (List<String> boneNames : getArmorBones().values())
@@ -125,6 +137,7 @@ public class KoboldEntity extends WildGirlEntity {
         super.initDataTracker(builder);
         builder.add(LEADER_STATE, false);
         builder.add(BODY_SIZE, 100);
+        builder.add(KOBOLD_BREAST_SIZE, 100);
         builder.add(KOBOLD_HEALTH, 6);
         builder.add(PRIMARY_COLOR, Colors.PEACH);
         builder.add(SECONDARY_COLOR, Colors.BANANA);
@@ -188,7 +201,7 @@ public class KoboldEntity extends WildGirlEntity {
         this.setBottomHornType(RANDOM.nextInt(0, 3)); // 0-2 inclusive
 
         // Random breast size
-        this.setBreastSize(RANDOM.nextInt(getBreastMinSize(), getBreastMaxSize() + 1));
+        this.setKoboldBreastSize(RANDOM.nextInt(getBreastMinSize(), getBreastMaxSize() + 1));
     }
 
     public void setColorPreset(PatternPresets preset) {
@@ -205,6 +218,12 @@ public class KoboldEntity extends WildGirlEntity {
         int clampedSize = Math.clamp(num, MIN_HEALTH, MAX_HEALTH);
         this.dataTracker.set(KOBOLD_HEALTH, clampedSize);
 
+        customizationApplied = false;
+    }
+
+    public void setKoboldBreastSize(int size) {
+        int clampedSize = Math.clamp(size, MIN_BODY_SIZE, MAX_BODY_SIZE);
+        this.dataTracker.set(KOBOLD_BREAST_SIZE, clampedSize);
         customizationApplied = false;
     }
 
@@ -247,6 +266,7 @@ public class KoboldEntity extends WildGirlEntity {
     }
     public boolean getLeaderState() { return this.dataTracker.get(LEADER_STATE);}
     public int getKoboldHealth() { return this.dataTracker.get(KOBOLD_HEALTH); }
+    public int getKoboldBreastSize() { return this.dataTracker.get(KOBOLD_BREAST_SIZE); }
     public int getBodySize() { return this.dataTracker.get(BODY_SIZE); }
     public int getPrimaryColor() { return this.dataTracker.get(PRIMARY_COLOR); }
     public int getSecondaryColor() { return this.dataTracker.get(SECONDARY_COLOR); }
@@ -309,11 +329,34 @@ public class KoboldEntity extends WildGirlEntity {
         customizationApplied = true;
     }
 
+    /**
+     * Calculates breast Z offset based on breast size
+     * Size 60  → Z offset -0.875
+     * Size 100 → Z offset ~0
+     * Size 160 → Z offset 1.0
+     */
+    private static float calculateBreastZOffset(int breastSize) {
+        // Clamp breast size to valid range
+        int clampedSize = Math.clamp(breastSize, 60, 160);
+
+        // Two-segment linear interpolation for more accurate positioning
+        if (clampedSize <= 100) {
+            // From size 60 to 100: offset goes from -0.875 to 0
+            float normalizedSize = (float)(clampedSize - 60) / (100 - 60);
+            return MathHelper.lerp(normalizedSize, -0.875f, 0f);
+        } else {
+            // From size 100 to 160: offset goes from 0 to 1.0
+            float normalizedSize = (float)(clampedSize - 100) / (160 - 100);
+            return MathHelper.lerp(normalizedSize, 0f, 1.0f);
+        }
+    }
+
     @Override
     public void writeCustomData(WriteView view) {
         super.writeCustomData(view);
         view.putBoolean("LeaderSate", getLeaderState());
         view.putInt("KoboldHealth", getKoboldHealth());
+        view.putInt("KoboldBreastSize", getKoboldBreastSize());
         view.putInt("BodySize", getBodySize());
         view.putInt("PrimaryColor", getPrimaryColor());
         view.putInt("SecondaryColor", getSecondaryColor());
@@ -328,6 +371,7 @@ public class KoboldEntity extends WildGirlEntity {
         int bodySize = view.getInt("BodySize", 100);
         this.dataTracker.set(LEADER_STATE, view.getBoolean("LeaderSate", false));
         this.dataTracker.set(KOBOLD_HEALTH, view.getInt("KoboldHealth", 6));
+        this.dataTracker.set(KOBOLD_BREAST_SIZE, view.getInt("KoboldBreastSize", 100));
         this.dataTracker.set(BODY_SIZE, bodySize);
         this.dataTracker.set(HITBOX_HEIGHT, calculateHitboxHeight(bodySize));
         this.dataTracker.set(PRIMARY_COLOR, view.getInt("PrimaryColor", Colors.PEACH));
@@ -347,7 +391,7 @@ public class KoboldEntity extends WildGirlEntity {
         // Server-side: Update hitbox if body size changed
         if (!this.getWorld().isClient()) {
             float currentHeight = calculateHitboxHeight(getBodySize());
-            if (Math.abs(currentHeight - lastHitboxHeight) > 0.001f) { // Small threshold to avoid floating point issues
+            if (Math.abs(currentHeight - lastHitboxHeight) > 0.001f) {
                 lastHitboxHeight = currentHeight;
                 this.dataTracker.set(HITBOX_HEIGHT, currentHeight);
                 this.calculateDimensions();
@@ -359,7 +403,17 @@ public class KoboldEntity extends WildGirlEntity {
             if (!customizationApplied) {
                 applyCustomizations();
             }
+
+            // Apply body size
             this.setBoneSize("body", getBodySize());
+
+            // Apply breast size and position offset
+            int breastSize = getKoboldBreastSize();
+            this.setBoneSize("boobs", breastSize, getBreastMinSize(), getBreastMaxSize());
+
+            // Calculate and apply breast position offset based on size
+            float zOffset = calculateBreastZOffset(breastSize);
+            this.setBonePos("boobs", 0f, 0f, zOffset);
         }
     }
 
@@ -443,5 +497,46 @@ public class KoboldEntity extends WildGirlEntity {
                 .add(EntityAttributes.MAX_HEALTH, 15)
                 .add(EntityAttributes.MOVEMENT_SPEED, .12)
                 .add(EntityAttributes.ATTACK_DAMAGE, 2);
+    }
+
+    @Override
+    public ActionResult interactMob(PlayerEntity player, Hand hand) {
+        ItemStack stack = player.getStackInHand(Hand.MAIN_HAND);
+
+        if(stack.isOf(Items.STICK)){
+            this.setGUIOpenState(true, player);
+            if(!this.getWorld().isClient() && !createdClone()){
+                // Create preview entity on server
+                KoboldEntity previewEntity = GirlRegistry.KOBOLD.create(this.getWorld(), SpawnReason.EVENT);
+
+                // Copy all appearance settings from the real entity to preview
+                previewEntity.setTemporaryState(true);
+                previewEntity.setBodySize(this.getBodySize());
+                previewEntity.setKoboldBreastSize(this.getKoboldBreastSize());
+                previewEntity.setPrimaryColor(this.getPrimaryColor());
+                previewEntity.setSecondaryColor(this.getSecondaryColor());
+                previewEntity.setIrisColor(this.getIrisColor());
+                previewEntity.setTopHornType(this.getTopHornType());
+                previewEntity.setBottomHornType(this.getBottomHornType());
+                previewEntity.setLeaderState(this.getLeaderState());
+                previewEntity.setKoboldHealth(this.getKoboldHealth());
+
+                // Position the preview entity far away so it's not visible in the world
+                // Use a position far below the world to ensure it's never seen
+                previewEntity.setPosition(player.getX(), 800, player.getZ());
+                previewEntity.setInvisible(true); // Make it invisible in world
+                previewEntity.setInvulnerable(true); // Prevent damage
+                previewEntity.setNoGravity(true); // Prevent falling
+
+                // Spawn the preview entity
+                this.getWorld().spawnEntity(previewEntity);
+                this.setCreatedCloneState(true);
+                // Send packet with both entity IDs
+                ServerPlayNetworking.send((ServerPlayerEntity) player,
+                        new OpenKoboldCustomizeScreenS2CPacket(this.getId(), previewEntity.getId()));
+            }
+        }
+
+        return super.interactMob(player, hand);
     }
 }
