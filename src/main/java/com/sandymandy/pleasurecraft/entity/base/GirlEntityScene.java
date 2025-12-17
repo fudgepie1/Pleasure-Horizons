@@ -697,7 +697,7 @@ public class GirlEntityScene extends GirlEntity implements GeoEntity {
                 this.setPregnancyTicks(this.getPregnancyTicks() - 1);
 
                 // Pregnancy completed
-                if (this.getPregnancyTicks() >= 0) {
+                if (this.getPregnancyTicks() <= 0) {
                     pregnancyFinished();
                 }
             }

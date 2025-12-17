@@ -4,6 +4,7 @@
 - Added Kobolds
 - Added a menu to customize the Kobolds
 - Added a new masturbation scene to lucy
+- Made the pregnancy progress save
 
 ## v0.6.1
 - Fixed the issue where girls in villagers would have tiny breasts
