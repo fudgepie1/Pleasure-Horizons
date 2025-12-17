@@ -48,6 +48,8 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.sound.SoundEvent;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
@@ -83,7 +85,6 @@ public class GirlEntityScene extends GirlEntity implements GeoEntity {
     private static final TrackedData<Boolean> THRUSTING = DataTracker.registerData(GirlEntityScene.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<Integer> INTRO_INDEX = DataTracker.registerData(GirlEntityScene.class, TrackedDataHandlerRegistry.INTEGER);
     private static final TrackedData<Integer> PREGNANCY_TICKS = DataTracker.registerData(GirlEntityScene.class, TrackedDataHandlerRegistry.INTEGER);
-    private static final TrackedData<Integer> PREGNANCY_DURATION = DataTracker.registerData(GirlEntityScene.class, TrackedDataHandlerRegistry.INTEGER);
     private static final TrackedData<Integer> STATIONARY_INDEX = DataTracker.registerData(GirlEntityScene.class, TrackedDataHandlerRegistry.INTEGER);
     public static final TrackedData<Optional<UUID>> CURRENT_SCENE_PLAYER = DataTracker.registerData(GirlEntityScene.class, PleasureCraftTrackedDataRegistry.OPTIONAL_UUID);
     private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
@@ -97,7 +98,7 @@ public class GirlEntityScene extends GirlEntity implements GeoEntity {
     public String passengerBoneName = "boyCam"; //The name of the bone that the player snaps to when in a scene
     private String lastSoundKey = null;
     BlockPos bedPos;
-    private static final int PREGNANCY_DUR = 20 * 60 * 5; // 5 minutes
+    private static final int PREGNANCY_MAX_TICKS = (int) (20 * 60 * 2.5); // 5 minutes
     private static final float PROGRESS_SPEED = 0.1f;
     private boolean swinging = false;
     private long lastSwing = 0L;
@@ -123,7 +124,6 @@ public class GirlEntityScene extends GirlEntity implements GeoEntity {
         builder.add(STATIONARY_LOOP,0);
         builder.add(STATIONARY_LOOP_THRESHOLD,0);
         builder.add(PREGNANCY_TICKS,0);
-        builder.add(PREGNANCY_DURATION, PREGNANCY_DUR);
         builder.add(THRUSTING,false);
         builder.add(INTRO_INDEX, 0);
         builder.add(STATIONARY_INDEX, 0);
@@ -232,14 +232,6 @@ public class GirlEntityScene extends GirlEntity implements GeoEntity {
         for (String boneName : bones) {
             this.boneVisibility.put(boneName, visible);
         }
-    }
-
-    public void setPregnancyDuration(int progress){
-        this.dataTracker.set(PREGNANCY_DURATION, progress);
-    }
-
-    public int getPregnancyDuration(){
-        return this.dataTracker.get(PREGNANCY_DURATION);
     }
 
     public void setPregnancyTicks(int progress){
@@ -384,7 +376,7 @@ public class GirlEntityScene extends GirlEntity implements GeoEntity {
 
     public float getPregnancyProgress() {
         if (!isPregnant()) return 0f;
-        return 1f - (getPregnancyTicks() / (float) getPregnancyDuration());
+        return 1f - (getPregnancyTicks() / (float) PREGNANCY_MAX_TICKS);
     }
 
     public void startScene(PlayerEntity player, Scene option) {
@@ -555,31 +547,33 @@ public class GirlEntityScene extends GirlEntity implements GeoEntity {
         }
     }
 
-    private void modelLogic(){
+    public void modelLogic(){
         if(!this.getWorld().isClient()) return;
         boolean isActivePhase = switch (getCurrentScenePhase()) {
             case NONE, BED_IDLE, LAYING_DOWN -> false; // Inactive/resting
             default -> true; // Active NSFW phases
         };
 
-        this.overrideBoneColor(List.of("nut"), ModConfig.INSTANCE.player.penisHeadColor);
-        this.overrideBoneColor(List.of("shaft", "ballL", "ballR"), ModConfig.INSTANCE.player.penisShaftColor);
+        if(!getCurrentScene().hidePlayer()) {
+            this.overrideBoneColor(List.of("nut"), ModConfig.INSTANCE.player.penisHeadColor);
+            this.overrideBoneColor(List.of("shaft", "ballL", "ballR"), ModConfig.INSTANCE.player.penisShaftColor);
 
-        this.setBoneVisibility(List.of("RightLeg", "LeftLeg", "Torso2"), isActivePhase );
+            this.setBoneVisibility(List.of("RightLeg", "LeftLeg", "Torso2"), isActivePhase);
 
-        List<String> Slim = List.of("rightArmAlex", "rightLowerArmAlex", "leftLowerArmAlex", "leftArmAlex");
-        List<String> Wide = List.of("rightArmSteve", "rightLowerArmSteve", "leftLowerArmSteve", "leftArmSteve");
+            List<String> Slim = List.of("rightArmAlex", "rightLowerArmAlex", "leftLowerArmAlex", "leftArmAlex");
+            List<String> Wide = List.of("rightArmSteve", "rightLowerArmSteve", "leftLowerArmSteve", "leftArmSteve");
 
-        this.setBoneVisibility(Slim , isPlayerModelSlim() && isActivePhase );
+            this.setBoneVisibility(Slim, isPlayerModelSlim() && isActivePhase);
 
-        this.setBoneVisibility(Wide , !isPlayerModelSlim() && isActivePhase );
-        this.setBoneSize("boobs", this.getBreastSize(), getBreastMinSize(), getBreastMaxSize());
-        this.setBonePos("boobs", this.getBreastOffset());
+            this.setBoneVisibility(Wide, !isPlayerModelSlim() && isActivePhase);
+        }
+
         int bellySize = isPregnant()
                 ? MathHelper.lerp(getPregnancyProgress(), 100, getMaxBellySizeWhenPregnant())
                 : 100;
 
-        this.setBoneSize("belly", bellySize);    }
+        this.setBoneSize("belly", bellySize);
+    }
 
     private void keyFrameEventHandler() {
         String key = getAnimationKeyFrameEvent();
@@ -687,14 +681,10 @@ public class GirlEntityScene extends GirlEntity implements GeoEntity {
         if(!this.getWorld().isClient()) {
             handleSceneSpeed();
 
-            if(amountOfUnprotectedSex() >= maxAmountOfSexUntilImpregnation()){
+            if(amountOfUnprotectedSex() >= maxAmountOfSexUntilImpregnation() && !isPregnant()){
                 this.setPregnantState(true);
+                this.setPregnancyTicks(PREGNANCY_MAX_TICKS); // Start pregnancy timer
                 this.setAmountOfUnprotectedSex(0);
-            }
-
-            if(isPregnant() != wasPregnantLastTick){
-                this.setPregnancyTicks(this.getPregnancyDuration());
-                wasPregnantLastTick = isPregnant();
             }
 
             if(!canGetImpregnated()){
@@ -707,7 +697,7 @@ public class GirlEntityScene extends GirlEntity implements GeoEntity {
                 this.setPregnancyTicks(this.getPregnancyTicks() - 1);
 
                 // Pregnancy completed
-                if (this.getPregnancyTicks()     == 0) {
+                if (this.getPregnancyTicks() >= 0) {
                     pregnancyFinished();
                 }
             }
@@ -1237,6 +1227,18 @@ public class GirlEntityScene extends GirlEntity implements GeoEntity {
     public boolean isCurrentScenePlayer(PlayerEntity player){
         if(this.getScenePlayer() == null) return false;
         return this.getScenePlayer().getUuid().equals(player.getUuid());
+    }
+
+    @Override
+    public void writeCustomData(WriteView view) {
+        super.writeCustomData(view);
+        view.putInt("PregnancyTicks", this.getPregnancyTicks());
+    }
+
+    @Override
+    public void readCustomData(ReadView view) {
+        super.readCustomData(view);
+        this.setPregnancyTicks(view.getInt("PregnancyTicks", 0));
     }
 
     private static class SoundKeyframeHandler implements AnimationController.KeyframeEventHandler<GirlEntityScene, SoundKeyframeData> {

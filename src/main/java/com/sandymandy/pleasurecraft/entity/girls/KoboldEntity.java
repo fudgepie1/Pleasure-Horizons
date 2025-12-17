@@ -55,6 +55,8 @@ public class KoboldEntity extends WildGirlEntity {
     private static final float MAX_HITBOX_HEIGHT = 1.75f;  // At size 115
     private static final int MIN_BODY_SIZE = 65;
     private static final int MAX_BODY_SIZE = 115;
+    private static final int MIN_BREAST_SIZE = 60;
+    private static final int MAX_BREAST_SIZE = 160;
     private static final int MIN_HEALTH = 4;
     private static final int MAX_HEALTH = 12;
 
@@ -70,16 +72,6 @@ public class KoboldEntity extends WildGirlEntity {
                 "armorBootyR", "armorKneeR", "armorKneeL"
         ));
         return bones;
-    }
-
-    @Override
-    public int getBreastMaxSize() {
-        return 160;
-    }
-
-    @Override
-    public int getBreastMinSize() {
-        return 60;
     }
 
     // Bone Categories
@@ -201,7 +193,7 @@ public class KoboldEntity extends WildGirlEntity {
         this.setBottomHornType(RANDOM.nextInt(0, 3)); // 0-2 inclusive
 
         // Random breast size
-        this.setKoboldBreastSize(RANDOM.nextInt(getBreastMinSize(), getBreastMaxSize() + 1));
+        this.setKoboldBreastSize(RANDOM.nextInt(MIN_BREAST_SIZE , MAX_BREAST_SIZE + 1));
     }
 
     public void setColorPreset(PatternPresets preset) {
@@ -222,7 +214,7 @@ public class KoboldEntity extends WildGirlEntity {
     }
 
     public void setKoboldBreastSize(int size) {
-        int clampedSize = Math.clamp(size, MIN_BODY_SIZE, MAX_BODY_SIZE);
+        int clampedSize = Math.clamp(size, MIN_BREAST_SIZE, MAX_BREAST_SIZE);
         this.dataTracker.set(KOBOLD_BREAST_SIZE, clampedSize);
         customizationApplied = false;
     }
@@ -409,7 +401,7 @@ public class KoboldEntity extends WildGirlEntity {
 
             // Apply breast size and position offset
             int breastSize = getKoboldBreastSize();
-            this.setBoneSize("boobs", breastSize, getBreastMinSize(), getBreastMaxSize());
+            this.setBoneSize("boobs", breastSize, MIN_BREAST_SIZE, MAX_BREAST_SIZE);
 
             // Calculate and apply breast position offset based on size
             float zOffset = calculateBreastZOffset(breastSize);

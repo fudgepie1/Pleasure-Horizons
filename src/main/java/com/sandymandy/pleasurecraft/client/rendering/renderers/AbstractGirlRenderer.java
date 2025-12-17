@@ -302,7 +302,6 @@ public abstract class AbstractGirlRenderer<T extends GirlEntityScene, R extends 
         }
 
         VertexConsumer targetBuffer = buffer;
-
         int targetColor = renderColor;
 
         // Still allow UV offset

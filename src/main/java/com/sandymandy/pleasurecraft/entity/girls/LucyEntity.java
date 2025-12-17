@@ -34,6 +34,14 @@ public class LucyEntity extends SettlementGirlEntityAI {
     @Override
     public List<Scene> getScenes() {
         return List.of(
+
+                Scene.stationary("Masterbation",
+                        4,
+                        "masturbating",
+                        4,
+                        true,
+                        true),
+
                 Scene.onPlayer("Paizuri",
                         6,
                         List.of("paizuri_intro"),

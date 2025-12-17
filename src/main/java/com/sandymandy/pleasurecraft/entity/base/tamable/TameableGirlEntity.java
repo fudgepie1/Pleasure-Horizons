@@ -200,6 +200,13 @@ public class TameableGirlEntity extends GirlEntityScene implements Tameable {
         }
     }
 
+    @Override
+    public void modelLogic() {
+        super.modelLogic();
+        this.setBoneSize("boobs", this.getBreastSize(), getBreastMinSize(), getBreastMaxSize());
+        this.setBonePos("boobs", this.getBreastOffset());
+    }
+
     private void tryTame(PlayerEntity player) {
         if (this.random.nextInt(3) == 0) {
             this.setTamedBy(player);

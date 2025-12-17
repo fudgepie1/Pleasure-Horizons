@@ -99,7 +99,6 @@ public class CustomGirlParser {
                         s.has("use_keyframe") && s.get("use_keyframe").getAsBoolean(),
                         s.has("counts_towards_impregnation") && s.get("counts_towards_impregnation").getAsBoolean(),
                         s.has("lay_down_anim") ? s.get("lay_down_anim").getAsString() : "",
-
                         s.has("idle_anim") ? s.get("idle_anim").getAsString() : ""
                 );
 
@@ -110,7 +109,8 @@ public class CustomGirlParser {
                         jsonArrayToList(s.getAsJsonArray("intro_anim")),
                         s.get("anim").getAsString(),
                         s.get("amount_of_loops").getAsInt(),
-                        needsStrip
+                        needsStrip,
+                        s.has("hide_player") && s.get("hide_player").getAsBoolean()
                 );
 
             case "stationary":
@@ -119,7 +119,8 @@ public class CustomGirlParser {
                         level,
                         s.get("anim").getAsString(),
                         s.get("amount_of_loops").getAsInt(),
-                        needsStrip
+                        needsStrip,
+                        s.has("hide_player") && s.get("hide_player").getAsBoolean()
                 );
 
             default:

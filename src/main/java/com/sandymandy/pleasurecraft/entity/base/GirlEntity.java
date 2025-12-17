@@ -346,7 +346,7 @@ public abstract class GirlEntity extends PathAwareEntity implements RangedAttack
 
     public int getMaxBellySizeWhenPregnant() { return 450;}
 
-    public int maxAmountOfSexUntilImpregnation(){return 5;}
+    public int maxAmountOfSexUntilImpregnation(){return 3;}
 
     public boolean hasStripAnim() {
         return true;

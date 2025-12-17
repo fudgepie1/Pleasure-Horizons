@@ -14,7 +14,7 @@ public class UnlitNormalVertexConsumer implements VertexConsumer {
     @Override
     public VertexConsumer normal(float x, float y, float z) {
         // force unlit normals
-        return parent.normal(1, 1, 1);
+        return parent.normal(.6f, .6f, .6f);
     }
 
     @Override

@@ -2,6 +2,8 @@
 
 ## v0.6.2
 - Added Kobolds
+- Added a menu to customize the Kobolds
+- Added a new masturbation scene to lucy
 
 ## v0.6.1
 - Fixed the issue where girls in villagers would have tiny breasts

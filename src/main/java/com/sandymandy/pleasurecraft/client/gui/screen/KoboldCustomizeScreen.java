@@ -5,7 +5,6 @@ import com.sandymandy.pleasurecraft.entity.girls.KoboldEntity;
 import com.sandymandy.pleasurecraft.networking.C2S.KoboldCustomizeC2SPacket;
 import com.sandymandy.pleasurecraft.networking.C2S.RemovePreviewEntityC2SPacket;
 import com.sandymandy.pleasurecraft.networking.C2S.SetGUIOpenStateC2SPacket;
-import com.sandymandy.pleasurecraft.registries.GirlRegistry;
 import com.sandymandy.pleasurecraft.util.Colors;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.MinecraftClient;
@@ -14,9 +13,13 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.SliderWidget;
-import net.minecraft.entity.SpawnReason;
 import net.minecraft.text.Text;
 import net.minecraft.world.World;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static com.sandymandy.pleasurecraft.util.Utils.getFormattedByUnderscore;
 import static net.minecraft.client.gui.screen.ingame.InventoryScreen.drawEntity;
@@ -24,7 +27,6 @@ import static net.minecraft.client.gui.screen.ingame.InventoryScreen.drawEntity;
 public class KoboldCustomizeScreen extends Screen {
 
     private final int entityId;
-    private final KoboldEntity entity;
     private final KoboldEntity previewEntity;
 
     // Customization values
@@ -35,6 +37,11 @@ public class KoboldCustomizeScreen extends Screen {
     private int irisColor;
     private int topHornType;
     private int bottomHornType;
+
+    // Button groups for selection tracking
+    private final Map<String, List<ButtonWidget>> buttonGroups = new HashMap<>();
+    private final Map<ButtonWidget, String> buttonToGroup = new HashMap<>();
+    private final Map<String, ButtonWidget> selectedButtons = new HashMap<>();
 
     // Scroll offset
     private double scrollOffset = 0;
@@ -47,26 +54,66 @@ public class KoboldCustomizeScreen extends Screen {
     public KoboldCustomizeScreen(int entityId, int previewEntityId) {
         super(Text.literal("Customize Kobold"));
         this.entityId = entityId;
-        // Create preview entity (client-side only)
+
         World world = MinecraftClient.getInstance().world;
         this.previewEntity = (KoboldEntity) world.getEntityById(previewEntityId);
-        this.entity = (KoboldEntity) world.getEntityById(entityId);
+        KoboldEntity entity = (KoboldEntity) world.getEntityById(entityId);
 
-        // Store current values
-        this.bodySize = this.entity.getBodySize();
-        this.breastSize = this.entity.getBreastSize();
-        this.primaryColor = this.entity.getPrimaryColor();
-        this.secondaryColor = this.entity.getSecondaryColor();
-        this.irisColor = this.entity.getIrisColor();
-        this.topHornType = this.entity.getTopHornType();
-        this.bottomHornType = this.entity.getBottomHornType();
+        this.bodySize = entity.getBodySize();
+        this.breastSize = entity.getBreastSize();
+        this.primaryColor = entity.getPrimaryColor();
+        this.secondaryColor = entity.getSecondaryColor();
+        this.irisColor = entity.getIrisColor();
+        this.topHornType = entity.getTopHornType();
+        this.bottomHornType = entity.getBottomHornType();
+    }
 
+    /**
+     * Helper method to create a selectable button that's part of a group
+     */
+    private ButtonWidget createSelectableButton(String groupId, Text message, int x, int y, int width, int height, ButtonWidget.PressAction onPress) {
+        ButtonWidget button = ButtonWidget.builder(message, btn -> {
+            selectButton(groupId, btn);
+            onPress.onPress(btn);
+        }).dimensions(x, y, width, height).build();
+
+        // Track this button in its group
+        buttonGroups.computeIfAbsent(groupId, k -> new ArrayList<>()).add(button);
+        buttonToGroup.put(button, groupId);
+
+        return button;
+    }
+
+    /**
+     * Select a button and deselect others in the same group
+     */
+    private void selectButton(String groupId, ButtonWidget button) {
+        // Deselect previous button in group
+        ButtonWidget previouslySelected = selectedButtons.get(groupId);
+        if (previouslySelected != null) {
+            previouslySelected.active = true;
+        }
+
+        // Select new button
+        button.active = false;
+        selectedButtons.put(groupId, button);
+    }
+
+    /**
+     * Mark initial selection without triggering the press action
+     */
+    private void markAsSelected(String groupId, ButtonWidget button) {
+        button.active = false;
+        selectedButtons.put(groupId, button);
     }
 
     @Override
     protected void init() {
         // Clear previous widgets
         this.clearChildren();
+        buttonGroups.clear();
+        buttonToGroup.clear();
+        selectedButtons.clear();
 
         // Calculate layout dimensions
         int previewWidth = this.width / 4;
@@ -75,8 +122,8 @@ public class KoboldCustomizeScreen extends Screen {
 
         int startY = 20;
         int currentY = startY - (int)scrollOffset;
-        int contentWidth = Math.min(400, menuWidth - 40); // Max 400px or fit to screen
-        int centerX = menuStartX + (menuWidth - contentWidth) / 2; // Center in menu area
+        int contentWidth = Math.min(400, menuWidth - 40);
+        int centerX = menuStartX + (menuWidth - contentWidth) / 2;
 
         // Title
         this.addDrawableChild(new net.minecraft.client.gui.widget.TextWidget(
@@ -109,7 +156,7 @@ public class KoboldCustomizeScreen extends Screen {
         // === BREAST SIZE SLIDER ===
         SliderWidget breastSlider = new SliderWidget(centerX, currentY, contentWidth, 20,
                 Text.literal("Breast Size: " + breastSize),
-                (breastSize - 60f) / 55f
+                (breastSize - 60f) / 100f
         ) {
             @Override
             protected void updateMessage() {
@@ -118,11 +165,11 @@ public class KoboldCustomizeScreen extends Screen {
 
             @Override
             protected void applyValue() {
-                breastSize = 60 + (int)(this.value * 55);
+                breastSize = 60 + (int)(this.value * 100);
                 applyPreviewSettings();
             }
         };
-        breastSlider.setTooltip(Tooltip.of(Text.literal("Adjust breast size (60-115)")));
+        breastSlider.setTooltip(Tooltip.of(Text.literal("Adjust breast size (60-160)")));
         this.addDrawableChild(breastSlider);
         currentY += 30;
 
@@ -135,7 +182,7 @@ public class KoboldCustomizeScreen extends Screen {
         currentY += 20;
 
         KoboldEntity.PatternPresets[] presets = KoboldEntity.PatternPresets.values();
-        int buttonWidth = (contentWidth - 5) / 2; // Two columns with 5px gap
+        int buttonWidth = (contentWidth - 5) / 2;
         for (int i = 0; i < presets.length; i++) {
             KoboldEntity.PatternPresets preset = presets[i];
             int row = i / 2;
@@ -143,16 +190,23 @@ public class KoboldCustomizeScreen extends Screen {
             int btnX = centerX + (col * (buttonWidth + 5));
             int btnY = currentY + (row * 25);
 
-            ButtonWidget presetBtn = ButtonWidget.builder(
+            ButtonWidget presetBtn = createSelectableButton(
+                    "color_preset",
                     Text.literal(getFormattedByUnderscore(preset.name())),
+                    btnX, btnY, buttonWidth, 20,
                     button -> {
                         primaryColor = preset.primary;
                         secondaryColor = preset.secondary;
                         applyPreviewSettings();
                     }
-            ).dimensions(btnX, btnY, buttonWidth, 20).build();
+            );
 
             this.addDrawableChild(presetBtn);
+
+            // Mark current preset as selected
+            if (preset.primary == primaryColor && preset.secondary == secondaryColor) {
+                markAsSelected("color_preset", presetBtn);
+            }
         }
         currentY += ((presets.length + 1) / 2) * 25 + 10;
 
@@ -171,7 +225,7 @@ public class KoboldCustomizeScreen extends Screen {
                 Colors.WHITE, Colors.GRAY, Colors.BLACK
         };
 
-        int colorButtonWidth = (contentWidth - 10) / 3; // Three columns with gaps
+        int colorButtonWidth = (contentWidth - 10) / 3;
         for (int i = 0; i < commonColors.length; i++) {
             int row = i / 3;
             int col = i % 3;
@@ -179,15 +233,22 @@ public class KoboldCustomizeScreen extends Screen {
             int btnY = currentY + (row * 25);
             int color = commonColors[i];
 
-            ButtonWidget colorBtn = ButtonWidget.builder(
+            ButtonWidget colorBtn = createSelectableButton(
+                    "iris_color",
                     Text.literal("■").styled(style -> style.withColor(color)),
+                    btnX, btnY, colorButtonWidth, 20,
                     button -> {
                         irisColor = color;
                         applyPreviewSettings();
                     }
-            ).dimensions(btnX, btnY, colorButtonWidth, 20).build();
+            );
 
             this.addDrawableChild(colorBtn);
+
+            // Mark current color as selected
+            if (color == irisColor) {
+                markAsSelected("iris_color", colorBtn);
+            }
         }
         currentY += ((commonColors.length + 2) / 3) * 25 + 10;
 
@@ -199,7 +260,7 @@ public class KoboldCustomizeScreen extends Screen {
         ));
         currentY += 20;
 
-        int hornButtonWidth = (contentWidth - 15) / 4; // Four columns
+        int hornButtonWidth = (contentWidth - 15) / 4;
         for (int i = 0; i < 8; i++) {
             int row = i / 4;
             int col = i % 4;
@@ -207,15 +268,22 @@ public class KoboldCustomizeScreen extends Screen {
             int btnY = currentY + (row * 25);
             final int hornType = i;
 
-            ButtonWidget hornBtn = ButtonWidget.builder(
+            ButtonWidget hornBtn = createSelectableButton(
+                    "top_horn",
                     Text.literal("Type " + i),
+                    btnX, btnY, hornButtonWidth, 20,
                     button -> {
                         topHornType = hornType;
                         applyPreviewSettings();
                     }
-            ).dimensions(btnX, btnY, hornButtonWidth, 20).build();
+            );
 
             this.addDrawableChild(hornBtn);
+
+            // Mark current horn as selected
+            if (hornType == topHornType) {
+                markAsSelected("top_horn", hornBtn);
+            }
         }
         currentY += 55;
 
@@ -232,15 +300,22 @@ public class KoboldCustomizeScreen extends Screen {
             int btnX = centerX + (i * (bottomHornWidth + 5));
             final int hornType = i;
 
-            ButtonWidget hornBtn = ButtonWidget.builder(
+            ButtonWidget hornBtn = createSelectableButton(
+                    "bottom_horn",
                     Text.literal("Type " + i),
+                    btnX, currentY, bottomHornWidth, 20,
                     button -> {
                         bottomHornType = hornType;
                         applyPreviewSettings();
                     }
-            ).dimensions(btnX, currentY, bottomHornWidth, 20).build();
-            if(bottomHornType == hornType) hornBtn.active = false;
+            );
+
             this.addDrawableChild(hornBtn);
+
+            // Mark current horn as selected
+            if (hornType == bottomHornType) {
+                markAsSelected("bottom_horn", hornBtn);
+            }
         }
         currentY += 30;
 
@@ -249,7 +324,7 @@ public class KoboldCustomizeScreen extends Screen {
                 Text.literal("§d§lRandomize"),
                 button -> {
                     bodySize = GirlEntity.RANDOM.nextInt(65, 116);
-                    breastSize = GirlEntity.RANDOM.nextInt(60, 116);
+                    breastSize = GirlEntity.RANDOM.nextInt(60, 161);
 
                     KoboldEntity.PatternPresets preset = presets[GirlEntity.RANDOM.nextInt(presets.length)];
                     primaryColor = preset.primary;
@@ -292,7 +367,7 @@ public class KoboldCustomizeScreen extends Screen {
 
     private void applyPreviewSettings() {
         previewEntity.setBodySize(bodySize);
-        previewEntity.setBreastSize(breastSize);
+        previewEntity.setKoboldBreastSize(breastSize);
         previewEntity.setPrimaryColor(primaryColor);
         previewEntity.setSecondaryColor(secondaryColor);
         previewEntity.setIrisColor(irisColor);
@@ -308,11 +383,12 @@ public class KoboldCustomizeScreen extends Screen {
         // Calculate preview area (1/4 of screen on left)
         int previewWidth = this.width / 3;
 
-        // Render preview entity on left side
-        renderEntityPreview(context, mouseX, mouseY, previewWidth);
-        applyPreviewSettings();
+        if (previewEntity != null) {
+            renderEntityPreview(context, mouseX, mouseY, previewWidth);
+            applyPreviewSettings();
+        }
 
-        // Render widgets
+
         super.render(context, mouseX, mouseY, delta);
 
         // Scroll indicator (only if needed)
@@ -320,19 +396,10 @@ public class KoboldCustomizeScreen extends Screen {
         int scrollBarY = (int)((this.height - scrollBarHeight) * (scrollOffset / maxScrollOffset));
         context.fill(this.width - 5, scrollBarY, this.width - 3, scrollBarY + scrollBarHeight, 0xFF808080);
 
-        // Instructions at bottom of preview area
-        context.drawCenteredTextWithShadow(
-                this.textRenderer,
-                "§7Move mouse to rotate",
-                previewWidth / 2,
-                this.height - 20,
-                0xFFFFFF
-        );
     }
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
-        // Only scroll if mouse is on the right side (controls area) and scrolling is needed
         if (mouseX > (double) this.width / 4) {
             scrollOffset = Math.max(0, Math.min(maxScrollOffset, scrollOffset - verticalAmount * SCROLL_SPEED));
             init();
@@ -342,15 +409,11 @@ public class KoboldCustomizeScreen extends Screen {
     }
 
     private void renderEntityPreview(DrawContext context, int mouseX, int mouseY, int previewWidth) {
-        if (previewEntity == null) return;
-
-        // Define preview area (left 1/4 of screen)
         int x1 = 10;
         int y1 = 50;
         int x2 = previewWidth - 10;
         int y2 = this.height - 50;
 
-        // Draw entity using the proper 1.21.6 method
         drawEntity(context, x1, y1, x2, y2, PREVIEW_SIZE, 0.0f, mouseX, mouseY, previewEntity);
     }
 
@@ -367,5 +430,4 @@ public class KoboldCustomizeScreen extends Screen {
         super.close();
         ClientPlayNetworking.send(new SetGUIOpenStateC2SPacket(this.entityId, false));
     }
-
 }

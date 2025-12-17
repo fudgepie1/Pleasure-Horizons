@@ -61,6 +61,7 @@ public class Scene {
     public final String cumAnim() {return this.animations.cumAnim;}
     public final float cumThreshold() {return this.options.cumThreshold;}
     public final boolean needsToStrip() {return this.options.needsToStrip;}
+    public final boolean hidePlayer() {return this.options.hidePlayer();}
     public final SceneType sceneType() {return this.sceneType;}
     public final boolean useKeyFrameEvents() {return this.options.useKeyFrameEvents;}
     public final boolean countTowardsImpregnation() {return this.options.countTowardsImpregnation;}
@@ -147,11 +148,12 @@ public class Scene {
             List<String> stationaryIntroAnim,
             String anim,
             int amountOfLoops,
-            boolean needsToStrip
+            boolean needsToStrip,
+            boolean hidePlayer
             ) {
         return new Scene(
                 name, requiredRelationshipLevel,
-                SceneOptions.of(needsToStrip, amountOfLoops),
+                SceneOptions.of(needsToStrip, hidePlayer, amountOfLoops),
                 SceneAnimations.of(stationaryIntroAnim, anim),
                 SceneType.STATIONARY_INTRO
                 );
@@ -163,11 +165,12 @@ public class Scene {
             int requiredRelationshipLevel,
             String anim,
             int amountOfLoops,
-            boolean needsToStrip
+            boolean needsToStrip,
+            boolean hidePlayer
             ) {
         return new Scene(
                 name, requiredRelationshipLevel,
-                SceneOptions.of(needsToStrip, amountOfLoops),
+                SceneOptions.of(needsToStrip, hidePlayer, amountOfLoops),
                 SceneAnimations.of(new ArrayList<>(), anim),
                 SceneType.STATIONARY
         );
@@ -242,16 +245,18 @@ public class Scene {
             boolean needsToStrip,
             boolean useKeyFrameEvents,
             boolean countTowardsImpregnation,
+            boolean hidePlayer,
             float bedAlignmentOffset,
             int amountOfLoops
     ) {
-        public static final SceneOptions EMPTY = new SceneOptions(0f, false, false, false, 0f, 0);
+        public static final SceneOptions EMPTY = new SceneOptions(0f, false, false, false, false, 0f, 0);
 
         public static final Codec<SceneOptions> CODEC = RecordCodecBuilder.create(instance -> instance.group(
                 Codec.FLOAT.fieldOf("cumThreshold").forGetter(SceneOptions::cumThreshold),
                 Codec.BOOL.fieldOf("needsToStrip").forGetter(SceneOptions::needsToStrip),
                 Codec.BOOL.fieldOf("useKeyFrameEvents").forGetter(SceneOptions::useKeyFrameEvents),
                 Codec.BOOL.fieldOf("countTowardsImpregnation").forGetter(SceneOptions::countTowardsImpregnation),
+                Codec.BOOL.fieldOf("hidePlayer").forGetter(SceneOptions::hidePlayer),
                 Codec.FLOAT.fieldOf("bedAlignmentOffset").forGetter(SceneOptions::bedAlignmentOffset),
                 Codec.INT.fieldOf("amountOfLoops").forGetter(SceneOptions::amountOfLoops)
         ).apply(instance, SceneOptions::new));
@@ -261,6 +266,7 @@ public class Scene {
                 PacketCodecs.BOOLEAN, SceneOptions::needsToStrip,
                 PacketCodecs.BOOLEAN, SceneOptions::useKeyFrameEvents,
                 PacketCodecs.BOOLEAN, SceneOptions::countTowardsImpregnation,
+                PacketCodecs.BOOLEAN, SceneOptions::hidePlayer,
                 PacketCodecs.FLOAT, SceneOptions::bedAlignmentOffset,
                 PacketCodecs.INTEGER, SceneOptions::amountOfLoops,
                 SceneOptions::new
@@ -274,7 +280,7 @@ public class Scene {
                 float bedAlignmentOffset,
                 int amountOfLoops
         ){
-            return new SceneOptions(cumThreshold, needsToStrip, useKeyFrameEvents, countTowardsImpregnation, bedAlignmentOffset, amountOfLoops);
+            return new SceneOptions(cumThreshold, needsToStrip, useKeyFrameEvents, countTowardsImpregnation, false,bedAlignmentOffset, amountOfLoops);
         }
 
         public static SceneOptions of(
@@ -284,7 +290,7 @@ public class Scene {
                 boolean countTowardsImpregnation,
                 float bedAlignmentOffset
         ){
-            return new SceneOptions(cumThreshold, needsToStrip, useKeyFrameEvents, countTowardsImpregnation, bedAlignmentOffset, 0);
+            return new SceneOptions(cumThreshold, needsToStrip, useKeyFrameEvents, countTowardsImpregnation, false,bedAlignmentOffset, 0);
         }
 
         public static SceneOptions of(
@@ -293,14 +299,15 @@ public class Scene {
                 boolean useKeyFrameEvents,
                 boolean countTowardsImpregnation
         ){
-            return new SceneOptions(cumThreshold, needsToStrip, useKeyFrameEvents, countTowardsImpregnation, 0, 0);
+            return new SceneOptions(cumThreshold, needsToStrip, useKeyFrameEvents, countTowardsImpregnation, false, 0, 0);
         }
 
         public static SceneOptions of(
                 boolean needsToStrip,
+                boolean hidePlayer,
                 int amountOfLoops
         ){
-            return new SceneOptions(0, needsToStrip, false, false, 0, amountOfLoops);
+            return new SceneOptions(0, needsToStrip, false, false, hidePlayer, 0, amountOfLoops);
         }
     }
 
