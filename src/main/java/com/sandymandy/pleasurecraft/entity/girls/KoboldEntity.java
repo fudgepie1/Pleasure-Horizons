@@ -410,6 +410,7 @@ public class KoboldEntity extends WildGirlEntity {
     }
 
     // ===== Data Tracker Changes =====
+
     @Override
     public void onTrackedDataSet(TrackedData<?> data) {
         super.onTrackedDataSet(data);
@@ -425,13 +426,12 @@ public class KoboldEntity extends WildGirlEntity {
             this.calculateDimensions();
         }
     }
-
     // Entity Properties
+
     @Override
     public Item isAttractedTo() {
         return Items.RAW_IRON;
     }
-
     @Override
     public String getGirlID() {
         return "kobold";
@@ -498,37 +498,25 @@ public class KoboldEntity extends WildGirlEntity {
         if(stack.isOf(Items.STICK)){
             this.setGUIOpenState(true, player);
             if(!this.getWorld().isClient() && !createdClone()){
-                // Create preview entity on server
-                KoboldEntity previewEntity = GirlRegistry.KOBOLD.create(this.getWorld(), SpawnReason.EVENT);
-
-                // Copy all appearance settings from the real entity to preview
-                previewEntity.setTemporaryState(true);
-                previewEntity.setBodySize(this.getBodySize());
-                previewEntity.setKoboldBreastSize(this.getKoboldBreastSize());
-                previewEntity.setPrimaryColor(this.getPrimaryColor());
-                previewEntity.setSecondaryColor(this.getSecondaryColor());
-                previewEntity.setIrisColor(this.getIrisColor());
-                previewEntity.setTopHornType(this.getTopHornType());
-                previewEntity.setBottomHornType(this.getBottomHornType());
-                previewEntity.setLeaderState(this.getLeaderState());
-                previewEntity.setKoboldHealth(this.getKoboldHealth());
-
-                // Position the preview entity far away so it's not visible in the world
-                // Use a position far below the world to ensure it's never seen
-                previewEntity.setPosition(player.getX(), 800, player.getZ());
-                previewEntity.setInvisible(true); // Make it invisible in world
-                previewEntity.setInvulnerable(true); // Prevent damage
-                previewEntity.setNoGravity(true); // Prevent falling
-
-                // Spawn the preview entity
-                this.getWorld().spawnEntity(previewEntity);
-                this.setCreatedCloneState(true);
-                // Send packet with both entity IDs
                 ServerPlayNetworking.send((ServerPlayerEntity) player,
-                        new OpenKoboldCustomizeScreenS2CPacket(this.getId(), previewEntity.getId()));
+                        new OpenKoboldCustomizeScreenS2CPacket(this.getId(), this.createTempClone().getId()));
             }
         }
 
         return super.interactMob(player, hand);
+    }
+
+    @Override
+    public void onTempCloneCreation(GirlEntity clone) {
+        KoboldEntity previewEntity = (KoboldEntity) clone;
+        previewEntity.setBodySize(this.getBodySize());
+        previewEntity.setKoboldBreastSize(this.getKoboldBreastSize());
+        previewEntity.setPrimaryColor(this.getPrimaryColor());
+        previewEntity.setSecondaryColor(this.getSecondaryColor());
+        previewEntity.setIrisColor(this.getIrisColor());
+        previewEntity.setTopHornType(this.getTopHornType());
+        previewEntity.setBottomHornType(this.getBottomHornType());
+        previewEntity.setLeaderState(this.getLeaderState());
+        previewEntity.setKoboldHealth(this.getKoboldHealth());
     }
 }

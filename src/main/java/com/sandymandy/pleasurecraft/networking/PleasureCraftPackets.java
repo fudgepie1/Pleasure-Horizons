@@ -64,7 +64,9 @@ public class PleasureCraftPackets {
                                     case "goToBase" -> girl.teleportToBase();
                                     case "sit" -> girl.setSitting(!girl.isSitting());
                                     case "follow" -> girl.setFollowing(!girl.isFollowing());
-                                    case "customize" -> ServerPlayNetworking.send(context.player(), new OpenCustomizeScreenS2CPacket(girl.getId(), girl.getBreastSize(), girl.getBreastOffset(), girl.canGetImpregnated()));
+                                    case "customize" ->{
+                                        ServerPlayNetworking.send(context.player(), new OpenCustomizeScreenS2CPacket(girl.getId(), girl.createTempClone().getId()));
+                                    }
                                     default -> PleasureCraft.LOGGER.warn("Unknown Girl interaction: " + packet.actionId());
                                 }
                             }

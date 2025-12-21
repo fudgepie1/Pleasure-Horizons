@@ -37,7 +37,7 @@ public abstract class LevelRendererMixin {
                           RenderTickCounter deltaTracker,
                           List<Entity> entities,
                           CallbackInfo ci) {
-        if (Freecam.isEnabled() && ModConfig.INSTANCE.visual.showPlayer) {
+        if (Freecam.isEnabled() && !ModConfig.INSTANCE.visual.hidePlayer) {
             Vec3d position = camera.getPos();
             float partialTick = deltaTracker.getTickProgress(false);
             renderEntity(MC.player, position.x, position.y, position.z, partialTick, poseStack, bufferBuilders.getEntityVertexConsumers());

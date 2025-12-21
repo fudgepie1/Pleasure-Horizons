@@ -2,8 +2,10 @@ package com.sandymandy.pleasurecraft.entity.base.tamable;
 
 import com.sandymandy.pleasurecraft.entity.ai.goal.*;
 import com.sandymandy.pleasurecraft.entity.base.GirlEntity;
+import com.sandymandy.pleasurecraft.registries.PleasureCraftTrackedDataRegistry;
 import com.sandymandy.pleasurecraft.settlement.Settlement;
 import com.sandymandy.pleasurecraft.settlement.SettlementMember;
+import com.sandymandy.pleasurecraft.util.managers.SettlementManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -19,6 +21,9 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.registry.tag.DamageTypeTags;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
+import net.minecraft.util.Uuids;
 import net.minecraft.world.World;
 import net.tslat.smartbrainlib.api.SmartBrainOwner;
 import net.tslat.smartbrainlib.api.core.BrainActivityGroup;
@@ -41,9 +46,16 @@ import net.tslat.smartbrainlib.api.core.sensor.vanilla.NearbyLivingEntitySensor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 public abstract class SettlementGirlEntityAI extends TameableGirlEntity implements SmartBrainOwner<SettlementGirlEntityAI>, SettlementMember {
-    private Settlement settlement;
+    @Nullable
+    private UUID settlementId;
+
+    @Nullable
+    private Settlement settlementCache;
+
     private static final TrackedData<Boolean> SHOULD_TICK_BRAIN = DataTracker.registerData(SettlementGirlEntityAI.class, TrackedDataHandlerRegistry.BOOLEAN);
     protected SettlementGirlEntityAI(EntityType<? extends SettlementGirlEntityAI> entityType, World world) {
         super(entityType, world);
@@ -77,14 +89,42 @@ public abstract class SettlementGirlEntityAI extends TameableGirlEntity implemen
         }
     }
 
+    @Nullable
+    public UUID getSettlementId() {
+        return settlementId;
+    }
+
     @Override
     public @Nullable Settlement getSettlement() {
-        return settlement;
+        // Lazy load settlement from ID if needed
+        if (settlementCache == null && settlementId != null && !this.getWorld().isClient()) {
+            ServerWorld serverWorld = (ServerWorld) this.getWorld();
+            SettlementManager manager = SettlementManager.get(serverWorld);
+            settlementCache = manager.getSettlement(settlementId);
+
+            // If settlement no longer exists, clear the ID
+            if (settlementCache == null) {
+                settlementId = null;
+            }
+        }
+        return settlementCache;
+    }
+
+    public void setSettlementById(@Nullable UUID id) {
+        this.settlementId = id;
+        this.settlementCache = null; // Will be lazy-loaded
     }
 
     @Override
     public void setSettlement(@Nullable Settlement settlement) {
-        this.settlement = settlement;
+        if(settlement != null) {
+            this.settlementId = settlement.getId();
+            this.settlementCache = settlement;
+        }
+        else {
+            this.settlementId = null;
+            this.settlementCache = null;
+        }
     }
 
     @Override
@@ -166,5 +206,24 @@ public abstract class SettlementGirlEntityAI extends TameableGirlEntity implemen
         this.dataTracker.set(SHOULD_TICK_BRAIN, !(isMovementLocked() && isSitting() && this.targetBedPos != null && this.isFollowing()) && this.hasSettlement());
     }
 
+    @Override
+    public void writeCustomData(WriteView view) {
+        super.writeCustomData(view);
 
+        if (settlementId != null) {
+            view.put("SettlementId", Uuids.CODEC, settlementId);
+        }
+    }
+
+    @Override
+    public void readCustomData(ReadView view) {
+        super.readCustomData(view);
+
+        Optional<UUID> id = view.read("SettlementId", Uuids.CODEC);
+        if (id.isPresent()) {
+            setSettlementById(id.get());
+        } else {
+            setSettlementById(null);
+        }
+    }
 }

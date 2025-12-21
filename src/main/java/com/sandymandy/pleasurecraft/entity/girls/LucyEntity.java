@@ -35,7 +35,7 @@ public class LucyEntity extends SettlementGirlEntityAI {
     public List<Scene> getScenes() {
         return List.of(
 
-                Scene.stationary("Masterbation",
+                Scene.stationary("Masturbation",
                         4,
                         "masturbating",
                         4,

@@ -101,6 +101,10 @@ public class Settlement {
         }
     }
 
+    public boolean hasMember(UUID girlId) {
+        return members.contains(girlId);
+    }
+
     public void removeMember(SettlementGirlEntityAI girl) {
         members.remove(girl.getUuid());
         girl.setSettlement(null);

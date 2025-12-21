@@ -102,7 +102,7 @@ public class ModConfig implements ConfigData {
         public Perspective perspective = Perspective.INSIDE;
 
         @ConfigEntry.Gui.Tooltip
-        public boolean showPlayer = true;
+        public boolean hidePlayer = true;
 
         @ConfigEntry.Gui.Tooltip
         public boolean showHand = false;

@@ -2,6 +2,7 @@ package com.sandymandy.pleasurecraft.item;
 
 import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.entity.PleasureCraftEntities;
+import com.sandymandy.pleasurecraft.item.items.SettlementRecruitmentToken;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroups;
@@ -15,6 +16,8 @@ import java.util.function.Function;
 
 public class PleasureCraftItems {
 
+    public static Item SETTLEMENT_RECRUITMENT_TOKEN = registerItem("settlement_recruitment_token",
+            settings -> new SettlementRecruitmentToken(settings.maxCount(16)));
 
     private static Item registerItem(String name, Function<Item.Settings, Item> function) {
         return Registry.register(Registries.ITEM, Identifier.of(PleasureCraft.MOD_ID, name),

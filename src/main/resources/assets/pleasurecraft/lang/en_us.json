@@ -11,6 +11,18 @@
 
   "item.pleasurecraft.settlement_hub": "Settlement Hub",
 
+  "item.pleasurecraft.settlement_recruitment_token": "Settlement Recruitment Token",
+
+  "item.pleasurecraft.settlement_recruitment_token.use_on_entity_invalid_entity": "This can only be used on girls that support settlements!",
+
+  "item.pleasurecraft.settlement_recruitment_token.use_on_entity_is_not_owner": "You don't own this girl!",
+
+  "item.pleasurecraft.settlement_recruitment_token.use_on_entity_settlement_no_assigned_overlay": "This token is not assigned to any settlement!",
+
+  "item.pleasurecraft.settlement_recruitment_token.use_on_entity_settlement_no_assigned_chat": "Shift + Right-click a Settlement Hub to assign it.",
+
+  "item.pleasurecraft.settlement_recruitment_token.use_on_entity_settlement_no_longer_exists": "Settlement no longer exists!",
+
   "block.pleasurecraft.settlement_hub" : "Settlement Hub",
 
   "block.pleasurecraft.house_tag" : "House Building Tag",
@@ -285,9 +297,9 @@
 
   "text.autoconfig.pleasurecraft.option.visual.perspective.inside": "Inside",
 
-  "text.autoconfig.pleasurecraft.option.visual.showPlayer": "Show Player",
+  "text.autoconfig.pleasurecraft.option.visual.hidePlayer": "Hide Player",
 
-  "text.autoconfig.pleasurecraft.option.visual.showPlayer.@Tooltip": "Shows your player in its original position.",
+  "text.autoconfig.pleasurecraft.option.visual.showPlayer.@Tooltip": "Hides your player model.",
 
   "text.autoconfig.pleasurecraft.option.visual.showHand": "Show Hand",
 

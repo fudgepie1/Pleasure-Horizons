@@ -1,5 +1,6 @@
 package com.sandymandy.pleasurecraft.entity.girls;
 
+import com.sandymandy.pleasurecraft.entity.base.GirlEntity;
 import com.sandymandy.pleasurecraft.entity.base.tamable.SettlementGirlEntityAI;
 import com.sandymandy.pleasurecraft.util.json.CustomGirlLoader;
 import com.sandymandy.pleasurecraft.util.variables.CustomGirlProfile;
@@ -197,5 +198,12 @@ public class CustomGirlEntity extends SettlementGirlEntityAI {
         this.calculateDimensions();
         boolean isPer = view.getBoolean("IsPermanent", false);
         this.dataTracker.set(IS_PROFILE_PERMANENT, isPer);
+    }
+
+    @Override
+    public void onTempCloneCreation(GirlEntity clone) {
+        super.onTempCloneCreation(clone);
+        CustomGirlEntity girl = (CustomGirlEntity) clone;
+        girl.setProfile(this.getProfile(), false);
     }
 }

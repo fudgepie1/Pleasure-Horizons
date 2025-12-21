@@ -18,6 +18,7 @@ public class PleasureCraftItemGroups {
                     .displayName(Text.translatable("itemgroup.pleasurecraft.pleasure_craft_items"))
                     .entries((displayContext, entries) -> {
                         PleasureCraftEntities.getAllSpawnEggs().forEach(entries::add);
+                        entries.add(PleasureCraftItems.SETTLEMENT_RECRUITMENT_TOKEN);
                     }).build());
 
     public static final ItemGroup PLEASURE_CRAFT_BLOCK_GROUP = Registry.register(Registries.ITEM_GROUP,

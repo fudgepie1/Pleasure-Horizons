@@ -41,7 +41,7 @@ import java.util.Optional;
 import static com.sandymandy.pleasurecraft.util.Utils.getPlayerName;
 import static com.sandymandy.pleasurecraft.util.Utils.getReadableTameItemName;
 
-public class TameableGirlEntity extends GirlEntityScene implements Tameable {
+public abstract class TameableGirlEntity extends GirlEntityScene implements Tameable {
 
     protected static final TrackedData<Byte> TAMEABLE_FLAGS = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.BYTE);
     protected static final TrackedData<Optional<LazyEntityReference<LivingEntity>>> OWNER_UUID = DataTracker.registerData(

@@ -21,6 +21,9 @@ public class PleasureCraftTrackedDataRegistry {
     public static final TrackedDataHandler<Optional<UUID>> OPTIONAL_UUID =
             TrackedDataHandler.create(Uuids.PACKET_CODEC.collect(PacketCodecs::optional));
 
+    public static final TrackedDataHandler<UUID> UUID =
+            TrackedDataHandler.create(Uuids.PACKET_CODEC);
+
     public static final TrackedDataHandler<ScenePhase> SCENE_PHASE =
             TrackedDataHandler.create(ScenePhase.PACKET_CODEC);
 
@@ -31,6 +34,7 @@ public class PleasureCraftTrackedDataRegistry {
         PleasureCraft.LOGGER.info("Registering custom TrackedDataHandlers for PleasureCraft");
         FabricTrackedDataRegistry.register(Identifier.of(PleasureCraft.MOD_ID, "scene"), PleasureCraftTrackedDataRegistry.SCENE);
         FabricTrackedDataRegistry.register(Identifier.of(PleasureCraft.MOD_ID, "uuid_optional"), PleasureCraftTrackedDataRegistry.OPTIONAL_UUID);
+        FabricTrackedDataRegistry.register(Identifier.of(PleasureCraft.MOD_ID, "uuid"), PleasureCraftTrackedDataRegistry.UUID);
         FabricTrackedDataRegistry.register(Identifier.of(PleasureCraft.MOD_ID, "scene_phase"), PleasureCraftTrackedDataRegistry.SCENE_PHASE);
         FabricTrackedDataRegistry.register(Identifier.of(PleasureCraft.MOD_ID, "vec3d"), PleasureCraftTrackedDataRegistry.VEC3D);
 

@@ -9,6 +9,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.PersistentState;
 import net.minecraft.world.PersistentStateType;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -49,6 +50,16 @@ public class SettlementManager extends PersistentState {
 
     public Settlement getSettlement(UUID id) {
         return settlements.get(id);
+    }
+
+    @Nullable
+    public Settlement getSettlementWithGirl(UUID girlId) {
+        for (Settlement settlement : settlements.values()) {
+            if (settlement.hasMember(girlId)) {
+                return settlement;
+            }
+        }
+        return null;
     }
 
     public void removeSettlement(UUID id) {

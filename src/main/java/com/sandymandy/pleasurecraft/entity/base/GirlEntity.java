@@ -170,6 +170,10 @@ public abstract class GirlEntity extends PathAwareEntity implements RangedAttack
         lookAtTarget = lookAt;
     }
 
+    public void setGUIOpenState(boolean state) {
+        this.setGUIOpenState(state, null);
+    }
+
     public boolean isGUIOpen() {
         return guiOpenSate;
     }
@@ -701,9 +705,9 @@ public abstract class GirlEntity extends PathAwareEntity implements RangedAttack
             }
         }
 
-        if(isGUIOpen() && lookAtTarget != null){
+        if(isGUIOpen()){
             this.navigation.stop();
-            getLookControl().lookAt(lookAtTarget, this.getMaxHeadRotation() + 20, this.getMaxLookPitchChange());
+            if(lookAtTarget != null) getLookControl().lookAt(lookAtTarget, this.getMaxHeadRotation() + 20, this.getMaxLookPitchChange());
         }
     }
 
@@ -729,6 +733,28 @@ public abstract class GirlEntity extends PathAwareEntity implements RangedAttack
         }
 
         return success;
+    }
+
+    public GirlEntity createTempClone() {
+        if(this.getWorld().isClient()) return null;
+
+        GirlEntity clone = (GirlEntity) this.getType().create(this.getWorld(), SpawnReason.EVENT);
+
+        clone.setTemporaryState(true);
+        clone.setPosition(this.getX(), 800, this.getZ());
+        clone.setInvisible(true);
+        clone.setInvulnerable(true);
+        clone.setNoGravity(true);
+
+        this.onTempCloneCreation(clone);
+
+        this.getWorld().spawnEntity(clone);
+        this.setCreatedCloneState(true);
+        return clone;
+    }
+
+    public void onTempCloneCreation(GirlEntity clone) {
+        clone.setStripped(this.isStripped());
     }
 
 }

@@ -73,7 +73,7 @@ import software.bernie.geckolib.animation.keyframe.event.data.SoundKeyframeData;
 
 import java.util.*;
 
-public class GirlEntityScene extends GirlEntity implements GeoEntity {
+public abstract class GirlEntityScene extends GirlEntity implements GeoEntity {
     private static final TrackedData<Scene> CURRENT_SCENE = DataTracker.registerData(GirlEntityScene.class, PleasureCraftTrackedDataRegistry.SCENE);
     private static final TrackedData<ScenePhase> CURRENT_SCENE_PHASE = DataTracker.registerData(GirlEntityScene.class, PleasureCraftTrackedDataRegistry.SCENE_PHASE);
     private static final TrackedData<String> ANIMATION_KEY_FRAME_EVENT = DataTracker.registerData(GirlEntityScene.class, TrackedDataHandlerRegistry.STRING);
@@ -875,7 +875,7 @@ public class GirlEntityScene extends GirlEntity implements GeoEntity {
                 }
             }
             else {
-                this.currentAnimState = getDefaultAnimation(state);
+                this.currentAnimState = !isTemporary() ? getDefaultAnimation(state) : "idle";
                 this.currentLoopState = true;
             }
 
@@ -969,11 +969,11 @@ public class GirlEntityScene extends GirlEntity implements GeoEntity {
 
 
     private String getDefaultAnimation(AnimationTest<?> state) {
-        if (!this.isOnGround() && !isSitting() && !this.hasVehicle() && !isTemporary()) return "fly";
-        if (state.isMoving() && !isSitting() && !isRunning() && !isTemporary()) return "walk";
-        if (state.isMoving() && !isSitting() && isRunning() && !isTemporary()) return "run";
-        if (isSitting() && !isTemporary()) return "sit";
-        if (this.hasVehicle() && !isTemporary()) return "ride";
+        if (!this.isOnGround() && !isSitting() && !this.hasVehicle()) return "fly";
+        if (state.isMoving() && !isSitting() && !isRunning()) return "walk";
+        if (state.isMoving() && !isSitting() && isRunning()) return "run";
+        if (isSitting()) return "sit";
+        if (this.hasVehicle()) return "ride";
         return "idle";
     }
 
