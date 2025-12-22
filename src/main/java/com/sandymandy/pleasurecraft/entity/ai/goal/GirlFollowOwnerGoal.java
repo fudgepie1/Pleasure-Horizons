@@ -67,7 +67,7 @@ public class GirlFollowOwnerGoal extends Goal {
 
     @Override
     public void stop() {
-        this.tameable.setRunning(false);
+        this.tameable.setSprinting(false);
         this.owner = null;
         this.navigation.stop();
         this.tameable.setPathfindingPenalty(PathNodeType.WATER, this.oldWaterPathfindingPenalty);
@@ -83,10 +83,10 @@ public class GirlFollowOwnerGoal extends Goal {
         if (--this.updateCountdownTicks <= 0) {
             this.updateCountdownTicks = this.getTickCount(10);
             if (bl) {
-                this.tameable.setRunning(false);
+                this.tameable.setSprinting(false);
                 this.tameable.tryTeleportToOwner();
             } else {
-                this.tameable.setRunning(true);
+                this.tameable.setSprinting(true);
                 this.navigation.startMovingTo(this.owner, this.speed);
             }
         }

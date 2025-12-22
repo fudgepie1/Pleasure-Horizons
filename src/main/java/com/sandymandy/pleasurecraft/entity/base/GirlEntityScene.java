@@ -970,8 +970,8 @@ public abstract class GirlEntityScene extends GirlEntity implements GeoEntity {
 
     private String getDefaultAnimation(AnimationTest<?> state) {
         if (!this.isOnGround() && !isSitting() && !this.hasVehicle()) return "fly";
-        if (state.isMoving() && !isSitting() && !isRunning()) return "walk";
-        if (state.isMoving() && !isSitting() && isRunning()) return "run";
+        if (state.isMoving() && !isSitting() && !isSprinting()) return "walk";
+        if (state.isMoving() && !isSitting() && isSprinting()) return "run";
         if (isSitting()) return "sit";
         if (this.hasVehicle()) return "ride";
         return "idle";

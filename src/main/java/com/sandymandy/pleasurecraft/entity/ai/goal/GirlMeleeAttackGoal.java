@@ -14,14 +14,14 @@ public class GirlMeleeAttackGoal extends MeleeAttackGoal {
 
     @Override
     public void start() {
-        this.girl.setRunning(true);
+        this.girl.setSprinting(true);
         super.start();
         this.ticks = 0;
     }
 
     @Override
     public void stop() {
-        this.girl.setRunning(false);
+        this.girl.setSprinting(false);
         super.stop();
         this.girl.setAttacking(false);
     }

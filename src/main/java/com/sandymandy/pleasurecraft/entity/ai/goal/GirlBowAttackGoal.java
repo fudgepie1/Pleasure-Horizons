@@ -62,12 +62,12 @@ public class GirlBowAttackGoal extends Goal {
     public void stop() {
         girl.setAttacking(false);
         girl.clearActiveItem();
-        girl.setRunning(false);
+        girl.setSprinting(false);
     }
 
     private void lowHpMovement(double distSq, LivingEntity target){
         // Low HP → defensive: stay between minRange and maxRange
-        girl.setRunning(false);
+        girl.setSprinting(false);
         if (distSq < minRangeSq) {
             // Too close → back off
             girl.getNavigation().startMovingTo(
@@ -103,7 +103,7 @@ public class GirlBowAttackGoal extends Goal {
         else {
             if (healthRatio > 0.5) {
                 // High HP → aggressive: get close to
-                girl.setRunning(true);
+                girl.setSprinting(true);
                 girl.getNavigation().startMovingTo(target, moveSpeed);
             } else {
                 lowHpMovement(distSq, target);

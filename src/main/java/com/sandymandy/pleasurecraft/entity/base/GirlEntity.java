@@ -12,6 +12,7 @@ import net.minecraft.entity.*;
 import net.minecraft.entity.ai.RangedAttackMob;
 import net.minecraft.entity.ai.control.MoveControl;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
+import net.minecraft.entity.attribute.EntityAttributeInstance;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
@@ -62,7 +63,6 @@ public abstract class GirlEntity extends PathAwareEntity implements RangedAttack
     private static final TrackedData<Boolean> PLAYER_MODEL_SLIM = DataTracker.registerData(GirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<Boolean> HAVING_SEX = DataTracker.registerData(GirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<Boolean> SITTING = DataTracker.registerData(GirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
-    private static final TrackedData<Boolean> RUNNING = DataTracker.registerData(GirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<Boolean> PREGNANT = DataTracker.registerData(GirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<Boolean> CAN_GET_IMPREGNATED = DataTracker.registerData(GirlEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<String> OVERRIDE_ANIM = DataTracker.registerData(GirlEntity.class, TrackedDataHandlerRegistry.STRING);
@@ -85,7 +85,12 @@ public abstract class GirlEntity extends PathAwareEntity implements RangedAttack
     public Map<String, Vec2f> boneUVOffsets = new HashMap<>();
     public final Map<EquipmentSlot, Boolean> armorVisibility = new EnumMap<>(EquipmentSlot.class);
     public Vec3d previousVelocity = Vec3d.ZERO;
+    private static final int SPRINTING_FLAG_INDEX = 3;
     private static final int MAX_TICKS_NO_HIT = 20 * 20;
+    private static final Identifier SPRINTING_SPEED_MODIFIER_ID = Identifier.of(PleasureCraft.MOD_ID, "sprinting_speed_modifier");
+    private static final EntityAttributeModifier SPRINTING_SPEED_BOOST = new EntityAttributeModifier(
+            SPRINTING_SPEED_MODIFIER_ID, 1.65 - 1.0, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL
+    );
     private int ticksSinceLastHit;
     public float previousYaw = 0;
     public float passengerYOffset = -0.8f;
@@ -119,7 +124,6 @@ public abstract class GirlEntity extends PathAwareEntity implements RangedAttack
         builder.add(PLAYER_MODEL_SLIM, false);
         builder.add(HAVING_SEX, false);
         builder.add(SITTING, false);
-        builder.add(RUNNING, false);
         builder.add(PREGNANT,false);
         builder.add(CAN_GET_IMPREGNATED,false);
         builder.add(AMOUNT_OF_SEX_UNTIL_IMPREGNATION, 0);
@@ -256,14 +260,6 @@ public abstract class GirlEntity extends PathAwareEntity implements RangedAttack
 
     public boolean isHavingSex() {
         return this.dataTracker.get(HAVING_SEX);
-    }
-
-    public void setRunning(boolean state) {
-        this.dataTracker.set(RUNNING, state);
-    }
-
-    public boolean isRunning() {
-        return this.dataTracker.get(RUNNING);
     }
 
     public void setPregnantState(boolean preggo){
@@ -534,32 +530,20 @@ public abstract class GirlEntity extends PathAwareEntity implements RangedAttack
     public void tick() {
         super.tick();
 
-        updateRunningSpeedBoost(isRunning());
         previousYaw = getYaw();
         previousVelocity = getVelocity();
         this.setMovementLockedState(this.isFrozenInPlace() || this.isWaitingAtBed() || this.isSceneActive() || this.isWaitingForPlayer());
     }
 
-    private static final Identifier RUNNING_SPEED_BOOST = Identifier.of(PleasureCraft.MOD_ID, "running_speed_boost");
 
-    public void updateRunningSpeedBoost(boolean active) {
-        var attr = this.getAttributeInstance(EntityAttributes.MOVEMENT_SPEED);
-        if (attr == null) return;
 
-        // Remove previous modifier if it exists
-        var oldModifier = attr.getModifier(RUNNING_SPEED_BOOST);
-        if (oldModifier != null) {
-            attr.removeModifier(oldModifier);
-        }
-
-        if (active) {
-            // 1.65x total movement speed boost
-            EntityAttributeModifier modifier = new EntityAttributeModifier(
-                    RUNNING_SPEED_BOOST,
-                    1.65 - 1.0,  // multiplier modifier must be (multiplier - 1)
-                    EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL
-            );
-            attr.addTemporaryModifier(modifier);
+    @Override
+    public void setSprinting(boolean sprinting) {
+        this.setFlag(SPRINTING_FLAG_INDEX, sprinting);
+        EntityAttributeInstance entityAttributeInstance = this.getAttributeInstance(EntityAttributes.MOVEMENT_SPEED);
+        entityAttributeInstance.removeModifier(SPRINTING_SPEED_BOOST.id());
+        if (sprinting) {
+            entityAttributeInstance.addTemporaryModifier(SPRINTING_SPEED_BOOST);
         }
     }
 
