@@ -43,7 +43,7 @@ public class ResourcesTab extends SettlementTab {
         // Example: Display resources
         context.drawText(
                 screen.getTextRenderer(),
-                Text.literal("Wood: 150"),
+                Text.literal("Amount Of Buildings"),
                 20, yOffset,
                 Colors.LIGHT_GRAY,
                 false
@@ -52,7 +52,7 @@ public class ResourcesTab extends SettlementTab {
 
         context.drawText(
                 screen.getTextRenderer(),
-                Text.literal("Stone: 200"),
+                Text.literal("" + this.settlement.getAllBuildings().size()),
                 20, yOffset,
                 Colors.LIGHT_GRAY,
                 false
@@ -61,7 +61,16 @@ public class ResourcesTab extends SettlementTab {
 
         context.drawText(
                 screen.getTextRenderer(),
-                Text.literal("Food: 75"),
+                Text.literal("Amount Of Settlers"),
+                20, yOffset,
+                Colors.LIGHT_GRAY,
+                false
+        );
+        yOffset += 12;
+
+        context.drawText(
+                screen.getTextRenderer(),
+                Text.literal("" + this.settlement.getMembers().size()),
                 20, yOffset,
                 Colors.LIGHT_GRAY,
                 false

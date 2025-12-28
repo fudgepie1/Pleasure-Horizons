@@ -39,7 +39,7 @@ public class SettlementHubScreen extends HandledScreen<SettlementHubScreenHandle
 
     public SettlementHubScreen(SettlementHubScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
-        this.settlement = handler.getData();
+        this.settlement = handler.getSettlement();
         this.backgroundWidth = WINDOW_WIDTH;
         this.backgroundHeight = WINDOW_HEIGHT;
     }
@@ -55,7 +55,7 @@ public class SettlementHubScreen extends HandledScreen<SettlementHubScreenHandle
                 Items.CHEST.getDefaultStack(),
                 Text.literal("Resources"),
                 Text.literal("Resource overview"),
-                Identifier.ofVanilla("textures/gui/advancements/backgrounds/end.png")
+                Identifier.ofVanilla("textures/gui/advancements/backgrounds/nether.png")
         )).setContentProvider(new ResourcesTab(this, settlement));
 
         addTab("settlers", SettlementDisplay.create(

@@ -40,6 +40,9 @@ public class ModConfig implements ConfigData {
 
         @ConfigEntry.Gui.Tooltip
         public boolean disableShading = false;
+
+        @ConfigEntry.Gui.Tooltip
+        public boolean disableVillagerNose = false;
     }
 
     public static class PlayerConfig {

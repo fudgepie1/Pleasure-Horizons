@@ -4,6 +4,7 @@ import com.sandymandy.pleasurecraft.advancement.criterion.PleasureCraftCriteria;
 import com.sandymandy.pleasurecraft.block.PleasureCraftBlocks;
 import com.sandymandy.pleasurecraft.block.entity.PleasureCraftBlockEntities;
 import com.sandymandy.pleasurecraft.command.Commands;
+import com.sandymandy.pleasurecraft.component.PleasureCraftDataComponentTypes;
 import com.sandymandy.pleasurecraft.entity.ai.brain.GirlMemoryTypes;
 import com.sandymandy.pleasurecraft.item.PleasureCraftItemGroups;
 import com.sandymandy.pleasurecraft.item.PleasureCraftItems;
@@ -17,8 +18,6 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.util.math.BlockPos;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import software.bernie.geckolib.loading.math.MathParser;
-import software.bernie.geckolib.loading.math.value.Variable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -34,7 +33,6 @@ public class PleasureCraft implements ModInitializer {
 	public void onInitialize() {
 		ServerTickEvents.END_WORLD_TICK.register(world -> {
 			if (!world.isClient()) {
-				SettlementManager.get(world).tick(world);
 				TamedGirlManager.get(world).cleanupDeadGirls(world);
 			}
 		});
@@ -42,6 +40,7 @@ public class PleasureCraft implements ModInitializer {
 		PleasureCraftPackets.registerPackets();
 		PleasureCraftPackets.registerC2SPackets();
 		PleasureCraftItemGroups.registerItemGroups();
+		PleasureCraftDataComponentTypes.registerDataComponentsTypes();
 		PleasureCraftItems.registerItems();
 		PleasureCraftBlockEntities.registerBlockEntities();
 		PleasureCraftBlocks.registerBlocks();

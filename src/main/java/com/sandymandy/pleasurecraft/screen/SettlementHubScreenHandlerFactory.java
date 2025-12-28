@@ -11,7 +11,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import org.jetbrains.annotations.Nullable;
 
-public class SettlementHubScreenHandlerFactory implements ExtendedScreenHandlerFactory {
+public class SettlementHubScreenHandlerFactory implements ExtendedScreenHandlerFactory<Settlement> {
     private final Settlement data;
 
     public SettlementHubScreenHandlerFactory(Settlement data) {
@@ -20,8 +20,7 @@ public class SettlementHubScreenHandlerFactory implements ExtendedScreenHandlerF
 
     // Called on the server → sends data to client
     @Override
-    public Object getScreenOpeningData(ServerPlayerEntity player) {
-        PleasureCraft.LOGGER.info(data+"");
+    public Settlement getScreenOpeningData(ServerPlayerEntity player) {
         return data;
     }
 

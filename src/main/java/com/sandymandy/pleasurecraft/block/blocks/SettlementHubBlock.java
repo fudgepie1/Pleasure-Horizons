@@ -3,11 +3,11 @@ package com.sandymandy.pleasurecraft.block.blocks;
 import com.mojang.serialization.MapCodec;
 import com.sandymandy.pleasurecraft.block.entity.PleasureCraftBlockEntities;
 import com.sandymandy.pleasurecraft.block.entity.entities.SettlementHubBlockEntity;
-import com.sandymandy.pleasurecraft.item.PleasureCraftItems;
-import com.sandymandy.pleasurecraft.item.items.SettlementRecruitmentToken;
-import com.sandymandy.pleasurecraft.settlement.Settlement;
 import com.sandymandy.pleasurecraft.util.managers.SettlementManager;
-import net.minecraft.block.*;
+import net.minecraft.block.BlockEntityProvider;
+import net.minecraft.block.BlockRenderType;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.BlockWithEntity;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
@@ -18,7 +18,6 @@ import net.minecraft.loot.context.LootWorldContext;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -99,17 +98,8 @@ public class SettlementHubBlock extends BlockWithEntity implements BlockEntityPr
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
         if (world.isClient) return ActionResult.SUCCESS;
 
-        ItemStack stack = player.getStackInHand(Hand.MAIN_HAND);
-
         BlockEntity be = world.getBlockEntity(pos);
         if (be instanceof SettlementHubBlockEntity hub) {
-            Settlement settlement = hub.getSettlement();
-            if (player.isSneaking() && stack.isOf(PleasureCraftItems.SETTLEMENT_RECRUITMENT_TOKEN)) {
-                    SettlementRecruitmentToken.setSettlementInfo(
-                            stack,
-                            settlement.getId()
-                    );
-            }
             hub.openGui((ServerWorld) world, (ServerPlayerEntity) player);
         }
 

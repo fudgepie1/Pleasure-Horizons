@@ -6,22 +6,32 @@
   "item.pleasurecraft.momo_spawn_egg": "Momo Spawn Egg",
 
   "item.pleasurecraft.slime_spawn_egg": "Slime Spawn Egg",
+  
+  "item.pleasurecraft.coppie_spawn_egg": "Coppie Spawn Egg",
 
   "item.pleasurecraft.kobold_spawn_egg": "Kobold Spawn Egg",
 
   "item.pleasurecraft.settlement_hub": "Settlement Hub",
 
-  "item.pleasurecraft.settlement_recruitment_token": "Settlement Recruitment Token",
+  "item.pleasurecraft.settlement_recruit_contract": "Settlement Recruit Contract",
 
-  "item.pleasurecraft.settlement_recruitment_token.use_on_entity_invalid_entity": "This can only be used on girls that support settlements!",
+  "item.pleasurecraft.settlement_recruit_contract.use_on_entity.invalid_entity": "This can only be used on girls that support settlements!",
 
-  "item.pleasurecraft.settlement_recruitment_token.use_on_entity_is_not_owner": "You don't own this girl!",
+  "item.pleasurecraft.settlement_recruit_contract.use_on_entity.is_not_owner": "You don't own this girl!",
 
-  "item.pleasurecraft.settlement_recruitment_token.use_on_entity_settlement_no_assigned_overlay": "This token is not assigned to any settlement!",
+  "item.pleasurecraft.settlement_recruit_contract.use_on_entity.settlement_no_assigned_overlay": "This contract is not assigned to any settlement!",
 
-  "item.pleasurecraft.settlement_recruitment_token.use_on_entity_settlement_no_assigned_chat": "Shift + Right-click a Settlement Hub to assign it.",
+  "item.pleasurecraft.settlement_recruit_contract.use_on_entity.settlement_no_assigned_chat": "Shift + Right-click a Settlement Hub to assign it.",
 
-  "item.pleasurecraft.settlement_recruitment_token.use_on_entity_settlement_no_longer_exists": "Settlement no longer exists!",
+  "item.pleasurecraft.settlement_recruit_contract.use_on_entity.settlement_no_longer_exists": "Settlement no longer exists!",
+
+  "item.pleasurecraft.settlement_recruit_contract.use_on_entity.already_in_settlement": "is already in",
+
+  "item.pleasurecraft.settlement_recruit_contract.use_on_entity.left_settlement": "left",
+
+  "item.pleasurecraft.settlement_recruit_contract.use_on_entity.joined_settlement": "joined",
+
+  "item.pleasurecraft.settlement_recruit_contract.use_on_block.set_settlement_id": "Connected To",
 
   "block.pleasurecraft.settlement_hub" : "Settlement Hub",
 
@@ -36,6 +46,8 @@
   "entity.pleasurecraft.momo": "Momo",
 
   "entity.pleasurecraft.slime": "Slime",
+  
+  "entity.pleasurecraft.coppie": "Coppie",
 
   "entity.pleasurecraft.kobold": "Kobold",
 
@@ -194,6 +206,10 @@
   "text.autoconfig.pleasurecraft.option.girls.boobWindow": "Boob Window",
 
   "text.autoconfig.pleasurecraft.option.girls.disableShading": "Disable Shading",
+
+  "text.autoconfig.pleasurecraft.option.girls.disableVillagerNose": "Disables Villager Nose",
+
+  "text.autoconfig.pleasurecraft.option.girls.disableVillagerNose.@Tooltip": "Disables the villager nose on the copper golem girl",
 
   "text.autoconfig.pleasurecraft.option.girls.boobWindow.@Tooltip": "Makes the armor on the girls have a window to see their breast",
 

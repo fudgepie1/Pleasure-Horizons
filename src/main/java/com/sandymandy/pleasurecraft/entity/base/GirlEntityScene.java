@@ -568,6 +568,8 @@ public abstract class GirlEntityScene extends GirlEntity implements GeoEntity {
             this.setBoneVisibility(Wide, !isPlayerModelSlim() && isActivePhase);
         }
 
+        this.setBoneVisibility(List.of("nose"), !ModConfig.INSTANCE.girls.disableVillagerNose);
+
         int bellySize = isPregnant()
                 ? MathHelper.lerp(getPregnancyProgress(), 100, getMaxBellySizeWhenPregnant())
                 : 100;

@@ -2,10 +2,16 @@ package com.sandymandy.pleasurecraft.settlement.building;
 
 import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.settlement.Settlement;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
+import net.minecraft.state.property.Properties;
+import net.minecraft.block.enums.BedPart;
+import net.minecraft.block.enums.DoubleBlockHalf;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.registry.tag.BlockTags;
+import net.minecraft.registry.tag.TagKey;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
@@ -31,67 +37,106 @@ public class BuildingScanner {
      * Scans from a given position (the inside side of a door or tag).
      * If the origin is floating, it automatically moves it down to floor level.
      */
-    public void scanForBuilding(World world, UUID id, BlockPos origin, BlockPos doorPos, BlockPos tagPos, BuildingType type, PlayerEntity player) {
+    public void scanForBuilding(World world, BlockPos origin, BlockPos doorPos, BlockPos tagPos, BuildingType type, PlayerEntity player) {
         if (world.isClient()) return;
 
-        // --- Align origin to ground level ---
         BlockPos groundAligned = findGroundLevel(world, origin);
         if (groundAligned == null) {
-            PleasureCraft.LOGGER.warn("[BuildingScanner] Could not find ground below {}, {}, {}", origin.getX(), origin.getY(), origin.getZ());
-            player.sendMessage(Text.literal("[BuildingScanner] Could not find ground below " + origin.getX() + ", " + origin.getY() + ", " + origin.getZ()), false);
+            player.sendMessage(Text.literal("[BuildingScanner] Could not find ground below origin.").formatted(Formatting.RED), false);
             return;
         }
 
-        PleasureCraft.LOGGER.info("[BuildingScanner] Starting scan at adjusted origin {}, {}, {}", groundAligned.getX(), groundAligned.getY(), groundAligned.getZ());
-        player.sendMessage(Text.literal("[BuildingScanner] Starting scan at adjusted origin " + groundAligned.getX() + ", " + groundAligned.getY() + ", " + groundAligned.getZ()), false);
-
-        Set<BlockPos> visited = new HashSet<>();
+        Set<BlockPos> visitedAir = new HashSet<>();
         Set<BlockPos> validQuadrants = new HashSet<>();
+        Map<BlockPos, BlockState> structureBlocks = new HashMap<>();
 
         Queue<BlockPos> toVisit = new ArrayDeque<>();
         toVisit.add(groundAligned);
 
         while (!toVisit.isEmpty()) {
             BlockPos pos = toVisit.poll();
-            if (!visited.add(pos)) continue; // skip already visited
-            if (!isAir(world, pos)) continue;
+            if (!visitedAir.add(pos)) continue;
 
-            // If this spot has no roof within vertical scan range, treat as outside and stop spreading
-            if (!hasRoofWithin(world, pos)) continue;
-
-            // Check clearance and roof
+            // Check if this column has a roof and enough height
             if (isValidQuadrant(world, pos)) {
                 validQuadrants.add(pos);
 
-                // Debug visualization (optional, remove in production)
-                world.setBlockState(pos, Blocks.GLOWSTONE.getDefaultState());
-
-                // Spread horizontally only inside roofed areas
-                for (Direction dir : Direction.Type.HORIZONTAL) {
+                // --- Scan Surroundings for Furniture/Walls ---
+                for (Direction dir : Direction.values()) {
                     BlockPos neighbor = pos.offset(dir);
-                    if (!visited.contains(neighbor) && isAir(world, neighbor)) {
-                        toVisit.add(neighbor);
+                    BlockState state = world.getBlockState(neighbor);
+
+                    if (isEmpty(world, neighbor)) {
+                        // Only spread horizontally for the floor-plan
+                        if (dir.getAxis().isHorizontal() && !visitedAir.contains(neighbor)) {
+                            toVisit.add(neighbor);
+                        }
+                    } else {
+                        // It's a solid block (Wall, Bed, Chest, etc.)
+                        structureBlocks.put(neighbor.toImmutable(), state);
                     }
                 }
             }
         }
 
-        // --- Validation and registration ---
-        if (validQuadrants.size() >= MIN_VALID_QUADRANTS) {
-            registerBuilding(id, doorPos, tagPos, type, List.copyOf(validQuadrants), player);
-        } else {
-            PleasureCraft.LOGGER.warn(
-                    "[BuildingScanner] Invalid building ({} valid quadrants).",
-                    validQuadrants.size()
-            );
-            player.sendMessage(Text.literal("[BuildingScanner] Invalid building, only " + validQuadrants.size() + " valid quadrants found, minimum required is 9."), false);
+        // --- Validation ---
+        boolean hasSize = validQuadrants.size() >= MIN_VALID_QUADRANTS;
+        boolean hasRequirements = checkRequirements(type, structureBlocks, player);
+
+        if (hasSize && hasRequirements) {
+            registerBuilding(doorPos, tagPos, type, structureBlocks, List.copyOf(validQuadrants), player);
+        } else if (!hasSize) {
+            player.sendMessage(Text.literal("[BuildingScanner] Invalid building, only " + validQuadrants.size() + " valid quadrants found, minimum required is 9.").formatted(Formatting.RED), false);
         }
     }
 
-    // --- Utility methods ---
+    private boolean checkRequirements(BuildingType type, Map<BlockPos, BlockState> blocks, PlayerEntity player) {
+        Map<Object, Integer> requirements = type.getRequirements();
 
-    private boolean isAir(World world, BlockPos pos) {
-        return world.getBlockState(pos).isAir();
+        for (Map.Entry<Object, Integer> entry : requirements.entrySet()) {
+            int foundCount = 0;
+            Object required = entry.getKey();
+            int requiredAmount = entry.getValue();
+
+            for (BlockState state : blocks.values()) {
+                if(!isMainPart(state)) continue;
+
+                if (required instanceof TagKey<?> tag) {
+                    if (state.isIn((TagKey<Block>) tag)) foundCount++;
+                } else if (required instanceof Block block) {
+                    if (state.isOf(block)) foundCount++;
+                }
+            }
+
+            if (foundCount < requiredAmount) {
+                String name = (required instanceof TagKey<?> tag) ? tag.id().getPath() : ((Block) required).getName().getString();
+                player.sendMessage(Text.literal("Missing requirement: " + name + " (Found " + foundCount + "/" + requiredAmount + ")").formatted(Formatting.RED), false);
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Determines if this blockstate is the "Main" part of a multi-block object.
+     * If it's a bed, we only count the HEAD.
+     * If it's a door or tall plant, we only count the LOWER half.
+     */
+    private boolean isMainPart(BlockState state) {
+        // Beds: Only count the head part
+        if (state.contains(Properties.BED_PART)) {
+            return state.get(Properties.BED_PART) == BedPart.HEAD;
+        }
+        // Doors, Tall Flowers, etc: Only count the bottom half
+        if (state.contains(Properties.DOUBLE_BLOCK_HALF)) {
+            return state.get(Properties.DOUBLE_BLOCK_HALF) == DoubleBlockHalf.LOWER;
+        }
+        // Normal blocks are always the "main" part
+        return true;
+    }
+
+    private boolean isEmpty(World world, BlockPos pos) {
+        return world.getBlockState(pos).isAir() || world.getBlockState(pos).isIn(BlockTags.WOOL_CARPETS);
     }
 
     /**
@@ -109,20 +154,6 @@ public class BuildingScanner {
             mutable.move(Direction.DOWN);
         }
         return null; // No ground found within limit
-    }
-
-    /**
-     * Checks if there is a solid block (roof) within a given height range.
-     * If air extends all the way up, returns false (open sky).
-     */
-    private boolean hasRoofWithin(World world, BlockPos pos) {
-        for (int i = 1; i <= MAX_VERTICAL_SCAN; i++) {
-            BlockState above = world.getBlockState(pos.up(i));
-            if (!above.isAir()) {
-                return true; // found roof
-            }
-        }
-        return false; // open to sky beyond scan limit
     }
 
     /**
@@ -148,23 +179,25 @@ public class BuildingScanner {
         return airHeight >= MIN_CLEARANCE - 1 && hasRoof;
     }
 
+
+
     /**
      * Registers a successfully scanned building to the settlement.
      */
-    private void registerBuilding(UUID id, BlockPos doorPos, BlockPos tagPos, BuildingType type, List<BlockPos> validBlocks, PlayerEntity player) {
+    private void registerBuilding(BlockPos doorPos, BlockPos tagPos, BuildingType type, Map<BlockPos, BlockState> structureBlocks, List<BlockPos> validBlocks, PlayerEntity player) {
         SettlementBuilding building = new SettlementBuilding(
                 doorPos,
                 tagPos,
                 type,
-                validBlocks
+                structureBlocks
         );
-
-        settlement.addBuilding(id, building);
+        if(settlement.getBuildingsMap().containsKey(doorPos)) settlement.removeBuilding(doorPos);
+        settlement.addBuilding(doorPos, building);
         PleasureCraft.LOGGER.info(
-                "[BuildingScanner] Registered valid building with {} interior quadrants.",
+                "[BuildingScanner] Registered building with {} valid quadrants.",
                 validBlocks.size()
         );
-        player.sendMessage(Text.literal("[BuildingScanner] Registered valid building with " + validBlocks.size() + " interior quadrants."), false);
+        player.sendMessage(Text.literal("[BuildingScanner] Registered building with " + validBlocks.size() + " valid quadrants.").formatted(Formatting.GREEN), false);
 
     }
 }

@@ -197,6 +197,13 @@ public abstract class TameableGirlEntity extends GirlEntityScene implements Tame
                 // not tamed anymore → remove
                 TamedGirlManager.get(world).removeGirl(this.getUuid());
             }
+
+            byte b = this.dataTracker.get(TAMEABLE_FLAGS);
+            if (isSitting()) {
+                this.dataTracker.set(TAMEABLE_FLAGS, (byte)(b | 1));
+            } else {
+                this.dataTracker.set(TAMEABLE_FLAGS, (byte)(b & -2));
+            }
         }
     }
 
@@ -286,21 +293,6 @@ public abstract class TameableGirlEntity extends GirlEntityScene implements Tame
     }
 
     protected void updateAttributesForTamed() {
-    }
-
-    public boolean isInSittingPose() {
-        return (this.dataTracker.get(TAMEABLE_FLAGS) & 1) != 0;
-    }
-
-    @Override
-    public void setSitting(boolean inSittingPose) {
-        super.setSitting(inSittingPose);
-        byte b = this.dataTracker.get(TAMEABLE_FLAGS);
-        if (inSittingPose) {
-            this.dataTracker.set(TAMEABLE_FLAGS, (byte)(b | 1));
-        } else {
-            this.dataTracker.set(TAMEABLE_FLAGS, (byte)(b & -2));
-        }
     }
 
     @Nullable

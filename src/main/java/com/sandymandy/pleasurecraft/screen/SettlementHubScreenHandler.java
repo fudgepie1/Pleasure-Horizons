@@ -9,11 +9,11 @@ import net.minecraft.screen.ScreenHandler;
 import static com.sandymandy.pleasurecraft.registries.PleasureCraftScreenHandlerRegistry.SETTLEMENT_HUB_SCREEN_HANDLER;
 
 public class SettlementHubScreenHandler extends ScreenHandler {
-    private final Settlement data;
+    private final Settlement settlement;
 
     public SettlementHubScreenHandler(int syncId, PlayerInventory playerInventory, Settlement data) {
-        super(SETTLEMENT_HUB_SCREEN_HANDLER, syncId); // will register later
-        this.data = data;
+        super(SETTLEMENT_HUB_SCREEN_HANDLER, syncId);
+        this.settlement = data;
     }
 
     @Override
@@ -26,7 +26,7 @@ public class SettlementHubScreenHandler extends ScreenHandler {
         return true;
     }
 
-    public Settlement getData() {
-        return data;
+    public Settlement getSettlement() {
+        return settlement;
     }
 }

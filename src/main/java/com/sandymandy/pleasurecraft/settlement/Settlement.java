@@ -15,10 +15,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class Settlement {
     private final UUID id;
@@ -28,7 +25,7 @@ public class Settlement {
     private SettlementResourceData data;
     private final BuildingScanner scanner = new BuildingScanner(this);
     private final List<UUID> members = new ArrayList<>();
-    private final HashMap<UUID, SettlementBuilding> buildings = new HashMap<>();
+    private final HashMap<BlockPos, SettlementBuilding> buildings = new HashMap<>();
     // === CODEC ===
     public static final Codec<Settlement> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Uuids.CODEC.fieldOf("id").forGetter(Settlement::getId),
@@ -36,10 +33,12 @@ public class Settlement {
             Codec.STRING.fieldOf("name").forGetter(Settlement::getName),
             BlockPos.CODEC.fieldOf("corePos").forGetter(Settlement::getCorePos),
             Codec.list(Uuids.CODEC).fieldOf("members").orElse(List.of()).forGetter(Settlement::getMembers),
+            Codec.list(SettlementBuilding.CODEC).fieldOf("buildings").orElse(List.of()).forGetter(Settlement::getAllBuildings),
             SettlementResourceData.CODEC.fieldOf("data").forGetter(Settlement::getData)
-    ).apply(instance, (id, owner, name, pos, members, data) -> {
+    ).apply(instance, (id, owner, name, pos, members, buildings, data) -> {
         Settlement s = new Settlement(id, owner, name, pos);
         s.members.addAll(members);
+        for (SettlementBuilding b : buildings) s.buildings.put(b.getDoorPos(), b);
         s.data = data;
         return s;
     }));
@@ -62,6 +61,13 @@ public class Settlement {
             Settlement s = new Settlement(id, owner, name, pos);
             s.members.addAll(members);
             s.data = data;
+
+            int buildingCount = buf.readVarInt();
+            for (int i = 0; i < buildingCount; i++) {
+                BlockPos bPos = buf.readBlockPos();
+                SettlementBuilding building = SettlementBuilding.PACKET_CODEC.decode(buf);
+                s.buildings.put(bPos, building);
+            }
             return s;
         }
 
@@ -74,8 +80,13 @@ public class Settlement {
 
             buf.writeVarInt(settlement.getMembers().size());
             for (UUID uuid : settlement.getMembers()) buf.writeUuid(uuid);
-
             SettlementResourceData.PACKET_CODEC.encode(buf, settlement.getData());
+
+            buf.writeVarInt(settlement.getBuildingsMap().size());
+            for (var entry : settlement.getBuildingsMap().entrySet()) {
+                buf.writeBlockPos(entry.getKey());
+                SettlementBuilding.PACKET_CODEC.encode(buf, entry.getValue());
+            }
         }
     };
 
@@ -94,6 +105,14 @@ public class Settlement {
     public SettlementResourceData getData() { return data; }
 
     // === Member handling ===
+    public List<UUID> getMembers() {
+        return List.copyOf(members);
+    }
+
+    public boolean hasMember(UUID girlId) {
+        return members.contains(girlId);
+    }
+
     public void addMember(SettlementGirlEntityAI girl) {
         if (!members.contains(girl.getUuid())) {
             members.add(girl.getUuid());
@@ -101,20 +120,11 @@ public class Settlement {
         }
     }
 
-    public boolean hasMember(UUID girlId) {
-        return members.contains(girlId);
-    }
-
     public void removeMember(SettlementGirlEntityAI girl) {
         members.remove(girl.getUuid());
         girl.setSettlement(null);
     }
 
-    public List<UUID> getMembers() {
-        return List.copyOf(members);
-    }
-
-    // === Resource management ===
     public void setMorale(float morale) { data = data.withMorale(morale); }
     public void addResources(int amount) { data = data.withMaterials(data.materials() + amount); }
 
@@ -129,24 +139,28 @@ public class Settlement {
 
     }
 
-    public void registerBuilding(World world, UUID Id, BlockPos doorPos, Direction tagFacing, BlockPos tagPos, BuildingType type, PlayerEntity player){
+    public void registerBuilding(World world, BlockPos doorPos, Direction tagFacing, BlockPos tagPos, BuildingType type, PlayerEntity player){
         BlockPos scanFrom = Utils.getBlockBehind(doorPos, tagFacing);
-        this.scanner.scanForBuilding(world, Id, scanFrom, doorPos, tagPos, type, player);
+        this.scanner.scanForBuilding(world, scanFrom, doorPos, tagPos, type, player);
     }
 
-    public void removeBuilding(UUID ID) {
-        this.buildings.remove(ID);
-    }
-
-    public HashMap<UUID, SettlementBuilding> getAllBuildings() {
+    public Map<BlockPos, SettlementBuilding> getBuildingsMap() {
         return this.buildings;
     }
 
-    public SettlementBuilding getBuilding(UUID ID) {
+    public List<SettlementBuilding> getAllBuildings() {
+        return new ArrayList<>(this.buildings.values());
+    }
+
+    public SettlementBuilding getBuilding(BlockPos ID) {
         return this.buildings.get(ID);
     }
 
-    public void addBuilding(UUID ID, SettlementBuilding building) {
+    public void addBuilding(BlockPos ID, SettlementBuilding building) {
         this.buildings.put(ID, building);
+    }
+
+    public void removeBuilding(BlockPos ID) {
+        this.buildings.remove(ID);
     }
 }

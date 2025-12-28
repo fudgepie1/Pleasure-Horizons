@@ -2,8 +2,8 @@ package com.sandymandy.pleasurecraft.block.blocks;
 
 import com.mojang.serialization.MapCodec;
 import com.sandymandy.pleasurecraft.block.PleasureCraftBlocks;
+import com.sandymandy.pleasurecraft.entity.girls.CoppieEntity;
 import com.sandymandy.pleasurecraft.entity.girls.CustomGirlEntity;
-import com.sandymandy.pleasurecraft.entity.girls.SlimeEntity;
 import com.sandymandy.pleasurecraft.registries.GirlRegistry;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.*;
@@ -11,9 +11,7 @@ import net.minecraft.block.pattern.BlockPattern;
 import net.minecraft.block.pattern.BlockPatternBuilder;
 import net.minecraft.block.pattern.CachedBlockPosition;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnReason;
-import net.minecraft.entity.passive.IronGolemEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.predicate.block.BlockStatePredicate;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -36,9 +34,10 @@ public class CarvedGirlPumpkinBlock extends HorizontalFacingBlock {
     @Nullable
     private BlockPattern customGirlPattern;
     @Nullable
-    private BlockPattern ironGolemDispenserPattern;
+    private BlockPattern copperGirlDispenserPattern;
     @Nullable
-    private BlockPattern ironGolemPattern;
+    private BlockPattern copperGirlPattern;
+
     private static final Predicate<BlockState> IS_GOLEM_HEAD_PREDICATE = state -> state != null
             && state.isOf(PleasureCraftBlocks.CARVED_GIRL_PUMPKIN);
 
@@ -60,7 +59,7 @@ public class CarvedGirlPumpkinBlock extends HorizontalFacingBlock {
     }
 
     public boolean canDispense(WorldView world, BlockPos pos) {
-        return this.getCustomGirlDispenserPattern().searchAround(world, pos) != null || this.getIronGolemDispenserPattern().searchAround(world, pos) != null;
+        return this.getCustomGirlDispenserPattern().searchAround(world, pos) != null || this.getCopperGirlDispenserPattern().searchAround(world, pos) != null;
     }
 
     private void trySpawnEntity(World world, BlockPos pos) {
@@ -71,12 +70,11 @@ public class CarvedGirlPumpkinBlock extends HorizontalFacingBlock {
                 spawnEntity(world, result, girl, result.translate(0, 1, 0).getBlockPos());
             }
         } else {
-            BlockPattern.Result result2 = this.getIronGolemPattern().searchAround(world, pos);
+            BlockPattern.Result result2 = this.getCopperGirlPattern().searchAround(world, pos);
             if (result2 != null) {
-                IronGolemEntity ironGolemEntity = EntityType.IRON_GOLEM.create(world, SpawnReason.TRIGGERED);
-                if (ironGolemEntity != null) {
-                    ironGolemEntity.setPlayerCreated(true);
-                    spawnEntity(world, result2, ironGolemEntity, result2.translate(1, 2, 0).getBlockPos());
+                CoppieEntity coppie = GirlRegistry.COPPIE.create(world, SpawnReason.TRIGGERED);
+                if (coppie != null) {
+                    spawnEntity(world, result2, coppie, result2.translate(0, 1, 0).getBlockPos());
                 }
             }
         }
@@ -127,7 +125,7 @@ public class CarvedGirlPumpkinBlock extends HorizontalFacingBlock {
         if (this.customGirlDispenserPattern == null) {
             this.customGirlDispenserPattern = BlockPatternBuilder.start()
                     .aisle(" ", "#")
-                    .where('#', CachedBlockPosition.matchesBlockState(BlockStatePredicate.forBlock(Blocks.COPPER_BLOCK)))
+                    .where('#', CachedBlockPosition.matchesBlockState(BlockStatePredicate.forBlock(Blocks.WHITE_WOOL)))
                     .build();
         }
 
@@ -146,28 +144,26 @@ public class CarvedGirlPumpkinBlock extends HorizontalFacingBlock {
         return this.customGirlPattern;
     }
 
-    private BlockPattern getIronGolemDispenserPattern() {
-        if (this.ironGolemDispenserPattern == null) {
-            this.ironGolemDispenserPattern = BlockPatternBuilder.start()
-                    .aisle("~ ~", "###", "~#~")
-                    .where('#', CachedBlockPosition.matchesBlockState(BlockStatePredicate.forBlock(Blocks.IRON_BLOCK)))
-                    .where('~', pos -> pos.getBlockState().isAir())
+    private BlockPattern getCopperGirlDispenserPattern() {
+        if (this.copperGirlDispenserPattern == null) {
+            this.copperGirlDispenserPattern = BlockPatternBuilder.start()
+                    .aisle(" ", "#")
+                    .where('#', CachedBlockPosition.matchesBlockState(BlockStatePredicate.forBlock(Blocks.COPPER_BLOCK)))
                     .build();
         }
 
-        return this.ironGolemDispenserPattern;
+        return this.copperGirlDispenserPattern;
     }
 
-    private BlockPattern getIronGolemPattern() {
-        if (this.ironGolemPattern == null) {
-            this.ironGolemPattern = BlockPatternBuilder.start()
-                    .aisle("~^~", "###", "~#~")
+    private BlockPattern getCopperGirlPattern() {
+        if (this.copperGirlPattern == null) {
+            this.copperGirlPattern = BlockPatternBuilder.start()
+                    .aisle("^", "#")
                     .where('^', CachedBlockPosition.matchesBlockState(IS_GOLEM_HEAD_PREDICATE))
-                    .where('#', CachedBlockPosition.matchesBlockState(BlockStatePredicate.forBlock(Blocks.IRON_BLOCK)))
-                    .where('~', pos -> pos.getBlockState().isAir())
+                    .where('#', CachedBlockPosition.matchesBlockState(BlockStatePredicate.forBlock(Blocks.COPPER_BLOCK)))
                     .build();
         }
 
-        return this.ironGolemPattern;
+        return this.copperGirlPattern;
     }
 }

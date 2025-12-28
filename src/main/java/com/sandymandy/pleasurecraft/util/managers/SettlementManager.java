@@ -31,8 +31,8 @@ public class SettlementManager extends PersistentState {
     // === PersistentStateType ===
     public static final PersistentStateType<SettlementManager> TYPE = new PersistentStateType<>(
             "pleasurecraft_settlements",
-            context -> new SettlementManager(),
-            context -> CODEC,
+            SettlementManager::new,
+            CODEC,
             DataFixTypes.LEVEL
     );
 
@@ -45,11 +45,16 @@ public class SettlementManager extends PersistentState {
         Settlement settlement = new Settlement(UUID.randomUUID(), owner, name, pos);
         settlements.put(settlement.getId(), settlement);
         markDirty();
+        System.out.println("Settlement Created: " + settlement.getId() + " | Total: " + settlements.size());
         return settlement;
     }
 
     public Settlement getSettlement(UUID id) {
-        return settlements.get(id);
+        Settlement s = settlements.get(id);
+        if (s == null) {
+            System.out.println("Failed to find settlement: " + id + " | Manager has: " + settlements.keySet());
+        }
+        return s;
     }
 
     @Nullable

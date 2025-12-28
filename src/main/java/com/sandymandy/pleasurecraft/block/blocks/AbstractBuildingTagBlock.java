@@ -1,8 +1,11 @@
 package com.sandymandy.pleasurecraft.block.blocks;
 
+import com.sandymandy.pleasurecraft.block.entity.PleasureCraftBlockEntities;
 import com.sandymandy.pleasurecraft.block.entity.entities.AbstractBuildingTagBlockEntity;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityTicker;
+import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.state.StateManager;
@@ -16,7 +19,6 @@ import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
 
 public abstract class AbstractBuildingTagBlock extends BlockWithEntity implements BlockEntityProvider {
@@ -63,15 +65,15 @@ public abstract class AbstractBuildingTagBlock extends BlockWithEntity implement
         };
     }
 
-
     @Override
-    public void onBroken(WorldAccess world, BlockPos pos, BlockState state) {
-        BlockEntity be = world.getBlockEntity(pos);
-        if (be instanceof AbstractBuildingTagBlockEntity tag) {
-            tag.onBreak();
-        }
-        super.onBroken(world, pos, state);
+    @Nullable
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(
+            World world, BlockState state, BlockEntityType<T> type) {
+
+        return validateTicker(type, PleasureCraftBlockEntities.BUILDING_TAG_BLOCK_ENTITY,
+                AbstractBuildingTagBlockEntity::tick);
     }
+
 
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {

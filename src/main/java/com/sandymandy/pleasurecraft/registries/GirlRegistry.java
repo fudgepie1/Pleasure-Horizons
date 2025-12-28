@@ -16,6 +16,8 @@ public class GirlRegistry {
 
     public static final EntityType<KoboldEntity> KOBOLD = PleasureCraftEntities.registerGirl("kobold", KoboldEntity::new, 0.5f, 1.75f, KoboldEntity::createAttributes);
 
+    public static final EntityType<CoppieEntity> COPPIE = PleasureCraftEntities.registerGirl("coppie", CoppieEntity::new, 0.5f, 1.35f, CoppieEntity::createAttributes);
+
     public static final EntityType<CustomGirlEntity> CUSTOM_GIRL = PleasureCraftEntities.registerGirl(
             "custom_girl",
             CustomGirlEntity::new,

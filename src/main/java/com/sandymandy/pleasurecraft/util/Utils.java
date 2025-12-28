@@ -10,6 +10,8 @@ import net.minecraft.block.enums.DoubleBlockHalf;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
+import net.minecraft.network.RegistryByteBuf;
+import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.registry.tag.TagKey;
@@ -29,7 +31,10 @@ import java.util.*;
 
 public class Utils {
 
-
+    public static final PacketCodec<RegistryByteBuf, BlockState> BLOCK_STATE_PACKET_CODEC = PacketCodec.ofStatic(
+            (buf, state) -> buf.writeVarInt(Block.STATE_IDS.getRawId(state)),
+            buf -> Block.STATE_IDS.get(buf.readVarInt())
+    );
 
     public static Settlement findNearestSettlement(World world, BlockPos pos) {
         if (!(world instanceof ServerWorld serverWorld)) return null;

@@ -1,10 +1,10 @@
 package com.sandymandy.pleasurecraft.block.entity.entities;
 
+import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.block.entity.PleasureCraftBlockEntities;
 import com.sandymandy.pleasurecraft.screen.SettlementHubScreenHandlerFactory;
 import com.sandymandy.pleasurecraft.settlement.Settlement;
 import com.sandymandy.pleasurecraft.util.managers.SettlementManager;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -29,7 +29,7 @@ import static com.sandymandy.pleasurecraft.util.Utils.getPlayerName;
 
 public class SettlementHubBlockEntity extends BlockEntity {
     private Settlement settlement;
-    private UUID settlementId; // ← Store the ID
+    private UUID settlementId;
 
     public SettlementHubBlockEntity(BlockPos pos, BlockState state) {
         super(PleasureCraftBlockEntities.SETTLEMENT_HUB_BLOCK_ENTITY, pos, state);
@@ -68,9 +68,10 @@ public class SettlementHubBlockEntity extends BlockEntity {
     public static void tick(World world, BlockPos pos, BlockState state, SettlementHubBlockEntity be) {
         if (world.isClient()) return;
 
-        Settlement settlement = be.getSettlement(); // ← Use getter
+        Settlement settlement = be.getSettlement();
         if (settlement != null) {
             settlement.tick(world);
+            PleasureCraft.LOGGER.info(settlement.getBuildingsMap().size()+"");
         }
     }
 
@@ -124,25 +125,21 @@ public class SettlementHubBlockEntity extends BlockEntity {
 
     @Nullable
     public Settlement getSettlement() {
-        // If we have the settlement cached, return it
-        if (settlement != null) {
-            return settlement;
-        }
+        if (this.settlement != null) return this.settlement;
 
-        // If we have an ID but not the settlement, try to fetch it
-        if (settlementId != null && world instanceof ServerWorld serverWorld) {
-            settlement = SettlementManager.get(serverWorld).getSettlement(settlementId);
+        if (this.world != null && !this.world.isClient && this.settlementId != null) {
+            this.settlement = SettlementManager.get((ServerWorld) this.world).getSettlement(this.settlementId);
         }
-
-        return settlement;
+        return this.settlement;
     }
 
-    /* === Sync Utility === */
-
-    public void syncToClient() {
-        if (world != null && !world.isClient()) {
-            world.updateListeners(pos, getCachedState(), getCachedState(), Block.NOTIFY_LISTENERS);
-            markDirty();
+    @Override
+    public void setWorld(World world) {
+        super.setWorld(world);
+        // As soon as the world is attached, try to resolve the settlement
+        if (!world.isClient && this.settlementId != null) {
+            this.settlement = SettlementManager.get((ServerWorld) world).getSettlement(this.settlementId);
         }
     }
+
 }
