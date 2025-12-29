@@ -16,6 +16,7 @@ import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Uuids;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -29,7 +30,8 @@ import static com.sandymandy.pleasurecraft.block.entity.PleasureCraftBlockEntiti
 public class AbstractBuildingTagBlockEntity extends BlockEntity {
 
     private BuildingType buildingType = BuildingType.NONE;
-    private BlockPos doorPos = new BlockPos(0, -70, 0);
+    private static final BlockPos doorNullPos = new BlockPos(0, -80, 0);
+    private BlockPos doorPos = doorNullPos;
     private UUID settlementId = null;
     private Settlement settlement;
 
@@ -75,21 +77,21 @@ public class AbstractBuildingTagBlockEntity extends BlockEntity {
     }
 
     public static void tick(World world, BlockPos pos, BlockState state, AbstractBuildingTagBlockEntity be) {
-        if (world.isClient) return;
+        if (world.isClient()) return;
 
         BlockPos doorPos = be.getDoorPos();
-        // Skip if this tag hasn't been assigned a door yet (using your -70 marker)
-        if (doorPos.getY() == -70) return;
+        // Skip if this tag hasn't been assigned a door yet
+        if (doorPos.equals(doorNullPos)) return;
 
-        // CRITICAL FIX: Only check the door if the chunk containing the door is actually loaded.
-        // If the chunk isn't loaded, world.getBlockState returns AIR, which triggers your removal logic incorrectly.
+        // Only check the door if the chunk containing the door is actually loaded.
+        // If the chunk isn't loaded, world.getBlockState returns AIR, which triggers the removal logic incorrectly.
         if (world.isChunkLoaded(doorPos)) {
             if (!world.getBlockState(doorPos).isIn(BlockTags.DOORS)) {
                 Settlement settlement = be.getSettlement();
                 if (settlement != null) {
-                    settlement.removeBuilding(doorPos);
+                    settlement.removeBuilding(doorPos, (ServerWorld) world);
                     PleasureCraftMessages.GlobleMessage(world, "Building Removed at " + doorPos.toShortString() + " because the door is missing!");
-                    be.setDoorPos(new BlockPos(0, -70, 0));
+                    be.setDoorPos(doorNullPos);
                 }
             }
         }
@@ -103,16 +105,16 @@ public class AbstractBuildingTagBlockEntity extends BlockEntity {
         BlockPos foundDoor = Utils.findNearbyDoor(world, pos, facingDirection);
 
         if (foundDoor == null) {
-            player.sendMessage(Text.literal("§cYou must place this tag above or beside a door!"), true);
+            player.sendMessage(Text.literal("You must place this tag above or beside a door!").formatted(Formatting.RED), true);
             return ActionResult.FAIL;
         }
 
         if(nearestSettlement == null || !nearestSettlement.getOwner().equals(player.getUuid())){
-            player.sendMessage(Text.of("§cNo nearby settlements found owned by you"), true);
+            player.sendMessage(Text.literal("No nearby settlements found owned by you").formatted(Formatting.RED), true);
             return ActionResult.FAIL;
         }
 
-        player.sendMessage(Text.of("Registering building to " + nearestSettlement.getName()), true);
+        player.sendMessage(Text.literal("Registering building to " + nearestSettlement.getName()), true);
         nearestSettlement.registerBuilding(world, foundDoor, facingDirection, pos, this.getBuildingType(), player);
 
         this.setSettlement(nearestSettlement);
@@ -123,8 +125,8 @@ public class AbstractBuildingTagBlockEntity extends BlockEntity {
     @Override
     public void onBlockReplaced(BlockPos pos, BlockState oldState) {
         Settlement s = getSettlement();
-        if (s != null && doorPos.getY() != -70) {
-            s.removeBuilding(doorPos);
+        if (s != null && !doorPos.equals(doorNullPos)) {
+            s.removeBuilding(doorPos, (ServerWorld) this.getWorld());
             PleasureCraft.LOGGER.info("Removed building at {} because the Tag was broken.", doorPos);
         }
     }

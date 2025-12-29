@@ -52,7 +52,7 @@ public class ResourcesTab extends SettlementTab {
 
         context.drawText(
                 screen.getTextRenderer(),
-                Text.literal("" + this.settlement.getAllBuildings().size()),
+                Text.literal("" + this.settlement.getBuildingIds().size()),
                 20, yOffset,
                 Colors.LIGHT_GRAY,
                 false

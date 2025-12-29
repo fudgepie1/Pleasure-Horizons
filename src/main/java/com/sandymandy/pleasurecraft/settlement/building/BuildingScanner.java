@@ -2,8 +2,11 @@ package com.sandymandy.pleasurecraft.settlement.building;
 
 import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.settlement.Settlement;
+import com.sandymandy.pleasurecraft.util.managers.SettlementBuildingManager;
+import com.sandymandy.pleasurecraft.util.variables.BlockEntry;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.property.Properties;
 import net.minecraft.block.enums.BedPart;
 import net.minecraft.block.enums.DoubleBlockHalf;
@@ -48,7 +51,7 @@ public class BuildingScanner {
 
         Set<BlockPos> visitedAir = new HashSet<>();
         Set<BlockPos> validQuadrants = new HashSet<>();
-        Map<BlockPos, BlockState> structureBlocks = new HashMap<>();
+        List<BlockEntry> structureBlocks = new ArrayList<>();
 
         Queue<BlockPos> toVisit = new ArrayDeque<>();
         toVisit.add(groundAligned);
@@ -73,7 +76,7 @@ public class BuildingScanner {
                         }
                     } else {
                         // It's a solid block (Wall, Bed, Chest, etc.)
-                        structureBlocks.put(neighbor.toImmutable(), state);
+                        structureBlocks.add(new BlockEntry(neighbor.toImmutable(), state));
                     }
                 }
             }
@@ -84,13 +87,13 @@ public class BuildingScanner {
         boolean hasRequirements = checkRequirements(type, structureBlocks, player);
 
         if (hasSize && hasRequirements) {
-            registerBuilding(doorPos, tagPos, type, structureBlocks, List.copyOf(validQuadrants), player);
+            registerBuilding(world, doorPos, tagPos, type, structureBlocks, List.copyOf(validQuadrants), player);
         } else if (!hasSize) {
             player.sendMessage(Text.literal("[BuildingScanner] Invalid building, only " + validQuadrants.size() + " valid quadrants found, minimum required is 9.").formatted(Formatting.RED), false);
         }
     }
 
-    private boolean checkRequirements(BuildingType type, Map<BlockPos, BlockState> blocks, PlayerEntity player) {
+    private boolean checkRequirements(BuildingType type, List<BlockEntry> blocks, PlayerEntity player) {
         Map<Object, Integer> requirements = type.getRequirements();
 
         for (Map.Entry<Object, Integer> entry : requirements.entrySet()) {
@@ -98,7 +101,8 @@ public class BuildingScanner {
             Object required = entry.getKey();
             int requiredAmount = entry.getValue();
 
-            for (BlockState state : blocks.values()) {
+            for (BlockEntry blockEntry : blocks) {
+                BlockState state = blockEntry.state();
                 if(!isMainPart(state)) continue;
 
                 if (required instanceof TagKey<?> tag) {
@@ -184,15 +188,15 @@ public class BuildingScanner {
     /**
      * Registers a successfully scanned building to the settlement.
      */
-    private void registerBuilding(BlockPos doorPos, BlockPos tagPos, BuildingType type, Map<BlockPos, BlockState> structureBlocks, List<BlockPos> validBlocks, PlayerEntity player) {
+    private void registerBuilding(World world, BlockPos doorPos, BlockPos tagPos, BuildingType type, List<BlockEntry> structureBlocks, List<BlockPos> validBlocks, PlayerEntity player) {
         SettlementBuilding building = new SettlementBuilding(
                 doorPos,
                 tagPos,
                 type,
                 structureBlocks
         );
-        if(settlement.getBuildingsMap().containsKey(doorPos)) settlement.removeBuilding(doorPos);
-        settlement.addBuilding(doorPos, building);
+        if(SettlementBuildingManager.get((ServerWorld) world).getAllBuildings().containsKey(doorPos)) settlement.removeBuilding(doorPos, (ServerWorld) world);
+        settlement.addBuilding(doorPos, building, (ServerWorld) world);
         PleasureCraft.LOGGER.info(
                 "[BuildingScanner] Registered building with {} valid quadrants.",
                 validBlocks.size()

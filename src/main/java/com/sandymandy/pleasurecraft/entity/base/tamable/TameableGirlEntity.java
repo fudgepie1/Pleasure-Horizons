@@ -64,70 +64,95 @@ public abstract class TameableGirlEntity extends GirlEntityScene implements Tame
     public ActionResult interactMob(PlayerEntity player, Hand hand) {
         ItemStack itemStack = player.getStackInHand(Hand.MAIN_HAND);
         Item itemInHand = itemStack.getItem();
-        if(this.getOverrideAnim().isEmpty()) {
-            if (!this.getWorld().isClient()) {
-                if (this.isTamed()) {
+        if (!this.getWorld().isClient() && this.getOverrideAnim().isEmpty()) {
+            if (this.isTamed()) {
 
-                    if (this.isOwner(player)) {
+                if (this.isOwner(player)) {
 
-                        if (itemInHand.equals(isAttractedTo())) {
-                            if (getCurrentRelationshipLevel() < maxRelationshipLevel()) {
-                                itemStack.decrementUnlessCreative(1, player);
-                                player.sendMessage(Text.literal("She Liked The Gift"), true);
-                                setCurrentRelationshipLevel(getCurrentRelationshipLevel() + 1);
-                                this.getWorld().sendEntityStatus(this, EntityStatuses.ADD_BREEDING_PARTICLES);
-                                return ActionResult.SUCCESS;
-                            } else {
-                                return ActionResult.PASS;
-                            }
+                    if (itemInHand.equals(isAttractedTo())) {
+                        if (getCurrentRelationshipLevel() < maxRelationshipLevel()) {
+                            itemStack.decrementUnlessCreative(1, player);
+                            player.sendMessage(Text.literal("She Liked The Gift"), true);
+                            setCurrentRelationshipLevel(getCurrentRelationshipLevel() + 1);
+                            this.getWorld().sendEntityStatus(this, EntityStatuses.ADD_VILLAGER_HAPPY_PARTICLES);
+                            return ActionResult.SUCCESS;
+                        } else {
+                            return ActionResult.PASS;
                         }
+                    }
 
-                        if (itemStack.isEmpty()) {
-                            if (player.isSneaking()) {
-                                this.setSitting(!this.isSitting());
-                                this.jumping = false;
-                                this.navigation.stop();
-                                this.setTarget(null);
-                                return ActionResult.SUCCESS.noIncrementStat();
-                            }
-                            else if (!this.isSceneActive()){
-                                player.openHandledScreen(new GirlInventoryScreenHandlerFactory(this));
-                                this.setGUIOpenState(true, player);
-                                return ActionResult.SUCCESS;
-                            }
+                    if (itemStack.isEmpty()) {
+                        if (player.isSneaking()) {
+                            this.setSitting(!this.isSitting());
+                            this.jumping = false;
+                            this.navigation.stop();
+                            this.setTarget(null);
+                            return ActionResult.SUCCESS.noIncrementStat();
                         }
-                    } else {
-                        if (itemInHand.equals(isAttractedTo())) {
-                            player.sendMessage(Text.of(PleasureCraftLangUtils.getStringFromKey("msg.pleasurecraft.alreadyInRelationship")), true);
-                            return ActionResult.FAIL;
+                        else if (!this.isSceneActive()){
+                            player.openHandledScreen(new GirlInventoryScreenHandlerFactory(this));
+                            this.setGUIOpenState(true, player);
+                            return ActionResult.SUCCESS;
                         }
                     }
                 } else {
-
-                    if (itemStack.isEmpty() && player.isSneaking()) {
-                        this.getNavigation().findPathTo(player, 20);
-                        player.openHandledScreen(new GirlInventoryScreenHandlerFactory(this));
-                        this.setGUIOpenState(true, player);
-                        return ActionResult.SUCCESS;
+                    if (itemInHand.equals(isAttractedTo())) {
+                        player.sendMessage(Text.of(PleasureCraftLangUtils.getStringFromKey("msg.pleasurecraft.alreadyInRelationship")), true);
+                        return ActionResult.FAIL;
                     }
+                }
+            } else {
+                if (itemStack.isEmpty() && player.isSneaking()) {
+                    this.getNavigation().findPathTo(player, 20);
+                    player.openHandledScreen(new GirlInventoryScreenHandlerFactory(this));
+                    this.setGUIOpenState(true, player);
+                    return ActionResult.SUCCESS;
+                }
 
-                    if (!this.getWorld().isClient()) {
-                        if (itemInHand.equals(isAttractedTo()) && !player.isSneaking()) {
-                            itemStack.decrementUnlessCreative(1, player);
-                            this.tryTame(player);
-                            return ActionResult.SUCCESS;
-                        } else {
-                            // Wrong item OR empty hand (not sneaking)
-                            player.sendMessage(Text.literal(
-                                    "She ignores you. Maybe try giving her a " + getReadableTameItemName(this.isAttractedTo()) + "."
-                            ), true);
-                            return ActionResult.FAIL;
-                        }
-                    }
+                if (itemInHand.equals(isAttractedTo()) && !player.isSneaking()) {
+                    itemStack.decrementUnlessCreative(1, player);
+                    this.tryTame(player);
+                    return ActionResult.SUCCESS;
+                } else {
+                    // Wrong item OR empty hand (not sneaking)
+                    player.sendMessage(Text.literal(
+                            "She ignores you. Maybe try giving her a " + getReadableTameItemName(this.isAttractedTo()) + "."
+                    ), true);
+                    return ActionResult.FAIL;
                 }
             }
         }
         return super.interactMob(player, hand);
+    }
+
+    private void tryTame(PlayerEntity player) {
+        if (this.random.nextInt(3) == 0) {
+            this.setTamedBy(player);
+            this.navigation.stop();
+            setTarget(null);
+            this.getWorld().sendEntityStatus(this, EntityStatuses.ADD_POSITIVE_PLAYER_REACTION_PARTICLES);
+            player.sendMessage(Text.literal("You Asked " + getGirlDisplayName() + " Out And She Said §aYes" ), true);
+            this.setBasePosHere();
+        } else {
+            this.getWorld().sendEntityStatus(this, EntityStatuses.ADD_NEGATIVE_PLAYER_REACTION_PARTICLES);
+        }
+    }
+
+    public void breakUp(PlayerEntity player) {
+        if(!player.getWorld().isClient){
+            this.setTamed(false,true); // Mark the entity as untamed
+            this.setOwner((LivingEntity) null); // Remove the owner UUID
+            TamedGirlManager.get((ServerWorld) this.getWorld()).removeGirl(this.getUuid());
+            this.setSitting(false); // Ensure the entity is not sitting
+            this.setStripped(false);
+            this.dropInventory((ServerWorld) this.getWorld());
+            this.setCurrentRelationshipLevel(0);
+            if(!isTamed() && !isOwner(player)){
+                player.sendMessage(Text.literal("§cYou Broke Up With " + getGirlDisplayName()), true);
+            }
+            this.getWorld().sendEntityStatus(this, EntityStatuses.ADD_VILLAGER_ANGRY_PARTICLES);
+
+        }
     }
 
     @Override
@@ -214,36 +239,6 @@ public abstract class TameableGirlEntity extends GirlEntityScene implements Tame
         this.setBonePos("boobs", this.getBreastOffset());
     }
 
-    private void tryTame(PlayerEntity player) {
-        if (this.random.nextInt(3) == 0) {
-            this.setTamedBy(player);
-            this.navigation.stop();
-            setTarget(null);
-            this.getWorld().sendEntityStatus(this, EntityStatuses.ADD_POSITIVE_PLAYER_REACTION_PARTICLES);
-            player.sendMessage(Text.literal("You Asked " + getGirlDisplayName() + " Out And She Said §aYes" ), true);
-            this.setBasePosHere();
-        } else {
-            this.getWorld().sendEntityStatus(this, EntityStatuses.ADD_NEGATIVE_PLAYER_REACTION_PARTICLES);
-        }
-    }
-
-    public void breakUp(PlayerEntity player) {
-        if(!player.getWorld().isClient){
-            this.setTamed(false,true); // Mark the entity as untamed
-            this.setOwner((LivingEntity) null); // Remove the owner UUID
-            TamedGirlManager.get((ServerWorld) this.getWorld()).removeGirl(this.getUuid());
-            this.setSitting(false); // Ensure the entity is not sitting
-            this.setStripped(false);
-            this.dropInventory((ServerWorld) this.getWorld());
-            this.setCurrentRelationshipLevel(0);
-            if(!isTamed() && !isOwner(player)){
-                player.sendMessage(Text.literal("§cYou Broke Up With " + getGirlDisplayName()), true);
-            }
-            this.getWorld().sendEntityStatus(this, EntityStatuses.ADD_VILLAGER_ANGRY_PARTICLES);
-
-        }
-    }
-
     @Override
     public boolean canBeLeashed() {
         return true;
@@ -255,13 +250,16 @@ public abstract class TameableGirlEntity extends GirlEntityScene implements Tame
             particleEffect = ParticleTypes.SMOKE;
         }
 
-        for(int i = 0; i < 7; ++i) {
+        produceParticles(particleEffect);
+    }
+
+    protected void produceParticles(ParticleEffect parameters) {
+        for (int i = 0; i < 5; i++) {
             double d = this.random.nextGaussian() * 0.02;
             double e = this.random.nextGaussian() * 0.02;
             double f = this.random.nextGaussian() * 0.02;
-            this.getWorld().addParticleClient(particleEffect, this.getParticleX((double)1.0F), this.getRandomBodyY() + (double)0.5F, this.getParticleZ((double)1.0F), d, e, f);
+            this.getWorld().addParticleClient(parameters, this.getParticleX(1.0), this.getRandomBodyY() + 0.5f, this.getParticleZ(1.0), d, e, f);
         }
-
     }
 
     @Override
@@ -270,7 +268,10 @@ public abstract class TameableGirlEntity extends GirlEntityScene implements Tame
             this.showEmoteParticle(true);
         } else if (status == EntityStatuses.ADD_NEGATIVE_PLAYER_REACTION_PARTICLES) {
             this.showEmoteParticle(false);
-        } else {
+        } else if (status == EntityStatuses.ADD_VILLAGER_HAPPY_PARTICLES) {
+            this.produceParticles(ParticleTypes.HAPPY_VILLAGER);
+        }
+        else {
             super.handleStatus(status);
         }
     }

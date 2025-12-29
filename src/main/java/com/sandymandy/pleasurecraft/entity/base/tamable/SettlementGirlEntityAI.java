@@ -2,15 +2,13 @@ package com.sandymandy.pleasurecraft.entity.base.tamable;
 
 import com.sandymandy.pleasurecraft.entity.ai.goal.*;
 import com.sandymandy.pleasurecraft.entity.base.GirlEntity;
-import com.sandymandy.pleasurecraft.registries.PleasureCraftTrackedDataRegistry;
 import com.sandymandy.pleasurecraft.settlement.Settlement;
 import com.sandymandy.pleasurecraft.settlement.SettlementMember;
 import com.sandymandy.pleasurecraft.util.managers.SettlementManager;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.brain.Brain;
 import net.minecraft.entity.ai.goal.*;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
@@ -225,5 +223,19 @@ public abstract class SettlementGirlEntityAI extends TameableGirlEntity implemen
         } else {
             setSettlementById(null);
         }
+    }
+
+    @Override
+    public void onDeath(DamageSource damageSource) {
+        if (this.getWorld() instanceof ServerWorld && this.hasSettlement()) {
+            this.getSettlement().removeMember(this);
+        }
+        super.onDeath(damageSource);
+    }
+
+    @Override
+    public void breakUp(PlayerEntity player) {
+        if(!player.getWorld().isClient() && this.hasSettlement()) this.getSettlement().removeMember(this);
+        super.breakUp(player);
     }
 }

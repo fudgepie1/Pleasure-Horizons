@@ -31,11 +31,6 @@ import java.util.*;
 
 public class Utils {
 
-    public static final PacketCodec<RegistryByteBuf, BlockState> BLOCK_STATE_PACKET_CODEC = PacketCodec.ofStatic(
-            (buf, state) -> buf.writeVarInt(Block.STATE_IDS.getRawId(state)),
-            buf -> Block.STATE_IDS.get(buf.readVarInt())
-    );
-
     public static Settlement findNearestSettlement(World world, BlockPos pos) {
         if (!(world instanceof ServerWorld serverWorld)) return null;
 

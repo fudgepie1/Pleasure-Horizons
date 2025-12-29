@@ -7,9 +7,12 @@ import com.sandymandy.pleasurecraft.settlement.building.BuildingScanner;
 import com.sandymandy.pleasurecraft.settlement.building.BuildingType;
 import com.sandymandy.pleasurecraft.settlement.building.SettlementBuilding;
 import com.sandymandy.pleasurecraft.util.Utils;
+import com.sandymandy.pleasurecraft.util.managers.SettlementBuildingManager;
+import com.sandymandy.pleasurecraft.util.managers.SettlementManager;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Uuids;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -25,7 +28,8 @@ public class Settlement {
     private SettlementResourceData data;
     private final BuildingScanner scanner = new BuildingScanner(this);
     private final List<UUID> members = new ArrayList<>();
-    private final HashMap<BlockPos, SettlementBuilding> buildings = new HashMap<>();
+    private final List<BlockPos> buildingIds = new ArrayList<>();
+    private SettlementManager manager; // For marking dirty
     // === CODEC ===
     public static final Codec<Settlement> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Uuids.CODEC.fieldOf("id").forGetter(Settlement::getId),
@@ -33,12 +37,12 @@ public class Settlement {
             Codec.STRING.fieldOf("name").forGetter(Settlement::getName),
             BlockPos.CODEC.fieldOf("corePos").forGetter(Settlement::getCorePos),
             Codec.list(Uuids.CODEC).fieldOf("members").orElse(List.of()).forGetter(Settlement::getMembers),
-            Codec.list(SettlementBuilding.CODEC).fieldOf("buildings").orElse(List.of()).forGetter(Settlement::getAllBuildings),
+            Codec.list(BlockPos.CODEC).fieldOf("buildingIds").orElse(List.of()).forGetter(Settlement::getBuildingIds),
             SettlementResourceData.CODEC.fieldOf("data").forGetter(Settlement::getData)
-    ).apply(instance, (id, owner, name, pos, members, buildings, data) -> {
+    ).apply(instance, (id, owner, name, pos, members, bIds, data) -> {
         Settlement s = new Settlement(id, owner, name, pos);
         s.members.addAll(members);
-        for (SettlementBuilding b : buildings) s.buildings.put(b.getDoorPos(), b);
+        s.buildingIds.addAll(bIds);
         s.data = data;
         return s;
     }));
@@ -56,18 +60,17 @@ public class Settlement {
             List<UUID> members = new ArrayList<>(memberCount);
             for (int i = 0; i < memberCount; i++) members.add(buf.readUuid());
 
+            int buildingCount = buf.readVarInt();
+            List<BlockPos> buildings = new ArrayList<>(buildingCount);
+            for (int i = 0; i < buildingCount; i++) buildings.add(buf.readBlockPos());
+
             SettlementResourceData data = SettlementResourceData.PACKET_CODEC.decode(buf);
 
             Settlement s = new Settlement(id, owner, name, pos);
             s.members.addAll(members);
+            s.buildingIds.addAll(buildings);
             s.data = data;
 
-            int buildingCount = buf.readVarInt();
-            for (int i = 0; i < buildingCount; i++) {
-                BlockPos bPos = buf.readBlockPos();
-                SettlementBuilding building = SettlementBuilding.PACKET_CODEC.decode(buf);
-                s.buildings.put(bPos, building);
-            }
             return s;
         }
 
@@ -80,13 +83,13 @@ public class Settlement {
 
             buf.writeVarInt(settlement.getMembers().size());
             for (UUID uuid : settlement.getMembers()) buf.writeUuid(uuid);
+
+            buf.writeVarInt(settlement.getBuildingIds().size());
+            for (BlockPos pos : settlement.getBuildingIds()) buf.writeBlockPos(pos);
+
             SettlementResourceData.PACKET_CODEC.encode(buf, settlement.getData());
 
-            buf.writeVarInt(settlement.getBuildingsMap().size());
-            for (var entry : settlement.getBuildingsMap().entrySet()) {
-                buf.writeBlockPos(entry.getKey());
-                SettlementBuilding.PACKET_CODEC.encode(buf, entry.getValue());
-            }
+
         }
     };
 
@@ -118,15 +121,23 @@ public class Settlement {
             members.add(girl.getUuid());
             girl.setSettlement(this);
         }
+        markDirty();
     }
 
     public void removeMember(SettlementGirlEntityAI girl) {
         members.remove(girl.getUuid());
         girl.setSettlement(null);
+        markDirty();
     }
 
-    public void setMorale(float morale) { data = data.withMorale(morale); }
-    public void addResources(int amount) { data = data.withMaterials(data.materials() + amount); }
+    public void setMorale(float morale) {
+        data = data.withMorale(morale);
+        markDirty();
+    }
+    public void addResources(int amount) {
+        data = data.withMaterials(data.materials() + amount);
+        markDirty();
+    }
 
     // === Ticking ===
     public void tick(World world) {
@@ -135,6 +146,7 @@ public class Settlement {
         if (world.getTime() % 24000 == 0) { // daily tick
             float newMorale = Math.max(0, data.morale() - 0.01f);
             data = data.withMorale(newMorale);
+            markDirty();
         }
 
     }
@@ -144,23 +156,39 @@ public class Settlement {
         this.scanner.scanForBuilding(world, scanFrom, doorPos, tagPos, type, player);
     }
 
-    public Map<BlockPos, SettlementBuilding> getBuildingsMap() {
-        return this.buildings;
+    public List<SettlementBuilding> getBuildings(ServerWorld world) {
+        SettlementBuildingManager manager = SettlementBuildingManager.get(world);
+        return buildingIds.stream()
+                .map(manager::getBuilding)
+                .filter(Objects::nonNull)
+                .toList();
     }
 
-    public List<SettlementBuilding> getAllBuildings() {
-        return new ArrayList<>(this.buildings.values());
+    public List<BlockPos> getBuildingIds() {
+        return this.buildingIds;
     }
 
-    public SettlementBuilding getBuilding(BlockPos ID) {
-        return this.buildings.get(ID);
+    public void addBuilding(BlockPos pos, SettlementBuilding building, ServerWorld world) {
+        if (!buildingIds.contains(pos)) {
+            SettlementBuildingManager.get(world).registerBuildings(building);
+            buildingIds.add(pos);
+        }
+        markDirty();
     }
 
-    public void addBuilding(BlockPos ID, SettlementBuilding building) {
-        this.buildings.put(ID, building);
+    public void removeBuilding(BlockPos pos, ServerWorld world) {
+        SettlementBuildingManager.get(world).removeBuilding(pos);
+        buildingIds.remove(pos);
+        markDirty();
     }
 
-    public void removeBuilding(BlockPos ID) {
-        this.buildings.remove(ID);
+    public void setManager(SettlementManager manager) {
+        this.manager = manager;
+    }
+
+    private void markDirty() {
+        if (this.manager != null) {
+            this.manager.markDirty();
+        }
     }
 }

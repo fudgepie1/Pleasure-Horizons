@@ -2,13 +2,13 @@ package com.sandymandy.pleasurecraft.util.managers;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.settlement.Settlement;
 import net.minecraft.datafixer.DataFixTypes;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.PersistentState;
 import net.minecraft.world.PersistentStateType;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -17,18 +17,21 @@ public class SettlementManager extends PersistentState {
 
     private final Map<UUID, Settlement> settlements = new HashMap<>();
 
-    // === CODEC ===
+    // __Codec__
     public static final Codec<SettlementManager> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.list(Settlement.CODEC)
                     .fieldOf("settlements")
                     .forGetter(manager -> new ArrayList<>(manager.settlements.values()))
     ).apply(instance, list -> {
         SettlementManager manager = new SettlementManager();
-        for (Settlement s : list) manager.settlements.put(s.getId(), s);
+        for (Settlement s : list) {
+            s.setManager(manager);
+            manager.settlements.put(s.getId(), s);
+        }
         return manager;
     }));
 
-    // === PersistentStateType ===
+    // __PersistentStateType__
     public static final PersistentStateType<SettlementManager> TYPE = new PersistentStateType<>(
             "pleasurecraft_settlements",
             SettlementManager::new,
@@ -36,7 +39,7 @@ public class SettlementManager extends PersistentState {
             DataFixTypes.LEVEL
     );
 
-    // === Core Methods ===
+    // __Core Methods__
     public static SettlementManager get(ServerWorld world) {
         return world.getPersistentStateManager().getOrCreate(TYPE);
     }
@@ -45,14 +48,14 @@ public class SettlementManager extends PersistentState {
         Settlement settlement = new Settlement(UUID.randomUUID(), owner, name, pos);
         settlements.put(settlement.getId(), settlement);
         markDirty();
-        System.out.println("Settlement Created: " + settlement.getId() + " | Total: " + settlements.size());
+        PleasureCraft.LOGGER.info("Settlement Created: " + settlement.getId() + " | Total: " + settlements.size());
         return settlement;
     }
 
     public Settlement getSettlement(UUID id) {
         Settlement s = settlements.get(id);
         if (s == null) {
-            System.out.println("Failed to find settlement: " + id + " | Manager has: " + settlements.keySet());
+            PleasureCraft.LOGGER.error("Failed to find settlement: " + id + " | Manager has: " + settlements.keySet());
         }
         return s;
     }
@@ -74,11 +77,5 @@ public class SettlementManager extends PersistentState {
 
     public Collection<Settlement> getAllSettlements() {
         return Collections.unmodifiableCollection(settlements.values());
-    }
-
-    public void tick(World world) {
-        for (Settlement s : settlements.values()) {
-            s.tick(world);
-        }
     }
 }

@@ -71,7 +71,6 @@ public class SettlementHubBlockEntity extends BlockEntity {
         Settlement settlement = be.getSettlement();
         if (settlement != null) {
             settlement.tick(world);
-            PleasureCraft.LOGGER.info(settlement.getBuildingsMap().size()+"");
         }
     }
 
