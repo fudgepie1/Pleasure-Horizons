@@ -234,6 +234,10 @@ public abstract class GirlEntityScene extends GirlEntity implements GeoEntity {
         }
     }
 
+    public void setBoneVisibility(String bone, boolean visible){
+        this.setBoneVisibility(List.of(bone), visible);
+    }
+
     public void setPregnancyTicks(int progress){
         this.dataTracker.set(PREGNANCY_TICKS, progress);
     }
@@ -643,10 +647,9 @@ public abstract class GirlEntityScene extends GirlEntity implements GeoEntity {
         this.setSceneProgress(Math.clamp(this.getSceneProgress(), 0, this.getCumThreshold()));
     }
 
-    private boolean wasPregnantLastTick = false;
-
     @Override
     public void tick() {
+        PleasureCraft.LOGGER.info(this.getPassengerBonePosition().toString());
         super.tick();
         //Rendering
         this.updateClothingAndArmor();
@@ -1071,7 +1074,7 @@ public abstract class GirlEntityScene extends GirlEntity implements GeoEntity {
                 // Special rule: hide vagina if armor is in legs slot
                 if (slot == EquipmentSlot.LEGS) {
                     boolean legsCovered = armorVisibility.getOrDefault(slot, false);
-                    setBoneVisibility(Collections.singletonList("vagina"), !legsCovered);
+                    setBoneVisibility("vagina", !legsCovered);
                 }
             }
             displayArmor(slot);

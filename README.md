@@ -81,6 +81,18 @@
 
 ---
 
+## License
+
+This project is **source-available** but **not open-source**.
+
+You may view the source code and contribute via pull requests.
+You may NOT use, compile, redistribute, or include this code in other projects
+without explicit permission.
+
+See the LICENSE file for details.
+
+---
+
 ## Disclaimer
 
 This mod contains **adult content** and is intended for **mature audiences only**.  

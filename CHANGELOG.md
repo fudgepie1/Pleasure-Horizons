@@ -9,6 +9,7 @@
 - Added a new item that adds girls to settlements 
 - Added a new girl based on the copper golem called Coppie
 - Improved how the building scanner works by requiring type specific blocks in the building
+- Fixed a bug that made you teleport to 0, 0, 0 sometimes when starting a scene
 
 ## v0.6.1
 - Fixed the issue where girls in villagers would have tiny breasts

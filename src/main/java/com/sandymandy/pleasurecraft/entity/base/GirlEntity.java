@@ -38,9 +38,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec2f;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
@@ -93,7 +91,7 @@ public abstract class GirlEntity extends PathAwareEntity implements RangedAttack
     );
     private int ticksSinceLastHit;
     public float previousYaw = 0;
-    public float passengerYOffset = -0.8f;
+    public float passengerYOffset = -1f;
     public boolean currentLoopState = false;
     public boolean currentHoldState = false;
     private boolean guiOpenSate = false;
@@ -101,7 +99,6 @@ public abstract class GirlEntity extends PathAwareEntity implements RangedAttack
     public final GirlInventory inventory = GirlInventory.ofSize();
     private LivingEntity attackTarget;
     private PlayerEntity lookAtTarget;
-
     protected GirlEntity(EntityType<? extends GirlEntity> entityType, World world) {
         super(entityType, world);
     }
@@ -558,13 +555,8 @@ public abstract class GirlEntity extends PathAwareEntity implements RangedAttack
     }
 
     public Vec3d getPassengerPos() {
-        boolean isZero = this.getPassengerBonePosition().lengthSquared() < 1.0E-12; // ~0
-        if(isZero){
-            return this.getPos().add(1.5, 0.9, 0);
-        }
-        else {
-            return this.getPassengerBonePosition().add(0, this.passengerYOffset, 0);
-        }
+        return this.getPos().add(this.getPassengerBonePosition())
+                .add(0, this.passengerYOffset, 0);
     }
 
     @Override

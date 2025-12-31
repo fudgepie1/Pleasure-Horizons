@@ -179,9 +179,8 @@ public abstract class AbstractGirlRenderer<T extends GirlEntityScene, R extends 
 
         if(getGeoModel().getBone(passengerBoneName).isPresent()){
             GeoBone bone = getGeoModel().getBone(passengerBoneName).get();
-            Vector3d bonePos = bone.getWorldPosition();
-            Vec3d passengerBonePos = new Vec3d(bonePos.x, bonePos.y, bonePos.z);
-            ClientPlayNetworking.send(new BonePosSyncC2SPacket(renderState.getGeckolibData(PleasureCraftDataTicketRegistry.ENTITY_ID), passengerBonePos));
+            Vector3d bonePos = bone.getLocalPosition();
+            ClientPlayNetworking.send(new BonePosSyncC2SPacket(renderState.getGeckolibData(PleasureCraftDataTicketRegistry.ENTITY_ID), new Vec3d(bonePos.x, bonePos.y, bonePos.z)));
         }
         super.renderFinal(renderState, poseStack, model, bufferSource, buffer, packedLight, packedOverlay, renderColor);
     }

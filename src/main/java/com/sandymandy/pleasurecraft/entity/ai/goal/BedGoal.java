@@ -31,7 +31,7 @@ public class BedGoal extends Goal {
         this.entity = entity;
         this.speed = speed;
         this.navigation = entity.getNavigation();
-        this.setControls(EnumSet.of(Goal.Control.MOVE, Goal.Control.LOOK, Control.JUMP));
+        this.setControls(EnumSet.of(Control.MOVE, Control.LOOK, Control.JUMP));
         if (!(entity.getNavigation() instanceof MobNavigation) && !(entity.getNavigation() instanceof BirdNavigation)) {
             throw new IllegalArgumentException("Unsupported mob type for BedGoal");
         }
@@ -85,7 +85,7 @@ public class BedGoal extends Goal {
     }
 
     private void handleMovement() {
-        if (this.entity.squaredDistanceTo(this.entity.targetBedPos.toCenterPos()) <= 3.0D) {
+        if (this.entity.targetBedPos != null && this.entity.squaredDistanceTo(this.entity.targetBedPos.toCenterPos()) <= 3.0D) {
             if (this.entity.getScenePlayer() != null) {
                 this.navigation.stop();
 
@@ -106,15 +106,8 @@ public class BedGoal extends Goal {
                     );
                 }
 
-                // Mirror to model this tick (safe on both sides)
-                this.entity.setYaw(targetYaw);
                 this.entity.setHeadYaw(targetYaw);
                 this.entity.setBodyYaw(targetYaw);
-
-                // Keep LookControl from fighting the snap while waiting
-                this.entity.getLookControl().lookAt(
-                        this.entity.getX(), this.entity.getEyeY(), this.entity.getZ()
-                );
 
                 if (!this.entity.isSceneActive()) {
                     this.entity.playPhase(ScenePhase.LAYING_DOWN);
