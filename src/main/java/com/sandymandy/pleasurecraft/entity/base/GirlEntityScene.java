@@ -649,7 +649,6 @@ public abstract class GirlEntityScene extends GirlEntity implements GeoEntity {
 
     @Override
     public void tick() {
-        PleasureCraft.LOGGER.info(this.getPassengerBonePosition().toString());
         super.tick();
         //Rendering
         this.updateClothingAndArmor();

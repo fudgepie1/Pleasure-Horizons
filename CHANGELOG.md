@@ -10,6 +10,7 @@
 - Added a new girl based on the copper golem called Coppie
 - Improved how the building scanner works by requiring type specific blocks in the building
 - Fixed a bug that made you teleport to 0, 0, 0 sometimes when starting a scene
+- Fixed the particles not showing when giving a gift to a girl
 
 ## v0.6.1
 - Fixed the issue where girls in villagers would have tiny breasts

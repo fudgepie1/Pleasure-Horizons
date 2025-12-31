@@ -1,12 +1,12 @@
 package com.sandymandy.pleasurecraft.entity.base;
 
 import com.sandymandy.pleasurecraft.PleasureCraft;
+import com.sandymandy.pleasurecraft.entity.PleasureCraftEntityStatuses;
 import com.sandymandy.pleasurecraft.registries.PleasureCraftTrackedDataRegistry;
 import com.sandymandy.pleasurecraft.util.PleasureCraftLangUtils;
 import com.sandymandy.pleasurecraft.util.inventory.GirlInventory;
 import com.sandymandy.pleasurecraft.util.variables.Scene;
 import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.FoodComponent;
 import net.minecraft.component.type.UseRemainderComponent;
 import net.minecraft.entity.*;
 import net.minecraft.entity.ai.RangedAttackMob;
@@ -29,13 +29,15 @@ import net.minecraft.inventory.Inventories;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.particle.ItemStackParticleEffect;
+import net.minecraft.particle.ParticleEffect;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
 import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.*;
@@ -72,6 +74,7 @@ public abstract class GirlEntity extends PathAwareEntity implements RangedAttack
     private static final TrackedData<BlockPos> BASE_POS = DataTracker.registerData(GirlEntity.class, TrackedDataHandlerRegistry.BLOCK_POS);
     private static final TrackedData<Vec3d> PASSENGER_BONE_POSITION = DataTracker.registerData(GirlEntity.class, PleasureCraftTrackedDataRegistry.VEC3D);
     private static final TrackedData<Vec3d> BREAST_OFFSET = DataTracker.registerData(GirlEntity.class, PleasureCraftTrackedDataRegistry.VEC3D);
+    private static final TrackedData<ItemStack> CONSUMING_STACK = DataTracker.registerData(GirlEntity.class, TrackedDataHandlerRegistry.ITEM_STACK);
     public static final Random RANDOM = new Random();
     public Map<String, Boolean> boneVisibility = new HashMap<>();
     public Map<String, Integer> boneColorOverrides = new HashMap<>();
@@ -132,6 +135,7 @@ public abstract class GirlEntity extends PathAwareEntity implements RangedAttack
         builder.add(BASE_POS, this.getBlockPos());
         builder.add(OVERRIDE_ANIM,"");
         builder.add(SCENE_ANIM,"");
+        builder.add(CONSUMING_STACK, new ItemStack(Items.COOKED_BEEF));
     }
 
     public void setFollowing(boolean follow) {
@@ -437,23 +441,6 @@ public abstract class GirlEntity extends PathAwareEntity implements RangedAttack
     }
 
     @Override
-    protected ActionResult interactMob(PlayerEntity player, Hand hand) {
-        ItemStack itemStack = player.getStackInHand(Hand.MAIN_HAND);
-        Item itemInHand = itemStack.getItem();
-
-        if (this.isFoodItem(itemStack) && this.getHealth() < this.getMaxHealth()) {
-            this.getNavigation().findPathTo(player, 20);
-            this.eat(player, hand, itemStack);
-            FoodComponent foodComponent = itemStack.get(DataComponentTypes.FOOD);
-            float f = foodComponent != null ? foodComponent.nutrition() : 1.0F;
-            this.heal(2.0F * f);
-            this.getWorld().sendEntityStatus(this, EntityStatuses.CONSUME_ITEM);
-            return ActionResult.CONSUME;
-        }
-        return super.interactMob(player, hand);
-    }
-
-    @Override
     public void writeCustomData(WriteView view) {
         super.writeCustomData(view);
         Inventories.writeData(view, this.inventory.getItems());
@@ -548,6 +535,9 @@ public abstract class GirlEntity extends PathAwareEntity implements RangedAttack
         int i = stack.getCount();
         UseRemainderComponent useRemainderComponent = stack.get(DataComponentTypes.USE_REMAINDER);
         stack.decrementUnlessCreative(1, player);
+        this.playSound(SoundEvents.ENTITY_GENERIC_EAT.value());
+        this.dataTracker.set(CONSUMING_STACK, stack);
+        this.getWorld().sendEntityStatus(this, PleasureCraftEntityStatuses.EAT_PARTICLES);
         if (useRemainderComponent != null) {
             ItemStack itemStack = useRemainderComponent.convert(stack, i, player.isInCreativeMode(), player::giveOrDropStack);
             player.setStackInHand(hand, itemStack);
@@ -555,6 +545,13 @@ public abstract class GirlEntity extends PathAwareEntity implements RangedAttack
     }
 
     public Vec3d getPassengerPos() {
+        boolean isZero = this.getPassengerBonePosition().isInRange(Vec3d.ZERO, 0.1);
+
+        if(isZero || !this.isHavingSex()){
+            // Default position when no bone data is available
+            return this.getPos().add(0, 1, 0);
+        }
+
         return this.getPos().add(this.getPassengerBonePosition())
                 .add(0, this.passengerYOffset, 0);
     }
@@ -664,7 +661,36 @@ public abstract class GirlEntity extends PathAwareEntity implements RangedAttack
         return ProjectileUtil.createArrowProjectile(this, arrow, damageModifier, shotFrom);
     }
 
+    @Override
+    public void handleStatus(byte status) {
+        if (status == PleasureCraftEntityStatuses.POSITIVE_REACTION_PARTICLES) {
+            this.spawnParticles(ParticleTypes.HEART);
+        }
+        else if (status == PleasureCraftEntityStatuses.NEGATIVE_REACTION_PARTICLES) {
+            this.spawnParticles(ParticleTypes.SMOKE);
+        }
+        else if (status == PleasureCraftEntityStatuses.HAPPY_PARTICLES) {
+            this.spawnParticles(ParticleTypes.HAPPY_VILLAGER);
+        }
+        else if (status == PleasureCraftEntityStatuses.ANGRY_PARTICLES) {
+            this.spawnParticles(ParticleTypes.ANGRY_VILLAGER);
+        }
+        else if (status == PleasureCraftEntityStatuses.EAT_PARTICLES) {
+            this.spawnItemParticles(this.dataTracker.get(CONSUMING_STACK), 16);
+        }
+        else {
+            super.handleStatus(status);
+        }
+    }
 
+    protected void spawnParticles(ParticleEffect parameters) {
+        for (int i = 0; i < 5; i++) {
+            double d = this.random.nextGaussian() * 0.02;
+            double e = this.random.nextGaussian() * 0.02;
+            double f = this.random.nextGaussian() * 0.02;
+            this.getWorld().addParticleClient(parameters, this.getParticleX(1.0), this.getRandomBodyY() + 0.5f, this.getParticleZ(1.0), d, e, f);
+        }
+    }
 
     @Override
     public void tickMovement() {

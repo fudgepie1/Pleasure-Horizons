@@ -103,7 +103,7 @@ public abstract class WildGirlEntity extends GirlEntityScene {
     @Override
     public ActionResult interactMob(PlayerEntity player, Hand hand) {
         // no taming, no inventory, no following
-        ItemStack stack = player.getStackInHand(Hand.MAIN_HAND);
+        ItemStack stack = player.getStackInHand(hand);
 
         if (!this.getWorld().isClient() && !this.isSceneActive()) {
 
@@ -112,14 +112,11 @@ public abstract class WildGirlEntity extends GirlEntityScene {
                     stack.decrementUnlessCreative(1, player);
                     player.sendMessage(Text.literal("She Liked The Gift"), true);
                     setCurrentRelationshipLevel(getCurrentRelationshipLevel() + 1);
-                    this.getWorld().sendEntityStatus(this, EntityStatuses.ADD_BREEDING_PARTICLES);
-                    return ActionResult.SUCCESS;
-                } else {
-                    return ActionResult.PASS;
+                    this.getWorld().sendEntityStatus(this, EntityStatuses.ADD_VILLAGER_HAPPY_PARTICLES);
+                    return ActionResult.SUCCESS_SERVER;
                 }
             }
-
-            if (stack.isEmpty() || getCurrentRelationshipLevel() > maxRelationshipLevel()) {
+            if (!player.getStackInHand(Hand.MAIN_HAND).isOf(this.isAttractedTo())) {
                 this.setGUIOpenState(true, player);
                 ServerPlayNetworking.send((ServerPlayerEntity) player, new SceneOptionsS2CPacket(this.getId(), this.getCurrentRelationshipLevel(), new ItemStack(isAttractedTo()), this.getScenes()));
                 return ActionResult.SUCCESS;
