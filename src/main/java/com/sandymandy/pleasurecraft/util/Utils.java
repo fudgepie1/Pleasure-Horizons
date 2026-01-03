@@ -10,8 +10,6 @@ import net.minecraft.block.enums.DoubleBlockHalf;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.registry.tag.TagKey;
@@ -176,7 +174,7 @@ public class Utils {
         return 0xFF000000 | color;
     }
 
-    public static String getReadableTameItemName(Item tameItem) {
+    public static String getReadableItemName(Item tameItem) {
         Identifier id = Registries.ITEM.getId(tameItem);
 
         if (id != null) {

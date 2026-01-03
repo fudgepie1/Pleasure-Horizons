@@ -759,4 +759,8 @@ public abstract class GirlEntity extends PathAwareEntity implements RangedAttack
         clone.setStripped(this.isStripped());
     }
 
+    @Override
+    public float getSoundPitch() {
+        return 1.0F;
+    }
 }

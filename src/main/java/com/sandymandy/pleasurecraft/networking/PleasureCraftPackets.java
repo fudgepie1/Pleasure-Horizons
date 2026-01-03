@@ -58,7 +58,7 @@ public class PleasureCraftPackets {
                             if (entity instanceof TameableGirlEntity girl) {
                                 switch (packet.actionId()) {
                                     case "stripOrDressup" -> girl.requestStrip();
-                                    case "breakUp" -> girl.breakUp(context.player());
+                                    case "breakUp" -> girl.breakUpParticles(context.player());
                                     case "setBase" -> girl.setBasePosHere();
                                     case "talk" -> ServerPlayNetworking.send(context.player(), new SceneOptionsS2CPacket(girl.getId(), girl.getCurrentRelationshipLevel(), new ItemStack(girl.isAttractedTo()), girl.getScenes()));
                                     case "goToBase" -> girl.teleportToBase();

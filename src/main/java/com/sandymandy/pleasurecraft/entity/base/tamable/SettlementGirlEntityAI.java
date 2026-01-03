@@ -69,8 +69,9 @@ public abstract class SettlementGirlEntityAI extends TameableGirlEntity implemen
     protected void initGoals() {
         super.initGoals();
 
+        this.goalSelector.add(0, new GirlSitGoal(this));
+
         if(!this.dataTracker.get(SHOULD_TICK_BRAIN)) {
-            this.goalSelector.add(0, new GirlSitGoal(this));
             this.goalSelector.add(1, new SwimGoal(this));
             this.goalSelector.add(2, new LongDoorInteractGoal(this, true));
             this.goalSelector.add(3, new TameableGirlEscapeDangerGoal(1.5D, DamageTypeTags.PANIC_ENVIRONMENTAL_CAUSES));

@@ -1,10 +1,18 @@
     package com.sandymandy.pleasurecraft.registries;
 
     import com.sandymandy.pleasurecraft.PleasureCraft;
+    import com.sandymandy.pleasurecraft.util.variables.AIMode;
+    import io.netty.buffer.ByteBuf;
+    import net.minecraft.network.codec.PacketCodec;
+    import net.minecraft.network.codec.PacketCodecs;
     import net.minecraft.registry.Registries;
     import net.minecraft.registry.Registry;
     import net.minecraft.sound.SoundEvent;
     import net.minecraft.util.Identifier;
+
+    import java.util.ArrayList;
+    import java.util.List;
+    import java.util.Map;
 
     public class PleasureCraftSoundEventRegistry {
 
@@ -61,11 +69,16 @@
 //  MOMO________________________________________________________________________________________________________________
         public static final SoundEvent MOMO_AHH = registerSound("momo.ahh");
         public static final SoundEvent MOMO_BJMOAN = registerSound("momo.bjmoan");
-        public static final SoundEvent MOMO_BREATH = registerSound("momo.breath");
+        public static final SoundEvent MOMO_MOAN = registerSound("momo.moan");
         public static final SoundEvent MOMO_GIGGLE = registerSound("momo.giggle");
+        public static final SoundEvent MOMO_HAPPYOH = registerSound("momo.happyoh");
+        public static final SoundEvent MOMO_SADOH = registerSound("momo.sadoh");
+        public static final SoundEvent MOMO_SIGH = registerSound("momo.sigh");
         public static final SoundEvent MOMO_HEY = registerSound("momo.hey");
+        public static final SoundEvent MOMO_HMPH = registerSound("momo.hmph");
         public static final SoundEvent MOMO_HUH = registerSound("momo.huh");
         public static final SoundEvent MOMO_MMM = registerSound("momo.mmm");
+        public static final SoundEvent MOMO_LIGHTBREATHING = registerSound("momo.lightbreathing");
 
         public static void registerSoundEvents() {
             PleasureCraft.LOGGER.info("Registering SoundEvents for PleasureCraft");
@@ -74,6 +87,40 @@
 
         private static SoundEvent registerSound(String soundPath) {
             Identifier id = Identifier.of(PleasureCraft.MOD_ID, soundPath);
-            return Registry.register(Registries.SOUND_EVENT, id, SoundEvent.of(id));
+            SoundEvent event = Registry.register(Registries.SOUND_EVENT, id, SoundEvent.of(id));
+            return event;
         }
+
+        public enum SoundGroup {
+                AFTERSSESSIONMOAN(Map.of("lucy", LUCY_AFTERSSESSIONMOAN, "mika", MIKA_AFTERSSESSIONMOAN)),
+                AHH(Map.of("lucy", LUCY_AHH, "mika", MIKA_AHH, "momo", MOMO_AHH)),
+                GIGGLE(Map.of("lucy", LUCY_GIGGLE, "mika", MIKA_GIGGLE, "momo", MOMO_GIGGLE)),
+                HAPPOH(Map.of("lucy", LUCY_HAPPOH, "mika", MIKA_HAPPYOH, "momo", MOMO_HAPPYOH)),
+                HEAVYBREATHING(Map.of("lucy", LUCY_HEAVYBREATHING, "mika", MIKA_HEAVYBREATHING)),
+                HMPH(Map.of("lucy", LUCY_HMPH, "mika", MIKA_HMPH, "momo", MOMO_HMPH)),
+                HUH(Map.of("lucy", LUCY_HUH, "mika", MIKA_HUH, "momo", MOMO_HUH)),
+                LIGHTBREATHING(Map.of("lucy", LUCY_LIGHTBREATHING, "mika", MIKA_LIGHTBREATHING, "momo", MOMO_LIGHTBREATHING)),
+                LIPSOUND(Map.of("lucy", LUCY_LIPSOUND, "mika", MIKA_LIPSOUND)),
+                MMM(Map.of("lucy", LUCY_MMM, "mika", MIKA_MMM, "momo", MOMO_MMM)),
+                MOAN(Map.of("lucy", LUCY_MOAN, "mika", MIKA_MOAN, "momo", MOMO_MOAN)),
+                SADOH(Map.of("lucy", LUCY_SADOH, "mika", MIKA_SADOH, "momo", MOMO_SADOH)),
+                SIGH(Map.of("lucy", LUCY_SIGH, "mika", MIKA_SIGH, "momo", MOMO_SIGH)),
+                HEY(Map.of("momo", MOMO_HEY)),
+                COMETOMOMMY(Map.of("mika", MIKA_COMETOMOMMY)),
+                MOMMYSHORNNY(Map.of("mika", MIKA_MOMMYSHORNNY)),
+                GOODBOY(Map.of("mika", MIKA_GOODBOY)),
+                BJMOAN(Map.of("lucy", LUCY_BJMOAN, "mika", MIKA_BJMOAN, "momo", MOMO_BJMOAN));
+
+                private final Map<String, SoundEvent> girlToSoundMap;
+
+                SoundGroup(Map<String, SoundEvent> map) {
+                        this.girlToSoundMap = map;
+                }
+
+                public SoundEvent getSound(String girlId) {
+                        // Returns the sound for the specific girl, or null if she doesn't have one in this group
+                        return girlToSoundMap.get(girlId.toLowerCase());
+                }
+        }
+
     }

@@ -948,6 +948,46 @@
       {
         "name": "pleasurecraft:girls/momo/ahh/ahh7",
         "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/ahh/ahh8",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/ahh/ahh9",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/ahh/ahh10",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/ahh/ahh11",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/ahh/ahh12",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/ahh/ahh13",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/ahh/ahh14",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/ahh/ahh15",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/ahh/ahh16",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/ahh/ahh17",
+        "stream": false
       }
     ]
   },
@@ -976,27 +1016,6 @@
       }
     ]
   },
-  "momo.breath": {
-    "subtitle": "subtitles.momo.breath",
-    "sounds": [
-      {
-        "name": "pleasurecraft:girls/momo/breath/breath0",
-        "stream": false
-      },
-      {
-        "name": "pleasurecraft:girls/momo/breath/breath1",
-        "stream": false
-      },
-      {
-        "name": "pleasurecraft:girls/momo/breath/breath2",
-        "stream": false
-      },
-      {
-        "name": "pleasurecraft:girls/momo/breath/breath3",
-        "stream": false
-      }
-    ]
-  },
   "momo.giggle": {
     "subtitle": "subtitles.momo.giggle",
     "sounds": [
@@ -1010,6 +1029,91 @@
       },
       {
         "name": "pleasurecraft:girls/momo/giggle/giggle2",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/giggle/giggle3",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/giggle/giggle4",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/giggle/giggle5",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/giggle/giggle6",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/giggle/giggle7",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/giggle/giggle8",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/giggle/giggle9",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/giggle/giggle10",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/giggle/giggle11",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/giggle/giggle12",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/giggle/giggle13",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/giggle/giggle14",
+        "stream": false
+      }
+    ]
+  },
+  "momo.happyoh": {
+    "subtitle": "subtitles.momo.happyoh",
+    "sounds": [
+      {
+        "name": "pleasurecraft:girls/momo/happyoh/happyoh0",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/happyoh/happyoh1",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/happyoh/happyoh2",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/happyoh/happyoh3",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/happyoh/happyoh4",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/happyoh/happyoh5",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/happyoh/happyoh6",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/happyoh/happyoh7",
         "stream": false
       }
     ]
@@ -1035,6 +1139,35 @@
       }
     ]
   },
+  "momo.hmph": {
+    "subtitle": "subtitles.momo.hmph",
+    "sounds": [
+      {
+        "name": "pleasurecraft:girls/momo/hmph/hmph0",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/hmph/hmph1",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/hmph/hmph2",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/hmph/hmph3",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/hmph/hmph4",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/hmph/hmph5",
+        "stream": false
+      }
+    ]
+  },
   "momo.huh": {
     "subtitle": "subtitles.momo.huh",
     "sounds": [
@@ -1048,6 +1181,119 @@
       },
       {
         "name": "pleasurecraft:girls/momo/huh/huh2",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/huh/huh3",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/huh/huh4",
+        "stream": false
+      }
+    ]
+  },
+  "momo.lightbreathing": {
+    "subtitle": "subtitles.momo.lightbreathing",
+    "sounds": [
+      {
+        "name": "pleasurecraft:girls/momo/lightbreathing/lightbreathing0",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/lightbreathing/lightbreathing1",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/lightbreathing/lightbreathing2",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/lightbreathing/lightbreathing3",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/lightbreathing/lightbreathing4",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/lightbreathing/lightbreathing5",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/lightbreathing/lightbreathing6",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/lightbreathing/lightbreathing7",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/lightbreathing/lightbreathing8",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/lightbreathing/lightbreathing9",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/lightbreathing/lightbreathing10",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/lightbreathing/lightbreathing11",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/lightbreathing/lightbreathing12",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/lightbreathing/lightbreathing13",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/lightbreathing/lightbreathing14",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/lightbreathing/lightbreathing15",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/lightbreathing/lightbreathing16",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/lightbreathing/lightbreathing17",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/lightbreathing/lightbreathing18",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/lightbreathing/lightbreathing19",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/lightbreathing/lightbreathing20",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/lightbreathing/lightbreathing21",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/lightbreathing/lightbreathing22",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/lightbreathing/lightbreathing23",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/lightbreathing/lightbreathing24",
         "stream": false
       }
     ]
@@ -1085,6 +1331,121 @@
       },
       {
         "name": "pleasurecraft:girls/momo/mmm/mmm7",
+        "stream": false
+      }
+    ]
+  },
+  "momo.moan": {
+    "subtitle": "subtitles.momo.moan",
+    "sounds": [
+      {
+        "name": "pleasurecraft:girls/momo/moan/moan0",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/moan/moan1",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/moan/moan2",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/moan/moan3",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/moan/moan4",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/moan/moan5",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/moan/moan6",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/moan/moan7",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/moan/moan8",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/moan/moan9",
+        "stream": false
+      }
+    ]
+  },
+  "momo.sadoh": {
+    "subtitle": "subtitles.momo.sadoh",
+    "sounds": [
+      {
+        "name": "pleasurecraft:girls/momo/sadoh/sadoh0",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/sadoh/sadoh1",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/sadoh/sadoh2",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/sadoh/sadoh3",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/sadoh/sadoh4",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/sadoh/sadoh5",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/sadoh/sadoh6",
+        "stream": false
+      }
+    ]
+  },
+  "momo.sigh": {
+    "subtitle": "subtitles.momo.sigh",
+    "sounds": [
+      {
+        "name": "pleasurecraft:girls/momo/sigh/sigh0",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/sigh/sigh1",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/sigh/sigh2",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/sigh/sigh3",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/sigh/sigh4",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/sigh/sigh5",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/sigh/sigh6",
+        "stream": false
+      },
+      {
+        "name": "pleasurecraft:girls/momo/sigh/sigh7",
         "stream": false
       }
     ]

@@ -11,8 +11,11 @@
 - Improved how the building scanner works by requiring type specific blocks in the building
 - Fixed a bug that made you teleport to 0, 0, 0 sometimes when starting a scene
 - Fixed the particles not showing when giving a gift to a girl
+- Fixed a bug with the interaction system where it would take two items instead of one
+- Added sound effects and particles when feeding a girl to give propper feedback
+- Added sounds when going out with a girl and giving gifts
 
-## v0.6.1
+## v0.6.1 
 - Fixed the issue where girls in villagers would have tiny breasts
 - Added the ability to turn off shading
 - Made it so that instead of cycling each profile you now how to use the profile's tame item to set it

@@ -24,7 +24,7 @@ import net.minecraft.util.math.Vec3d;
 
 import java.util.concurrent.CompletableFuture;
 
-import static com.sandymandy.pleasurecraft.util.Utils.getReadableTameItemName;
+import static com.sandymandy.pleasurecraft.util.Utils.getReadableItemName;
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
@@ -102,7 +102,7 @@ public class GirlsCommand {
             return 0;
         }
         for (CustomGirlProfile profile : CustomGirlLoader.REGISTERED_PROFILES.values()){
-            player.sendMessage(Text.of("§d"+profile.id() + " → §b" + getReadableTameItemName(profile.tameItem())), false);
+            player.sendMessage(Text.of("§d"+profile.id() + " → §b" + getReadableItemName(profile.tameItem())), false);
         }
         return 1;
     }
