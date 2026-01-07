@@ -1,18 +1,18 @@
 package com.sandymandy.pleasurecraft.entity.ai.goal;
 
-import com.sandymandy.pleasurecraft.entity.base.GirlEntityScene;
+import com.sandymandy.pleasurecraft.entity.base.GirlSceneEntity;
 import com.sandymandy.pleasurecraft.util.variables.Scene;
 import net.minecraft.entity.ai.goal.Goal;
 
 import java.util.EnumSet;
 
 public class StripGoal extends Goal {
-    private final GirlEntityScene girl; ;
+    private final GirlSceneEntity girl; ;
     private boolean stripTrigged = false;
     private boolean started = false;
     private Scene scene = Scene.EMPTY;
 
-    public StripGoal(GirlEntityScene girl) {
+    public StripGoal(GirlSceneEntity girl) {
         this.girl = girl;
         this.setControls(EnumSet.of(Control.MOVE, Control.LOOK, Control.JUMP));
     }

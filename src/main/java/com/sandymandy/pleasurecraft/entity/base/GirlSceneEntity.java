@@ -58,7 +58,6 @@ import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-import software.bernie.geckolib.animatable.GeoAnimatable;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animatable.instance.SingletonAnimatableInstanceCache;
@@ -73,20 +72,20 @@ import software.bernie.geckolib.animation.keyframe.event.data.SoundKeyframeData;
 
 import java.util.*;
 
-public abstract class GirlEntityScene extends GirlEntity implements GeoEntity {
-    private static final TrackedData<Scene> CURRENT_SCENE = DataTracker.registerData(GirlEntityScene.class, PleasureCraftTrackedDataRegistry.SCENE);
-    private static final TrackedData<ScenePhase> CURRENT_SCENE_PHASE = DataTracker.registerData(GirlEntityScene.class, PleasureCraftTrackedDataRegistry.SCENE_PHASE);
-    private static final TrackedData<String> ANIMATION_KEY_FRAME_EVENT = DataTracker.registerData(GirlEntityScene.class, TrackedDataHandlerRegistry.STRING);
-    private static final TrackedData<String> CURRENT_SEX_ANIM = DataTracker.registerData(GirlEntityScene.class, TrackedDataHandlerRegistry.STRING);
-    public static final TrackedData<Float> SCENE_PROGRESS = DataTracker.registerData(GirlEntityScene.class, TrackedDataHandlerRegistry.FLOAT);
-    public static final TrackedData<Float> CUM_THRESHOLD = DataTracker.registerData(GirlEntityScene.class, TrackedDataHandlerRegistry.FLOAT);
-    public static final TrackedData<Integer> STATIONARY_LOOP = DataTracker.registerData(GirlEntityScene.class, TrackedDataHandlerRegistry.INTEGER);
-    public static final TrackedData<Integer> STATIONARY_LOOP_THRESHOLD = DataTracker.registerData(GirlEntityScene.class, TrackedDataHandlerRegistry.INTEGER);
-    private static final TrackedData<Boolean> THRUSTING = DataTracker.registerData(GirlEntityScene.class, TrackedDataHandlerRegistry.BOOLEAN);
-    private static final TrackedData<Integer> INTRO_INDEX = DataTracker.registerData(GirlEntityScene.class, TrackedDataHandlerRegistry.INTEGER);
-    private static final TrackedData<Integer> PREGNANCY_TICKS = DataTracker.registerData(GirlEntityScene.class, TrackedDataHandlerRegistry.INTEGER);
-    private static final TrackedData<Integer> STATIONARY_INDEX = DataTracker.registerData(GirlEntityScene.class, TrackedDataHandlerRegistry.INTEGER);
-    public static final TrackedData<Optional<UUID>> CURRENT_SCENE_PLAYER = DataTracker.registerData(GirlEntityScene.class, PleasureCraftTrackedDataRegistry.OPTIONAL_UUID);
+public abstract class GirlSceneEntity extends GirlEntity implements GeoEntity {
+    private static final TrackedData<Scene> CURRENT_SCENE = DataTracker.registerData(GirlSceneEntity.class, PleasureCraftTrackedDataRegistry.SCENE);
+    private static final TrackedData<ScenePhase> CURRENT_SCENE_PHASE = DataTracker.registerData(GirlSceneEntity.class, PleasureCraftTrackedDataRegistry.SCENE_PHASE);
+    private static final TrackedData<String> ANIMATION_KEY_FRAME_EVENT = DataTracker.registerData(GirlSceneEntity.class, TrackedDataHandlerRegistry.STRING);
+    private static final TrackedData<String> CURRENT_SEX_ANIM = DataTracker.registerData(GirlSceneEntity.class, TrackedDataHandlerRegistry.STRING);
+    public static final TrackedData<Float> SCENE_PROGRESS = DataTracker.registerData(GirlSceneEntity.class, TrackedDataHandlerRegistry.FLOAT);
+    public static final TrackedData<Float> CUM_THRESHOLD = DataTracker.registerData(GirlSceneEntity.class, TrackedDataHandlerRegistry.FLOAT);
+    public static final TrackedData<Integer> STATIONARY_LOOP = DataTracker.registerData(GirlSceneEntity.class, TrackedDataHandlerRegistry.INTEGER);
+    public static final TrackedData<Integer> STATIONARY_LOOP_THRESHOLD = DataTracker.registerData(GirlSceneEntity.class, TrackedDataHandlerRegistry.INTEGER);
+    private static final TrackedData<Boolean> THRUSTING = DataTracker.registerData(GirlSceneEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+    private static final TrackedData<Integer> INTRO_INDEX = DataTracker.registerData(GirlSceneEntity.class, TrackedDataHandlerRegistry.INTEGER);
+    private static final TrackedData<Integer> PREGNANCY_TICKS = DataTracker.registerData(GirlSceneEntity.class, TrackedDataHandlerRegistry.INTEGER);
+    private static final TrackedData<Integer> STATIONARY_INDEX = DataTracker.registerData(GirlSceneEntity.class, TrackedDataHandlerRegistry.INTEGER);
+    public static final TrackedData<Optional<UUID>> CURRENT_SCENE_PLAYER = DataTracker.registerData(GirlSceneEntity.class, PleasureCraftTrackedDataRegistry.OPTIONAL_UUID);
     private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
     public BlockPos targetBedPos;
     public Scene stripOptions = Scene.EMPTY;
@@ -108,7 +107,7 @@ public abstract class GirlEntityScene extends GirlEntity implements GeoEntity {
         return cache;
     }
 
-    protected GirlEntityScene(EntityType<? extends GirlEntityScene> entityType, World world) {
+    protected GirlSceneEntity(EntityType<? extends GirlSceneEntity> entityType, World world) {
         super(entityType, world);
     }
 
@@ -721,14 +720,14 @@ public abstract class GirlEntityScene extends GirlEntity implements GeoEntity {
         controllerRegistrar.add(new AnimationController<>("girl_face", 4, this::handleFacialAnimations));
     }
 
-    private PlayState handleFacialAnimations(AnimationTest<GeoAnimatable> state){
+    private PlayState handleFacialAnimations(AnimationTest<GirlSceneEntity> state){
         AnimationController<?> controller = state.controller();
 
 
         return state.setAndContinue(RawAnimation.begin().then(getAnimationPath("blink"), Animation.LoopType.LOOP));
     }
 
-    private PlayState handleAttackAnimations(AnimationTest<GeoAnimatable> state) {
+    private PlayState handleAttackAnimations(AnimationTest<GirlSceneEntity> state) {
         AnimationController<?> controller = state.controller();
 
         // End swing after 7 ticks
@@ -763,7 +762,7 @@ public abstract class GirlEntityScene extends GirlEntity implements GeoEntity {
     }
 
 
-    private PlayState handleAnimations(AnimationTest<GirlEntityScene> state) {
+    private PlayState handleAnimations(AnimationTest<GirlSceneEntity> state) {
         if (isSceneActive() && getOverrideAnim().isEmpty()) {
             final AnimationController<?> controller = state.controller();
             final Scene options = this.getCurrentScene();
@@ -1245,16 +1244,16 @@ public abstract class GirlEntityScene extends GirlEntity implements GeoEntity {
         this.setPregnancyTicks(view.getInt("PregnancyTicks", 0));
     }
 
-    private static class SoundKeyframeHandler implements AnimationController.KeyframeEventHandler<GirlEntityScene, SoundKeyframeData> {
+    private static class SoundKeyframeHandler implements AnimationController.KeyframeEventHandler<GirlSceneEntity, SoundKeyframeData> {
 
-        private final GirlEntityScene entity;
+        private final GirlSceneEntity entity;
 
-        public SoundKeyframeHandler(GirlEntityScene entity) {
+        public SoundKeyframeHandler(GirlSceneEntity entity) {
             this.entity = entity;
         }
 
         @Override
-        public void handle(KeyFrameEvent<GirlEntityScene, SoundKeyframeData> event) {
+        public void handle(KeyFrameEvent<GirlSceneEntity, SoundKeyframeData> event) {
             if (!this.entity.getWorld().isClient()) return;
 
             String key = event.keyframeData().getSound().toLowerCase();

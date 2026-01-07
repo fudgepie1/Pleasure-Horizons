@@ -4,7 +4,7 @@ import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.client.gui.screen.GirlCustomizeScreen;
 import com.sandymandy.pleasurecraft.client.gui.screen.KoboldCustomizeScreen;
 import com.sandymandy.pleasurecraft.client.models.AbstractGirlModel;
-import com.sandymandy.pleasurecraft.entity.base.GirlEntityScene;
+import com.sandymandy.pleasurecraft.entity.base.GirlSceneEntity;
 import com.sandymandy.pleasurecraft.client.gui.screen.hud.SceneProgressOverlay;
 import com.sandymandy.pleasurecraft.networking.S2C.*;
 import com.sandymandy.pleasurecraft.client.gui.screen.GirlSceneScreen;
@@ -27,7 +27,7 @@ public class PleasureCraftClientPackets {
                     if (world == null) return;
 
                     Entity entity = world.getEntityById(packet.entityId());
-                    if (entity instanceof GirlEntityScene girl) {
+                    if (entity instanceof GirlSceneEntity girl) {
                         int i = 0;
                         for (EquipmentSlot slot : EquipmentSlot.values()) {
                             girl.armorVisibility.put(slot, packet.armor().get(i));
@@ -71,7 +71,7 @@ public class PleasureCraftClientPackets {
                     if (world == null) return;
 
                     Entity entity = world.getEntityById(packet.entityId());
-                    if (entity instanceof GirlEntityScene girl) {
+                    if (entity instanceof GirlSceneEntity girl) {
                         girl.triggerSwing();
                     }
                 })

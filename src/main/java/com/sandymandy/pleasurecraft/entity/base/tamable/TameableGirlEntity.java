@@ -2,7 +2,7 @@ package com.sandymandy.pleasurecraft.entity.base.tamable;
 
 import com.sandymandy.pleasurecraft.advancement.criterion.PleasureCraftCriteria;
 import com.sandymandy.pleasurecraft.entity.PleasureCraftEntityStatuses;
-import com.sandymandy.pleasurecraft.entity.base.GirlEntityScene;
+import com.sandymandy.pleasurecraft.entity.base.GirlSceneEntity;
 import com.sandymandy.pleasurecraft.registries.PleasureCraftSoundEventRegistry;
 import com.sandymandy.pleasurecraft.screen.GirlInventoryScreenHandlerFactory;
 import com.sandymandy.pleasurecraft.util.PleasureCraftMessages;
@@ -37,19 +37,24 @@ import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.Optional;
 
 import static com.sandymandy.pleasurecraft.util.Utils.getPlayerName;
 import static com.sandymandy.pleasurecraft.util.Utils.getReadableItemName;
 
-public abstract class TameableGirlEntity extends GirlEntityScene implements Tameable {
+public abstract class TameableGirlEntity extends GirlSceneEntity implements Tameable {
 
     protected static final TrackedData<Byte> TAMEABLE_FLAGS = DataTracker.registerData(TameableGirlEntity.class, TrackedDataHandlerRegistry.BYTE);
     protected static final TrackedData<Optional<LazyEntityReference<LivingEntity>>> OWNER_UUID = DataTracker.registerData(
             TameableGirlEntity.class, TrackedDataHandlerRegistry.LAZY_ENTITY_REFERENCE
     );
 
-    protected TameableGirlEntity(EntityType<? extends GirlEntityScene> entityType, World world) {
+    public List<String> getGiftReplies() {
+        return List.of("Oh, Thank you", "Nice", "Thank you so much");
+    }
+
+    protected TameableGirlEntity(EntityType<? extends GirlSceneEntity> entityType, World world) {
         super(entityType, world);
     }
 
@@ -88,6 +93,7 @@ public abstract class TameableGirlEntity extends GirlEntityScene implements Tame
             if (itemInHand.equals(isAttractedTo()) && getCurrentRelationshipLevel() < maxRelationshipLevel()) {
                 itemStack.decrementUnlessCreative(1, player);
                 player.sendMessage(Text.literal("She Liked The Gift"), true);
+                messageAsEntity(this.getGiftReplies().get(RANDOM.nextInt(this.getGiftReplies().size())));
                 setCurrentRelationshipLevel(getCurrentRelationshipLevel() + 1);
                 this.getWorld().sendEntityStatus(this, PleasureCraftEntityStatuses.HAPPY_PARTICLES);
                 this.playSound(PleasureCraftSoundEventRegistry.SoundGroup.GIGGLE.getSound(this.getGirlID()));

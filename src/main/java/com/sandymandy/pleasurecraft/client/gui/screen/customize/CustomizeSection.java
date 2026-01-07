@@ -1,9 +1,9 @@
 package com.sandymandy.pleasurecraft.client.gui.screen.customize;
 
 import com.sandymandy.pleasurecraft.client.gui.screen.CustomizeScreen;
-import com.sandymandy.pleasurecraft.entity.base.GirlEntityScene;
+import com.sandymandy.pleasurecraft.entity.base.GirlSceneEntity;
 
-public abstract class CustomizeSection<T extends GirlEntityScene> {
+public abstract class CustomizeSection<T extends GirlSceneEntity> {
 
     protected final T entity;
     protected final T previewEntity;

@@ -3,7 +3,7 @@ package com.sandymandy.pleasurecraft.client.rendering.renderers;
 import com.mojang.datafixers.util.Either;
 import com.sandymandy.pleasurecraft.PleasureCraftClient;
 import com.sandymandy.pleasurecraft.config.ModConfig;
-import com.sandymandy.pleasurecraft.entity.base.GirlEntityScene;
+import com.sandymandy.pleasurecraft.entity.base.GirlSceneEntity;
 import com.sandymandy.pleasurecraft.networking.C2S.BonePosSyncC2SPacket;
 import com.sandymandy.pleasurecraft.registries.PleasureCraftDataTicketRegistry;
 import com.sandymandy.pleasurecraft.util.rendering.OffsetVertexConsumer;
@@ -32,7 +32,7 @@ import software.bernie.geckolib.renderer.layer.BlockAndItemGeoLayer;
 
 import java.util.*;
 
-public abstract class AbstractGirlRenderer<T extends GirlEntityScene, R extends LivingEntityRenderState & GeoRenderState> extends GeoEntityRenderer<T, R> {
+public abstract class AbstractGirlRenderer<T extends GirlSceneEntity, R extends LivingEntityRenderState & GeoRenderState> extends GeoEntityRenderer<T, R> {
 
     protected ItemStack mainHandItem;
 

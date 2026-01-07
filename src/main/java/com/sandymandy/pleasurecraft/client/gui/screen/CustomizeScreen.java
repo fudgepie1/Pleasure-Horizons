@@ -1,7 +1,7 @@
 package com.sandymandy.pleasurecraft.client.gui.screen;
 
 import com.sandymandy.pleasurecraft.client.gui.screen.customize.CustomizeSection;
-import com.sandymandy.pleasurecraft.entity.base.GirlEntityScene;
+import com.sandymandy.pleasurecraft.entity.base.GirlSceneEntity;
 import com.sandymandy.pleasurecraft.networking.C2S.RemovePreviewEntityC2SPacket;
 import com.sandymandy.pleasurecraft.networking.C2S.SetGUIOpenStateC2SPacket;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -19,7 +19,7 @@ import java.util.*;
 
 import static net.minecraft.client.gui.screen.ingame.InventoryScreen.drawEntity;
 
-public abstract class CustomizeScreen<T extends GirlEntityScene> extends Screen {
+public abstract class CustomizeScreen<T extends GirlSceneEntity> extends Screen {
 
     protected final int entityId;
     protected final T previewEntity;

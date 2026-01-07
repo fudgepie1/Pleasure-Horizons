@@ -1,10 +1,10 @@
 package com.sandymandy.pleasurecraft.client.gui.screen.customize;
 
 import com.sandymandy.pleasurecraft.client.gui.screen.CustomizeScreen;
-import com.sandymandy.pleasurecraft.entity.base.GirlEntityScene;
+import com.sandymandy.pleasurecraft.entity.base.GirlSceneEntity;
 import net.minecraft.text.Text;
 
-public class LabelSection<T extends GirlEntityScene> extends CustomizeSection<T> {
+public class LabelSection<T extends GirlSceneEntity> extends CustomizeSection<T> {
 
     private final Text text;
 

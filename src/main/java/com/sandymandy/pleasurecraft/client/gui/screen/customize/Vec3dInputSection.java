@@ -1,7 +1,7 @@
 package com.sandymandy.pleasurecraft.client.gui.screen.customize;
 
 import com.sandymandy.pleasurecraft.client.gui.screen.CustomizeScreen;
-import com.sandymandy.pleasurecraft.entity.base.GirlEntityScene;
+import com.sandymandy.pleasurecraft.entity.base.GirlSceneEntity;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.text.Text;
@@ -10,7 +10,7 @@ import net.minecraft.util.math.Vec3d;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class Vec3dInputSection<T extends GirlEntityScene> extends CustomizeSection<T> {
+public class Vec3dInputSection<T extends GirlSceneEntity> extends CustomizeSection<T> {
 
     private final String label;
     private final Supplier<Vec3d> valueGetter;

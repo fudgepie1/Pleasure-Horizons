@@ -1,7 +1,7 @@
 package com.sandymandy.pleasurecraft.client.gui.screen.customize;
 
 import com.sandymandy.pleasurecraft.client.gui.screen.CustomizeScreen;
-import com.sandymandy.pleasurecraft.entity.base.GirlEntityScene;
+import com.sandymandy.pleasurecraft.entity.base.GirlSceneEntity;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -11,7 +11,7 @@ import java.util.function.Supplier;
 
 import static com.sandymandy.pleasurecraft.util.Utils.getFirstLetterCapitalized;
 
-public class ButtonSection<T extends GirlEntityScene> extends CustomizeSection<T> {
+public class ButtonSection<T extends GirlSceneEntity> extends CustomizeSection<T> {
     private final String label;
     private final Supplier<Boolean> valueGetter;
     private final Consumer<Boolean> valueSetter;

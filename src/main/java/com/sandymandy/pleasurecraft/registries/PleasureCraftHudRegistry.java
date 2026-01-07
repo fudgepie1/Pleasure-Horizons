@@ -2,7 +2,7 @@ package com.sandymandy.pleasurecraft.registries;
 
 import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.client.gui.screen.hud.SceneProgressOverlay;
-import com.sandymandy.pleasurecraft.entity.base.GirlEntityScene;
+import com.sandymandy.pleasurecraft.entity.base.GirlSceneEntity;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerEntity;
@@ -16,7 +16,7 @@ public class PleasureCraftHudRegistry {
                     MinecraftClient client = MinecraftClient.getInstance();
                     PlayerEntity localPlayer = client.player;
 
-                    if (localPlayer != null && localPlayer.getVehicle() instanceof GirlEntityScene scene) {
+                    if (localPlayer != null && localPlayer.getVehicle() instanceof GirlSceneEntity scene) {
                         if(scene.getAnimationKeyFrameEvent().contains("sexui")) SceneProgressOverlay.setActive(true);
                         SceneProgressOverlay.render(context, scene.getSceneProgress(), scene.getCumThreshold());
                     } else {

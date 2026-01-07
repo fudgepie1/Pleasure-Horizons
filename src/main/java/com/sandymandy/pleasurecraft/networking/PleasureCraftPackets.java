@@ -1,7 +1,7 @@
 package com.sandymandy.pleasurecraft.networking;
 
 import com.sandymandy.pleasurecraft.PleasureCraft;
-import com.sandymandy.pleasurecraft.entity.base.GirlEntityScene;
+import com.sandymandy.pleasurecraft.entity.base.GirlSceneEntity;
 import com.sandymandy.pleasurecraft.entity.base.tamable.TameableGirlEntity;
 import com.sandymandy.pleasurecraft.entity.girls.KoboldEntity;
 import com.sandymandy.pleasurecraft.networking.C2S.*;
@@ -82,7 +82,7 @@ public class PleasureCraftPackets {
                         var world = context.player().getWorld();
                         var entity = world.getEntityById(packet.entityId());
 
-                        if (!(entity instanceof GirlEntityScene girl))
+                        if (!(entity instanceof GirlSceneEntity girl))
                             return;
 
                         if (!girl.isCurrentScenePlayer(context.player())) {
@@ -98,7 +98,7 @@ public class PleasureCraftPackets {
         ServerPlayNetworking.registerGlobalReceiver(AnimationSyncC2SPacket.ID,
                 (packet, context) -> Objects.requireNonNull(context.player().getServer()).execute(() -> {
                             var entity = context.player().getWorld().getEntityById(packet.entityId());
-                            if (entity instanceof GirlEntityScene girl) {
+                            if (entity instanceof GirlSceneEntity girl) {
                                 girl.setOverrideAnim(packet.animationState());
                                 girl.setOverrideLoop(packet.loopState());
                                 girl.setOverrideHold(packet.holdState());
@@ -110,7 +110,7 @@ public class PleasureCraftPackets {
         ServerPlayNetworking.registerGlobalReceiver(CumKeybindC2SPacket.ID,
                 (packet, context) -> Objects.requireNonNull(context.player().getServer()).execute(() -> {
                     var entity = context.player().getVehicle();
-                    if (entity instanceof GirlEntityScene girl) {
+                    if (entity instanceof GirlSceneEntity girl) {
                         if (packet.pressed()) {
                             girl.tryTriggerCum();
                         }
@@ -120,7 +120,7 @@ public class PleasureCraftPackets {
         ServerPlayNetworking.registerGlobalReceiver(ThrustKeybindC2SPacket.ID,
                 (packet, context) -> Objects.requireNonNull(context.player().getServer()).execute(() -> {
                     var entity = context.player().getVehicle();
-                    if (entity instanceof GirlEntityScene girl) {
+                    if (entity instanceof GirlSceneEntity girl) {
                         girl.setThrusting(packet.held());
                     }
                 }));
@@ -128,7 +128,7 @@ public class PleasureCraftPackets {
         ServerPlayNetworking.registerGlobalReceiver(StartSceneC2SPacket.ID,
                 (packet, context) -> Objects.requireNonNull(context.player().getServer()).execute(() -> {
                     var entity = context.player().getWorld().getEntityById(packet.entityId());
-                    if (entity instanceof GirlEntityScene girl) {
+                    if (entity instanceof GirlSceneEntity girl) {
                         girl.startScene(context.player(), packet.scene());
                     }
                 }));
@@ -136,7 +136,7 @@ public class PleasureCraftPackets {
         ServerPlayNetworking.registerGlobalReceiver(SetGUIOpenStateC2SPacket.ID,
                 (packet, context) -> Objects.requireNonNull(context.player().getServer()).execute(() -> {
                     var entity = context.player().getWorld().getEntityById(packet.entityId());
-                    if (entity instanceof GirlEntityScene girl) {
+                    if (entity instanceof GirlSceneEntity girl) {
                         girl.setGUIOpenState(packet.data(), null);
                     }
                 }));
@@ -144,7 +144,7 @@ public class PleasureCraftPackets {
         ServerPlayNetworking.registerGlobalReceiver(AnimationFinishC2SPacket.ID,
                 (packet, context) -> Objects.requireNonNull(context.player().getServer()).execute(() -> {
                     var entity = context.player().getWorld().getEntityById(packet.entityId());
-                    if (entity instanceof GirlEntityScene girl) {
+                    if (entity instanceof GirlSceneEntity girl) {
                         girl.animationFinished();
                     }
                 }));
@@ -152,7 +152,7 @@ public class PleasureCraftPackets {
         ServerPlayNetworking.registerGlobalReceiver(ScenePhaseSyncC2SPacket.ID,
                 (packet, context) -> Objects.requireNonNull(context.player().getServer()).execute(() -> {
                     var entity = context.player().getWorld().getEntityById(packet.entityId());
-                    if (entity instanceof GirlEntityScene girl) {
+                    if (entity instanceof GirlSceneEntity girl) {
                         girl.playPhase(packet.phase());
                     }
                 }));
@@ -160,7 +160,7 @@ public class PleasureCraftPackets {
         ServerPlayNetworking.registerGlobalReceiver(StopSceneOnServerC2SPacket.ID,
                 (packet, context) -> Objects.requireNonNull(context.player().getServer()).execute(() -> {
                     var entity = context.player().getWorld().getEntityById(packet.entityId());
-                    if (entity instanceof GirlEntityScene girl) {
+                    if (entity instanceof GirlSceneEntity girl) {
                         girl.stopScene();
                     }
                 }));
@@ -168,7 +168,7 @@ public class PleasureCraftPackets {
         ServerPlayNetworking.registerGlobalReceiver(SoundEventSyncC2SPacket.ID,
                 (packet, context) -> Objects.requireNonNull(context.player().getServer()).execute(() -> {
                     var entity = context.player().getWorld().getEntityById(packet.entityId());
-                    if (entity instanceof GirlEntityScene girl) {
+                    if (entity instanceof GirlSceneEntity girl) {
                         girl.setAnimationKeyFrameEventState(packet.soundEvent());
                     }
                 }));
@@ -176,7 +176,7 @@ public class PleasureCraftPackets {
         ServerPlayNetworking.registerGlobalReceiver(GirlCustomizeC2SPacket.ID,
                 (packet, context) -> Objects.requireNonNull(context.player().getServer()).execute(() -> {
                     var entity = context.player().getWorld().getEntityById(packet.entityId());
-                    if (entity instanceof GirlEntityScene girl) {
+                    if (entity instanceof GirlSceneEntity girl) {
 
                         girl.setBreastSize(packet.breastSize());
                         girl.setBreastOffset(packet.breastOffset());
@@ -207,7 +207,7 @@ public class PleasureCraftPackets {
                     }
 
                     var entity = world.getEntityById(packet.entityId());
-                    if (entity instanceof GirlEntityScene girl) {
+                    if (entity instanceof GirlSceneEntity girl) {
                         girl.setCreatedCloneState(false);
                     }
                 }));

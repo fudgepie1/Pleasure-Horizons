@@ -1,6 +1,6 @@
 package com.sandymandy.pleasurecraft.entity.base.wild;
 
-import com.sandymandy.pleasurecraft.entity.base.GirlEntityScene;
+import com.sandymandy.pleasurecraft.entity.base.GirlSceneEntity;
 import com.sandymandy.pleasurecraft.networking.S2C.SceneOptionsS2CPacket;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.EntityStatuses;
@@ -17,16 +17,15 @@ import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.random.Random;
-import net.minecraft.world.Difficulty;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.World;
 
 import java.util.List;
 
-public abstract class WildGirlEntity extends GirlEntityScene {
+public abstract class WildGirlEntity extends GirlSceneEntity {
     private static final List<EquipmentSlot> EQUIPMENT_INIT_ORDER = List.of(EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET);
 
-    protected WildGirlEntity(EntityType<? extends GirlEntityScene> entityType, World world) {
+    protected WildGirlEntity(EntityType<? extends GirlSceneEntity> entityType, World world) {
         super(entityType, world);
     }
 

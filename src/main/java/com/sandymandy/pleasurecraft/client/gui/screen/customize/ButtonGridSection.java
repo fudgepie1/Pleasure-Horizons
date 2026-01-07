@@ -2,7 +2,7 @@ package com.sandymandy.pleasurecraft.client.gui.screen.customize;
 
 import com.sandymandy.pleasurecraft.client.gui.screen.CustomizeScreen;
 import com.sandymandy.pleasurecraft.client.gui.screen.CustomizeScreen.LayoutConfig;
-import com.sandymandy.pleasurecraft.entity.base.GirlEntityScene;
+import com.sandymandy.pleasurecraft.entity.base.GirlSceneEntity;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
 
@@ -10,7 +10,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public class ButtonGridSection<T extends GirlEntityScene, V> extends CustomizeSection<T> {
+public class ButtonGridSection<T extends GirlSceneEntity, V> extends CustomizeSection<T> {
 
     private final String title;
     private final String groupId;

@@ -2,7 +2,7 @@ package com.sandymandy.pleasurecraft.client.models;
 
 import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.config.ModConfig;
-import com.sandymandy.pleasurecraft.entity.base.GirlEntityScene;
+import com.sandymandy.pleasurecraft.entity.base.GirlSceneEntity;
 import com.sandymandy.pleasurecraft.registries.PleasureCraftDataTicketRegistry;
 import com.sandymandy.pleasurecraft.util.rendering.GeoBoneExtension;
 import com.sandymandy.pleasurecraft.util.rendering.JigglePhysics;
@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 
-public abstract class AbstractGirlModel<T extends GirlEntityScene> extends GeoModel<T> {
+public abstract class AbstractGirlModel<T extends GirlSceneEntity> extends GeoModel<T> {
     private final Map<Long, Map<String, JigglePhysics>> jiggleMapByEntity = new HashMap<>();
     private final Map<Long, Map<String, Vec3d>> defaultRotationsByEntity = new HashMap<>();
     private final Map<Long, Long> lastUpdateTimeByEntity = new HashMap<>();

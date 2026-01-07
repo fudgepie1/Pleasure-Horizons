@@ -1,7 +1,7 @@
 package com.sandymandy.pleasurecraft.client.gui.screen.customize;
 
 import com.sandymandy.pleasurecraft.client.gui.screen.CustomizeScreen;
-import com.sandymandy.pleasurecraft.entity.base.GirlEntityScene;
+import com.sandymandy.pleasurecraft.entity.base.GirlSceneEntity;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.SliderWidget;
 import net.minecraft.text.Text;
@@ -9,7 +9,7 @@ import net.minecraft.text.Text;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class SliderSection<T extends GirlEntityScene> extends CustomizeSection<T> {
+public class SliderSection<T extends GirlSceneEntity> extends CustomizeSection<T> {
 
     private final String label;
     private final int minValue;

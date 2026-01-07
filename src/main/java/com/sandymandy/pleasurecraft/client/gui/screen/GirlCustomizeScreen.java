@@ -4,7 +4,7 @@ import com.sandymandy.pleasurecraft.client.gui.screen.customize.ButtonSection;
 import com.sandymandy.pleasurecraft.client.gui.screen.customize.CustomizeSection;
 import com.sandymandy.pleasurecraft.client.gui.screen.customize.SliderSection;
 import com.sandymandy.pleasurecraft.client.gui.screen.customize.Vec3dInputSection;
-import com.sandymandy.pleasurecraft.entity.base.GirlEntityScene;
+import com.sandymandy.pleasurecraft.entity.base.GirlSceneEntity;
 import com.sandymandy.pleasurecraft.networking.C2S.GirlCustomizeC2SPacket;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -12,14 +12,14 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.Vec3d;
 
-public class GirlCustomizeScreen extends CustomizeScreen<GirlEntityScene> {
+public class GirlCustomizeScreen extends CustomizeScreen<GirlSceneEntity> {
 
     private int breastSize;
     private boolean canGetImpregnated;
     private Vec3d breastOffset;
 
     public GirlCustomizeScreen(int entityId, int previewEntityId) {
-        super(Text.literal("Customize Girl"), entityId, previewEntityId, GirlEntityScene.class);
+        super(Text.literal("Customize Girl"), entityId, previewEntityId, GirlSceneEntity.class);
         entity.setGUIOpenState(true);
 
         if (entity != null) {
@@ -57,13 +57,13 @@ public class GirlCustomizeScreen extends CustomizeScreen<GirlEntityScene> {
         ));
 
         //Clear
-        sections.add(new CustomizeSection<GirlEntityScene>(entity, previewEntity) {
+        sections.add(new CustomizeSection<GirlSceneEntity>(entity, previewEntity) {
             @Override
-            public void init(CustomizeScreen<GirlEntityScene> screen, LayoutConfig layout, int startY) {
+            public void init(CustomizeScreen<GirlSceneEntity> screen, LayoutConfig layout, int startY) {
             }
 
             @Override
-            public int render(CustomizeScreen<GirlEntityScene> screen, LayoutConfig layout, int currentY) {
+            public int render(CustomizeScreen<GirlSceneEntity> screen, LayoutConfig layout, int currentY) {
                 ButtonWidget randomizeBtn = ButtonWidget.builder(
                         Text.literal("Clear").formatted(Formatting.RED, Formatting.BOLD),
                         button -> {

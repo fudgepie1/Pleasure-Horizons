@@ -1,7 +1,7 @@
 package com.sandymandy.pleasurecraft.entity.ai.goal;
 
 import com.sandymandy.pleasurecraft.PleasureCraft;
-import com.sandymandy.pleasurecraft.entity.base.GirlEntityScene;
+import com.sandymandy.pleasurecraft.entity.base.GirlSceneEntity;
 import com.sandymandy.pleasurecraft.util.variables.ScenePhase;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.ai.pathing.EntityNavigation;
@@ -9,10 +9,10 @@ import net.minecraft.entity.ai.pathing.EntityNavigation;
 import java.util.UUID;
 
 public class StationaryContactGoal extends Goal {
-    private final GirlEntityScene entity;
+    private final GirlSceneEntity entity;
     private final EntityNavigation navigation;
     private boolean stop = false;
-    public StationaryContactGoal(GirlEntityScene entity) {
+    public StationaryContactGoal(GirlSceneEntity entity) {
         this.entity = entity;
         this.navigation = entity.getNavigation();
 
