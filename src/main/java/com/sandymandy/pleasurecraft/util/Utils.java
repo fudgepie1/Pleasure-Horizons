@@ -20,6 +20,7 @@ import net.minecraft.state.property.Properties;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
@@ -28,6 +29,8 @@ import java.math.RoundingMode;
 import java.util.*;
 
 public class Utils {
+
+    public static BlockPos getBlockPosFromVec3d(Vec3d pos) {return new BlockPos((int) pos.getX(), (int) pos.getY(), (int) pos.getZ());}
 
     public static Settlement findNearestSettlement(World world, BlockPos pos) {
         if (!(world instanceof ServerWorld serverWorld)) return null;
@@ -38,6 +41,15 @@ public class Utils {
                 .filter(s -> s.getCorePos().isWithinDistance(pos, 200))
                 .min(Comparator.comparingDouble(s -> s.getCorePos().getSquaredDistance(pos)))
                 .orElse(null);
+    }
+
+    public static Settlement findSettlementByBuilding(ServerWorld world, BlockPos doorPos) {
+        List<Settlement> settlements = SettlementManager.get(world).getAllSettlements();
+
+        for(Settlement settlement : settlements) {
+            if(settlement.getBuildingIds().contains(doorPos)) return settlement;
+        }
+        return null;
     }
 
     public static BlockPos findNearbyDoor(World world, BlockPos origin, Direction facing) {

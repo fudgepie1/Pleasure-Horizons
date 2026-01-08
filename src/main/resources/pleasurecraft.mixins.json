@@ -4,23 +4,24 @@
   "package": "com.sandymandy.pleasurecraft.mixins",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "bugfix.ScreenHandlerMixin"
+    "bugfix.ScreenHandlerMixin",
+    "settlement.ServerWorldMixin"
   ],
   "client": [
+    "freecam.BlockStateBaseMixin",
     "freecam.BubbleColumnAmbientSoundHandlerMixin",
     "freecam.CameraMixin",
     "freecam.ClientPacketListenerMixin",
+    "freecam.EntityMixin",
     "freecam.EntityRenderDispatcherAccessor",
     "freecam.EntityRenderDispatcherMixin",
-    "freecam.BlockStateBaseMixin",
-    "freecam.EntityMixin",
-    "freecam.LivingEntityMixin",
     "freecam.EntityRendererMixin",
     "freecam.GameRendererMixin",
     "freecam.GuiMixin",
     "freecam.ItemInHandRendererMixin",
     "freecam.LevelRendererMixin",
     "freecam.LightTextureMixin",
+    "freecam.LivingEntityMixin",
     "freecam.LocalPlayerMixin",
     "freecam.MinecraftMixin",
     "freecam.MultiPlayerGameModeMixin",

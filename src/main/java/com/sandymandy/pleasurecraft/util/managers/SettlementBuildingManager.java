@@ -7,6 +7,7 @@ import com.sandymandy.pleasurecraft.settlement.building.SettlementBuilding;
 import net.minecraft.datafixer.DataFixTypes;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.PersistentState;
 import net.minecraft.world.PersistentStateType;
 
@@ -55,6 +56,19 @@ public class SettlementBuildingManager extends PersistentState {
     public void removeBuilding(BlockPos id) {
         buildings.remove(id);
         markDirty();
+    }
+
+    public SettlementBuilding getBuildingAt(BlockPos pos) {
+        // If no buildings exist in this world, exit immediately
+        if (this.buildings.isEmpty()) return null;
+
+        for (SettlementBuilding building : this.buildings.values()) {
+            // Fast Bounding Box Check (Integer comparisons only)
+            if (building.getBoundingBox().contains(pos.getX(), pos.getY(), pos.getZ())) {
+                return building;
+            }
+        }
+        return null;
     }
 
     public Map<BlockPos, SettlementBuilding> getAllBuildings() {

@@ -7,14 +7,16 @@ import net.minecraft.world.World;
 import java.util.Objects;
 
 public class PleasureCraftMessages {
-    public static void GlobleMessage(World world, String messageContent) {
-        Text message = Text.literal(messageContent);
-        if (world.isClient) return; // Don't run on client
-
+    public static void GlobleMessage(World world, Text message) {
+        if (world.isClient()) return;
 
         Objects.requireNonNull(world.getServer())
                 .getPlayerManager()
                 .broadcast(message, false);
+    }
+
+    public static void GlobleMessage(World world, String message) {
+        GlobleMessage(world, Text.literal(message));
     }
 
     public static void PlayerSpecificMessage(PlayerEntity playerEntity, String messageContent){

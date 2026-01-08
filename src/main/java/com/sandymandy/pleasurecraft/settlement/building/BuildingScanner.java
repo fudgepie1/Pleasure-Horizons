@@ -1,11 +1,14 @@
 package com.sandymandy.pleasurecraft.settlement.building;
 
+import com.ibm.icu.impl.breakiter.DictionaryBreakEngine;
 import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.settlement.Settlement;
+import com.sandymandy.pleasurecraft.util.Utils;
 import com.sandymandy.pleasurecraft.util.managers.SettlementBuildingManager;
 import com.sandymandy.pleasurecraft.util.variables.BlockEntry;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.property.Properties;
 import net.minecraft.block.enums.BedPart;
@@ -18,6 +21,7 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -51,36 +55,60 @@ public class BuildingScanner {
 
         Set<BlockPos> visitedAir = new HashSet<>();
         Set<BlockPos> validQuadrants = new HashSet<>();
-        List<BlockEntry> structureBlocks = new ArrayList<>();
 
         Queue<BlockPos> toVisit = new ArrayDeque<>();
         toVisit.add(groundAligned);
 
+        // 1. FLOOD FILL: Find the "walkable" footprint of the room horizontally
         while (!toVisit.isEmpty()) {
             BlockPos pos = toVisit.poll();
             if (!visitedAir.add(pos)) continue;
 
-            // Check if this column has a roof and enough height
             if (isValidQuadrant(world, pos)) {
                 validQuadrants.add(pos);
 
-                // --- Scan Surroundings for Furniture/Walls ---
-                for (Direction dir : Direction.values()) {
+                for (Direction dir : Direction.Type.HORIZONTAL) {
                     BlockPos neighbor = pos.offset(dir);
-                    BlockState state = world.getBlockState(neighbor);
-
-                    if (isEmpty(world, neighbor)) {
-                        // Only spread horizontally for the floor-plan
-                        if (dir.getAxis().isHorizontal() && !visitedAir.contains(neighbor)) {
-                            toVisit.add(neighbor);
-                        }
-                    } else {
-                        // It's a solid block (Wall, Bed, Chest, etc.)
-                        structureBlocks.add(new BlockEntry(neighbor.toImmutable(), state));
+                    if (isEmpty(world, neighbor) && !visitedAir.contains(neighbor)) {
+                        toVisit.add(neighbor);
                     }
                 }
             }
         }
+
+        // 2. VERTICAL SCAN: For every quadrant, scan upwards to capture walls, floor, and roof
+        Map<BlockPos, BlockState> capturedBlocks = new HashMap<>();
+        for (BlockPos floorPos : validQuadrants) {
+            // Capture the block directly below the walkable area (The Floor)
+            BlockPos ground = floorPos.down();
+            capturedBlocks.put(ground.toImmutable(), world.getBlockState(ground));
+
+            // Iterate upwards through the air column
+            for (int yOffset = 0; yOffset <= MAX_VERTICAL_SCAN; yOffset++) {
+                BlockPos currentAirPos = floorPos.up(yOffset);
+                BlockState state = world.getBlockState(currentAirPos);
+
+                if (!isEmpty(world, currentAirPos)) {
+                    // We hit a solid block (The Ceiling/Roof)
+                    capturedBlocks.put(currentAirPos.toImmutable(), state);
+                    break; // Stop going up for this specific column
+                }
+
+                // If this block is air, check its horizontal neighbors (Walls/Furniture at this height)
+                for (Direction dir : Direction.Type.HORIZONTAL) {
+                    BlockPos neighbor = currentAirPos.offset(dir);
+                    BlockState neighborState = world.getBlockState(neighbor);
+
+                    if (!isEmpty(world, neighbor)) {
+                        capturedBlocks.put(neighbor.toImmutable(), neighborState);
+                    }
+                }
+            }
+        }
+
+        // Convert our unique map of blocks into the List<BlockEntry> for the building data
+        List<BlockEntry> structureBlocks = new ArrayList<>();
+        capturedBlocks.forEach((pos, state) -> structureBlocks.add(new BlockEntry(pos, state)));
 
         // --- Validation ---
         boolean hasSize = validQuadrants.size() >= MIN_VALID_QUADRANTS;
@@ -89,11 +117,74 @@ public class BuildingScanner {
         if (hasSize && hasRequirements) {
             registerBuilding(world, doorPos, tagPos, type, structureBlocks, List.copyOf(validQuadrants), player);
         } else if (!hasSize) {
-            player.sendMessage(Text.literal("[BuildingScanner] Invalid building, only " + validQuadrants.size() + " valid quadrants found, minimum required is 9.").formatted(Formatting.RED), false);
+            player.sendMessage(Text.literal("[BuildingScanner] Invalid building: only " + validQuadrants.size() + " quadrants found (min 9).").formatted(Formatting.RED), false);
         }
     }
 
-    private boolean checkRequirements(BuildingType type, List<BlockEntry> blocks, PlayerEntity player) {
+    /**
+     * Performs a full re-scan of the building area to ensure the interior
+     * space still meets all structural and requirement criteria.
+     */
+    public boolean reScanVerify(World world, BlockPos doorPos, BuildingType type, Direction tagFacing) {
+        if (world.isClient) return false;
+        BlockPos origin = Utils.getBlockBehind(doorPos, tagFacing);
+
+        // 2. Align to ground
+        BlockPos groundAligned = findGroundLevel(world, origin);
+        if (groundAligned == null) return false;
+
+        Set<BlockPos> visitedAir = new HashSet<>();
+        Set<BlockPos> validQuadrants = new HashSet<>();
+        Queue<BlockPos> toVisit = new ArrayDeque<>();
+        toVisit.add(groundAligned);
+
+        // 3. Flood Fill (Same as scanForBuilding)
+        while (!toVisit.isEmpty()) {
+            BlockPos pos = toVisit.poll();
+            if (!visitedAir.add(pos)) continue;
+
+            if (isValidQuadrant(world, pos)) {
+                validQuadrants.add(pos);
+                for (Direction dir : Direction.Type.HORIZONTAL) {
+                    BlockPos neighbor = pos.offset(dir);
+                    if (isEmpty(world, neighbor) && !visitedAir.contains(neighbor)) {
+                        toVisit.add(neighbor);
+                    }
+                }
+            }
+            // Limit scan size for performance during verification
+            if (visitedAir.size() > 400) break;
+        }
+
+        // 4. Structural Validation
+        if (validQuadrants.size() < MIN_VALID_QUADRANTS) return false;
+
+        // 5. Requirements Validation (Live check of captured area)
+        Map<BlockPos, BlockState> capturedBlocks = new HashMap<>();
+        for (BlockPos floorPos : validQuadrants) {
+            capturedBlocks.put(floorPos.down(), world.getBlockState(floorPos.down()));
+            for (int yOffset = 0; yOffset <= MAX_VERTICAL_SCAN; yOffset++) {
+                BlockPos currentAirPos = floorPos.up(yOffset);
+                BlockState state = world.getBlockState(currentAirPos);
+                if (!isEmpty(world, currentAirPos)) {
+                    capturedBlocks.put(currentAirPos, state);
+                    break;
+                }
+                for (Direction dir : Direction.Type.HORIZONTAL) {
+                    BlockPos neighbor = currentAirPos.offset(dir);
+                    if (!isEmpty(world, neighbor)) capturedBlocks.put(neighbor, world.getBlockState(neighbor));
+                }
+            }
+        }
+
+        // Convert map to List<BlockEntry> for the existing checkRequirements method
+        List<BlockEntry> liveBlocks = new ArrayList<>();
+        capturedBlocks.forEach((pos, state) -> liveBlocks.add(new BlockEntry(pos, state)));
+
+        return checkRequirements(type, liveBlocks, null);
+    }
+
+    public boolean checkRequirements(BuildingType type, List<BlockEntry> blocks, @Nullable PlayerEntity player) {
         Map<Object, Integer> requirements = type.getRequirements();
 
         for (Map.Entry<Object, Integer> entry : requirements.entrySet()) {
@@ -114,7 +205,7 @@ public class BuildingScanner {
 
             if (foundCount < requiredAmount) {
                 String name = (required instanceof TagKey<?> tag) ? tag.id().getPath() : ((Block) required).getName().getString();
-                player.sendMessage(Text.literal("Missing requirement: " + name + " (Found " + foundCount + "/" + requiredAmount + ")").formatted(Formatting.RED), false);
+                if(player != null) player.sendMessage(Text.literal("Missing requirement: " + name + " (Found " + foundCount + "/" + requiredAmount + ")").formatted(Formatting.RED), false);
                 return false;
             }
         }
@@ -202,6 +293,5 @@ public class BuildingScanner {
                 validBlocks.size()
         );
         player.sendMessage(Text.literal("[BuildingScanner] Registered building with " + validBlocks.size() + " valid quadrants.").formatted(Formatting.GREEN), false);
-
     }
 }

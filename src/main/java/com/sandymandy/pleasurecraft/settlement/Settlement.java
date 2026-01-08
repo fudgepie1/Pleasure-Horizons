@@ -182,6 +182,10 @@ public class Settlement {
         markDirty();
     }
 
+    public BuildingScanner getScanner(){
+        return this.scanner;
+    }
+
     public void setManager(SettlementManager manager) {
         this.manager = manager;
     }

@@ -75,7 +75,7 @@ public class SettlementManager extends PersistentState {
         markDirty();
     }
 
-    public Collection<Settlement> getAllSettlements() {
-        return Collections.unmodifiableCollection(settlements.values());
+    public List<Settlement> getAllSettlements() {
+        return List.copyOf(settlements.values());
     }
 }
