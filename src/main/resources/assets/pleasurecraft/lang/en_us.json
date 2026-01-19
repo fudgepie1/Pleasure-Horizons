@@ -13,25 +13,22 @@
 
   "item.pleasurecraft.settlement_hub": "Settlement Hub",
 
+  "item.pleasurecraft.bottle_of_breast_milk": "Bottle of Breast Milk",
+
   "item.pleasurecraft.settlement_recruit_contract": "Settlement Recruit Contract",
-
   "item.pleasurecraft.settlement_recruit_contract.use_on_entity.invalid_entity": "This can only be used on girls that support settlements!",
-
   "item.pleasurecraft.settlement_recruit_contract.use_on_entity.is_not_owner": "You don't own this girl!",
-
   "item.pleasurecraft.settlement_recruit_contract.use_on_entity.settlement_no_assigned_overlay": "This contract is not assigned to any settlement!",
-
   "item.pleasurecraft.settlement_recruit_contract.use_on_entity.settlement_no_assigned_chat": "Shift + Right-click a Settlement Hub to assign it.",
-
   "item.pleasurecraft.settlement_recruit_contract.use_on_entity.settlement_no_longer_exists": "Settlement no longer exists!",
-
   "item.pleasurecraft.settlement_recruit_contract.use_on_entity.already_in_settlement": "is already in",
-
   "item.pleasurecraft.settlement_recruit_contract.use_on_entity.left_settlement": "left",
-
   "item.pleasurecraft.settlement_recruit_contract.use_on_entity.joined_settlement": "joined",
-
   "item.pleasurecraft.settlement_recruit_contract.use_on_block.set_settlement_id": "Connected To",
+
+  "item.pleasurecraft.milk_jug_full": "Milk Jug",
+  "item.pleasurecraft.milk_jug_half": "Used Milk Jug",
+  "item.pleasurecraft.milk_jug_empty": "Empty Milk Jug",
 
   "block.pleasurecraft.settlement_hub" : "Settlement Hub",
 

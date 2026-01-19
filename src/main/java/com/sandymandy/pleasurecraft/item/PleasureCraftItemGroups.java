@@ -4,7 +4,9 @@ import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.block.PleasureCraftBlocks;
 import com.sandymandy.pleasurecraft.entity.PleasureCraftEntities;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
+import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.item.ItemGroup;
+import net.minecraft.item.ItemGroups;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
@@ -19,6 +21,9 @@ public class PleasureCraftItemGroups {
                     .entries((displayContext, entries) -> {
                         PleasureCraftEntities.getAllSpawnEggs().forEach(entries::add);
                         entries.add(PleasureCraftItems.SETTLEMENT_RECRUITMENT_TOKEN);
+                        entries.add(PleasureCraftItems.MILK_JUG_EMPTY);
+                        entries.add(PleasureCraftItems.MILK_JUG_FULL);
+                        entries.add(PleasureCraftItems.MILK_JUG_HALF);
                     }).build());
 
     public static final ItemGroup PLEASURE_CRAFT_BLOCK_GROUP = Registry.register(Registries.ITEM_GROUP,
@@ -34,5 +39,17 @@ public class PleasureCraftItemGroups {
 
     public static void registerItemGroups(){
         PleasureCraft.LOGGER.info("Registering Item Groups for PleasureCraft");
+        ItemGroupEvents.modifyEntriesEvent(ItemGroups.SPAWN_EGGS).register(entries -> {
+            PleasureCraftEntities.getAllSpawnEggs().forEach(entries::add);
+        });
+
+        ItemGroupEvents.modifyEntriesEvent(ItemGroups.INGREDIENTS).register(entries -> {
+            entries.add(PleasureCraftItems.MILK_JUG_EMPTY);
+        });
+
+        ItemGroupEvents.modifyEntriesEvent(ItemGroups.FOOD_AND_DRINK).register(entries -> {
+            entries.add(PleasureCraftItems.MILK_JUG_FULL);
+            entries.add(PleasureCraftItems.MILK_JUG_HALF);
+        });
     }
 }

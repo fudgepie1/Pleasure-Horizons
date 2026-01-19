@@ -79,7 +79,15 @@ public class LucyEntity extends SettlementGirlEntityAI {
                         "doggy_lay_on_bed",
                         "doggy_bed_idle")
                 );
+    }
 
+    @Override
+    public List<String> giftRepliesLike() {
+        return List.of("Wow, for me? Thanks!", "An allium? That’s so nice of you…!", "Ahah, this is great!");
+    }
 
+    @Override
+    public List<String> giftRepliesLove() {
+        return List.of("Oh, another one? Well, you’re the real gift here~.", "Babe, you’re too nice. And hot~.", "Stop giving me gifts and just fuck me already~!");
     }
 }

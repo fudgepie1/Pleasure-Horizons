@@ -25,7 +25,7 @@ public class PleasureCraftBlocks {
             properties -> new SettlementHubBlock(properties.strength(3.5f, 1200.0F).sounds(BlockSoundGroup.LODESTONE).requiresTool()));
 
     public static Block HOUSE_BUILDING_TAG = registerBlock("house_tag",
-            properties -> new HouseBuildingTagBlock(properties.strength(1.0F, 100.0F)));
+            properties -> new HouseBuildingTagBlock(properties.strength(1.0F, 100.0F).pistonBehavior(PistonBehavior.DESTROY)));
 
     public static Block CARVED_GIRL_PUMPKIN = registerBlock("carved_girl_pumpkin",
             properties -> new CarvedGirlPumpkinBlock(properties

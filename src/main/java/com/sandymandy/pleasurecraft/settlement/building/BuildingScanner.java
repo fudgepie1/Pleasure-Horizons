@@ -220,7 +220,7 @@ public class BuildingScanner {
     private boolean isMainPart(BlockState state) {
         // Beds: Only count the head part
         if (state.contains(Properties.BED_PART)) {
-            return state.get(Properties.BED_PART) == BedPart.HEAD;
+            return state.get(Properties.BED_PART) == BedPart.FOOT;
         }
         // Doors, Tall Flowers, etc: Only count the bottom half
         if (state.contains(Properties.DOUBLE_BLOCK_HALF)) {

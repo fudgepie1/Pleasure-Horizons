@@ -10,7 +10,6 @@ import com.sandymandy.pleasurecraft.item.PleasureCraftItemGroups;
 import com.sandymandy.pleasurecraft.item.PleasureCraftItems;
 import com.sandymandy.pleasurecraft.networking.PleasureCraftPackets;
 import com.sandymandy.pleasurecraft.registries.*;
-import com.sandymandy.pleasurecraft.util.managers.SettlementManager;
 import com.sandymandy.pleasurecraft.util.json.CustomGirlLoader;
 import com.sandymandy.pleasurecraft.util.managers.TamedGirlManager;
 import net.fabricmc.api.ModInitializer;

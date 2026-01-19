@@ -64,6 +64,16 @@ public class CoppieEntity extends SettlementGirlEntityAI {
         );
     }
 
+    @Override
+    public List<String> giftRepliesLike() {
+        return List.of("This golem accepts this… thing.", "This golem will accept the gift accordingly.", "Why are you giving this golem gifts, master?");
+    }
+
+    @Override
+    public List<String> giftRepliesLove() {
+        return List.of("This golem… no… I appreciate this, master.", "This really means alot to me master.", "Are you sure you don’t want to use my sexual functions, master?");
+    }
+
     public static DefaultAttributeContainer.Builder createAttributes() {
         return GirlEntity.createDefaultAttributes()
                 .add(EntityAttributes.MAX_HEALTH, 15)

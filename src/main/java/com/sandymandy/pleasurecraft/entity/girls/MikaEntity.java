@@ -80,6 +80,16 @@ public class MikaEntity extends SettlementGirlEntityAI {
         );
     }
 
+    @Override
+    public List<String> giftRepliesLike() {
+        return List.of("Wait is that… An actual open eyeblossom…!", "You’re a pretty lame but this is… Thanks…!", "Amazing… So that’s what an eyeblossom looks like…!");
+    }
+
+    @Override
+    public List<String> giftRepliesLove() {
+        return List.of("Mm, you’re actually pretty hot y’know…", "Are you in need of a mommy or something?", "C-Come on… This is too much…");
+    }
+
     public static DefaultAttributeContainer.Builder createAttributes() {
         return GirlEntity.createDefaultAttributes()
                 .add(EntityAttributes.MAX_HEALTH, 30)

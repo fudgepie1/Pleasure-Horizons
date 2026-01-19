@@ -29,7 +29,6 @@ import net.minecraft.inventory.Inventories;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.particle.ItemStackParticleEffect;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.tag.ItemTags;
@@ -75,6 +74,7 @@ public abstract class GirlEntity extends PathAwareEntity implements RangedAttack
     private static final TrackedData<Vec3d> PASSENGER_BONE_POSITION = DataTracker.registerData(GirlEntity.class, PleasureCraftTrackedDataRegistry.VEC3D);
     private static final TrackedData<Vec3d> BREAST_OFFSET = DataTracker.registerData(GirlEntity.class, PleasureCraftTrackedDataRegistry.VEC3D);
     private static final TrackedData<ItemStack> CONSUMING_STACK = DataTracker.registerData(GirlEntity.class, TrackedDataHandlerRegistry.ITEM_STACK);
+    private static final TrackedData<Integer> MILKED_AMOUNT = DataTracker.registerData(GirlEntity.class, TrackedDataHandlerRegistry.INTEGER);
     public static final Random RANDOM = new Random();
     public Map<String, Boolean> boneVisibility = new HashMap<>();
     public Map<String, Integer> boneColorOverrides = new HashMap<>();
@@ -135,7 +135,8 @@ public abstract class GirlEntity extends PathAwareEntity implements RangedAttack
         builder.add(BASE_POS, this.getBlockPos());
         builder.add(OVERRIDE_ANIM,"");
         builder.add(SCENE_ANIM,"");
-        builder.add(CONSUMING_STACK, new ItemStack(Items.COOKED_BEEF));
+        builder.add(CONSUMING_STACK, Items.COOKED_BEEF.getDefaultStack());
+        builder.add(MILKED_AMOUNT, 0);
     }
 
     public void setFollowing(boolean follow) {
@@ -307,6 +308,10 @@ public abstract class GirlEntity extends PathAwareEntity implements RangedAttack
 
     public int getBreastSize() { return this.dataTracker.get(BREAST_SIZE); }
 
+    public void setMilkedAmount(int value) { this.dataTracker.set(MILKED_AMOUNT, value); }
+
+    public int getMilkedAmount() { return this.dataTracker.get(MILKED_AMOUNT); }
+
     public void setBreastOffset(Vec3d value) { this.dataTracker.set(BREAST_OFFSET, value); }
 
     public Vec3d getBreastOffset() { return this.dataTracker.get(BREAST_OFFSET); }
@@ -452,6 +457,7 @@ public abstract class GirlEntity extends PathAwareEntity implements RangedAttack
         view.putBoolean("CanGetImpregnated", this.canGetImpregnated());
         view.putBoolean("PregnantState", this.isPregnant());
         view.putInt("AmountOfUnprotectedSex", this.amountOfUnprotectedSex());
+        view.putInt("MilkedAmount", this.getMilkedAmount());
         view.put("BreastOffset", Vec3d.CODEC, getBreastOffset());
         view.put("BasePos", BlockPos.CODEC, this.getBasePos());
         view.putBoolean("Sitting", this.isSitting());
@@ -485,6 +491,7 @@ public abstract class GirlEntity extends PathAwareEntity implements RangedAttack
         this.canGetImpregnatedState(view.getBoolean("CanGetImpregnated", false));
         this.setPregnantState(view.getBoolean("PregnantState", false));
         this.setAmountOfUnprotectedSex(view.getInt("AmountOfUnprotectedSex", 0));
+        this.setMilkedAmount(view.getInt("MilkedAmount", 0));
 
     }
 

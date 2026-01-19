@@ -3,6 +3,7 @@ package com.sandymandy.pleasurecraft.entity.base.tamable;
 import com.sandymandy.pleasurecraft.advancement.criterion.PleasureCraftCriteria;
 import com.sandymandy.pleasurecraft.entity.PleasureCraftEntityStatuses;
 import com.sandymandy.pleasurecraft.entity.base.GirlSceneEntity;
+import com.sandymandy.pleasurecraft.item.PleasureCraftItems;
 import com.sandymandy.pleasurecraft.registries.PleasureCraftSoundEventRegistry;
 import com.sandymandy.pleasurecraft.screen.GirlInventoryScreenHandlerFactory;
 import com.sandymandy.pleasurecraft.util.PleasureCraftMessages;
@@ -23,6 +24,8 @@ import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUsage;
+import net.minecraft.item.Items;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.scoreboard.Team;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -50,8 +53,11 @@ public abstract class TameableGirlEntity extends GirlSceneEntity implements Tame
             TameableGirlEntity.class, TrackedDataHandlerRegistry.LAZY_ENTITY_REFERENCE
     );
 
-    public List<String> getGiftReplies() {
-        return List.of("Oh, Thank you", "Nice", "Thank you so much");
+    public List<String> giftRepliesLike() {
+        return List.of("Nice", "Thank you so much");
+    }
+    public List<String> giftRepliesLove() {
+        return List.of("Oh, Thank you", "Love you ~_^");
     }
 
     protected TameableGirlEntity(EntityType<? extends GirlSceneEntity> entityType, World world) {
@@ -81,6 +87,15 @@ public abstract class TameableGirlEntity extends GirlSceneEntity implements Tame
                 return ActionResult.CONSUME;
             }
 
+            if(itemStack.isOf(PleasureCraftItems.MILK_JUG_EMPTY ) && this.isStripped() && isPregnant() && this.getMilkedAmount() < 4) {
+                ItemStack milkInHand = ItemUsage.exchangeStack(itemStack, player, PleasureCraftItems.MILK_JUG_FULL.getDefaultStack());
+                player.setStackInHand(hand, milkInHand);
+                this.setMilkedAmount(this.getMilkedAmount() + 1);
+                return ActionResult.CONSUME;
+            }
+
+            if(itemStack.isOf(Items.POTION)) return ActionResult.FAIL;
+
             if (this.isTamed()) return interactTamed(player, itemStack, itemInHand);
 
             return interactNotTamed(player, itemStack, itemInHand);
@@ -88,12 +103,14 @@ public abstract class TameableGirlEntity extends GirlSceneEntity implements Tame
         return ActionResult.PASS;
     }
 
+
     public ActionResult interactTamed(PlayerEntity player, ItemStack itemStack, Item itemInHand) {
         if (this.isOwner(player)) {
             if (itemInHand.equals(isAttractedTo()) && getCurrentRelationshipLevel() < maxRelationshipLevel()) {
                 itemStack.decrementUnlessCreative(1, player);
                 player.sendMessage(Text.literal("She Liked The Gift"), true);
-                messageAsEntity(this.getGiftReplies().get(RANDOM.nextInt(this.getGiftReplies().size())));
+                if(getCurrentRelationshipLevel() < 4) messageAsEntity(this.giftRepliesLike().get(RANDOM.nextInt(this.giftRepliesLike().size())));
+                else messageAsEntity(this.giftRepliesLove().get(RANDOM.nextInt(this.giftRepliesLove().size())));
                 setCurrentRelationshipLevel(getCurrentRelationshipLevel() + 1);
                 this.getWorld().sendEntityStatus(this, PleasureCraftEntityStatuses.HAPPY_PARTICLES);
                 this.playSound(PleasureCraftSoundEventRegistry.SoundGroup.GIGGLE.getSound(this.getGirlID()));

@@ -64,9 +64,19 @@ public class MomoEntity extends SettlementGirlEntityAI {
         );
     }
 
+    @Override
+    public List<String> giftRepliesLike() {
+        return List.of("Wow!!! A poppy!! Yay!!", "Wow, wow wow! A gift for me!", "Momo loves gifts! Give Momo more!\n");
+    }
+
+    @Override
+    public List<String> giftRepliesLove() {
+        return List.of("Yay!! Another gift! You should really be my owner!", "Yay, yay, yay! Can we play now!", "M-Momo is in heat because of you…");
+    }
+
     public static DefaultAttributeContainer.Builder createAttributes() {
         return GirlEntity.createDefaultAttributes()
-                .add(EntityAttributes.MAX_HEALTH, 15)
+                .add(EntityAttributes.MAX_HEALTH, 20)
                 .add(EntityAttributes.MOVEMENT_SPEED, .20)
                 .add(EntityAttributes.ATTACK_DAMAGE, 2);
     }

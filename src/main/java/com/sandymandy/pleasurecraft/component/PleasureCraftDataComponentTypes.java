@@ -12,7 +12,7 @@ import java.util.function.UnaryOperator;
 
 public class PleasureCraftDataComponentTypes {
 
-    public static final ComponentType<UUID> SETTLEMENT_UUID = register("settlement_uuid", builder -> builder.codec(Uuids.CODEC));
+    public static final ComponentType<UUID> SETTLEMENT_UUID = register("settlement_uuid", builder -> builder.codec(Uuids.CODEC).packetCodec(Uuids.PACKET_CODEC));
 
     private static <T>ComponentType<T> register(String name, UnaryOperator<ComponentType.Builder<T>> builderOperator) {
         return Registry.register(Registries.DATA_COMPONENT_TYPE, Identifier.of(PleasureCraft.MOD_ID, name),

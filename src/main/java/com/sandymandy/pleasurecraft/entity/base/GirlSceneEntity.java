@@ -944,6 +944,7 @@ public abstract class GirlSceneEntity extends GirlEntity implements GeoEntity {
     private void pregnancyFinished(){
         this.playSound(PleasureCraftSoundEventRegistry.PLOB, 1f,1f);
         this.dropPregnancyLoot(LootTables.END_CITY_TREASURE_CHEST);
+        this.setMilkedAmount(0);
         this.setPregnantState(false);
     }
 
