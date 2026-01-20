@@ -238,7 +238,6 @@ public abstract class TameableGirlEntity extends GirlSceneEntity implements Tame
 
     @Override
     public void tick() {
-        super.tick();
         if (!this.getWorld().isClient()) {
             ServerWorld world = (ServerWorld) this.getWorld();
 
@@ -257,6 +256,7 @@ public abstract class TameableGirlEntity extends GirlSceneEntity implements Tame
                 this.dataTracker.set(TAMEABLE_FLAGS, (byte)(b & -2));
             }
         }
+        super.tick();
     }
 
     @Override

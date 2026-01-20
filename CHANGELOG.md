@@ -18,6 +18,7 @@
 - Added Breast Milk
 - Made each girl say something when receiving gifts
 - Added a way to tell what pregnancy stage a girl is on
+- Made it so that duplicate animation events happen less
 
 ## v0.6.1 
 - Fixed the issue where girls in villagers would have tiny breasts

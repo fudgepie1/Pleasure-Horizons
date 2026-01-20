@@ -129,7 +129,6 @@ public class CustomGirlEntity extends SettlementGirlEntityAI {
 
     @Override
     public void tick() {
-        super.tick();
 
         if (!this.getWorld().isClient()) {
             this.dataTracker.set(GIRL_ID, getProfile().id());
@@ -142,6 +141,8 @@ public class CustomGirlEntity extends SettlementGirlEntityAI {
                 this.calculateDimensions();
             }
         }
+
+        super.tick();
     }
 
     @Override

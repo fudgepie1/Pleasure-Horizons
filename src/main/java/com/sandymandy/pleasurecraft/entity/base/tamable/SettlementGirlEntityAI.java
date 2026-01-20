@@ -201,8 +201,8 @@ public abstract class SettlementGirlEntityAI extends TameableGirlEntity implemen
 
     @Override
     public void tick() {
-        super.tick();
         this.dataTracker.set(SHOULD_TICK_BRAIN, !(isMovementLocked() || isSitting() || this.targetBedPos != null || this.isFollowing()) && this.hasSettlement());
+        super.tick();
     }
 
     @Override

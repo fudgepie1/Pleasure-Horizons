@@ -378,7 +378,6 @@ public class KoboldEntity extends WildGirlEntity {
 
     @Override
     public void tick() {
-        super.tick();
 
         // Server-side: Update hitbox if body size changed
         if (!this.getWorld().isClient()) {
@@ -407,6 +406,7 @@ public class KoboldEntity extends WildGirlEntity {
             float zOffset = calculateBreastZOffset(breastSize);
             this.setBonePos("boobs", 0f, 0f, zOffset);
         }
+        super.tick();
     }
 
     // ===== Data Tracker Changes =====

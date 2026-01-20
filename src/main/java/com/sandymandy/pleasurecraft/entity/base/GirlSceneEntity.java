@@ -73,9 +73,10 @@ import software.bernie.geckolib.animation.keyframe.event.data.SoundKeyframeData;
 import java.util.*;
 
 public abstract class GirlSceneEntity extends GirlEntity implements GeoEntity {
+    public final Queue<String> animationEventQueueClient = new LinkedList<>();
+    public final Queue<String> animationEventQueueServer = new LinkedList<>();
     private static final TrackedData<Scene> CURRENT_SCENE = DataTracker.registerData(GirlSceneEntity.class, PleasureCraftTrackedDataRegistry.SCENE);
     private static final TrackedData<ScenePhase> CURRENT_SCENE_PHASE = DataTracker.registerData(GirlSceneEntity.class, PleasureCraftTrackedDataRegistry.SCENE_PHASE);
-    private static final TrackedData<String> ANIMATION_KEY_FRAME_EVENT = DataTracker.registerData(GirlSceneEntity.class, TrackedDataHandlerRegistry.STRING);
     private static final TrackedData<String> CURRENT_SEX_ANIM = DataTracker.registerData(GirlSceneEntity.class, TrackedDataHandlerRegistry.STRING);
     public static final TrackedData<Float> SCENE_PROGRESS = DataTracker.registerData(GirlSceneEntity.class, TrackedDataHandlerRegistry.FLOAT);
     public static final TrackedData<Float> CUM_THRESHOLD = DataTracker.registerData(GirlSceneEntity.class, TrackedDataHandlerRegistry.FLOAT);
@@ -116,7 +117,6 @@ public abstract class GirlSceneEntity extends GirlEntity implements GeoEntity {
         super.initDataTracker(builder);
         builder.add(CURRENT_SCENE, Scene.EMPTY);
         builder.add(CURRENT_SCENE_PHASE, ScenePhase.NONE);
-        builder.add(ANIMATION_KEY_FRAME_EVENT,"");
         builder.add(CURRENT_SEX_ANIM,"");
         builder.add(SCENE_PROGRESS,0f);
         builder.add(CUM_THRESHOLD,5f);
@@ -154,12 +154,12 @@ public abstract class GirlSceneEntity extends GirlEntity implements GeoEntity {
         return this.dataTracker.get(CURRENT_SEX_ANIM);
     }
 
-    public void setAnimationKeyFrameEventState(String  str){
-        this.dataTracker.set(ANIMATION_KEY_FRAME_EVENT, str);
-    }
+    public Queue<String> getAnimationKeyFrameEvent(){
+        if(this.getWorld().isClient()) {
+            return this.animationEventQueueClient;
+        }
 
-    public String getAnimationKeyFrameEvent(){
-        return this.dataTracker.get(ANIMATION_KEY_FRAME_EVENT);
+        return this.animationEventQueueServer;
     }
 
     public void setThrusting(boolean thrust){
@@ -580,33 +580,9 @@ public abstract class GirlSceneEntity extends GirlEntity implements GeoEntity {
         this.setBoneSize("belly", bellySize);
     }
 
-    private void keyFrameEventHandler() {
-        String key = getAnimationKeyFrameEvent();
-
-        // If this is the same key as last time, skip
-        if (key.equals(lastSoundKey)) {
-            setAnimationKeyFrameEventState("");
-        }
-
-        // Update last key
-        lastSoundKey = key;
-
-    }
-
-    protected void soundHandler() {
-        String key = getAnimationKeyFrameEvent();
-
-        // Get all sounds for this key
-        List<SoundEvent> sounds = SceneKeyframeEventRegistry.getSound(this.getGirlID(), key);
-
-        // Play all sounds sequentially (or simultaneously)
-        for (SoundEvent sound : sounds) {
-            this.playSound(sound, 1.0f, 1.0f);
-        }
-    }
-
-    protected void messageHandler() {
-        String key = getAnimationKeyFrameEvent();
+    public void handleAnimationEventClient(String key) {
+        if(!this.getWorld().isClient()) return;
+        this.animationEventQueueClient.add(key.toLowerCase());
 
         List<String> girlMsgs = SceneKeyframeEventRegistry.getMessage(this.getGirlID(), key);
         List<String> playerMsgs = SceneKeyframeEventRegistry.getPlayerMessage(key);
@@ -618,26 +594,42 @@ public abstract class GirlSceneEntity extends GirlEntity implements GeoEntity {
         for (String msg : playerMsgs) {
             this.messageAsPlayer(msg);
         }
+
+        List<SoundEvent> sounds = SceneKeyframeEventRegistry.getSound(this.getGirlID(), key);
+
+        // Play all sounds sequentially (or simultaneously)
+        for (SoundEvent sound : sounds) {
+            this.getWorld().playSoundFromEntityClient(this, sound, this.getSoundCategory(), 1.0f, 1.0f);
+        }
     }
 
-    private void handleSceneFootstepSounds(){
+    public void handleAnimationEventServer(String key) {
+        if (this.getWorld().isClient()) return;
+
+        // Update queue
+        this.animationEventQueueServer.add(key.toLowerCase());
+
+        // Call server dependent methods
+        handleSceneSpeed(key);
+        handleSceneFootstepSounds(key);
+    }
+
+    private void handleSceneFootstepSounds(String key){
         BlockPos posBelow = this.getBlockPos().down();
         BlockState state = this.getWorld().getBlockState(posBelow);
         BlockSoundGroup soundGroup = state.getSoundGroup();
         SoundEvent stepSound = soundGroup.getStepSound();
 
-        if(getAnimationKeyFrameEvent().equals("paizuri_startStep".toLowerCase())){
+        if(key.equals("paizuri_startStep".toLowerCase())){
             this.playSound(stepSound, 1.0f, 1.0f);
         }
 
     }
 
-    private void handleSceneSpeed() {
+    private void handleSceneSpeed(String key) {
         if (!this.getCurrentScenePhase().equals(ScenePhase.HAVING_SEX)) {
             return;
         }
-
-        String key = getAnimationKeyFrameEvent().toLowerCase();
 
         if (key.contains("thrust")) {
             this.setSceneProgress(this.getSceneProgress() + PROGRESS_SPEED);
@@ -654,12 +646,8 @@ public abstract class GirlSceneEntity extends GirlEntity implements GeoEntity {
         this.modelLogic();
 
         //Scene
-        keyFrameEventHandler();
-        if(this.getWorld().isClient())messageHandler();
 
         if(!this.getWorld().isClient()) {
-            soundHandler();
-            handleSceneFootstepSounds();
             this.setSceneState(getCurrentScenePhase() != ScenePhase.NONE);
 
             boolean InSexPhases = switch (getCurrentScenePhase()) {
@@ -682,7 +670,6 @@ public abstract class GirlSceneEntity extends GirlEntity implements GeoEntity {
         if(!this.hasPassengers() && this.isSceneActive() && isStopPhase) stopScene();
 
         if(!this.getWorld().isClient()) {
-            handleSceneSpeed();
 
             if(getPregnancyStage() >= maxPregnancyStage() && !isPregnant()){
                 this.setPregnantState(true);
@@ -703,7 +690,15 @@ public abstract class GirlSceneEntity extends GirlEntity implements GeoEntity {
                     pregnancyFinished();
                 }
             }
+
+            // Clear AnimEvent Queue
+            this.animationEventQueueServer.clear();
         }
+        else {
+            this.animationEventQueueClient.clear();
+        }
+
+
     }
 
     public void triggerSwing() {
@@ -765,7 +760,6 @@ public abstract class GirlSceneEntity extends GirlEntity implements GeoEntity {
         if (isSceneActive() && getOverrideAnim().isEmpty()) {
             final AnimationController<?> controller = state.controller();
             final Scene options = this.getCurrentScene();
-
             // Notify server when an animation finishes (only once per cycle)
             if ((controller.hasAnimationFinished() || controller.getAnimationState() == AnimationController.State.PAUSED) && !lastSceneAnim.isEmpty()) {
                 ClientPlayNetworking.send(new AnimationFinishC2SPacket(this.getId()));
@@ -798,7 +792,7 @@ public abstract class GirlSceneEntity extends GirlEntity implements GeoEntity {
                     }
 
                     if(options.useKeyFrameEvents()){
-                        String key = getAnimationKeyFrameEvent();
+                        Queue<String> key = this.getAnimationKeyFrameEvent();
 
                         if (key.contains("switch") && thrustKeyDown) {
                             setCurrentSexAnim(getRandomFromList(options.fastAnim()));
@@ -1246,7 +1240,6 @@ public abstract class GirlSceneEntity extends GirlEntity implements GeoEntity {
     }
 
     private static class SoundKeyframeHandler implements AnimationController.KeyframeEventHandler<GirlSceneEntity, SoundKeyframeData> {
-
         private final GirlSceneEntity entity;
 
         public SoundKeyframeHandler(GirlSceneEntity entity) {
@@ -1258,6 +1251,12 @@ public abstract class GirlSceneEntity extends GirlEntity implements GeoEntity {
             if (!this.entity.getWorld().isClient()) return;
 
             String key = event.keyframeData().getSound().toLowerCase();
+
+            // 1. Play locally IMMEDIATELY (Only for the player in the scene)
+            // This ensures the sound is perfectly synced with the animation frame
+            entity.handleAnimationEventClient(key);
+
+            // 2. Notify server so it can tell OTHER players to play the sound
             ClientPlayNetworking.send(new SoundEventSyncC2SPacket(this.entity.getId(), key));
         }
     }

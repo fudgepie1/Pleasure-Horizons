@@ -7,8 +7,10 @@ import com.sandymandy.pleasurecraft.entity.girls.KoboldEntity;
 import com.sandymandy.pleasurecraft.networking.C2S.*;
 import com.sandymandy.pleasurecraft.networking.S2C.*;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 
 import java.util.Objects;
@@ -46,6 +48,7 @@ public class PleasureCraftPackets {
         PayloadTypeRegistry.playS2C().register(RefreshModelsS2CPacket.ID, RefreshModelsS2CPacket.CODEC);
         PayloadTypeRegistry.playS2C().register(PlayAttackAnimationS2CPacket.ID, PlayAttackAnimationS2CPacket.CODEC);
         PayloadTypeRegistry.playS2C().register(OpenKoboldCustomizeScreenS2CPacket.ID, OpenKoboldCustomizeScreenS2CPacket.CODEC);
+        PayloadTypeRegistry.playS2C().register(RunAnimEventsS2CPacket.ID, RunAnimEventsS2CPacket.CODEC);
 
     }
 
@@ -169,7 +172,14 @@ public class PleasureCraftPackets {
                 (packet, context) -> Objects.requireNonNull(context.player().getServer()).execute(() -> {
                     var entity = context.player().getWorld().getEntityById(packet.entityId());
                     if (entity instanceof GirlSceneEntity girl) {
-                        girl.setAnimationKeyFrameEventState(packet.soundEvent());
+                        for (ServerPlayerEntity otherPlayer : PlayerLookup.tracking(girl)) {
+                            if (otherPlayer != context.player()) {
+                                ServerPlayNetworking.send(otherPlayer, new RunAnimEventsS2CPacket(girl.getId(), packet.soundEvent()));
+                            }
+                        }
+
+                        // Handle Server-only logic (like pregnancy progress or gameplay stats) here
+                        girl.handleAnimationEventServer(packet.soundEvent());
                     }
                 }));
 

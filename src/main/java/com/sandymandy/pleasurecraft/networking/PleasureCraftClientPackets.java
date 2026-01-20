@@ -78,6 +78,19 @@ public class PleasureCraftClientPackets {
         );
 
         ClientPlayNetworking.registerGlobalReceiver(
+                RunAnimEventsS2CPacket.ID,
+                (packet, context) -> context.client().execute(() -> {
+                    var world = context.client().world;
+                    if (world == null) return;
+
+                    Entity entity = world.getEntityById(packet.entityId());
+                    if (entity instanceof GirlSceneEntity girl) {
+                        girl.handleAnimationEventClient(packet.event());
+                    }
+                })
+        );
+
+        ClientPlayNetworking.registerGlobalReceiver(
                 OpenKoboldCustomizeScreenS2CPacket.ID,
                 (packet, context) -> context.client().execute(() -> {
                     MinecraftClient.getInstance().setScreen(new KoboldCustomizeScreen(packet.entityId(), packet.previewEntityId()));
