@@ -17,6 +17,7 @@
 - Made it so that changing any block in a building causes it to do a rescan
 - Added Breast Milk
 - Made each girl say something when receiving gifts
+- Added a way to tell what pregnancy stage a girl is on
 
 ## v0.6.1 
 - Fixed the issue where girls in villagers would have tiny breasts

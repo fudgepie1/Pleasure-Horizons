@@ -684,14 +684,13 @@ public abstract class GirlSceneEntity extends GirlEntity implements GeoEntity {
         if(!this.getWorld().isClient()) {
             handleSceneSpeed();
 
-            if(amountOfUnprotectedSex() >= maxAmountOfSexUntilImpregnation() && !isPregnant()){
+            if(getPregnancyStage() >= maxPregnancyStage() && !isPregnant()){
                 this.setPregnantState(true);
                 this.setPregnancyTicks(PREGNANCY_MAX_TICKS); // Start pregnancy timer
-                this.setAmountOfUnprotectedSex(0);
             }
 
             if(!canGetImpregnated()){
-                setAmountOfUnprotectedSex(0);
+                setPregnancyStage(0);
                 setPregnantState(false);
                 this.setPregnancyTicks(0);
             }
@@ -913,7 +912,7 @@ public abstract class GirlSceneEntity extends GirlEntity implements GeoEntity {
                 }
             }
             case CUM -> {
-                if(this.getCurrentScene().countTowardsImpregnation() && this.canGetImpregnated()) this.setAmountOfUnprotectedSex(this.amountOfUnprotectedSex() + 1);
+                if(this.getCurrentScene().countTowardsImpregnation() && this.canGetImpregnated()) this.setPregnancyStage(this.getPregnancyStage() + 1);
                 stopScene();
             }
             case LAYING_DOWN -> playPhase(ScenePhase.BED_IDLE);
@@ -945,6 +944,7 @@ public abstract class GirlSceneEntity extends GirlEntity implements GeoEntity {
         this.playSound(PleasureCraftSoundEventRegistry.PLOB, 1f,1f);
         this.dropPregnancyLoot(LootTables.END_CITY_TREASURE_CHEST);
         this.setMilkedAmount(0);
+        this.setPregnancyStage(0);
         this.setPregnantState(false);
     }
 

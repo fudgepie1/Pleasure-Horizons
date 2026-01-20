@@ -1,24 +1,24 @@
 package com.sandymandy.pleasurecraft.client.gui.screen;
 
-import com.sandymandy.pleasurecraft.PleasureCraft;
 import com.sandymandy.pleasurecraft.networking.C2S.SetGUIOpenStateC2SPacket;
 import com.sandymandy.pleasurecraft.networking.C2S.StartSceneC2SPacket;
+import com.sandymandy.pleasurecraft.util.ScreenUtils;
+import com.sandymandy.pleasurecraft.util.Utils;
 import com.sandymandy.pleasurecraft.util.variables.Scene;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
-import net.minecraft.util.Identifier;
 
 import java.util.List;
+
+import static com.sandymandy.pleasurecraft.util.PleasureCraftIcons.HEART_ICON;
 
 public class GirlSceneScreen extends Screen {
     private final int entityId;
@@ -72,18 +72,17 @@ public class GirlSceneScreen extends Screen {
         context.drawItem(this.attractedTo, itemX, iconY);
 
         // Draw relationship icon after the item
-        Identifier RELATIONSHIP_ICON = Identifier.of(PleasureCraft.MOD_ID, "textures/gui/relationship_heart.png");
         int heartX = centerX - 10; // 10 pixels left of center
-        context.drawTexture(RenderPipelines.GUI_TEXTURED, RELATIONSHIP_ICON, heartX, iconY, 0, 0, 18, 18, 18, 18);
+        context.drawTexture(RenderPipelines.GUI_TEXTURED, HEART_ICON, heartX, iconY, 0, 0, 18, 18, 18, 18);
 
         // Draw the relationship level number next to the heart
-        context.drawText(MinecraftClient.getInstance().textRenderer,
+        context.drawText(textRenderer,
                 String.valueOf(currentRelationshipLevel),
                 heartX + 20, iconY + 4, Colors.WHITE, true);
 
-        if (mouseX >= itemX && mouseX <= itemX + 16 && mouseY >= iconY && mouseY <= iconY + 16) {
+        if (ScreenUtils.isMouseOverHere(mouseX, mouseY, itemX, iconY, 16, 16)) {
             // Draw tooltip with item name
-            context.drawTooltip(MinecraftClient.getInstance().textRenderer,
+            context.drawTooltip(textRenderer,
                     this.attractedTo.getName(),
                     mouseX, mouseY);
         }

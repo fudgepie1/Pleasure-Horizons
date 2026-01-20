@@ -69,7 +69,7 @@ public abstract class GirlEntity extends PathAwareEntity implements RangedAttack
     private static final TrackedData<Integer> BREAST_SIZE = DataTracker.registerData(GirlEntity.class, TrackedDataHandlerRegistry.INTEGER);
     private static final TrackedData<Integer> RELATIONSHIP_LEVEL = DataTracker.registerData(GirlEntity.class, TrackedDataHandlerRegistry.INTEGER);
     private static final TrackedData<Integer> MAX_RELATIONSHIP_LEVEL = DataTracker.registerData(GirlEntity.class, TrackedDataHandlerRegistry.INTEGER);
-    private static final TrackedData<Integer> AMOUNT_OF_SEX_UNTIL_IMPREGNATION = DataTracker.registerData(GirlEntity.class, TrackedDataHandlerRegistry.INTEGER);
+    private static final TrackedData<Integer> PREGNANCY_STAGE = DataTracker.registerData(GirlEntity.class, TrackedDataHandlerRegistry.INTEGER);
     private static final TrackedData<BlockPos> BASE_POS = DataTracker.registerData(GirlEntity.class, TrackedDataHandlerRegistry.BLOCK_POS);
     private static final TrackedData<Vec3d> PASSENGER_BONE_POSITION = DataTracker.registerData(GirlEntity.class, PleasureCraftTrackedDataRegistry.VEC3D);
     private static final TrackedData<Vec3d> BREAST_OFFSET = DataTracker.registerData(GirlEntity.class, PleasureCraftTrackedDataRegistry.VEC3D);
@@ -126,7 +126,7 @@ public abstract class GirlEntity extends PathAwareEntity implements RangedAttack
         builder.add(SITTING, false);
         builder.add(PREGNANT,false);
         builder.add(CAN_GET_IMPREGNATED,false);
-        builder.add(AMOUNT_OF_SEX_UNTIL_IMPREGNATION, 0);
+        builder.add(PREGNANCY_STAGE, 0);
         builder.add(RELATIONSHIP_LEVEL,0);
         builder.add(MAX_RELATIONSHIP_LEVEL,4);
         builder.add(BREAST_SIZE,100);
@@ -280,12 +280,13 @@ public abstract class GirlEntity extends PathAwareEntity implements RangedAttack
         return this.dataTracker.get(CAN_GET_IMPREGNATED);
     }
 
-    public void setAmountOfUnprotectedSex(int num){
-        this.dataTracker.set(AMOUNT_OF_SEX_UNTIL_IMPREGNATION, num);
+    public void setPregnancyStage(int num){
+        num = MathHelper.clamp(num, 0, maxPregnancyStage());
+        this.dataTracker.set(PREGNANCY_STAGE, num);
     }
 
-    public int amountOfUnprotectedSex(){
-        return this.dataTracker.get(AMOUNT_OF_SEX_UNTIL_IMPREGNATION);
+    public int getPregnancyStage(){
+        return this.dataTracker.get(PREGNANCY_STAGE);
     }
 
     public int getCurrentRelationshipLevel() { return this.dataTracker.get(RELATIONSHIP_LEVEL);}
@@ -352,7 +353,7 @@ public abstract class GirlEntity extends PathAwareEntity implements RangedAttack
 
     public int getMaxBellySizeWhenPregnant() { return 450;}
 
-    public int maxAmountOfSexUntilImpregnation(){return 3;}
+    public int maxPregnancyStage(){return 3;}
 
     public boolean hasStripAnim() {
         return true;
@@ -456,7 +457,7 @@ public abstract class GirlEntity extends PathAwareEntity implements RangedAttack
         view.putInt("BreastSize", getBreastSize());
         view.putBoolean("CanGetImpregnated", this.canGetImpregnated());
         view.putBoolean("PregnantState", this.isPregnant());
-        view.putInt("AmountOfUnprotectedSex", this.amountOfUnprotectedSex());
+        view.putInt("AmountOfUnprotectedSex", this.getPregnancyStage());
         view.putInt("MilkedAmount", this.getMilkedAmount());
         view.put("BreastOffset", Vec3d.CODEC, getBreastOffset());
         view.put("BasePos", BlockPos.CODEC, this.getBasePos());
@@ -490,7 +491,7 @@ public abstract class GirlEntity extends PathAwareEntity implements RangedAttack
         this.setBreastSize(view.getInt("BreastSize", 100));
         this.canGetImpregnatedState(view.getBoolean("CanGetImpregnated", false));
         this.setPregnantState(view.getBoolean("PregnantState", false));
-        this.setAmountOfUnprotectedSex(view.getInt("AmountOfUnprotectedSex", 0));
+        this.setPregnancyStage(view.getInt("AmountOfUnprotectedSex", 0));
         this.setMilkedAmount(view.getInt("MilkedAmount", 0));
 
     }

@@ -6,6 +6,7 @@ import com.sandymandy.pleasurecraft.networking.C2S.SetGUIOpenStateC2SPacket;
 import com.sandymandy.pleasurecraft.registries.InventoryButtonRegistry;
 import com.sandymandy.pleasurecraft.screen.GirlInventoryScreenHandler;
 import com.sandymandy.pleasurecraft.screen.InventoryButtonAction;
+import com.sandymandy.pleasurecraft.util.ScreenUtils;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
@@ -19,6 +20,8 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
 import net.minecraft.util.Identifier;
 
+import static com.sandymandy.pleasurecraft.util.PleasureCraftIcons.*;
+
 public class GirlInventoryScreen extends HandledScreen<GirlInventoryScreenHandler> {
     private static final Identifier TEXTURE = Identifier.of(PleasureCraft.MOD_ID, "/textures/gui/inventory.png");
     private float xMouse;
@@ -27,7 +30,6 @@ public class GirlInventoryScreen extends HandledScreen<GirlInventoryScreenHandle
     private static final int GUI_HEIGHT = 170;
     private final TameableGirlEntity girl;
     private final PlayerEntity player;
-
 
 
     public GirlInventoryScreen(GirlInventoryScreenHandler handler, PlayerInventory inventory, Text title) {
@@ -58,23 +60,55 @@ public class GirlInventoryScreen extends HandledScreen<GirlInventoryScreenHandle
         context.drawTexture(RenderPipelines.GUI_TEXTURED, TEXTURE, centerX, centerY, 0, 0, GUI_WIDTH, GUI_HEIGHT, GUI_WIDTH, GUI_HEIGHT);
         InventoryScreen.drawEntity(context, i + 26, j + 8, i + 75, j + 78, this.girl.getSizeGUI(), this.girl.getYAxisGUI(), mouseX, mouseY, this.girl);
 
+        int iconY = centerY - 22; // Positioned slightly above the top edge of the GUI
+        int iconSize = 18;
+
         int relLevel = girl.getCurrentRelationshipLevel();
+        int relX = centerX;
+
+        context.drawTexture(RenderPipelines.GUI_TEXTURED, HEART_ICON, relX, iconY, 0, 0, iconSize, iconSize, iconSize, iconSize);
+        context.drawText(this.textRenderer, Text.literal(String.valueOf(relLevel)), relX + 20, iconY + 5, Colors.WHITE, true);
+
+        if (ScreenUtils.isMouseOverHere(mouseX, mouseY, relX, iconY, 18, 18)) {
+            context.drawTooltip(textRenderer, Text.translatable("screen.pleasurecraft.girl_inventory.relationship_tooltip"), mouseX, mouseY);
+        }
+
+        int pregLevel = girl.getPregnancyStage();
+        int pregMax = girl.maxPregnancyStage();
+        int pregX = centerX + GUI_WIDTH - iconSize; // Aligned to the far right edge of the menu
+        String pregText = pregLevel + "/" + pregMax;
+        int textWidth = this.textRenderer.getWidth(pregText);
+
+        if(girl.canGetImpregnated()){
+            context.drawTexture(RenderPipelines.GUI_TEXTURED, getPregnancyIcon(pregLevel), pregX, iconY, 0, 0, iconSize, iconSize, iconSize, iconSize);
+            context.drawText(this.textRenderer, Text.literal(pregText), pregX - textWidth - 5, iconY + 5, Colors.WHITE, true);
+
+            if (ScreenUtils.isMouseOverHere(mouseX, mouseY, pregX, iconY, 18, 18)) {
+                context.drawTooltip(textRenderer, Text.translatable("screen.pleasurecraft.girl_inventory.pregnancy_tooltip"), mouseX, mouseY);
+            }
+        }
 
 
-        Identifier HEALTH_BOOST_ICON = Identifier.of(PleasureCraft.MOD_ID, "textures/gui/relationship_heart.png");
+    }
 
-        // pick position relative to GUI
-        int iconX = centerX;  // adjust position
-        int iconY = centerY - 20;
+    private Identifier getPregnancyIcon(int stage) {
+        switch (stage) {
+            case 1 -> {
+                return PREGNANCY_LEVEL_ONE_ICON;
+            }
 
-        // draw the effect texture (assumes 18x18 size like vanilla)
-        context.drawTexture(RenderPipelines.GUI_TEXTURED, HEALTH_BOOST_ICON,
-                iconX, iconY, 0, 0, 18, 18, 18, 18);
+            case 2 -> {
+                return PREGNANCY_LEVEL_TWO_ICON;
+            }
 
-        // draw the number next to it
-        context.drawText(this.textRenderer, Text.literal(String.valueOf(relLevel)),
-                iconX + 20, iconY + 5, Colors.WHITE, true);
+            case 3 -> {
+                return PREGNANCY_LEVEL_THREE_ICON;
+            }
 
+            default -> {
+                return PREGNANCY_LEVEL_ZERO_ICON;
+            }
+        }
     }
 
     @Override

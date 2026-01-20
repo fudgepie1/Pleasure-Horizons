@@ -51,6 +51,8 @@
   "entity.pleasurecraft.custom_girl": "Custom Girl",
 
   "screen.pleasurecraft.girl_inventory": "Inventory",
+  "screen.pleasurecraft.girl_inventory.relationship_tooltip": "Relationship Level",
+  "screen.pleasurecraft.girl_inventory.pregnancy_tooltip": "Pregnancy Stage",
 
   "screen.pleasurecraft.settlement_hub" : "Settlement Hub",
 
