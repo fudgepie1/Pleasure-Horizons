@@ -30,6 +30,15 @@ import java.util.*;
 
 public class Utils {
 
+    public static Boolean isStringInQueue(Queue<String> queue, String text) {
+        for (String event : queue) {
+            if (event.contains(text)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
 
     public static BlockPos getBlockPosFromVec3d(Vec3d pos) {return new BlockPos((int) pos.getX(), (int) pos.getY(), (int) pos.getZ());}

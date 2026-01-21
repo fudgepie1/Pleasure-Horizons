@@ -72,6 +72,8 @@ import software.bernie.geckolib.animation.keyframe.event.data.SoundKeyframeData;
 
 import java.util.*;
 
+import static com.sandymandy.pleasurecraft.util.Utils.isStringInQueue;
+
 public abstract class GirlSceneEntity extends GirlEntity implements GeoEntity {
     public final Queue<String> animationEventQueueClient = new LinkedList<>();
     public final Queue<String> animationEventQueueServer = new LinkedList<>();
@@ -96,7 +98,6 @@ public abstract class GirlSceneEntity extends GirlEntity implements GeoEntity {
     private boolean requestWaitForPlayer;
     private String lastSceneAnim = "";
     public String passengerBoneName = "boyCam"; //The name of the bone that the player snaps to when in a scene
-    private String lastSoundKey = null;
     BlockPos bedPos;
     private static final int PREGNANCY_MAX_TICKS = (int) (20 * 60 * 2.5); // 5 minutes
     private static final float PROGRESS_SPEED = 0.1f;
@@ -794,15 +795,15 @@ public abstract class GirlSceneEntity extends GirlEntity implements GeoEntity {
                     if(options.useKeyFrameEvents()){
                         Queue<String> key = this.getAnimationKeyFrameEvent();
 
-                        if (key.contains("switch") && thrustKeyDown) {
+                        if (isStringInQueue(key, "switch") && thrustKeyDown) {
                             setCurrentSexAnim(getRandomFromList(options.fastAnim()));
                         }
 
-                        if (key.contains("reset") && thrustKeyDown) {
+                        if (isStringInQueue(key, "reset") && thrustKeyDown) {
                             return state.setAndContinue(RawAnimation.begin().then(getAnimationPath(getRandomFromList(options.fastAnim())), Animation.LoopType.LOOP));
                         }
 
-                        if (key.contains("reset") && !thrustKeyDown) {
+                        if (isStringInQueue(key, "reset") && !thrustKeyDown) {
                             setCurrentSexAnim(getRandomFromList(options.slowAnim()));
                         }
 

@@ -172,13 +172,6 @@ public class PleasureCraftPackets {
                 (packet, context) -> Objects.requireNonNull(context.player().getServer()).execute(() -> {
                     var entity = context.player().getWorld().getEntityById(packet.entityId());
                     if (entity instanceof GirlSceneEntity girl) {
-                        for (ServerPlayerEntity otherPlayer : PlayerLookup.tracking(girl)) {
-                            if (otherPlayer != context.player()) {
-                                ServerPlayNetworking.send(otherPlayer, new RunAnimEventsS2CPacket(girl.getId(), packet.soundEvent()));
-                            }
-                        }
-
-                        // Handle Server-only logic (like pregnancy progress or gameplay stats) here
                         girl.handleAnimationEventServer(packet.soundEvent());
                     }
                 }));

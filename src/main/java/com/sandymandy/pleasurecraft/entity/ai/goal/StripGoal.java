@@ -6,6 +6,8 @@ import net.minecraft.entity.ai.goal.Goal;
 
 import java.util.EnumSet;
 
+import static com.sandymandy.pleasurecraft.util.Utils.isStringInQueue;
+
 public class StripGoal extends Goal {
     private final GirlSceneEntity girl; ;
     private boolean stripTrigged = false;
@@ -41,7 +43,7 @@ public class StripGoal extends Goal {
         if(!girl.hasStripAnim()) return;
         if(started) {
             if (!girl.isFrozenInPlace()) girl.setFreeze(true);
-            if (girl.getAnimationKeyFrameEvent().contains("becomeNude".toLowerCase()) && !stripTrigged) {
+            if (isStringInQueue(girl.getAnimationKeyFrameEvent(), "becomeNude".toLowerCase()) && !stripTrigged) {
                 girl.setStripped(!girl.isStripped()); // toggle stripped state
                 stripTrigged = true;
             }
