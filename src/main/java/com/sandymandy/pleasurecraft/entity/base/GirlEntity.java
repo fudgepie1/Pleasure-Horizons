@@ -359,7 +359,7 @@ public abstract class GirlEntity extends PathAwareEntity implements RangedAttack
         return true;
     }
 
-    protected int maxRelationshipLevel() {
+    public int maxRelationshipLevel() {
         try {
             // Get all scene options
             List<Scene> options = getScenes();
@@ -770,5 +770,10 @@ public abstract class GirlEntity extends PathAwareEntity implements RangedAttack
     @Override
     public float getSoundPitch() {
         return 1.0F;
+    }
+
+    @Override
+    public boolean isPersistent() {
+        return true;
     }
 }

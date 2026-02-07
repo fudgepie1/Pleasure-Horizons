@@ -23,7 +23,7 @@ public class SlimeEntity extends WildGirlEntity {
 
     @Override
     public Item isAttractedTo() {
-        return Items.LILY_PAD;
+        return Items.SLIME_BALL;
     }
 
     @Override

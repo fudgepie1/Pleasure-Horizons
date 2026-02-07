@@ -64,10 +64,12 @@ public class GirlInventoryScreen extends HandledScreen<GirlInventoryScreenHandle
         int iconSize = 18;
 
         int relLevel = girl.getCurrentRelationshipLevel();
+        int relMax = girl.maxRelationshipLevel();
+        String relText = relLevel + "/" + relMax;
         int relX = centerX;
 
         context.drawTexture(RenderPipelines.GUI_TEXTURED, HEART_ICON, relX, iconY, 0, 0, iconSize, iconSize, iconSize, iconSize);
-        context.drawText(this.textRenderer, Text.literal(String.valueOf(relLevel)), relX + 20, iconY + 5, Colors.WHITE, true);
+        context.drawText(this.textRenderer, Text.literal(relText), relX + 20, iconY + 5, Colors.WHITE, true);
 
         if (ScreenUtils.isMouseOverHere(mouseX, mouseY, relX, iconY, 18, 18)) {
             context.drawTooltip(textRenderer, Text.translatable("screen.pleasurecraft.girl_inventory.relationship_tooltip"), mouseX, mouseY);

@@ -60,7 +60,7 @@ public class GirlsCommand {
                         )
 
                         // --- spawn <girlName> ---
-                        .then(literal("spawn")
+                        .then(literal("spawnCustom")
                                 .requires(src -> src.hasPermissionLevel(2))
                                 // /girl spawn <id>
                                 .then(argument("id", StringArgumentType.string())

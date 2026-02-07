@@ -2,7 +2,7 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    "minecraft:lily_pad",
+    "minecraft:slime_ball",
     "#minecraft:eggs"
   ],
   "result": {
