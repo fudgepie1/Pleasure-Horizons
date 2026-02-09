@@ -66,7 +66,7 @@ public class MomoEntity extends SettlementGirlEntityAI {
 
     @Override
     public List<String> giftRepliesLike() {
-        return List.of("Wow!!! A poppy!! Yay!!", "Wow, wow wow! A gift for me!", "Momo loves gifts! Give Momo more!\n");
+        return List.of("Wow!!! A poppy!! Yay!!", "Wow, wow wow! A gift for me!", "Momo loves gifts! Give Momo more!");
     }
 
     @Override

@@ -1,7 +1,9 @@
 package com.sandymandy.pleasurecraft.entity.base.wild;
 
+import com.sandymandy.pleasurecraft.entity.PleasureCraftEntityStatuses;
 import com.sandymandy.pleasurecraft.entity.base.GirlSceneEntity;
 import com.sandymandy.pleasurecraft.networking.S2C.SceneOptionsS2CPacket;
+import com.sandymandy.pleasurecraft.registries.PleasureCraftSoundEventRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.EntityStatuses;
 import net.minecraft.entity.EntityType;
@@ -104,18 +106,18 @@ public abstract class WildGirlEntity extends GirlSceneEntity {
         // no taming, no inventory, no following
         ItemStack stack = player.getStackInHand(hand);
 
-        if (!this.getWorld().isClient() && !this.isSceneActive()) {
+        if (!this.getWorld().isClient() && !this.isSceneActive() && hand.equals(Hand.MAIN_HAND)) {
 
             if (stack.isOf(isAttractedTo())) {
                 if (getCurrentRelationshipLevel() < maxRelationshipLevel()) {
                     stack.decrementUnlessCreative(1, player);
                     player.sendMessage(Text.literal("She Liked The Gift"), true);
                     setCurrentRelationshipLevel(getCurrentRelationshipLevel() + 1);
-                    this.getWorld().sendEntityStatus(this, EntityStatuses.ADD_VILLAGER_HAPPY_PARTICLES);
+                    this.getWorld().sendEntityStatus(this, PleasureCraftEntityStatuses.HAPPY_PARTICLES);
                     return ActionResult.SUCCESS_SERVER;
                 }
             }
-            if (!player.getStackInHand(Hand.MAIN_HAND).isOf(this.isAttractedTo())) {
+            else {
                 this.setGUIOpenState(true, player);
                 ServerPlayNetworking.send((ServerPlayerEntity) player, new SceneOptionsS2CPacket(this.getId(), this.getCurrentRelationshipLevel(), new ItemStack(isAttractedTo()), this.getScenes()));
                 return ActionResult.SUCCESS;
