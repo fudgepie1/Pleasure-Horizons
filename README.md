@@ -1,9 +1,9 @@
-# PleasureCraft
+# Pleasure Horizons
 
-**PleasureCraft** is an adult-themed mod for **Minecraft 1.21+** built using the **Fabric Mod Loader**. It’s a full remake and modern reimagining of the old 1.12.2 **FapCraft** mod made by *Schnurri_tv*, rebuilt from the ground up to support current versions of Minecraft using modern tools and practices.
+**Pleasure Horizons** is an adult-themed mod for **Minecraft 1.21+** built using the **Fabric Mod Loader**. It’s a full remake and modern reimagining of the old 1.12.2 **FapCraft** mod made by *Schnurri_tv*, rebuilt from the ground up to support current versions of Minecraft using modern tools and practices.
 
 # Join the Discord Server For The Latest and Greatest Versions
-## https://discord.gg/PleasureCraft
+## https://discord.gg/PleasureHorizons
 
 ---
 
@@ -67,7 +67,7 @@
 > The default button for thrusting is "Z" and the default button for cumming is "V" but they can be changed in the change keybind screen
 
 ➞ **How do I install custom girls**
-> First you need to make sure that you got both the config and the assets. To install it first grab the girl json file and put it here `config/pleasurecraft/girls` in your minecraft instance and  for the assets you just need to install it as a resource pack
+> First you need to make sure that you got both the config and the assets. To install it first grab the girl json file and put it here `config/pleasurehorizons/girls` in your minecraft instance and  for the assets you just need to install it as a resource pack
 ---
 
 ## Requirements
