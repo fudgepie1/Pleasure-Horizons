@@ -9,32 +9,32 @@ jobs:
       GRADLE_USER_HOME: ${{ github.workspace }}/.gradle
 
     steps:
-      # 1. Checkout repository
-      - uses: actions/checkout@v4
-
-      # 2. Delete ALL stale nested workspaces GitHub Actions keeps restoring
-      #    Runner logs show the actual folder is "Pleasure-Horizons"
-      - name: Delete old nested workspace
+      # 0. Delete stale workspace BEFORE checkout
+      #    This is the critical fix: checkout recreates the stale folder if we don't delete it first.
+      - name: Delete stale runner workspace
         run: |
-          rm -rf Pleasure-Horizons
+          rm -rf /home/runner/work/Pleasure-Horizons
           rm -rf ${{ github.workspace }}/Pleasure-Horizons
           rm -rf ${{ github.workspace }}/Pleasure-Horizons/Pleasure-Horizons
 
-      # 3. Show actual workspace structure
+      # 1. Checkout repository (now into a clean workspace)
+      - uses: actions/checkout@v4
+
+      # 2. Show actual workspace structure
       - name: Show workspace structure
         run: ls -R ${{ github.workspace }}
 
-      # 4. Set up Java
+      # 3. Set up Java
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 21
 
-      # 5. Verify Gradle path
+      # 4. Verify Gradle path
       - name: Verify Gradle path
         run: echo "GRADLE_USER_HOME=$GRADLE_USER_HOME"
 
-      # 6. FULL CACHE CLEAR — Gradle + Loom + workspace caches
+      # 5. FULL CACHE CLEAR — Gradle + Loom + workspace caches
       - name: Clear Gradle & Loom caches
         run: |
           rm -rf $GRADLE_USER_HOME/caches
@@ -44,7 +44,7 @@ jobs:
           rm -rf ${{ github.workspace }}/.gradle/caches
           rm -rf ${{ github.workspace }}/.gradle/loom-cache
 
-      # 7. Diagnostic: Show where Loom is loading mappings + Unpick metadata
+      # 6. Diagnostic: Show where Loom is loading mappings + Unpick metadata
       - name: Show Loom mapping source
         run: |
           echo "=== Searching workspace for Yarn/Unpick ==="
@@ -52,4 +52,30 @@ jobs:
           find ${{ github.workspace }} -type f -name "*unpick*" -print
 
           echo "=== Searching GRADLE_USER_HOME for Yarn/Unpick ==="
-          find /home/runner/work/Pleasure-Horizons/.gradle -type f -name "*yarn*" -
+          find /home/runner/work/Pleasure-Horizons/.gradle -type f -name "*yarn*" -print || echo "No yarn files"
+          find /home/runner/work/Pleasure-Horizons/.gradle -type f -name "*unpick*" -print || echo "No unpick files"
+
+          echo "=== Searching ~/.gradle for Yarn/Unpick ==="
+          if [ -d ~/.gradle ]; then
+            find ~/.gradle -type f -name "*yarn*" -print
+            find ~/.gradle -type f -name "*unpick*" -print
+          else
+            echo "~/.gradle does not exist"
+          fi
+
+      # 7. Make Gradle executable
+      - name: Grant execute permission for Gradle
+        run: chmod +x gradlew
+
+      # 8. Show Yarn mapping version
+      - name: Check Yarn mapping version
+        run: grep "yarn_mappings" gradle.properties || echo "gradle.properties not found"
+
+      # 9. Force dependency refresh
+      - name: Force dependency refresh
+        run: ./gradlew --refresh-dependencies
+
+      # 10. Build mod
+      - name: Build with Gradle
+        run: ./gradlew build --stacktrace
+
