@@ -1,40 +1,7 @@
 # Changelog
 
-## v0.6.2
-- Added Kobolds (Not finished)
-- Added a menu to customize the Kobolds
-- Added a new masturbation scene to lucy
-- Made the pregnancy progress save
-- Updated the girl customize screen so it acts like the kobold one
-- Added a new item that adds girls to settlements 
-- Added a new girl based on the copper golem called Coppie
-- Improved how the building scanner works by requiring type specific blocks in the building
-- Fixed a bug that made you teleport to 0, 0, 0 sometimes when starting a scene
-- Fixed the particles not showing when giving a gift to a girl
-- Fixed a bug with the interaction system where it would take two items instead of one
-- Added sound effects and particles when feeding a girl to give propper feedback
-- Added sounds when going out with a girl and giving gifts
-- Made it so that changing any block in a building causes it to do a rescan
-- Added Breast Milk
-- Made each girl say something when receiving gifts
-- Added a way to tell what pregnancy stage a girl is on
-- Made it so that duplicate animation events happen less
-
-## v0.6.1 
-- Fixed the issue where girls in villagers would have tiny breasts
-- Added the ability to turn off shading
-- Made it so that instead of cycling each profile you now how to use the profile's tame item to set it
-- Added a new command to show the tame item for each loaded profile
-- Made the girl spawn eggs craftable
-- Added a new pregnancy system
-- Added support for making the thrust key in to a toggle instead of a hold via the mod menu
-- Added an animation when attacking
-- Fixed my implementation of the main hand **(So now they deal the proper amount of damage depending on the item they are holding)**
-- Added bow support when fighting
-- Reworked how attacking is handled
-
 ## v0.6.0
-- Updated to 1.21.6
+- Updated to 1.21.8
 - Added a new slime girl.
 - Added a new block called "Carved Girl Pumpkin" To summon Golem Girls in the future
 - Added a new block called "Settlement Hub" to create and manage settlements
@@ -48,11 +15,7 @@
 - Made the bed scanner only scan horizontally
 - Added a new system that allows players to add their own girls
 - Fixed the scene progress overlay not showing in some cases
-- Added a new command called /girls which is used to spawn a custom girl, refresh Jiggle Physics and locate all your tamed girls and more
-- Fixed How animations get pick so that its properly random when needed
-- Added a way to spawn the custom girls in survival with the use of the "Carved Girl Pumpkin" and White wool
-- Added a way to cycle through the loaded profiles on a custom girl; by shift clicking with a stick
-- Added a new button in the girl GUI to customize the girls breasts
+- Added a new command called /girls which is used to spawn a custom girl, locate all your tamed girls and more
 
 ___
 
@@ -149,3 +112,11 @@ ___
 
 ___
 
+## TODO
+- [x] Fix the animation randomizer in the Scene.
+- [x] FreeCam integration
+- [x] Togglable Boob Window
+- [ ] Make the AI more advance.
+- [ ] Fix Attacking animation.
+- [ ] Fix Holding item.
+- [ ] Dialog.
