@@ -13,7 +13,7 @@ jobs:
       - uses: actions/checkout@v4
 
       # 2. Delete ALL stale nested workspaces GitHub Actions keeps restoring
-      #    (IMPORTANT: your repo name is Pleasure-Horizons-1, not Pleasure-Horizons)
+      #    (IMPORTANT: your repo name is Pleasure-Horizons-1)
       - name: Delete old nested workspace
         run: |
           rm -rf Pleasure-Horizons-1
@@ -47,12 +47,21 @@ jobs:
       # 7. Diagnostic: Show where Loom is loading mappings + Unpick metadata
       - name: Show Loom mapping source
         run: |
-          echo "=== Searching for Yarn mappings and Unpick metadata in workspace ==="
+          echo "=== Searching workspace for Yarn/Unpick ==="
           find ${{ github.workspace }} -type f -name "*yarn*" -print
           find ${{ github.workspace }} -type f -name "*unpick*" -print
-          echo "=== Searching in Gradle caches ==="
-          find ~/.gradle -type f -name "*yarn*" -print
-          find ~/.gradle -type f -name "*unpick*" -print
+
+          echo "=== Searching GRADLE_USER_HOME for Yarn/Unpick ==="
+          find $GRADLE_USER_HOME -type f -name "*yarn*" -print
+          find $GRADLE_USER_HOME -type f -name "*unpick*" -print
+
+          echo "=== Searching ~/.gradle for Yarn/Unpick ==="
+          if [ -d ~/.gradle ]; then
+            find ~/.gradle -type f -name "*yarn*" -print
+            find ~/.gradle -type f -name "*unpick*" -print
+          else
+            echo "~/.gradle does not exist"
+          fi
 
       # 8. Make Gradle executable
       - name: Grant execute permission for Gradle
