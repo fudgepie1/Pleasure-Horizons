@@ -13,7 +13,7 @@ jobs:
       - uses: actions/checkout@v4
 
       # 2. Delete ALL stale nested workspaces GitHub Actions keeps restoring
-      #    GitHub Actions truncates "-1" in printed paths, so the actual folder is "Pleasure-Horizons"
+      #    Runner logs show the actual folder is "Pleasure-Horizons"
       - name: Delete old nested workspace
         run: |
           rm -rf Pleasure-Horizons
@@ -52,7 +52,4 @@ jobs:
           find ${{ github.workspace }} -type f -name "*unpick*" -print
 
           echo "=== Searching GRADLE_USER_HOME for Yarn/Unpick ==="
-          find $GRADLE_USER_HOME -type f -name "*yarn*" -print
-          find $GRADLE_USER_HOME -type f -name "*unpick*" -print
-
-          echo "=== Searching ~/.gradle for Yarn/
+          find /home/runner/work/Pleasure-Horizons/.gradle -type f -name "*yarn*" -
