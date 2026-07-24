@@ -43,6 +43,8 @@ repositories {
     maven { url "https://maven.terraformersmc.com/releases/" }
     maven { url "https://maven.shedaniel.me/" }
 	maven { url = "https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1" }
+    maven { url "https://maven.modrinth.com" }
+
 }
 
 fabricApi {
