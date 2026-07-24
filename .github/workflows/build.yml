@@ -9,43 +9,29 @@ jobs:
       GRADLE_USER_HOME: ${{ github.workspace }}/.gradle
 
     steps:
+      # 1. Checkout repository
       - uses: actions/checkout@v4
 
+      # 2. Delete stale nested workspace GitHub Actions keeps restoring
+      - name: Delete old nested workspace
+        run: |
+          rm -rf Pleasure-Horizons
+
+      # 3. Show actual workspace structure
       - name: Show workspace structure
         run: ls -R .
 
+      # 4. Set up Java
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 21
-          
+
+      # 5. Verify Gradle path
       - name: Verify Gradle path
         run: echo "GRADLE_USER_HOME=$GRADLE_USER_HOME"
 
-      # ⭐ FULL CACHE CLEAR — Gradle + Loom + workspace caches
+      # 6. FULL CACHE CLEAR — Gradle + Loom + workspace caches
       - name: Clear Gradle & Loom caches
         run: |
-          rm -rf $GRADLE_USER_HOME/caches
-          rm -rf $GRADLE_USER_HOME/loom-cache
-          rm -rf ~/.gradle/caches
-          rm -rf ~/.gradle/loom-cache
-          rm -rf ${{ github.workspace }}/.gradle/caches
-          rm -rf ${{ github.workspace }}/.gradle/loom-cache
-
-      - name: Grant execute permission for Gradle
-        run: chmod +x gradlew
-
-      - name: Check Yarn mapping version
-        run: grep "yarn_mappings" gradle.properties || echo "gradle.properties not found"
-
-      - name: Force dependency refresh
-        run: ./gradlew --refresh-dependencies
-
-      - name: Build with Gradle
-        run: ./gradlew build --stacktrace
-
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: mod-jar
-          path: build/libs/*.jar
+          rm -rf $GRADLE_USER
