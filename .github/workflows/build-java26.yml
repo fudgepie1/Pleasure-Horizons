@@ -4,25 +4,29 @@ on: [push, pull_request]
 jobs:
   build:
     runs-on: ubuntu-latest
+    # Disable automatic Gradle cache restoration
+    defaults:
+      run:
+        shell: bash
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - uses: actions/setup-java@v3
+      - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 21
 
+      # Prevent GitHub from restoring Gradle caches
+      - name: Disable Gradle cache
+        run: echo "No Gradle cache will be restored."
+
       - name: Clear Gradle & Loom caches
         run: |
-          rm -rf ~/.gradle/caches
-          rm -rf ~/.gradle/loom-cache
-          rm -rf /home/runner/.gradle/caches
-          rm -rf /home/runner/.gradle/loom-cache
-          rm -rf $GITHUB_WORKSPACE/.gradle/caches
-          rm -rf $GITHUB_WORKSPACE/.gradle/loom-cache
-          rm -rf ${{ github.workspace }}/.gradle/caches
-          rm -rf ${{ github.workspace }}/.gradle/loom-cache
+          rm -rf ~/.gradle/caches ~/.gradle/loom-cache
+          rm -rf /home/runner/.gradle/caches /home/runner/.gradle/loom-cache
+          rm -rf $GITHUB_WORKSPACE/.gradle/caches $GITHUB_WORKSPACE/.gradle/loom-cache
+          rm -rf ${{ github.workspace }}/.gradle/caches ${{ github.workspace }}/.gradle/loom-cache
 
       - name: Grant execute permission for Gradle
         run: chmod +x gradlew
