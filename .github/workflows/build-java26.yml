@@ -11,8 +11,8 @@ jobs:
           java-version: 26
       - name: Build with Gradle
         run: ./gradlew build
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: mod-jar
-          path: build/libs/*.jar
+- name: Upload Artifact
+  uses: actions/upload-artifact@v4
+  with:
+    name: mod-jar
+    path: build/libs/*.jar
