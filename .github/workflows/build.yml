@@ -15,6 +15,9 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
+          
+      - name: Verify Gradle path
+        run: echo "GRADLE_USER_HOME=$GRADLE_USER_HOME"
 
       - name: Clear Gradle & Loom caches
         run: |
