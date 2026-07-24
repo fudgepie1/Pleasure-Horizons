@@ -21,7 +21,7 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
     // Local JARs for 1.21.11 mods
-    modImplementation files('libs/fabric-api-0.128.2+1.21.11.jar')
+    modImplementation files('libs/fabric-api-0.141.4+1.21.11.jar')
     modImplementation files('libs/geckolib-fabric-1.21.11-5.2.0.jar')
     modImplementation files('libs/SmartBrainLib-fabric-1.21.11-1.16.8.jar')
 
