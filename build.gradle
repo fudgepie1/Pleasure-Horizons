@@ -28,9 +28,6 @@ dependencies {
     // Local DevAuth — REQUIRED
     modRuntimeOnly files('libs/DevAuth-fabric-1.2.1.jar')
 
-    // Correct ModMenu version for 1.21.11
-    modApi "com.terraformersmc:modmenu:11.0.0"
-
     modApi("me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}") {
         exclude(group: "net.fabricmc.fabric-api")
     }
