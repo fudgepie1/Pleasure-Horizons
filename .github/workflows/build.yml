@@ -11,6 +11,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Move project files to workspace root
+        run: |
+          shopt -s dotglob
+          mv Pleasure-Horizons/* .
+
+      - name: Remove nested folder
+        run: rm -rf Pleasure-Horizons
+
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
