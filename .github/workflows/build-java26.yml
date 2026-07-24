@@ -19,7 +19,10 @@ jobs:
           rm -rf ~/.gradle/loom-cache
           rm -rf /home/runner/.gradle/caches
           rm -rf /home/runner/.gradle/loom-cache
+          rm -rf $GITHUB_WORKSPACE/.gradle/caches
           rm -rf $GITHUB_WORKSPACE/.gradle/loom-cache
+          rm -rf ${{ github.workspace }}/.gradle/caches
+          rm -rf ${{ github.workspace }}/.gradle/loom-cache
 
       - name: Grant execute permission for Gradle
         run: chmod +x gradlew
