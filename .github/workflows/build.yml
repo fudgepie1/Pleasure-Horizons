@@ -11,6 +11,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Flatten project folder
+        run: |
+          shopt -s dotglob
+          if [ -d "Pleasure-Horizons" ]; then
+            mv Pleasure-Horizons/* .
+            rm -rf Pleasure-Horizons
+          fi
+
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -36,7 +44,6 @@ jobs:
         run: ./gradlew --refresh-dependencies
 
       - name: Build with Gradle
-        working-directory: ${{ github.workspace }}
         run: ./gradlew build --stacktrace
 
       - name: Upload Artifact
