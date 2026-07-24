@@ -11,13 +11,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Flatten project folder
+      # ⭐ FIX: Automatically flatten nested project folder
+      - name: Flatten nested project folder
         run: |
           shopt -s dotglob
-          if [ -d "Pleasure-Horizons" ]; then
-            mv Pleasure-Horizons/* .
-            rm -rf Pleasure-Horizons
-          fi
+          for d in */; do
+            if [ -f "$d/build.gradle" ]; then
+              echo "Found nested project folder: $d"
+              mv "$d"/* .
+              rm -rf "$d"
+              break
+            fi
+          done
 
       - uses: actions/setup-java@v4
         with:
