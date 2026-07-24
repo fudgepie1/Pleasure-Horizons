@@ -12,10 +12,12 @@ jobs:
       # 1. Checkout repository
       - uses: actions/checkout@v4
 
-      # 2. Delete stale nested workspace GitHub Actions keeps restoring
+      # 2. Delete ALL stale nested workspaces GitHub Actions keeps restoring
       - name: Delete old nested workspace
         run: |
           rm -rf Pleasure-Horizons
+          rm -rf ${{ github.workspace }}/Pleasure-Horizons
+          rm -rf ${{ github.workspace }}/Pleasure-Horizons/Pleasure-Horizons
 
       # 3. Show actual workspace structure
       - name: Show workspace structure
