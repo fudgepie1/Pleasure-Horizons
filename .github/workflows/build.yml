@@ -55,33 +55,4 @@ jobs:
           find $GRADLE_USER_HOME -type f -name "*yarn*" -print
           find $GRADLE_USER_HOME -type f -name "*unpick*" -print
 
-          echo "=== Searching ~/.gradle for Yarn/Unpick ==="
-          if [ -d ~/.gradle ]; then
-            find ~/.gradle -type f -name "*yarn*" -print
-            find ~/.gradle -type f -name "*unpick*" -print
-          else
-            echo "~/.gradle does not exist"
-          fi
-
-      # 8. Make Gradle executable
-      - name: Grant execute permission for Gradle
-        run: chmod +x gradlew
-
-      # 9. Show Yarn mapping version
-      - name: Check Yarn mapping version
-        run: grep "yarn_mappings" gradle.properties || echo "gradle.properties not found"
-
-      # 10. Force dependency refresh
-      - name: Force dependency refresh
-        run: ./gradlew --refresh-dependencies
-
-      # 11. Build mod
-      - name: Build with Gradle
-        run: ./gradlew build --stacktrace
-
-      # 12. Upload mod JAR
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: mod-jar
-          path: build/libs/*.jar
+          echo "=== Searching ~/.gradle for Yarn/
