@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '1.5.+'
+    id 'fabric-loom' version '1.6.7'
     id 'maven-publish'
 }
 
@@ -39,8 +39,6 @@ dependencies {
         exclude(group: "net.fabricmc.fabric-api")
     }
 
-    // ⭐ Force Loom to use the correct Unpick version (fixes Unsupported unpick version)
-    modImplementation "net.fabricmc.unpick:unpick:3.0.0"
 }
 
 processResources {
