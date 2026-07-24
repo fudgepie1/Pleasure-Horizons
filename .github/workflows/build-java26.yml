@@ -13,8 +13,13 @@ jobs:
           distribution: temurin
           java-version: 21
 
-      - name: Clear Gradle caches
-        run: rm -rf ~/.gradle/caches ~/.gradle/loom-cache
+      - name: Clear Gradle & Loom caches
+        run: |
+          rm -rf ~/.gradle/caches
+          rm -rf ~/.gradle/loom-cache
+          rm -rf /home/runner/.gradle/caches
+          rm -rf /home/runner/.gradle/loom-cache
+          rm -rf $GITHUB_WORKSPACE/.gradle/loom-cache
 
       - name: Grant execute permission for Gradle
         run: chmod +x gradlew
