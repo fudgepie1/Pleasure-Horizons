@@ -9,12 +9,13 @@ jobs:
       GRADLE_USER_HOME: ${{ github.workspace }}/.gradle
 
     steps:
-      # 0. Delete ONLY the nested stale workspace (NOT the parent folder)
-      - name: Delete stale nested workspace
+      # 0. Delete stale nested workspace AND recreate it so checkout doesn't crash
+      - name: Reset stale workspace
         run: |
           rm -rf /home/runner/work/Pleasure-Horizons/Pleasure-Horizons
+          mkdir -p /home/runner/work/Pleasure-Horizons/Pleasure-Horizons
 
-      # 1. Checkout repository
+      # 1. Checkout repository (now into a clean workspace)
       - uses: actions/checkout@v4
 
       # 2. Show actual workspace structure
