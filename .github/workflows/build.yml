@@ -13,12 +13,12 @@ jobs:
       - uses: actions/checkout@v4
 
       # 2. Delete ALL stale nested workspaces GitHub Actions keeps restoring
-      #    (IMPORTANT: your repo name is Pleasure-Horizons-1)
+      #    GitHub Actions truncates "-1" in printed paths, so the actual folder is "Pleasure-Horizons"
       - name: Delete old nested workspace
         run: |
-          rm -rf Pleasure-Horizons-1
-          rm -rf ${{ github.workspace }}/Pleasure-Horizons-1
-          rm -rf ${{ github.workspace }}/Pleasure-Horizons-1/Pleasure-Horizons-1
+          rm -rf Pleasure-Horizons
+          rm -rf ${{ github.workspace }}/Pleasure-Horizons
+          rm -rf ${{ github.workspace }}/Pleasure-Horizons/Pleasure-Horizons
 
       # 3. Show actual workspace structure
       - name: Show workspace structure
