@@ -11,18 +11,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # ⭐ FIX: Automatically flatten nested project folder
-      - name: Flatten nested project folder
-        run: |
-          shopt -s dotglob
-          for d in */; do
-            if [ -f "$d/build.gradle" ]; then
-              echo "Found nested project folder: $d"
-              mv "$d"/* .
-              rm -rf "$d"
-              break
-            fi
-          done
+      # ⭐ Diagnostic: show actual folder structure
+      - name: Show workspace structure
+        run: ls -R .
 
       - uses: actions/setup-java@v4
         with:
@@ -43,7 +34,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Check Yarn mapping version
-        run: grep "yarn_mappings" gradle.properties
+        run: grep "yarn_mappings" gradle.properties || echo "gradle.properties not found"
 
       - name: Force dependency refresh
         run: ./gradlew --refresh-dependencies
